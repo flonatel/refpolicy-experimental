@@ -1,0 +1,16 @@
+Revision: refpolicy--debian--0.0--patch-7
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:50:09 CDT 2006
+Standard-date: 2006-05-09 17:50:09 GMT
+Modified-files: policy/modules/admin/logrotate.if
+    policy/modules/services/cron.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-7
+Summary: Allow cron to execute logrotate jobs
+Keywords: 
+
+* policy/modules/admin/logrotate.if: Added in interface to allow modules
+  to search the /var/lib/logrotate hierarchy
+
+* policy/modules/services/cron.te: Use the search /var/lib/ interface of
+  logrotate. 

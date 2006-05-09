@@ -1,0 +1,13 @@
+Revision: refpolicy--debian--0.0--patch-9
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Thu May 11 20:28:30 CDT 2006
+Standard-date: 2006-05-12 01:28:30 GMT
+Modified-files: Rules.modular
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-9
+Summary: Comment out .SECONDARY: phony target
+Keywords: 
+
+Currently, not removing any intermediate files seems to make corenet.te
+be a circular dependency of all_te_files --- I got lost trying to figure
+out why.

@@ -217,6 +217,13 @@ optional_policy(`
 	udev_read_db(crond_t)
 ')
 
+optional_policy(`
+        #  allow crond to search logrotate jobs
+	logrotate_search_varlib(crond_t)
+')
+
+
+
 ########################################
 #
 # System cron process domain

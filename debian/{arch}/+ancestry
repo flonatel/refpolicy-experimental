@@ -1,0 +1,12 @@
+arch ancestry version 1
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-5
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-4
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-3
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-2
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-1
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--base-0
+arch:patch:srivasta@debian.org--etch/debian-dir--skeleton--1.0--base-0
+arch:patch:srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--version-0
+arch:patch:srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--patch-2
+arch:patch:srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--patch-1
+arch:patch:srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--base-0

@@ -117,11 +117,18 @@ ifdef(`targeted_policy',`
 	admin_user_template(sysadm)
 	unpriv_user_template(staff)
 	unpriv_user_template(user)
+        network_user_template(netuser)
 
 	# user role change rules:
 	# sysadm_r can change to user roles
 	role_change(sysadm, user)
 	role_change(sysadm, staff)
+
+        # netuser is flexible
+        role_change(sysadm, netuser)
+        role_change(staff, netuser)
+        role_change(netuser, user)
+        role_change(user, netuser)
 
 	# only staff_r can change to sysadm_r
 	role_change(staff, sysadm)

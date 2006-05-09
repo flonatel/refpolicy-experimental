@@ -1,0 +1,112 @@
+#! /bin/sh
+#                           -*- Mode: Sh -*- 
+# postinst --- 
+# Author           : Manoj Srivastava ( srivasta@glaurung.green-gryphon.com ) 
+# Created On       : Fri Nov 14 11:25:07 2003
+# Created On Node  : glaurung.green-gryphon.com
+# Last Modified By : Manoj Srivastava
+# Last Modified On : Fri May 12 01:53:39 2006
+# Last Machine Used: glaurung.internal.golden-gryphon.com
+# Update Count     : 13
+# Status           : Unknown, Use with caution!
+# HISTORY          : 
+# Description      : 
+# 
+# arch-tag: 5401e9ef-39cc-4aee-96a4-61dfb8f32cf7
+#  
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# 
+
+# Abort if any command returns an error value
+set -e
+
+TYPE=strict
+package_name=selinux-policy-refpolicy-$TYPE
+POLICYNAME=refpolicy-$TYPE
+BASEDIR=/etc/selinux/$POLICYNAME
+SRCDIR=/usr/share/${package_name}
+
+if [ -z "$package_name" ]; then
+    print >&2 "Internal Error. Please report a bug."
+    exit 1;
+fi
+
+case "$1" in
+    configure)
+        
+        if [ -e $BASEDIR/modules/active/base.pp ]; then
+            # policy already exists
+            echo >&2 "You already have a $POLICYNAME policy installed."
+            echo >&2 "I am leaving it alone. Please check and update manually."
+        elif [ -e $SRCDIR/base.pp ]; then
+            echo >&2 "Notice: Trying to link (but not load) a $POLICYNAME policy."
+            echo >&2 "We don't do dependency handling yet, so this may fail installing"
+            echo >&2 "some modules - you should check the results, and you need to do"
+            echo >&2 "the switch to this policy yourself anyway."
+            # create a new base policy, not loading it
+            semodule -b $SRCDIR/base.pp -s $POLICYNAME -n
+            # get a list of available modules
+            modules=$(ls $SRCDIR | egrep "\.pp$" | grep -v base.pp | /bin/sed -e 's/.pp$//')
+            for module in $modules; do
+                # process modules
+                echo >&2 "Trying to add module $module"
+                semodule -i $SRCDIR/${module}.pp -s $POLICYNAME
+            done
+        else
+            echo >&2 "."
+        fi
+        ;;
+  abort-upgrade)
+    # Back out of an attempt to upgrade this package FROM THIS VERSION
+    # to version $2.  Undo the effects of "prerm upgrade $2".
+    :
+
+    ;;
+  abort-remove)
+    if test "$2" != in-favour; then
+      echo "$0: undocumented call to \`postinst $*'" 1>&2
+      exit 0
+    fi
+    # Back out of an attempt to remove this package, which was due to
+    # a conflict with package $3 (version $4).  Undo the effects of
+    # "prerm remove in-favour $3 $4".
+    :
+
+    ;;
+  abort-deconfigure)
+    if test "$2" != in-favour || test "$5" != removing; then
+      echo "$0: undocumented call to \`postinst $*'" 1>&2
+      exit 0
+    fi
+    # Back out of an attempt to deconfigure this package, which was
+    # due to package $6 (version $7) which we depend on being removed
+    # to make way for package $3 (version $4).  Undo the effects of
+    # "prerm deconfigure in-favour $3 $4 removing $6 $7".
+    :
+
+    ;;
+  *) echo "$0: didn't understand being called with \`$1'" 1>&2
+     exit 0;;
+esac
+
+# Install doc base documentation
+##:if which install-docs >/dev/null 2>&1; then
+##:  if [ -e /usr/share/doc-base/${package_name} ]; then
+##:    install-docs -i /usr/share/doc-base/${package_name}
+##:  fi
+##:fi
+
+exit 0

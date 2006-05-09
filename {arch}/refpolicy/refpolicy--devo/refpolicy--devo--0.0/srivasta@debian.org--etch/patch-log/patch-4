@@ -1,0 +1,16 @@
+Revision: refpolicy--devo--0.0--patch-4
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:02:04 CDT 2006
+Standard-date: 2006-05-09 17:02:04 GMT
+Modified-files: policy/modules/system/selinuxutil.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-3
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-4
+Summary: Merge from debian beanch. Fix errors with semanage.
+Keywords: 
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-3
+   Prevents errors
+

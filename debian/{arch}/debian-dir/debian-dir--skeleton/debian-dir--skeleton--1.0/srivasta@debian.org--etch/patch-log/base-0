@@ -1,0 +1,14 @@
+Revision: debian-dir--skeleton--1.0--base-0
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed May 18 22:50:35 CDT 2005
+Standard-date: 2005-05-19 03:50:35 GMT
+New-patches: srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--base-0
+    srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--patch-1
+    srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--patch-2
+    srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--version-0
+    srivasta@debian.org--etch/debian-dir--skeleton--1.0--base-0
+Continuation-of: srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--version-0
+Summary: tag of srivasta@debian.org--2003-primary/debian-dir--skeleton--1.0--version-0
+
+(automatically generated log message)

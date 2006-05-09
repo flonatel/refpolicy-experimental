@@ -1,0 +1,31 @@
+Some of the tasks on the TODO list:
+
+* Clean uninstallation (read: purge)
+
+* We need some form of dependency handling for modules, and a smarter
+  guessing method for automatically picking required modules.
+
+- Non-trivial mappings:
+  + apache2       -> apache.pp
+  + dhcp*         -> dhcp.pp
+  + pump          -> dhcp.pp
+  + dhclient      -> dhcp.pp
+  + proftpd*      -> ftp.pp
+  + mysql-server* -> mysql.pp
+  + etc. pp - tons...
+
+- Known dependencies between modules that need to be handled somehow:
+  (incomplete!)
+  + cvs       -> inetd (now base)
+  + finger    -> inetd (now base)
+  + samba     -> inetd (now base)
+  + stunnel   -> inetd (now base)
+  + tcpd      -> inetd (now base)
+  + telnet    -> inetd (now base)
+  + tftp      -> inetd (now base)
+  + uucp      -> inetd (now base)
+  + nis       -> portmap
+  + portmap   -> nfs
+  + webalizer -> apache
+
+ -- Manoj Srivastava <srivasta@debian.org>, Tue,  9 May 2006 14:07:31 -0500

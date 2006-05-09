@@ -1,0 +1,22 @@
+Revision: refpolicy--devo--0.0--patch-9
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:57:48 CDT 2006
+Standard-date: 2006-05-09 17:57:48 GMT
+Modified-files: policy/modules/admin/logrotate.if
+    policy/modules/services/cron.te
+    policy/modules/services/openvpn.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-7
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-8
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-9
+Summary: cancell the openvpn changes, add in ability of crond to run logrotate jobs.
+Keywords: 
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-7
+   Allow cron to execute logrotate jobs
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-8
+   cancell the openvpn changes.
+

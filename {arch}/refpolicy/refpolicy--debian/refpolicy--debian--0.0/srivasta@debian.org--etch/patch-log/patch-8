@@ -1,0 +1,10 @@
+Revision: refpolicy--debian--0.0--patch-8
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:56:09 CDT 2006
+Standard-date: 2006-05-09 17:56:09 GMT
+Modified-files: policy/modules/services/openvpn.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-8
+Summary: cancell the openvpn changes.
+Keywords: 
+

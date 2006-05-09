@@ -1,0 +1,21 @@
+Revision: refpolicy--devo--0.0--patch-1
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 10:53:26 CDT 2006
+Standard-date: 2006-05-09 15:53:26 GMT
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--base-0
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-1
+    srivasta@debian.org--etch/refpolicy--netuser--0.0--base-0
+Summary: Synch with upstream
+Keywords: 
+
+Synch with upstream
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--base-0
+   tag of srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-2
+
+ * srivasta@debian.org--etch/refpolicy--netuser--0.0--base-0
+   tag of srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-2
+

@@ -543,6 +543,7 @@ corecmd_exec_bin(semanage_t)
 corecmd_exec_sbin(semanage_t)
 
 files_read_etc_files(semanage_t)
+files_read_etc_runtime_files(semanage_t)
 files_read_usr_files(semanage_t)
 files_list_pids(semanage_t)
 

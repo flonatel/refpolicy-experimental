@@ -12,6 +12,7 @@ ifdef(`strict_policy',`
 	user_r user user_t
 	staff_r staff staff_t
 	sysadm_r sysadm sysadm_t
+        netuser_r netuser netuser_t
 
 	ifdef(`enable_mls',`
 		secadm_r secadm secadm_t

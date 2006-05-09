@@ -1,0 +1,158 @@
+refpolicy (0.0.20060509-1) unstable; urgency=low
+
+  * New upstream release. First packaging for Sid. 
+
+ -- Manoj Srivastava <srivasta@debian.org>  Tue,  9 May 2006 13:56:10 -0500
+
+refpolicy (20060506-1) sesarge; urgency=low
+
+  * New upstream checkout from CVS.
+  * Even more new modules.
+
+ -- Erich Schubert <erich@debian.org>  Sat,  6 May 2006 21:44:07 +0200
+
+refpolicy (20060418-2) sesarge; urgency=low
+
+  * New upstream checkout from CVS.
+
+ -- Erich Schubert <erich@debian.org>  Fri, 21 Apr 2006 19:17:05 +0200
+
+refpolicy (20060417-1) sesarge; urgency=low
+
+  * New upstream checkout from CVS.
+  * Until module linking is fixed, build everything into base.
+    (Sorry, this will result in a much larger policy than necessary.
+     Feel free to use the -src package to build your own!)
+
+ -- Erich Schubert <erich@debian.org>  Mon, 17 Apr 2006 21:04:49 +0200
+
+refpolicy (20060414-1) sesarge; urgency=low
+
+  * New upstream version with tons of new policy files
+
+ -- Erich Schubert <erich@debian.org>  Mon, 17 Apr 2006 20:48:50 +0200
+
+refpolicy (20060329-2) sesarge; urgency=low
+
+  * Merge upstream 20060329-2
+
+ -- Erich Schubert <erich@debian.org>  Mon,  3 Apr 2006 00:44:06 +0200
+
+refpolicy (20060324-2) sesarge; urgency=low
+
+  * Merge upstream 20060324-4
+
+ -- Erich Schubert <erich@debian.org>  Sat, 25 Mar 2006 03:34:36 +0100
+
+refpolicy (20060324-1) sesarge; urgency=low
+
+  * Merge upstream 20060323-2
+  * Merge changes by Thomas Bleher
+  * Build with checkpolicy 1.30.1
+  * Sorry, still doesn't work with make > 3.80
+
+ -- Erich Schubert <erich@debian.org>  Sat, 25 Mar 2006 02:21:00 +0100
+
+refpolicy (20060315-2) sesarge; urgency=low
+
+  * Make modular policy actually work. Hopefully.
+    (Up to now, optional_policy(`module') in base was not working upstream!)
+  * Revamp build process, don't use CDBS anymore since I didn't figure out
+    how to do two clean runs of the same source tree, and there is little
+    benefit here without any autotools or library magic needed
+
+ -- Erich Schubert <erich@debian.org>  Fri, 17 Mar 2006 20:51:55 +0100
+
+refpolicy (20060315-1.1) sesarge; urgency=low
+
+  * Small tweaks and bugfixes to policy
+
+ -- Erich Schubert <erich@debian.org>  Thu, 16 Mar 2006 23:13:40 +0100
+
+refpolicy (20060315-1) sesarge; urgency=low
+
+  * Merge with upstream and debian changes as of 20060309, rev 50
+  * Merge with upstream and debian changes as of 20060315, rev 55
+  * Added "netuser" role, similar to user_tcp_server boolean, but
+    you can enable it for single users only.
+
+ -- Erich Schubert <erich@debian.org>  Thu, 16 Mar 2006 00:23:54 +0100
+
+refpolicy (20060306-1) sesarge; urgency=low
+
+  * Merge with upstream and debian policy changes as of 20060306, Rev 31
+  * Try to auto-build a policy after a fresh install in postinst
+  * Add inetd module to base for now
+  * Increase policycoreutils build-dep to hopefully solve the users_extra
+    issues by using a newer policycoreutils for building...
+
+ -- Erich Schubert <erich@debian.org>  Mon,  6 Mar 2006 17:10:43 +0100
+
+refpolicy (20060227-1) sesarge; urgency=low
+
+  * Merge with upstream and debian policy changes as of 20060227, Rev 20
+
+ -- Erich Schubert <erich@debian.org>  Tue, 28 Feb 2006 03:48:48 +0100
+
+refpolicy (20060224-2) sesarge; urgency=low
+
+  * Update build process to not require a tarball, include previous
+    patches into our "branch" of the reference policy instead.
+
+ -- Erich Schubert <erich@debian.org>  Tue, 28 Feb 2006 03:13:51 +0100
+
+refpolicy (20060224-1) sesarge; urgency=low
+
+  * New upstream CVS checkout.
+  * Move policy src from /etc to /usr/share/selinux/refpolicy
+    This avoids an apt-get size limitation and follows Fedora.
+  * Ship edited build.conf with policy source.
+  * Use debhelper for installing documentation.
+  * Add dependency for source onto gawk.
+
+ -- Erich Schubert <erich@debian.org>  Sat, 25 Feb 2006 01:01:44 +0100
+
+refpolicy (20060222-1) sesarge; urgency=low
+
+  * New upstream CVS checkout.
+  * Thomas also provided a workaround for the make issues in his version.
+  * Update dpkg/apt policy to interface renamings
+  * Remove dpkg_script_exec_t, as supporting this would require bad hacks
+    to dpkg and/or tar. Use dpkg_var_lib_t instead.
+
+ -- Erich Schubert <erich@debian.org>  Thu, 23 Feb 2006 02:01:35 +0100
+
+refpolicy (20060217-3) sesarge; urgency=low
+
+  * Create selinux-policy-refpolicy-doc package
+  * DIRECT_INITRC=y
+
+ -- Thomas Bleher <ThomasBleher@gmx.de>  Mon, 20 Feb 2006 23:43:53 +0000
+
+refpolicy (20060217-2) sesarge; urgency=low
+
+  * Added first drafts of dpkg, apt policy
+
+ -- Erich Schubert <erich@debian.org>  Sat, 18 Feb 2006 03:20:59 +0100
+
+refpolicy (20060217-1) sesarge; urgency=low
+
+  * New upstream CVS checkout
+  * Document make incompaibility via build-dep
+  * Don't build some redhat specific policy modules, minor tweaks
+
+ -- Erich Schubert <erich@debian.org>  Tue, 14 Feb 2006 02:35:04 +0100
+
+refpolicy (20060213-1) sesarge; urgency=low
+
+  * New upstream CVS checkout.
+  * Still not really useable
+
+ -- Erich Schubert <erich@debian.org>  Tue, 14 Feb 2006 02:35:04 +0100
+
+refpolicy (20060117-1) sesarge; urgency=low
+
+  * Experimental release
+
+ -- Erich Schubert <erich@debian.org>  Mon, 13 Feb 2006 22:50:03 +0100
+

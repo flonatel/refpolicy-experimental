@@ -745,6 +745,41 @@ template(`unpriv_user_template', `
 
 #######################################
 ## <summary>
+##	The template for creating a user with network access.
+## </summary>
+## <desc>
+##	<p>
+##	This template creates a user domain, types, and
+##	rules for the user's tty, pty, home directories,
+##	tmp, and tmpfs files.
+##	</p>
+##	<p>
+##	This differs from the unpriv_user_template by allowing non-privileged network access.
+##	</p>
+## </desc>
+## <param name="userdomain_prefix">
+##	<summary>
+##	The prefix of the user domain (e.g., sysadm
+##	is the prefix for sysadm_t).
+##	</summary>
+## </param>
+#
+template(`network_user_template',`
+	##############################
+	#
+	# Declarations
+	#
+
+	# Inherit rules for ordinary users.
+	unpriv_user_template($1)
+	# like user_tcp_server
+	corenet_tcp_bind_generic_port($1_t)
+	sysnet_dns_name_resolve($1_t)
+	allow $1_t self:tcp_socket create_stream_socket_perms;
+	allow $1_t self:udp_socket create_stream_socket_perms;
+')
+#######################################
+## <summary>
 ##	The template for creating an administrative user.
 ## </summary>
 ## <desc>

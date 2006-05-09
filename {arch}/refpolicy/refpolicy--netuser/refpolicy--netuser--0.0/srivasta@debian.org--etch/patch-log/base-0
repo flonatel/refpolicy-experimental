@@ -1,0 +1,13 @@
+Revision: refpolicy--netuser--0.0--base-0
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 10:12:14 CDT 2006
+Standard-date: 2006-05-09 15:12:14 GMT
+New-patches: srivasta@debian.org--etch/refpolicy--netuser--0.0--base-0
+    srivasta@debian.org--etch/refpolicy--upstream--0.0--base-0
+    srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-1
+    srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-2
+Continuation-of: srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-2
+Summary: tag of srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-2
+
+(automatically generated log message)

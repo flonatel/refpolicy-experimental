@@ -1,0 +1,16 @@
+Revision: refpolicy--devo--0.0--patch-7
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:28:45 CDT 2006
+Standard-date: 2006-05-09 17:28:45 GMT
+Modified-files: policy/modules/services/openvpn.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-6
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-7
+Summary: Merge from debian beanch. openvpn does not need sys_tty_config, surely?
+Keywords: 
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-6
+   Don't audit openvpn, does it really need sys_tty_config ?
+

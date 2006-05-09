@@ -1,0 +1,10 @@
+Revision: debian-dir--refpolicy--1.0--patch-2
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Fri May 12 02:49:12 CDT 2006
+Standard-date: 2006-05-12 07:49:12 GMT
+Modified-files: control
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-2
+Summary: Fixed a duplicate dependency
+Keywords: 
+

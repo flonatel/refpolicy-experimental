@@ -1,0 +1,9 @@
+Revision: refpolicy--devo--0.0--patch-8
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 12:54:13 CDT 2006
+Standard-date: 2006-05-09 17:54:13 GMT
+New-patches: srivasta@debian.org--etch/refpolicy--devo--0.0--patch-8
+Summary: Merge from debian branch. Allow crond to runn logrotate jobs
+Keywords: 
+

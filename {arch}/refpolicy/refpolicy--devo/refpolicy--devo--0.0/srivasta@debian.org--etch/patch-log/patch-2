@@ -1,0 +1,16 @@
+Revision: refpolicy--devo--0.0--patch-2
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue May  9 11:18:35 CDT 2006
+Standard-date: 2006-05-09 16:18:35 GMT
+Modified-files: policy/modules/services/ldap.fc
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-1
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-2
+Summary: Merge from debian beanch. Debian and Ubuntu place slapd in a different location.
+Keywords: 
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-1
+   Debian and Ubunto place slapd in a different location
+

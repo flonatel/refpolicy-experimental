@@ -84,6 +84,7 @@ files_pid_filetrans(amavis_t,amavis_var_run_t, { file sock_file })
 
 # amavis tries to access /proc/self/stat, /etc/shadow and /root - perl...
 kernel_dontaudit_list_proc(amavis_t)
+kernel_dontaudit_read_system_state(amavis_t)
 
 # find perl
 corecmd_exec_bin(amavis_t)
@@ -145,6 +146,7 @@ optional_policy(`
 
 optional_policy(`
 	ldap_use(amavis_t)
+        sysnet_use_ldap(amavis_t)
 ')
 
 optional_policy(`
