@@ -5,9 +5,9 @@
 # Created On       : Fri Nov 14 11:25:07 2003
 # Created On Node  : glaurung.green-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Fri May 12 01:53:39 2006
+# Last Modified On : Fri May 12 09:04:30 2006
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 13
+# Update Count     : 20
 # Status           : Unknown, Use with caution!
 # HISTORY          : 
 # Description      : 
@@ -37,7 +37,7 @@ TYPE=strict
 package_name=selinux-policy-refpolicy-$TYPE
 POLICYNAME=refpolicy-$TYPE
 BASEDIR=/etc/selinux/$POLICYNAME
-SRCDIR=/usr/share/${package_name}
+SRCDIR=/usr/share/selinux/$POLICYNAME
 
 if [ -z "$package_name" ]; then
     print >&2 "Internal Error. Please report a bug."
@@ -52,19 +52,21 @@ case "$1" in
             echo >&2 "You already have a $POLICYNAME policy installed."
             echo >&2 "I am leaving it alone. Please check and update manually."
         elif [ -e $SRCDIR/base.pp ]; then
-            echo >&2 "Notice: Trying to link (but not load) a $POLICYNAME policy."
-            echo >&2 "We don't do dependency handling yet, so this may fail installing"
-            echo >&2 "some modules - you should check the results, and you need to do"
-            echo >&2 "the switch to this policy yourself anyway."
+            if cat /selinux/policyvers >/dev/null 2>&1; then
+                echo >&2 "Notice: Trying to link (but not load) a $POLICYNAME policy."
+                echo >&2 "We don't do dependency handling yet, so this may fail installing"
+                echo >&2 "some modules - you should check the results, and you need to do"
+                echo >&2 "the switch to this policy yourself anyway."
             # create a new base policy, not loading it
-            semodule -b $SRCDIR/base.pp -s $POLICYNAME -n
+                semodule -b $SRCDIR/base.pp -s $POLICYNAME -n
             # get a list of available modules
-            modules=$(ls $SRCDIR | egrep "\.pp$" | grep -v base.pp | /bin/sed -e 's/.pp$//')
-            for module in $modules; do
+                modules=$(ls $SRCDIR | egrep "\.pp$" | grep -v base.pp | /bin/sed -e 's/.pp$//')
+                for module in $modules; do
                 # process modules
-                echo >&2 "Trying to add module $module"
-                semodule -i $SRCDIR/${module}.pp -s $POLICYNAME
-            done
+                    echo >&2 "Trying to add module $module"
+                    semodule -i $SRCDIR/${module}.pp -s $POLICYNAME -n
+                done                
+            fi            
         else
             echo >&2 "."
         fi

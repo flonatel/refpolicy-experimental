@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Fri May 12 03:21:12 2006
+## Last Modified On : Fri May 12 08:52:31 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 42
+## Update Count     : 47
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -159,13 +159,13 @@ install/selinux-policy-refpolicy-strict:
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(MENUDIR)
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/modules
+	$(make_directory)    $(TMPTOP)/usr/share/selinux/
 	(cd $(SRCTOP)/debian/build-$(package);                      \
             $(MAKE) NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS)\
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/system.users)
-	mv $(TMPTOP)/usr/share/selinux/refpolicy-strict/ $(TMPTOP)/usr/share/$(package)
-	rmdir $(TMPTOP)/usr/share/selinux
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
@@ -180,13 +180,13 @@ install/selinux-policy-refpolicy-targeted:
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(MENUDIR)
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/modules
+	$(make_directory)    $(TMPTOP)/usr/share/selinux/
 	(cd $(SRCTOP)/debian/build-$(package);                      \
             $(MAKE) NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS)\
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/system.users)
-	mv $(TMPTOP)/usr/share/selinux/refpolicy-targeted/ $(TMPTOP)/usr/share/$(package)
-	rmdir $(TMPTOP)/usr/share/selinux
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
