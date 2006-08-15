@@ -1,5 +1,5 @@
 
-policy_module(mysql,1.2.1)
+policy_module(mysql,1.2.5)
 
 ########################################
 #
@@ -32,9 +32,8 @@ files_tmp_file(mysqld_tmp_t)
 
 allow mysqld_t self:capability { dac_override setgid setuid sys_resource net_bind_service };
 dontaudit mysqld_t self:capability sys_tty_config;
-allow mysqld_t self:process { setsched getsched setrlimit signal_perms };
+allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
 allow mysqld_t self:fifo_file { read write };
-allow mysqld_t self:netlink_route_socket r_netlink_socket_perms;
 allow mysqld_t self:unix_stream_socket create_stream_socket_perms;
 allow mysqld_t self:tcp_socket create_stream_socket_perms;
 allow mysqld_t self:udp_socket create_socket_perms;
@@ -60,24 +59,21 @@ allow mysqld_t mysqld_var_run_t:sock_file create_file_perms;
 allow mysqld_t mysqld_var_run_t:file create_file_perms;
 files_pid_filetrans(mysqld_t,mysqld_var_run_t,file)
 
-kernel_list_proc(mysqld_t)
-kernel_read_kernel_sysctls(mysqld_t)
-kernel_read_proc_symlinks(mysqld_t)
 kernel_read_system_state(mysqld_t)
+kernel_read_kernel_sysctls(mysqld_t)
 
+corenet_non_ipsec_sendrecv(mysqld_t)
 corenet_tcp_sendrecv_all_if(mysqld_t)
 corenet_udp_sendrecv_all_if(mysqld_t)
-corenet_raw_sendrecv_all_if(mysqld_t)
 corenet_tcp_sendrecv_all_nodes(mysqld_t)
 corenet_udp_sendrecv_all_nodes(mysqld_t)
-corenet_raw_sendrecv_all_nodes(mysqld_t)
 corenet_tcp_sendrecv_all_ports(mysqld_t)
 corenet_udp_sendrecv_all_ports(mysqld_t)
-corenet_non_ipsec_sendrecv(mysqld_t)
 corenet_tcp_bind_all_nodes(mysqld_t)
-corenet_udp_bind_all_nodes(mysqld_t)
 corenet_tcp_bind_mysqld_port(mysqld_t)
 corenet_tcp_connect_mysqld_port(mysqld_t)
+corenet_sendrecv_mysqld_client_packets(mysqld_t)
+corenet_sendrecv_mysqld_server_packets(mysqld_t)
 
 dev_read_sysfs(mysqld_t)
 
@@ -94,6 +90,8 @@ files_read_etc_files(mysqld_t)
 files_read_usr_files(mysqld_t)
 files_search_var_lib(mysqld_t)
 
+auth_use_nsswitch(mysqld_t)
+
 init_use_fds(mysqld_t)
 init_use_script_ptys(mysqld_t)
 
@@ -104,7 +102,6 @@ logging_send_syslog_msg(mysqld_t)
 
 miscfiles_read_localization(mysqld_t)
 
-sysnet_use_ldap(mysqld_t)
 sysnet_read_config(mysqld_t)
 
 userdom_dontaudit_use_unpriv_user_fds(mysqld_t)
@@ -124,10 +121,6 @@ ifdef(`targeted_policy',`
 
 optional_policy(`
 	daemontools_service_domain(mysqld_t, mysqld_exec_t)
-')
-
-optional_policy(`
-	mount_send_nfs_client_request(mysqld_t)
 ')
 
 optional_policy(`

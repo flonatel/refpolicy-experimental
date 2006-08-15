@@ -1,0 +1,10 @@
+Revision: debian-dir--refpolicy--1.0--patch-11
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed Aug 16 01:17:42 CDT 2006
+Standard-date: 2006-08-16 06:17:42 GMT
+Modified-files: changelog control local-vars.mk local.mk
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-11
+Summary: New upstream modular version
+Keywords: 
+

@@ -170,11 +170,6 @@ template(`evolution_per_userdomain_template',`
 	allow $2 $1_evolution_t:dir { search getattr read };
 	allow $2 $1_evolution_t:{ file lnk_file } { read getattr };
 	allow $2 $1_evolution_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_evolution_t:process ptrace;
 
 	#FIXME check to see if really needed
 	kernel_read_kernel_sysctls($1_evolution_t)
@@ -188,31 +183,34 @@ template(`evolution_per_userdomain_template',`
 	corecmd_exec_bin($1_evolution_t)
 	corecmd_exec_sbin($1_evolution_t)
 
+	corenet_non_ipsec_sendrecv($1_evolution_t)
 	corenet_tcp_sendrecv_generic_if($1_evolution_t)
 	corenet_udp_sendrecv_generic_if($1_evolution_t)
 	corenet_raw_sendrecv_generic_if($1_evolution_t)
 	corenet_tcp_sendrecv_all_nodes($1_evolution_t)
 	corenet_udp_sendrecv_all_nodes($1_evolution_t)
-	corenet_raw_sendrecv_all_nodes($1_evolution_t)
 	corenet_tcp_sendrecv_pop_port($1_evolution_t)
-	corenet_tcp_sendrecv_smtp_port($1_evolution_t)
-	corenet_tcp_sendrecv_innd_port($1_evolution_t)
-	corenet_tcp_sendrecv_ldap_port($1_evolution_t)
-	###corenet_tcp_sendrecv_ipp($1_evolution_t)
 	corenet_udp_sendrecv_pop_port($1_evolution_t)
+	corenet_tcp_sendrecv_smtp_port($1_evolution_t)
 	corenet_udp_sendrecv_smtp_port($1_evolution_t)
+	corenet_tcp_sendrecv_innd_port($1_evolution_t)
 	corenet_udp_sendrecv_innd_port($1_evolution_t)
+	corenet_tcp_sendrecv_ldap_port($1_evolution_t)
 	corenet_udp_sendrecv_ldap_port($1_evolution_t)
-	###corenet_udp_sendrecv_ipp($1_evolution_t)
-	corenet_non_ipsec_sendrecv($1_evolution_t)
-	corenet_tcp_bind_all_nodes($1_evolution_t)
-	corenet_udp_bind_all_nodes($1_evolution_t)
+	corenet_tcp_sendrecv_ipp_port($1_evolution_t)
+	corenet_udp_sendrecv_ipp_port($1_evolution_t)
 	corenet_tcp_connect_pop_port($1_evolution_t)
 	corenet_tcp_connect_smtp_port($1_evolution_t)
 	corenet_tcp_connect_innd_port($1_evolution_t)
 	corenet_tcp_connect_ldap_port($1_evolution_t)
-	###corenet_tcp_connect_ipp_port($1_evolution_t)
+	corenet_tcp_connect_ipp_port($1_evolution_t)
+	corenet_sendrecv_pop_client_packets($1_evolution_t)
+	corenet_sendrecv_smtp_client_packets($1_evolution_t)
+	corenet_sendrecv_innd_client_packets($1_evolution_t)
+	corenet_sendrecv_ldap_client_packets($1_evolution_t)
+	corenet_sendrecv_ipp_client_packets($1_evolution_t)
 	# not sure about this bind
+	corenet_udp_bind_all_nodes($1_evolution_t)
 	corenet_udp_bind_generic_port($1_evolution_t)
 
 	dev_read_urand($1_evolution_t)
@@ -294,7 +292,7 @@ template(`evolution_per_userdomain_template',`
 		userdom_read_user_home_content_files($1,$1_evolution_t)
 		userdom_read_user_home_content_symlinks($1,$1_evolution_t)
 		
-		ifdef(`mls_policy',`',`
+		ifndef(`enable_mls',`
 			fs_search_removable($1_evolution_t)
 			fs_read_removable_files($1_evolution_t)
 			fs_read_removable_symlinks($1_evolution_t)
@@ -635,25 +633,15 @@ template(`evolution_per_userdomain_template',`
 	corecmd_exec_shell($1_evolution_server_t)
 
 	# Obtain weather data via http (read server name from xml file in /usr)
+	corenet_non_ipsec_sendrecv($1_evolution_server_t)
 	corenet_tcp_sendrecv_generic_if($1_evolution_server_t)
-	corenet_raw_sendrecv_generic_if($1_evolution_server_t)
 	corenet_tcp_sendrecv_all_nodes($1_evolution_server_t)
-	corenet_raw_sendrecv_all_nodes($1_evolution_server_t)
 	corenet_tcp_sendrecv_http_port($1_evolution_server_t)
 	corenet_tcp_sendrecv_http_cache_port($1_evolution_server_t)
-	corenet_non_ipsec_sendrecv($1_evolution_server_t)
-	corenet_tcp_bind_all_nodes($1_evolution_server_t)
 	corenet_tcp_connect_http_cache_port($1_evolution_server_t)
 	corenet_tcp_connect_http_port($1_evolution_server_t)
-	# Talk to ldap (address book)
-	corenet_tcp_sendrecv_generic_if($1_evolution_server_t)
-	corenet_raw_sendrecv_generic_if($1_evolution_server_t)
-	corenet_tcp_sendrecv_all_nodes($1_evolution_server_t)
-	corenet_raw_sendrecv_all_nodes($1_evolution_server_t)
-	corenet_tcp_sendrecv_ldap_port($1_evolution_server_t)
-	corenet_non_ipsec_sendrecv($1_evolution_server_t)
-	corenet_tcp_bind_all_nodes($1_evolution_server_t)
-	corenet_tcp_connect_ldap_port($1_evolution_server_t)
+	corenet_sendrecv_http_client_packets($1_evolution_server_t)
+	corenet_sendrecv_http_cache_client_packets($1_evolution_server_t)
 
 	files_read_etc_files($1_evolution_server_t)
 	# Obtain weather data via http (read server name from xml file in /usr)
@@ -668,9 +656,9 @@ template(`evolution_per_userdomain_template',`
 	miscfiles_read_certs($1_evolution_server_t)
 
 	# Talk to ldap (address book)
-	# Obtain weather data via http (read server name from xml file in /usr)
 	sysnet_read_config($1_evolution_server_t)
 	sysnet_dns_name_resolve($1_evolution_server_t)
+	sysnet_use_ldap($1_evolution_server_t)
 
 	# Access evolution home
 	userdom_search_user_home_dirs($1,$1_evolution_server_t)
@@ -720,16 +708,17 @@ template(`evolution_per_userdomain_template',`
 	# Transition from user type
 	domain_auto_trans($2, evolution_webcal_exec_t, $1_evolution_webcal_t)
 
+	corenet_non_ipsec_sendrecv($1_evolution_webcal_t)
 	corenet_tcp_sendrecv_generic_if($1_evolution_webcal_t)
 	corenet_raw_sendrecv_generic_if($1_evolution_webcal_t)
 	corenet_tcp_sendrecv_all_nodes($1_evolution_webcal_t)
 	corenet_raw_sendrecv_all_nodes($1_evolution_webcal_t)
 	corenet_tcp_sendrecv_http_port($1_evolution_webcal_t)
 	corenet_tcp_sendrecv_http_cache_port($1_evolution_webcal_t)
-	corenet_non_ipsec_sendrecv($1_evolution_webcal_t)
-	corenet_tcp_bind_all_nodes($1_evolution_webcal_t)
 	corenet_tcp_connect_http_cache_port($1_evolution_webcal_t)
 	corenet_tcp_connect_http_port($1_evolution_webcal_t)
+	corenet_sendrecv_http_client_packets($1_evolution_webcal_t)
+	corenet_sendrecv_http_cache_client_packets($1_evolution_webcal_t)
 
 	# Networking capability - connect to website and handle ics link
 	sysnet_read_config($1_evolution_webcal_t)

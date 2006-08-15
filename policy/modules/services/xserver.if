@@ -99,16 +99,15 @@ template(`xserver_common_domain_template',`
 	corenet_non_ipsec_sendrecv($1_xserver_t)
 	corenet_tcp_sendrecv_generic_if($1_xserver_t)
 	corenet_udp_sendrecv_generic_if($1_xserver_t)
-	corenet_raw_sendrecv_generic_if($1_xserver_t)
 	corenet_tcp_sendrecv_all_nodes($1_xserver_t)
 	corenet_udp_sendrecv_all_nodes($1_xserver_t)
-	corenet_raw_sendrecv_all_nodes($1_xserver_t)
 	corenet_tcp_sendrecv_all_ports($1_xserver_t)
 	corenet_udp_sendrecv_all_ports($1_xserver_t)
 	corenet_tcp_bind_all_nodes($1_xserver_t)
-	corenet_udp_bind_all_nodes($1_xserver_t)
 	corenet_tcp_bind_xserver_port($1_xserver_t)
 	corenet_tcp_connect_all_ports($1_xserver_t)
+	corenet_sendrecv_xserver_server_packets($1_xserver_t)
+	corenet_sendrecv_all_client_packets($1_xserver_t)
 
 	dev_read_sysfs($1_xserver_t)
 	dev_rw_mouse($1_xserver_t)
@@ -175,16 +174,6 @@ template(`xserver_common_domain_template',`
 	optional_policy(`
 		xfs_stream_connect($1_xserver_t)
 	')
-
-	ifdef(`TODO',`
-	ifdef(`distro_redhat',`
-		ifdef(`rpm.te', `
-			allow $1_xserver_t rpm_t:shm { unix_read unix_write read write associate getattr };
-			allow $1_xserver_t rpm_tmpfs_t:file { read write };
-			rpm_use_fds($1_xserver_t)
-		')
-	')
-	') dnl end TODO
 ')
 
 #######################################
@@ -318,9 +307,6 @@ template(`xserver_per_userdomain_template',`
 	')
 
 	ifdef(`TODO',`
-	allow $1_t xdm_xserver_tmp_t:dir r_dir_perms;
-	allow $1_t xdm_xserver_t:unix_stream_socket connectto;
-
 	ifdef(`xdm.te', `
 		allow $1_t xdm_tmp_t:sock_file unlink;
 		allow $1_xserver_t xdm_var_run_t:dir search;
@@ -354,11 +340,6 @@ template(`xserver_per_userdomain_template',`
 	allow $2 $1_xauth_t:dir { search getattr read };
 	allow $2 $1_xauth_t:{ file lnk_file } { read getattr };
 	allow $2 $1_xauth_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_xauth_t:process ptrace;
 
 	allow $2 $1_xauth_home_t:file manage_file_perms;
 	allow $2 $1_xauth_home_t:file { relabelfrom relabelto };
@@ -421,11 +402,6 @@ template(`xserver_per_userdomain_template',`
 	allow $2 $1_iceauth_t:dir { search getattr read };
 	allow $2 $1_iceauth_t:{ file lnk_file } { read getattr };
 	allow $2 $1_iceauth_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_iceauth_t:process ptrace;
 
 	allow $2 $1_iceauth_home_t:file manage_file_perms;
 	allow $2 $1_iceauth_home_t:file { relabelfrom relabelto };
@@ -745,6 +721,42 @@ interface(`xserver_rw_console',`
 	')
 
 	allow $1 xconsole_device_t:fifo_file { getattr read write };
+')
+
+########################################
+## <summary>
+##	Use file descriptors for xdm.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`xserver_use_xdm_fds',`
+	gen_require(`
+		type xdm_t;
+	')
+
+	allow $1 xdm_t:fd use; 
+')
+
+########################################
+## <summary>
+##	Read and write XDM unnamed pipes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`xserver_rw_xdm_pipes',`
+	gen_require(`
+		type xdm_t;
+	')
+
+	allow $1 xdm_t:fifo_file { getattr read write }; 
 ')
 
 ########################################
@@ -1072,4 +1084,26 @@ interface(`xserver_dontaudit_rw_xdm_xserver_tcp_sockets',`
 	')
 
 	dontaudit $1 xdm_xserver_t:tcp_socket { read write };
+')
+
+########################################
+## <summary>
+##	Connect to xdm_xserver over a unix domain
+##	stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`xserver_stream_connect_xdm_xserver',`
+	gen_require(`
+		type xdm_xserver_t, xdm_xserver_tmp_t;
+	')
+
+	files_search_tmp($1)
+	allow $1 xdm_xserver_tmp_t:dir search_dir_perms;
+	allow $1 xdm_xserver_tmp_t:sock_file write;
+	allow $1 xdm_xserver_t:unix_stream_socket connectto;
 ')

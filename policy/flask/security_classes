@@ -88,4 +88,9 @@ class netlink_kobject_uevent_socket
 
 class appletalk_socket
 
+class packet
+
+# Kernel access key retention
+class key
+
 # FLASK

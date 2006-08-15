@@ -1,0 +1,13 @@
+Revision: refpolicy--debian--0.0--patch-12
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue Aug 15 23:59:46 CDT 2006
+Standard-date: 2006-08-16 04:59:46 GMT
+Modified-files: policy/modules/admin/apt.te
+    policy/modules/services/ssh.if
+    policy/modules/system/selinuxutil.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-12
+Summary: Allow semanage and apt to use the ssh fd
+Keywords: 
+
+Not sure why this is needed, but it does seem to be

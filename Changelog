@@ -1,3 +1,15 @@
+- Full support for netfilter_contexts.
+- MRTG patch for daemon operation from Stefan.
+- Add authlogin interface to abstract common access for login programs.
+- Remove setbool auditallow, except for RHEL4.
+- Change eventpollfs to task SID labeling.
+- Add key support from Michael LeMay.
+- Add ftpdctl domain to ftp, from Paul Howarth.
+- Fix build system to not move type declarations out of optionals.
+- Add gcc-config domain to portage.
+- Add packet object class and support in corenetwork.
+- Add a copy of genhomedircon for monolithic policy building, so that a
+  policycoreutils package update is not required for RHEL4 systems.
 - Add appletalk sockets for use in cups.
 - Add Make target to validate module linking.
 - Make duplicate template and interface declarations a fatal error.
@@ -35,6 +47,20 @@
   Petre Rodan.
 - Fix temporary rules at the bottom of portmap.
 - Updated comments in mls file from Chad Hanson.
+- Patches from Dan Walsh:
+	Fri, 17 Mar 2006
+	Wed, 29 Mar 2006
+	Tue, 11 Apr 2006
+	Fri, 14 Apr 2006
+	Tue, 18 Apr 2006
+	Thu, 20 Apr 2006
+	Tue, 02 May 2006
+	Mon, 15 May 2006
+	Thu, 18 May 2006
+	Tue, 06 Jun 2006
+	Mon, 12 Jun 2006
+	Tue, 20 Jun 2006
+	Wed, 26 Jul 2006
 - Added modules:
 	afs
 	amavis (Erich Schubert)
@@ -69,6 +95,7 @@
 	nessus
 	nsd
 	ntop
+	nx
 	oav
 	openca
 	openvpn (Petre Rodan)

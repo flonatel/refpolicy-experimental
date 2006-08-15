@@ -69,6 +69,7 @@ template(`dbus_per_userdomain_template',`
 	# Local policy
 	#
 
+	allow $1_dbusd_t self:capability audit_write;
 	allow $1_dbusd_t self:process { getattr sigkill signal };
 	allow $1_dbusd_t self:file { getattr read write };
 	allow $1_dbusd_t self:dbus { send_msg acquire_svc };
@@ -106,12 +107,10 @@ template(`dbus_per_userdomain_template',`
 	kernel_read_system_state($1_dbusd_t)
 	kernel_read_kernel_sysctls($1_dbusd_t)
 
-	corenet_tcp_sendrecv_all_if($1_dbusd_t)
-	corenet_raw_sendrecv_all_if($1_dbusd_t)
-	corenet_tcp_sendrecv_all_nodes($1_dbusd_t)
-	corenet_raw_sendrecv_all_nodes($1_dbusd_t)
-	corenet_tcp_sendrecv_all_ports($1_dbusd_t)
 	corenet_non_ipsec_sendrecv($1_dbusd_t)
+	corenet_tcp_sendrecv_all_if($1_dbusd_t)
+	corenet_tcp_sendrecv_all_nodes($1_dbusd_t)
+	corenet_tcp_sendrecv_all_ports($1_dbusd_t)
 	corenet_tcp_bind_all_nodes($1_dbusd_t)
 	corenet_tcp_bind_reserved_port($1_dbusd_t)
 
@@ -168,10 +167,9 @@ template(`dbus_per_userdomain_template',`
 		nscd_socket_use($1_dbusd_t)
 	')
 
-	ifdef(`TODO',`
-	ifdef(`xdm.te', `
-	can_pipe_xdm($1_dbusd_t)
-	')
+	optional_policy(`
+		xserver_use_xdm_fds($1_dbusd_t)
+		xserver_rw_xdm_pipes($1_dbusd_t)
 	')
 ')
 
@@ -237,8 +235,7 @@ template(`dbus_system_bus_client_template',`
 #
 template(`dbus_user_bus_client_template',`
 	gen_require(`
-		type $1_dbusd_t, $1_dbusd_t;
-		type $1_dbusd_var_run_t;
+		type $1_dbusd_t;
 		class dbus send_msg;
 	')
 
@@ -249,10 +246,7 @@ template(`dbus_user_bus_client_template',`
 	allow $2_dbusd_$1_t { $1_dbusd_t self }:dbus send_msg;
 
 	# For connecting to the bus
-	files_search_pids($3)
-	allow $3 system_dbusd_var_run_t:dir search;
-	allow $3 system_dbusd_var_run_t:sock_file write;
-	allow $3 system_dbusd_t:unix_stream_socket connectto;
+	allow $3 $1_dbusd_t:unix_stream_socket connectto;
 ')
 
 ########################################

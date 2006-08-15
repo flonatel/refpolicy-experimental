@@ -81,11 +81,6 @@ template(`mplayer_per_userdomain_template',`
 	allow $2 $1_mencoder_t:dir { search getattr read };
 	allow $2 $1_mencoder_t:{ file lnk_file } { read getattr };
 	allow $2 $1_mencoder_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_mencoder_t:process ptrace;
 	allow $2 $1_mencoder_t:process signal_perms;
 
 	# Read /proc files and directories
@@ -122,7 +117,7 @@ template(`mplayer_per_userdomain_template',`
 	userdom_read_user_home_content_symlinks($1,$1_mencoder_t)
 
 	# Read content to encode
-	ifdef(`mls_policy',`',`
+	ifdef(`enable_mls',`',`
 		fs_search_removable($1_mencoder_t)
 		fs_read_removable_files($1_mencoder_t)
 		fs_read_removable_symlinks($1_mencoder_t)
@@ -295,11 +290,6 @@ template(`mplayer_per_userdomain_template',`
 	allow $2 $1_mplayer_t:dir { search getattr read };
 	allow $2 $1_mplayer_t:{ file lnk_file } { read getattr };
 	allow $2 $1_mplayer_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_mplayer_t:process ptrace;
 	allow $2 $1_mplayer_t:process signal_perms;
 
 	kernel_dontaudit_list_unlabeled($1_mplayer_t)
@@ -359,7 +349,7 @@ template(`mplayer_per_userdomain_template',`
 	xserver_user_client_template($1,$1_mplayer_t,$1_mplayer_tmpfs_t)
 	
 	# Read songs
-	ifdef(`mls_policy',`',`
+	ifdef(`enable_mls',`',`
 		fs_search_removable($1_mplayer_t)
 		fs_read_removable_files($1_mplayer_t)
 		fs_read_removable_symlinks($1_mplayer_t)

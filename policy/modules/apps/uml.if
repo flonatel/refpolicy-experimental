@@ -65,7 +65,7 @@ template(`uml_per_userdomain_template',`
 	# Local policy
 	#
 	allow $1_uml_t self:fifo_file rw_file_perms;
-	allow $1_uml_t self:process { fork signal_perms ptrace };
+	allow $1_uml_t self:process { signal_perms ptrace };
 	allow $1_uml_t self:unix_stream_socket create_stream_socket_perms;
 	allow $1_uml_t self:unix_dgram_socket create_socket_perms;
 	# Use the network.
@@ -120,11 +120,6 @@ template(`uml_per_userdomain_template',`
 	allow $2 $1_uml_t:dir { search getattr read };
 	allow $2 $1_uml_t:{ file lnk_file } { read getattr };
 	allow $2 $1_uml_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_uml_t:process ptrace;
 
 	allow $2 $1_uml_tmp_t:dir create_dir_perms;
 	allow $2 $1_uml_tmp_t:file create_file_perms;
@@ -147,18 +142,15 @@ template(`uml_per_userdomain_template',`
 	corecmd_exec_bin($1_uml_t)
 	corecmd_exec_sbin($1_uml_t)
 
+	corenet_non_ipsec_sendrecv($1_uml_t)
 	corenet_tcp_sendrecv_generic_if($1_uml_t)
 	corenet_udp_sendrecv_generic_if($1_uml_t)
-	corenet_raw_sendrecv_generic_if($1_uml_t)
 	corenet_tcp_sendrecv_all_nodes($1_uml_t)
 	corenet_udp_sendrecv_all_nodes($1_uml_t)
-	corenet_raw_sendrecv_all_nodes($1_uml_t)
 	corenet_tcp_sendrecv_all_ports($1_uml_t)
 	corenet_udp_sendrecv_all_ports($1_uml_t)
-	corenet_non_ipsec_sendrecv($1_uml_t)
-	corenet_tcp_bind_all_nodes($1_uml_t)
-	corenet_udp_bind_all_nodes($1_uml_t)
 	corenet_tcp_connect_all_ports($1_uml_t)
+	corenet_sendrecv_all_client_packets($1_uml_t)
 	corenet_rw_tun_tap_dev($1_uml_t)
 	
 	domain_use_interactive_fds($1_uml_t)
@@ -186,10 +178,6 @@ template(`uml_per_userdomain_template',`
 	sysnet_read_config($1_uml_t)
 
 	userdom_use_user_terminals($1,$1_uml_t)
-
-	optional_policy(`
-		mount_send_nfs_client_request($1_uml_t)
-	')
 
 	optional_policy(`
 		nis_use_ypbind($1_uml_t)

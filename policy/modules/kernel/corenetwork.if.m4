@@ -18,7 +18,7 @@ define(`create_netif_interfaces',``
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -37,7 +37,7 @@ interface(`corenet_tcp_sendrecv_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -56,7 +56,7 @@ interface(`corenet_udp_send_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="read" weight="10"/>
@@ -75,7 +75,7 @@ interface(`corenet_udp_receive_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -91,7 +91,7 @@ interface(`corenet_udp_sendrecv_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -102,10 +102,6 @@ interface(`corenet_raw_send_$1_if',`
 	')
 
 	allow dollarsone $1_$2:netif rawip_send;
-
-	# cjp: comment out until raw access is
-	# is fixed for network users
-	#allow dollarsone self:capability net_raw;
 ')
 
 ########################################
@@ -114,7 +110,7 @@ interface(`corenet_raw_send_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="read" weight="10"/>
@@ -133,7 +129,7 @@ interface(`corenet_raw_receive_$1_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -157,7 +153,7 @@ define(`create_node_interfaces',``
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -176,7 +172,7 @@ interface(`corenet_tcp_sendrecv_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -195,7 +191,7 @@ interface(`corenet_udp_send_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="read" weight="10"/>
@@ -214,7 +210,7 @@ interface(`corenet_udp_receive_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -230,7 +226,7 @@ interface(`corenet_udp_sendrecv_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -249,7 +245,7 @@ interface(`corenet_raw_send_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -268,7 +264,7 @@ interface(`corenet_raw_receive_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -284,7 +280,7 @@ interface(`corenet_raw_sendrecv_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="none"/>
@@ -303,7 +299,7 @@ interface(`corenet_tcp_bind_$1_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="none"/>
@@ -330,7 +326,7 @@ define(`create_port_interfaces',``
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -349,7 +345,7 @@ interface(`corenet_tcp_sendrecv_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="write" weight="10"/>
@@ -368,7 +364,7 @@ interface(`corenet_udp_send_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="read" weight="10"/>
@@ -387,7 +383,7 @@ interface(`corenet_udp_receive_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -403,7 +399,7 @@ interface(`corenet_udp_sendrecv_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="none"/>
@@ -423,7 +419,7 @@ interface(`corenet_tcp_bind_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="none"/>
@@ -443,7 +439,7 @@ interface(`corenet_udp_bind_$1_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -453,6 +449,80 @@ interface(`corenet_tcp_connect_$1_port',`
 	')
 
 	allow dollarsone $1_$2:tcp_socket name_connect;
+')
+'') dnl end create_port_interfaces
+
+define(`create_packet_interfaces',``
+########################################
+## <summary>
+##	Send $1 packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_$1_packets',`
+	gen_require(`
+		type $1_packet_t;
+	')
+
+	allow dollarsone $1_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive $1 packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_$1_packets',`
+	gen_require(`
+		type $1_packet_t;
+	')
+
+	allow dollarsone $1_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive $1 packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_$1_packets',`
+	corenet_send_$1_packets(dollarsone)
+	corenet_receive_$1_packets(dollarsone)
+')
+
+########################################
+## <summary>
+##	Relabel packets to $1 the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_$1_packets',`
+	gen_require(`
+		type $1_packet_t;
+	')
+
+	allow dollarsone $1_packet_t:packet relabelto;
 ')
 '') dnl end create_port_interfaces
 
@@ -510,4 +580,14 @@ define(`create_port_attrib_interfaces',`create_port_interfaces($1,port,attribute
 #
 define(`network_port',`
 create_port_type_interfaces($*)
+create_packet_interfaces($1_client)
+create_packet_interfaces($1_server)
+')
+
+#
+# network_packet(packet_name)
+#
+define(`network_packet',`
+create_packet_interfaces($1_client)
+create_packet_interfaces($1_server)
 ')

@@ -15,6 +15,7 @@ template(`apache_content_template',`
 	gen_require(`
 		attribute httpdcontent;
 		attribute httpd_exec_scripts;
+		attribute httpd_script_exec_type;
 		type httpd_t, httpd_suexec_t, httpd_log_t;
 	')
 	# allow write access to public file transfer
@@ -35,7 +36,7 @@ template(`apache_content_template',`
 	role system_r types httpd_$1_script_t;
 
 	# This type is used for executable scripts files
-	type httpd_$1_script_exec_t; # customizable;
+	type httpd_$1_script_exec_t, httpd_script_exec_type; # customizable;
 	corecmd_shell_entry_type(httpd_$1_script_t)
 	domain_entry_file(httpd_$1_script_t,httpd_$1_script_exec_t)
 
@@ -115,6 +116,7 @@ template(`apache_content_template',`
 	seutil_dontaudit_search_config(httpd_$1_script_t)
 
 	tunable_policy(`httpd_enable_cgi && httpd_unified',`
+		allow httpd_$1_script_t httpdcontent:file entrypoint;
 		allow httpd_$1_script_t httpdcontent:dir create_dir_perms;
 		allow httpd_$1_script_t httpdcontent:file create_file_perms;
 		allow httpd_$1_script_t httpdcontent:lnk_file create_lnk_perms;
@@ -177,7 +179,6 @@ template(`apache_content_template',`
 		dev_read_urand(httpd_$1_script_t)
 
 		fs_getattr_xattr_fs(httpd_$1_script_t)
-		fs_read_eventpollfs(httpd_$1_script_t)
 
 		files_read_etc_runtime_files(httpd_$1_script_t)
 		files_read_usr_files(httpd_$1_script_t)
@@ -185,13 +186,6 @@ template(`apache_content_template',`
 		libs_read_lib_files(httpd_$1_script_t)
 
 		miscfiles_read_localization(httpd_$1_script_t)
-
-		# added back to make sediff nicer
-		dev_rw_null(httpd_$1_script_t)
-		term_use_controlling_term(httpd_$1_script_t)
-		allow httpd_$1_script_t self:dir r_dir_perms;
-		allow httpd_$1_script_t self:file r_file_perms;
-		allow httpd_$1_script_t self:lnk_file read;
 	')
 
 	tunable_policy(`httpd_enable_cgi && httpd_can_network_connect_db',`
@@ -201,16 +195,14 @@ template(`apache_content_template',`
 		corenet_non_ipsec_sendrecv(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_if(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_if(httpd_$1_script_t)
-		corenet_raw_sendrecv_all_if(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_nodes(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_nodes(httpd_$1_script_t)
-		corenet_raw_sendrecv_all_nodes(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_ports(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_ports(httpd_$1_script_t)
-		corenet_tcp_bind_all_nodes(httpd_$1_script_t)
-		corenet_udp_bind_all_nodes(httpd_$1_script_t)
 		corenet_tcp_connect_postgresql_port(httpd_$1_script_t)
 		corenet_tcp_connect_mysqld_port(httpd_$1_script_t)
+		corenet_sendrecv_postgresql_client_packets(httpd_$1_script_t)
+		corenet_sendrecv_mysqld_client_packets(httpd_$1_script_t)
 
 		sysnet_read_config(httpd_$1_script_t)
 	')
@@ -219,28 +211,18 @@ template(`apache_content_template',`
 		allow httpd_$1_script_t self:tcp_socket create_stream_socket_perms;
 		allow httpd_$1_script_t self:udp_socket create_socket_perms;
 
+		corenet_non_ipsec_sendrecv(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_if(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_if(httpd_$1_script_t)
-		corenet_raw_sendrecv_all_if(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_nodes(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_nodes(httpd_$1_script_t)
-		corenet_raw_sendrecv_all_nodes(httpd_$1_script_t)
 		corenet_tcp_sendrecv_all_ports(httpd_$1_script_t)
 		corenet_udp_sendrecv_all_ports(httpd_$1_script_t)
-		corenet_non_ipsec_sendrecv(httpd_$1_script_t)
-		corenet_tcp_bind_all_nodes(httpd_$1_script_t)
-		corenet_udp_bind_all_nodes(httpd_$1_script_t)
 		corenet_tcp_connect_all_ports(httpd_$1_script_t)
+		corenet_sendrecv_all_client_packets(httpd_$1_script_t)
 
 		sysnet_read_config(httpd_$1_script_t)
 	')
-
-	optional_policy(`
-		tunable_policy(`httpd_enable_cgi && httpd_can_network_connect',`
-			mount_send_nfs_client_request(httpd_$1_script_t)
-		')
-	')
-
 
 	optional_policy(`
 		mta_send_mail(httpd_$1_script_t)
@@ -352,6 +334,58 @@ template(`apache_per_userdomain_template', `
 		userdom_search_user_home_dirs($1,httpd_suexec_t)
 		userdom_search_user_home_dirs($1,httpd_$1_script_t)
 	')
+')
+
+########################################
+## <summary>
+##	Read httpd user scripts executables.
+## </summary>
+## <param name="domain_prefix">
+##	<summary>
+##	Prefix of the domain. Example, user would be
+##	the prefix for the uder_t domain.
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+template(`apache_read_user_scripts',`
+	gen_require(`
+		type httpd_$1_script_exec_t;
+	')
+
+	allow $2 httpd_$1_script_exec_t:dir r_dir_perms;
+	allow $2 httpd_$1_script_exec_t:file r_file_perms;
+	allow $2 httpd_$1_script_exec_t:lnk_file { getattr read };
+')
+
+########################################
+## <summary>
+##	Read user web content.
+## </summary>
+## <param name="domain_prefix">
+##	<summary>
+##	Prefix of the domain. Example, user would be
+##	the prefix for the uder_t domain.
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+template(`apache_read_user_content',`
+	gen_require(`
+		type httpd_$1_content_t;
+	')
+
+	allow $2 httpd_$1_content_t:dir r_dir_perms;
+	allow $2 httpd_$1_content_t:file r_file_perms;
+	allow $2 httpd_$1_content_t:lnk_file { getattr read };
 ')
 
 ########################################
@@ -472,6 +506,31 @@ interface(`apache_dontaudit_rw_tcp_sockets',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete all web content.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`apache_manage_all_content',`
+	gen_require(`
+		attribute httpdcontent, httpd_script_exec_type;
+	')
+
+	allow $1 httpdcontent:dir manage_dir_perms;
+	allow $1 httpdcontent:file manage_file_perms;
+	allow $1 httpdcontent:lnk_file create_lnk_perms;
+
+	allow $1 httpd_script_exec_type:dir manage_dir_perms;
+	allow $1 httpd_script_exec_type:file manage_file_perms;
+	allow $1 httpd_script_exec_type:lnk_file create_lnk_perms;
+
+')
+
+########################################
+## <summary>
 ##	Allow the specified domain to read
 ##	and write Apache cache files.
 ## </summary>
@@ -508,6 +567,28 @@ interface(`apache_read_config',`
 	files_search_etc($1)
 	allow $1 httpd_config_t:dir r_dir_perms;
 	allow $1 httpd_config_t:file r_file_perms;
+	allow $1 httpd_config_t:lnk_file { getattr read };
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to manage
+##	apache configuration files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`apache_manage_config',`
+	gen_require(`
+		type httpd_config_t;
+	')
+
+	files_search_etc($1)
+	allow $1 httpd_config_t:dir manage_dir_perms;
+	allow $1 httpd_config_t:file manage_file_perms;
 	allow $1 httpd_config_t:lnk_file { getattr read };
 ')
 
@@ -632,6 +713,28 @@ interface(`apache_dontaudit_append_log',`
 
 ########################################
 ## <summary>
+##	Allow the specified domain to manage
+##	to apache log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`apache_manage_log',`
+	gen_require(`
+		type httpd_log_t;
+	')
+
+	logging_search_logs($1)
+	allow $1 httpd_log_t:dir manage_dir_perms;
+	allow $1 httpd_log_t:file manage_file_perms;
+	allow $1 httpd_log_t:lnk_file { getattr read };
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to search Apache
 ##	module directories.
 ## </summary>
@@ -688,6 +791,28 @@ interface(`apache_exec_modules',`
 	allow $1 httpd_modules_t:dir r_dir_perms;
 	allow $1 httpd_modules_t:lnk_file r_file_perms;
 	can_exec($1,httpd_modules_t)
+')
+
+########################################
+## <summary>
+##	Execute a domain transition to run httpd_rotatelogs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`apache_domtrans_rotatelogs',`
+	gen_require(`
+		type httpd_rotatelogs_t, httpd_rotatelogs_exec_t;
+	')
+
+	domain_auto_trans($1,httpd_rotatelogs_exec_t,httpd_rotatelogs_t)
+
+	allow httpd_rotatelogs_t $1:fd use;
+	allow httpd_rotatelogs_t $1:fifo_file rw_file_perms;
+	allow httpd_rotatelogs_t $1:process sigchld;
 ')
 
 ########################################
@@ -900,56 +1025,4 @@ interface(`apache_search_sys_script_state',`
 	')
 
 	allow $1 httpd_sys_script_t:dir search;
-')
-
-########################################
-## <summary>
-##	Read httpd user scripts executables.
-## </summary>
-## <param name="domain_prefix">
-##	<summary>
-##	Prefix of the domain. Example, user would be
-##	the prefix for the uder_t domain.
-##	</summary>
-## </param>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`apache_read_user_scripts',`
-	gen_require(`
-		type httpd_$1_script_exec_t;
-	')
-
-	allow $2 httpd_$1_script_exec_t:dir r_dir_perms;
-	allow $2 httpd_$1_script_exec_t:file r_file_perms;
-	allow $2 httpd_$1_script_exec_t:lnk_file { getattr read };
-')
-
-########################################
-## <summary>
-##	Read user web content.
-## </summary>
-## <param name="domain_prefix">
-##	<summary>
-##	Prefix of the domain. Example, user would be
-##	the prefix for the uder_t domain.
-##	</summary>
-## </param>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`apache_read_user_content',`
-	gen_require(`
-		type httpd_$1_content_t;
-	')
-
-	allow $2 httpd_$1_content_t:dir r_dir_perms;
-	allow $2 httpd_$1_content_t:file r_file_perms;
-	allow $2 httpd_$1_content_t:lnk_file { getattr read };
 ')

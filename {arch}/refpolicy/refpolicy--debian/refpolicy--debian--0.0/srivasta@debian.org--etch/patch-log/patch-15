@@ -1,0 +1,10 @@
+Revision: refpolicy--debian--0.0--patch-15
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed Aug 16 00:21:19 CDT 2006
+Standard-date: 2006-08-16 05:21:19 GMT
+Modified-files: policy/modules/services/cron.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-15
+Summary: mysql cron jons should be able to connect to the db
+Keywords: 
+

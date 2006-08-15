@@ -89,10 +89,6 @@ interface(`corenet_raw_send_generic_if',`
 	')
 
 	allow $1 netif_t:netif rawip_send;
-
-	# cjp: comment out until raw access is
-	# is fixed for network users
-	#allow $1 self:capability net_raw;
 ')
 
 ########################################
@@ -213,10 +209,6 @@ interface(`corenet_raw_send_all_if',`
 	')
 
 	allow $1 netif_type:netif rawip_send;
-
-	# cjp: comment out until raw access is
-	# is fixed for network users
-	#allow $1 self:capability net_raw;
 ')
 
 ########################################
@@ -827,6 +819,7 @@ interface(`corenet_tcp_bind_all_ports',`
 	')
 
 	allow $1 port_type:tcp_socket name_bind;
+	allow $1 self:capability net_bind_service;
 ')
 
 ########################################
@@ -863,6 +856,7 @@ interface(`corenet_udp_bind_all_ports',`
 	')
 
 	allow $1 port_type:udp_socket name_bind;
+	allow $1 self:capability net_bind_service;
 ')
 
 ########################################
@@ -1228,22 +1222,6 @@ interface(`corenet_rw_ppp_dev',`
 
 ########################################
 ## <summary>
-##	Send and receive messages on a
-##	non-encrypted (no IPSEC) network
-##	session.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`corenet_non_ipsec_sendrecv',`
-	kernel_sendrecv_unlabeled_association($1)
-')
-
-########################################
-## <summary>
 ##	Bind TCP sockets to all RPC ports.
 ## </summary>
 ## <param name="domain">
@@ -1314,6 +1292,388 @@ interface(`corenet_dontaudit_udp_bind_all_rpc_ports',`
 	')
 
 	dontaudit $1 rpc_port_type:udp_socket name_bind;
+')
+
+########################################
+## <summary>
+##	Send and receive messages on a
+##	non-encrypted (no IPSEC) network
+##	session.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_non_ipsec_sendrecv',`
+	kernel_sendrecv_unlabeled_association($1)
+')
+
+########################################
+## <summary>
+##	Send generic client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_send_generic_client_packets',`
+	gen_require(`
+		type client_packet_t;
+	')
+
+	allow $1 client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive generic client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_receive_generic_client_packets',`
+	gen_require(`
+		type client_packet_t;
+	')
+
+	allow $1 client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive generic client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_generic_client_packets',`
+	corenet_send_generic_client_packets($1)
+	corenet_receive_generic_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to the generic client packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_generic_client_packets',`
+	gen_require(`
+		type client_packet_t;
+	')
+
+	allow $1 client_packet_t:packet relabelto;
+')
+
+########################################
+## <summary>
+##	Send generic server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_send_generic_server_packets',`
+	gen_require(`
+		type server_packet_t;
+	')
+
+	allow $1 server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive generic server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_receive_generic_server_packets',`
+	gen_require(`
+		type server_packet_t;
+	')
+
+	allow $1 server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive generic server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_generic_server_packets',`
+	corenet_send_generic_server_packets($1)
+	corenet_receive_generic_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to the generic server packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_generic_server_packets',`
+	gen_require(`
+		type server_packet_t;
+	')
+
+	allow $1 server_packet_t:packet relabelto;
+')
+
+########################################
+## <summary>
+##	Send and receive unlabeled packets.
+## </summary>
+## <desc>
+##	<p>
+##	Send and receive unlabeled packets.
+##	These packets do not match any netfilter
+##	SECMARK rules.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_unlabeled_packets',`
+	kernel_sendrecv_unlabeled_packets($1)
+')
+
+########################################
+## <summary>
+##	Send all client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_send_all_client_packets',`
+	gen_require(`
+		attribute client_packet_type;
+	')
+
+	allow $1 client_packet_type:packet send;
+')
+
+########################################
+## <summary>
+##	Receive all client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_receive_all_client_packets',`
+	gen_require(`
+		attribute client_packet_type;
+	')
+
+	allow $1 client_packet_type:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive all client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_all_client_packets',`
+	corenet_send_all_client_packets($1)
+	corenet_receive_all_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to any client packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_all_client_packets',`
+	gen_require(`
+		attribute client_packet_type;
+	')
+
+	allow $1 client_packet_type:packet relabelto;
+')
+
+########################################
+## <summary>
+##	Send all server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_send_all_server_packets',`
+	gen_require(`
+		attribute server_packet_type;
+	')
+
+	allow $1 server_packet_type:packet send;
+')
+
+########################################
+## <summary>
+##	Receive all server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_receive_all_server_packets',`
+	gen_require(`
+		attribute server_packet_type;
+	')
+
+	allow $1 server_packet_type:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive all server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_all_server_packets',`
+	corenet_send_all_server_packets($1)
+	corenet_receive_all_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to any server packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_all_server_packets',`
+	gen_require(`
+		attribute server_packet_type;
+	')
+
+	allow $1 server_packet_type:packet relabelto;
+')
+
+########################################
+## <summary>
+##	Send all packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_send_all_packets',`
+	gen_require(`
+		attribute packet_type;
+	')
+
+	allow $1 packet_type:packet send;
+')
+
+########################################
+## <summary>
+##	Receive all packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_receive_all_packets',`
+	gen_require(`
+		attribute packet_type;
+	')
+
+	allow $1 packet_type:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive all packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_sendrecv_all_packets',`
+	corenet_send_all_packets($1)
+	corenet_receive_all_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to any packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_all_packets',`
+	gen_require(`
+		attribute packet_type;
+	')
+
+	allow $1 packet_type:packet relabelto;
 ')
 
 ########################################

@@ -1,5 +1,5 @@
 
-policy_module(postgrey,1.0.0)
+policy_module(postgrey,1.0.2)
 
 ########################################
 #
@@ -38,6 +38,7 @@ allow postgrey_t postgrey_var_lib_t:dir rw_dir_perms;
 files_var_lib_filetrans(postgrey_t,postgrey_var_lib_t,file)
 
 allow postgrey_t postgrey_var_run_t:file create_file_perms;
+allow postgrey_t postgrey_var_run_t:sock_file manage_file_perms;
 allow postgrey_t postgrey_var_run_t:dir rw_dir_perms;
 files_pid_filetrans(postgrey_t,postgrey_var_run_t,file)
 
@@ -50,12 +51,11 @@ corecmd_search_sbin(postgrey_t)
 
 corenet_non_ipsec_sendrecv(postgrey_t)
 corenet_tcp_sendrecv_generic_if(postgrey_t)
-corenet_raw_sendrecv_generic_if(postgrey_t)
 corenet_tcp_sendrecv_all_nodes(postgrey_t)
-corenet_raw_sendrecv_all_nodes(postgrey_t)
 corenet_tcp_sendrecv_all_ports(postgrey_t)
 corenet_tcp_bind_all_nodes(postgrey_t)
 corenet_tcp_bind_postgrey_port(postgrey_t)
+corenet_sendrecv_postgrey_server_packets(postgrey_t)
 
 dev_read_urand(postgrey_t)
 dev_read_sysfs(postgrey_t)

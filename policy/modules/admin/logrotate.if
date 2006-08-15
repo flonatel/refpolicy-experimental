@@ -102,7 +102,7 @@ interface(`logrotate_use_fds',`
 #
 interface(`logrotate_search_varlib',`
 	gen_require(`
-		type logrotate_t;
+		type logrotate_var_lib_t;
 	')
 
 	allow $1 logrotate_var_lib_t:dir search;

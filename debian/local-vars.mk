@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:43:00 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Tue May  9 16:21:27 2006
+## Last Modified On : Tue Aug 15 09:53:55 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 11
+## Update Count     : 12
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -40,6 +40,8 @@ DOCTOP  = $(TMPTOP)/usr/share/doc
 DOCDIR  = $(DOCTOP)/$(package)
 MENUDIR   = $(TMPTOP)/usr/lib/menu/
 OPTIONS=DISTRO=debian DIRECT_INITRC=y MONOLITHIC=n
+PYDEFAULT  =$(strip $(shell pyversions -vd))
+MODULES_DIR=$(TMPTOP)/usr/share/python-support/$(package)
 
 
 

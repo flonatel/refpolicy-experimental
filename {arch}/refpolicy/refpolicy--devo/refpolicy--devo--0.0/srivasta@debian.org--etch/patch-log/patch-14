@@ -1,0 +1,44 @@
+Revision: refpolicy--devo--0.0--patch-14
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed Aug 16 00:42:46 CDT 2006
+Standard-date: 2006-08-16 05:42:46 GMT
+Modified-files: policy/modules/admin/apt.te
+    policy/modules/admin/logrotate.te
+    policy/modules/services/amavis.fc
+    policy/modules/services/cron.te
+    policy/modules/services/openvpn.te
+    policy/modules/services/ssh.if
+    policy/modules/system/selinuxutil.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-11
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-12
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-13
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-14
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-15
+    srivasta@debian.org--etch/refpolicy--debian--0.0--patch-16
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-14
+Summary: A number of minor policy tweaks and updates for Debian from Erich.
+Keywords: 
+
+A number of minor policy tweaks and updates for Debian from Erich.
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-11
+   apt looks at all the file systems, don't audit that.
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-12
+   Allow semanage and apt to use the ssh fd
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-13
+   Allow logcheck to search run time dirs for logrotate
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-14
+   Amavis needs to run a cron job for bayes maintainance
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-15
+   mysql cron jons should be able to connect to the db
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-16
+   Fix openvpm local policy 
+

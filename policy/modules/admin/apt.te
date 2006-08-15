@@ -1,5 +1,5 @@
 
-policy_module(apt,1.0.0)
+policy_module(apt,1.0.1)
 
 ########################################
 #
@@ -76,23 +76,26 @@ corecmd_exec_bin(apt_t)
 corecmd_exec_shell(apt_t)
 corecmd_exec_sbin(apt_t)
 
+corenet_non_ipsec_sendrecv(apt_t)
 corenet_tcp_sendrecv_all_if(apt_t)
 corenet_udp_sendrecv_all_if(apt_t)
 corenet_tcp_sendrecv_all_nodes(apt_t)
 corenet_udp_sendrecv_all_nodes(apt_t)
 corenet_tcp_sendrecv_all_ports(apt_t)
 corenet_udp_sendrecv_all_ports(apt_t)
-corenet_non_ipsec_sendrecv(apt_t)
 # TODO: reall allow all these?
 corenet_tcp_bind_all_nodes(apt_t)
 corenet_udp_bind_all_nodes(apt_t)
 corenet_tcp_connect_all_ports(apt_t)
+corenet_sendrecv_all_client_packets(apt_t)
 
 dev_read_urand(apt_t)
 
 files_exec_usr_files(apt_t)
 files_read_etc_files(apt_t)
 files_read_etc_runtime_files(apt_t)
+
+fs_dontaudit_getattr_all_fs(apt_t)
 
 term_list_ptys(apt_t)
 term_use_all_terms(apt_t)
@@ -133,4 +136,9 @@ optional_policy(`
 optional_policy(`
 	rpm_read_db(apt_t)
 	rpm_domtrans(apt_t)
+')
+
+# Semanage and apt have issues without this. -- MS
+optional_policy(`
+	ssh_use_sshd_fd(apt_t)
 ')

@@ -1,5 +1,5 @@
 
-policy_module(nis,1.1.2)
+policy_module(nis,1.1.6)
 
 ########################################
 #
@@ -72,24 +72,26 @@ kernel_list_proc(ypbind_t)
 kernel_read_proc_symlinks(ypbind_t)
 kernel_tcp_recvfrom(ypbind_t)
 
+corenet_non_ipsec_sendrecv(ypbind_t)
 corenet_tcp_sendrecv_all_if(ypbind_t)
 corenet_udp_sendrecv_all_if(ypbind_t)
-corenet_raw_sendrecv_all_if(ypbind_t)
 corenet_tcp_sendrecv_all_nodes(ypbind_t)
 corenet_udp_sendrecv_all_nodes(ypbind_t)
-corenet_raw_sendrecv_all_nodes(ypbind_t)
 corenet_tcp_sendrecv_all_ports(ypbind_t)
 corenet_udp_sendrecv_all_ports(ypbind_t)
-corenet_non_ipsec_sendrecv(ypbind_t)
 corenet_tcp_bind_all_nodes(ypbind_t)
 corenet_udp_bind_all_nodes(ypbind_t)
 corenet_tcp_bind_generic_port(ypbind_t)
 corenet_udp_bind_generic_port(ypbind_t)
 corenet_tcp_bind_reserved_port(ypbind_t)
 corenet_udp_bind_reserved_port(ypbind_t)
+corenet_tcp_bind_all_rpc_ports(ypbind_t)
+corenet_udp_bind_all_rpc_ports(ypbind_t)
 corenet_tcp_connect_all_ports(ypbind_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(ypbind_t)
 corenet_dontaudit_udp_bind_all_reserved_ports(ypbind_t)
+corenet_sendrecv_all_client_packets(ypbind_t)
+corenet_sendrecv_generic_server_packets(ypbind_t)
 
 dev_read_sysfs(ypbind_t)
 
@@ -128,10 +130,6 @@ ifdef(`targeted_policy', `
 ')
 
 optional_policy(`
-	mount_send_nfs_client_request(ypbind_t)
-')
-
-optional_policy(`
 	seutil_sigchld_newrole(ypbind_t)
 ')
 
@@ -166,21 +164,20 @@ kernel_read_proc_symlinks(yppasswdd_t)
 kernel_getattr_proc_files(yppasswdd_t)
 kernel_read_kernel_sysctls(yppasswdd_t)
 
+corenet_non_ipsec_sendrecv(yppasswdd_t)
 corenet_tcp_sendrecv_generic_if(yppasswdd_t)
 corenet_udp_sendrecv_generic_if(yppasswdd_t)
-corenet_raw_sendrecv_generic_if(yppasswdd_t)
 corenet_tcp_sendrecv_all_nodes(yppasswdd_t)
 corenet_udp_sendrecv_all_nodes(yppasswdd_t)
-corenet_raw_sendrecv_all_nodes(yppasswdd_t)
 corenet_tcp_sendrecv_all_ports(yppasswdd_t)
 corenet_udp_sendrecv_all_ports(yppasswdd_t)
-corenet_non_ipsec_sendrecv(yppasswdd_t)
 corenet_tcp_bind_all_nodes(yppasswdd_t)
 corenet_udp_bind_all_nodes(yppasswdd_t)
 corenet_tcp_bind_reserved_port(yppasswdd_t)
 corenet_udp_bind_reserved_port(yppasswdd_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(yppasswdd_t)
 corenet_dontaudit_udp_bind_all_reserved_ports(yppasswdd_t)
+corenet_sendrecv_generic_server_packets(yppasswdd_t)
 
 dev_read_sysfs(yppasswdd_t)
 
@@ -272,21 +269,20 @@ kernel_read_kernel_sysctls(ypserv_t)
 kernel_list_proc(ypserv_t)
 kernel_read_proc_symlinks(ypserv_t)
 
+corenet_non_ipsec_sendrecv(ypserv_t)
 corenet_tcp_sendrecv_all_if(ypserv_t)
 corenet_udp_sendrecv_all_if(ypserv_t)
-corenet_raw_sendrecv_all_if(ypserv_t)
 corenet_tcp_sendrecv_all_nodes(ypserv_t)
 corenet_udp_sendrecv_all_nodes(ypserv_t)
-corenet_raw_sendrecv_all_nodes(ypserv_t)
 corenet_tcp_sendrecv_all_ports(ypserv_t)
 corenet_udp_sendrecv_all_ports(ypserv_t)
-corenet_non_ipsec_sendrecv(ypserv_t)
 corenet_tcp_bind_all_nodes(ypserv_t)
 corenet_udp_bind_all_nodes(ypserv_t)
 corenet_tcp_bind_reserved_port(ypserv_t)
 corenet_udp_bind_reserved_port(ypserv_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(ypserv_t)
 corenet_dontaudit_udp_bind_all_reserved_ports(ypserv_t)
+corenet_sendrecv_generic_server_packets(ypserv_t)
 
 dev_read_sysfs(ypserv_t)
 
@@ -342,15 +338,13 @@ optional_policy(`
 
 allow ypxfr_t self:unix_stream_socket create_stream_socket_perms;
 
+corenet_non_ipsec_sendrecv(ypxfr_t)
 corenet_tcp_sendrecv_all_if(ypxfr_t)
 corenet_udp_sendrecv_all_if(ypxfr_t)
-corenet_raw_sendrecv_all_if(ypxfr_t)
 corenet_tcp_sendrecv_all_nodes(ypxfr_t)
 corenet_udp_sendrecv_all_nodes(ypxfr_t)
-corenet_raw_sendrecv_all_nodes(ypxfr_t)
 corenet_tcp_sendrecv_all_ports(ypxfr_t)
 corenet_udp_sendrecv_all_ports(ypxfr_t)
-corenet_non_ipsec_sendrecv(ypxfr_t)
 corenet_tcp_bind_all_nodes(ypxfr_t)
 corenet_udp_bind_all_nodes(ypxfr_t)
 corenet_tcp_bind_reserved_port(ypxfr_t)
@@ -358,5 +352,7 @@ corenet_udp_bind_reserved_port(ypxfr_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(ypxfr_t)
 corenet_dontaudit_udp_bind_all_reserved_ports(ypxfr_t)
 corenet_tcp_connect_all_ports(ypxfr_t)
+corenet_sendrecv_generic_server_packets(ypxfr_t)
+corenet_sendrecv_all_client_packets(ypxfr_t)
 
 files_read_etc_files(ypxfr_t)

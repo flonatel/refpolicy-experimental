@@ -1,5 +1,5 @@
 
-policy_module(postfix,1.2.4)
+policy_module(postfix,1.2.10)
 
 ########################################
 #
@@ -11,12 +11,12 @@ attribute postfix_user_domains;
 # postfix user domains
 attribute postfix_user_domtrans;
 
-postfix_public_domain_template(bounce)
+postfix_server_domain_template(bounce)
 
 type postfix_spool_bounce_t;
 files_type(postfix_spool_bounce_t)
 
-postfix_public_domain_template(cleanup)
+postfix_server_domain_template(cleanup)
 
 type postfix_etc_t;
 files_type(postfix_etc_t)
@@ -45,9 +45,9 @@ typealias postfix_master_t alias postfix_t;
 # generation macro work
 mta_mailserver(postfix_t,postfix_master_exec_t)
 
-postfix_public_domain_template(pickup)
+postfix_server_domain_template(pickup)
 
-postfix_public_domain_template(pipe)
+postfix_server_domain_template(pipe)
 
 postfix_user_domain_template(postdrop)
 mta_mailserver_user_agent(postfix_postdrop_t)
@@ -60,7 +60,7 @@ files_type(postfix_private_t)
 type postfix_prng_t;
 files_type(postfix_prng_t)
 
-postfix_public_domain_template(qmgr)
+postfix_server_domain_template(qmgr)
 
 postfix_user_domain_template(showq)
 
@@ -131,20 +131,20 @@ allow postfix_master_t postfix_spool_maildrop_t:file { unlink rename getattr };
 
 kernel_read_all_sysctls(postfix_master_t)
 
+corenet_non_ipsec_sendrecv(postfix_master_t)
 corenet_tcp_sendrecv_all_if(postfix_master_t)
 corenet_udp_sendrecv_all_if(postfix_master_t)
-corenet_raw_sendrecv_all_if(postfix_master_t)
 corenet_tcp_sendrecv_all_nodes(postfix_master_t)
 corenet_udp_sendrecv_all_nodes(postfix_master_t)
-corenet_raw_sendrecv_all_nodes(postfix_master_t)
 corenet_tcp_sendrecv_all_ports(postfix_master_t)
 corenet_udp_sendrecv_all_ports(postfix_master_t)
-corenet_non_ipsec_sendrecv(postfix_master_t)
 corenet_tcp_bind_all_nodes(postfix_master_t)
-corenet_udp_bind_all_nodes(postfix_master_t)
 corenet_tcp_bind_amavisd_send_port(postfix_master_t)
 corenet_tcp_bind_smtp_port(postfix_master_t)
 corenet_tcp_connect_all_ports(postfix_master_t)
+corenet_sendrecv_amavisd_send_server_packets(postfix_master_t)
+corenet_sendrecv_smtp_server_packets(postfix_master_t)
+corenet_sendrecv_all_client_packets(postfix_master_t)
 
 # for a find command
 selinux_dontaudit_search_fs(postfix_master_t)
@@ -160,7 +160,7 @@ files_read_usr_files(postfix_master_t)
 
 init_use_script_ptys(postfix_master_t)
 
-miscfiles_dontaudit_search_man_pages(postfix_master_t)
+miscfiles_read_man_pages(postfix_master_t)
 
 seutil_sigchld_newrole(postfix_master_t)
 # postfix does a "find" on startup for some reason - keep it quiet
@@ -178,10 +178,6 @@ optional_policy(`
 optional_policy(`
 #	for postalias
 	mailman_manage_data_files(postfix_master_t)
-')
-
-optional_policy(`
-	mount_send_nfs_client_request(postfix_master_t)
 ')
 
 optional_policy(`
@@ -223,6 +219,7 @@ allow postfix_bounce_t self:capability dac_read_search;
 allow postfix_bounce_t self:tcp_socket create_socket_perms;
 
 allow postfix_bounce_t postfix_public_t:sock_file write;
+allow postfix_bounce_t postfix_public_t:dir search;
 
 allow postfix_bounce_t postfix_spool_t:dir create_dir_perms;
 allow postfix_bounce_t postfix_spool_t:file create_file_perms;
@@ -246,6 +243,7 @@ allow postfix_cleanup_t postfix_private_t:sock_file rw_file_perms;
 
 allow postfix_cleanup_t postfix_public_t:fifo_file rw_file_perms;
 allow postfix_cleanup_t postfix_public_t:sock_file { getattr write };
+allow postfix_cleanup_t postfix_public_t:dir search;
 
 allow postfix_cleanup_t postfix_spool_t:dir create_dir_perms;
 allow postfix_cleanup_t postfix_spool_t:file create_file_perms;
@@ -288,7 +286,7 @@ mta_read_config(postfix_local_t)
 
 optional_policy(`
 #	for postalias
-	mailman_read_data_files(postfix_local_t)
+	mailman_manage_data_files(postfix_local_t)
 ')
 
 optional_policy(`
@@ -318,18 +316,15 @@ kernel_read_kernel_sysctls(postfix_map_t)
 kernel_dontaudit_list_proc(postfix_map_t)
 kernel_dontaudit_read_system_state(postfix_map_t)
 
+corenet_non_ipsec_sendrecv(postfix_map_t)
 corenet_tcp_sendrecv_all_if(postfix_map_t)
 corenet_udp_sendrecv_all_if(postfix_map_t)
-corenet_raw_sendrecv_all_if(postfix_map_t)
 corenet_tcp_sendrecv_all_nodes(postfix_map_t)
 corenet_udp_sendrecv_all_nodes(postfix_map_t)
-corenet_raw_sendrecv_all_nodes(postfix_map_t)
 corenet_tcp_sendrecv_all_ports(postfix_map_t)
 corenet_udp_sendrecv_all_ports(postfix_map_t)
-corenet_non_ipsec_sendrecv(postfix_map_t)
-corenet_tcp_bind_all_nodes(postfix_map_t)
-corenet_udp_bind_all_nodes(postfix_map_t)
 corenet_tcp_connect_all_ports(postfix_map_t)
+corenet_sendrecv_all_client_packets(postfix_map_t)
 
 corecmd_list_bin(postfix_map_t)
 corecmd_read_bin_symlinks(postfix_map_t)
@@ -393,6 +388,7 @@ allow postfix_pickup_t postfix_private_t:sock_file write;
 
 allow postfix_pickup_t postfix_public_t:fifo_file rw_file_perms;
 allow postfix_pickup_t postfix_public_t:sock_file rw_file_perms;
+allow postfix_pickup_t postfix_public_t:dir search;
 
 postfix_list_spool(postfix_pickup_t)
 allow postfix_pickup_t postfix_spool_maildrop_t:dir rw_dir_perms;
@@ -410,6 +406,7 @@ allow postfix_pipe_t postfix_private_t:dir search;
 allow postfix_pipe_t postfix_private_t:sock_file write;
 
 allow postfix_pipe_t postfix_public_t:fifo_file { getattr write };
+allow postfix_pipe_t postfix_public_t:dir search;
 
 allow postfix_pipe_t postfix_spool_t:dir search;
 allow postfix_pipe_t postfix_spool_t:file rw_file_perms;
@@ -455,10 +452,7 @@ ifdef(`targeted_policy', `
 ')
 
 optional_policy(`
-	cron_use_fds(postfix_postdrop_t)
-	cron_rw_pipes(postfix_postdrop_t)
-	cron_use_system_job_fds(postfix_postdrop_t)
-	cron_rw_system_job_pipes(postfix_postdrop_t)
+	cron_system_entry(postfix_postdrop_t, postfix_postdrop_exec_t)
 ')
 
 optional_policy(`
@@ -515,6 +509,7 @@ allow postfix_qmgr_t postfix_private_t:sock_file rw_file_perms;
 
 allow postfix_qmgr_t postfix_public_t:fifo_file rw_file_perms;
 allow postfix_qmgr_t postfix_public_t:sock_file write;
+allow postfix_qmgr_t postfix_public_t:dir search;
 
 # for /var/spool/postfix/active
 allow postfix_qmgr_t postfix_spool_t:dir create_dir_perms;
@@ -594,6 +589,10 @@ allow { postfix_smtp_t postfix_smtpd_t } postfix_prng_t:file rw_file_perms;
 # for OpenSSL certificates
 files_read_usr_files(postfix_smtpd_t)
 mta_read_aliases(postfix_smtpd_t)
+
+optional_policy(`
+	postgrey_stream_connect(postfix_smtpd_t)
+')
 
 optional_policy(`
 	sasl_connect(postfix_smtpd_t)

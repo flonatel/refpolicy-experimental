@@ -1,0 +1,10 @@
+Revision: refpolicy--netuser--0.0--patch-3
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed Aug 16 00:35:58 CDT 2006
+Standard-date: 2006-08-16 05:35:58 GMT
+Modified-files: policy/modules/kernel/kernel.te
+New-patches: srivasta@debian.org--etch/refpolicy--netuser--0.0--patch-3
+Summary: Actually define the role netuser_r
+Keywords: 
+

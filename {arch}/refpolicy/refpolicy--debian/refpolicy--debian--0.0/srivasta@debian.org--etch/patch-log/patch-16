@@ -1,0 +1,10 @@
+Revision: refpolicy--debian--0.0--patch-16
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Wed Aug 16 00:27:16 CDT 2006
+Standard-date: 2006-08-16 05:27:16 GMT
+Modified-files: policy/modules/services/openvpn.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-16
+Summary: Fix openvpm local policy 
+Keywords: 
+

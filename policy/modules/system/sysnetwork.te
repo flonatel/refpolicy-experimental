@@ -1,5 +1,5 @@
 
-policy_module(sysnetwork,1.1.3)
+policy_module(sysnetwork,1.1.9)
 
 ########################################
 #
@@ -91,6 +91,7 @@ kernel_read_network_state(dhcpc_t)
 kernel_read_kernel_sysctls(dhcpc_t)
 kernel_use_fds(dhcpc_t)
 
+corenet_non_ipsec_sendrecv(dhcpc_t)
 corenet_tcp_sendrecv_all_if(dhcpc_t)
 corenet_raw_sendrecv_all_if(dhcpc_t)
 corenet_udp_sendrecv_all_if(dhcpc_t)
@@ -99,11 +100,12 @@ corenet_raw_sendrecv_all_nodes(dhcpc_t)
 corenet_udp_sendrecv_all_nodes(dhcpc_t)
 corenet_tcp_sendrecv_all_ports(dhcpc_t)
 corenet_udp_sendrecv_all_ports(dhcpc_t)
-corenet_non_ipsec_sendrecv(dhcpc_t)
 corenet_tcp_bind_all_nodes(dhcpc_t)
 corenet_udp_bind_all_nodes(dhcpc_t)
 corenet_udp_bind_dhcpc_port(dhcpc_t)
 corenet_tcp_connect_all_ports(dhcpc_t)
+corenet_sendrecv_dhcpd_client_packets(dhcpc_t)
+corenet_sendrecv_dhcpc_server_packets(dhcpc_t)
 
 dev_read_sysfs(dhcpc_t)
 # for SSP:
@@ -153,7 +155,6 @@ ifdef(`distro_redhat', `
 ifdef(`targeted_policy', `
 	term_dontaudit_use_unallocated_ttys(dhcpc_t)
 	term_dontaudit_use_generic_ptys(dhcpc_t)
-
 	files_dontaudit_read_root_files(dhcpc_t)
 ')
 
@@ -176,11 +177,6 @@ optional_policy(`
 
 	optional_policy(`
 		networkmanager_dbus_chat(dhcpc_t)
-	')
-
-	ifdef(`unconfined.te', `
-		allow unconfined_t dhcpc_t:dbus send_msg;
-		allow dhcpc_t unconfined_t:dbus send_msg;
 	')
 ')
 
@@ -247,6 +243,8 @@ optional_policy(`
 ')
 
 optional_policy(`
+	kernel_read_xen_state(dhcpc_t)
+	kernel_write_xen_state(dhcpc_t)
 	xen_append_log(dhcpc_t)
 	xen_dontaudit_rw_unix_stream_sockets(dhcpc_t)
 ')
@@ -279,6 +277,7 @@ allow ifconfig_t self:udp_socket create_socket_perms;
 # for /sbin/ip
 allow ifconfig_t self:packet_socket create_socket_perms;
 allow ifconfig_t self:netlink_route_socket create_netlink_socket_perms;
+allow ifconfig_t self:netlink_xfrm_socket { create_netlink_socket_perms nlmsg_read };
 allow ifconfig_t self:tcp_socket { create ioctl };
 files_read_etc_files(ifconfig_t);
 
@@ -291,6 +290,8 @@ kernel_rw_net_sysctls(ifconfig_t)
 corenet_rw_tun_tap_dev(ifconfig_t)
 
 dev_read_sysfs(ifconfig_t)
+# for IPSEC setup:
+dev_read_urand(ifconfig_t)
 
 fs_getattr_xattr_fs(ifconfig_t)
 fs_search_auto_mountpoints(ifconfig_t)
@@ -347,6 +348,8 @@ optional_policy(`
 ')
 
 optional_policy(`
+	kernel_read_xen_state(ifconfig_t)
+	kernel_write_xen_state(ifconfig_t)
 	xen_append_log(ifconfig_t)
 	xen_dontaudit_rw_unix_stream_sockets(ifconfig_t)
 ')

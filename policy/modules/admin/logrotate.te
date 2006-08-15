@@ -122,7 +122,10 @@ userdom_use_unpriv_users_fds(logrotate_t)
 
 cron_system_entry(logrotate_t, logrotate_exec_t)
 cron_search_spool(logrotate_t)
-
+# for logcheck: (Note that this is a design-rule violation for refpolicy,
+# using crond_t in this file directly, should be via an interface!)
+allow crond_t logrotate_var_lib_t:dir search;
+ 
 mta_send_mail(logrotate_t)
 
 ifdef(`distro_debian', `
@@ -199,8 +202,6 @@ optional_policy(`
 ')
 
 ifdef(`TODO',`
-ifdef(`gnome-pty-helper.te', `allow logrotate_t sysadm_gph_t:fd use;')
-
 # it should not require this
 allow logrotate_t {staff_home_dir_t sysadm_home_dir_t}:dir { getattr read search };
 

@@ -1,3 +1,16 @@
+refpolicy (0.0.20060813-1) unstable; urgency=low
+
+  * New upstream SCM HEAD.
+  * Bug fix: "refpolicy: FTBFS: tmp/generated_definitions.conf:597:ERROR
+    'syntax error' at token '' on line 3416:", thanks to Andreas Jochens
+                                                        (Closes: #379559).
+  * Bug fix: "FTBFS while generating selinux-policy-refpolicy-strict",
+    thanks to Devin Carraway                            (Closes: #379376).
+  * Python transition (#2): you are building a private python module.
+                                                        (Closes: #380930).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Tue, 15 Aug 2006 09:53:06 -0500
+
 refpolicy (0.0.20060509-2) unstable; urgency=low
 
   * Modified some paths to be more in line with upstream standards.

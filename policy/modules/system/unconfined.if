@@ -52,14 +52,11 @@ interface(`unconfined_domain_noaudit',`
 		allow $1 self:process execmem;
 	')
 
-	tunable_policy(`allow_execmem && allow_execstack',`
-		# Allow making the stack executable via mprotect.
-		allow $1 self:process execstack;
+	tunable_policy(`allow_execstack',`
+		# Allow making the stack executable via mprotect;
+		# execstack implies execmem;
+		allow $1 self:process { execstack execmem };
 #		auditallow $1 self:process execstack;
-	', `
-		# These are fairly common but seem to be harmless
-		# caused by using shared libraries built with old tool chains
-		#dontaudit $1 self:process execstack;
 	')
 
 
@@ -73,6 +70,8 @@ interface(`unconfined_domain_noaudit',`
 	')
 
 	optional_policy(`
+		# this is to handle execmod on shared
+		# libs with text relocations
 		libs_use_shared_libs($1)
 	')
 
@@ -184,6 +183,44 @@ interface(`unconfined_shell_domtrans',`
 	')
 
 	corecmd_shell_domtrans($1,unconfined_t)
+')
+
+########################################
+## <summary>
+##	Allow unconfined to execute the specified program in
+##	the specified domain.
+## </summary>
+## <desc>
+##	<p>
+##	Allow unconfined to execute the specified program in
+##	the specified domain.
+##	</p>
+##	<p>
+##	This is a interface to support third party modules
+##	and its use is not allowed in upstream reference
+##	policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain to execute in.
+##	</summary>
+## </param>
+## <param name="entry_file">
+##	<summary>
+##	Domain entry point file.
+##	</summary>
+## </param>
+#
+interface(`unconfined_domtrans_to',`
+	gen_require(`
+		type unconfined_t;
+	')
+
+	domain_auto_trans(unconfined_t,$2,$1)
+	allow $1 unconfined_t:fd use;
+	allow $1 unconfined_t:fifo_file rw_file_perms;
+	allow $1 unconfined_t:process sigchld;
 ')
 
 ########################################
@@ -362,6 +399,24 @@ interface(`unconfined_dontaudit_rw_tcp_sockets',`
 
 ########################################
 ## <summary>
+##	Create keys for the unconfined domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`unconfined_create_keys',`
+	gen_require(`
+		type unconfined_t;
+	')
+
+	allow $1 unconfined_t:key create;
+')
+
+########################################
+## <summary>
 ##	Send messages to the unconfined domain over dbus.
 ## </summary>
 ## <param name="domain">
@@ -428,6 +483,26 @@ interface(`unconfined_alias_domain',`
 
 		typealias unconfined_t alias $1;
 	',`
-		errprint(`Warning: $0($1) has no effect in strict policy.'__endline__)
+		refpolicywarn(`$0($1) has no effect in strict policy.')
 	')
+')
+
+########################################
+## <summary>
+##	Connect to the the unconfined DBUS
+##	for service (acquire_svc).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`unconfined_dbus_connect',`
+	gen_require(`
+		type unconfined_t;
+		class dbus acquire_svc;
+	')
+
+	allow $1 unconfined_t:dbus acquire_svc;
 ')

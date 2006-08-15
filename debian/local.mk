@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Fri May 12 08:52:31 2006
+## Last Modified On : Tue Aug 15 10:08:05 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 47
+## Update Count     : 48
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -125,10 +125,6 @@ DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-doc
 
 build/selinux-policy-refpolicy-strict:
 	$(REASON)
-	# until module linking is fixed, build everything as modules...
-	test -e debian/stamp/build-strict                    ||            \
-	  sed -e 's/ = module/ = base/' < debian/modules.conf.strict >     \
-                   $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	test -e debian/stamp/build-strict                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS) policy all)
@@ -137,10 +133,6 @@ STAMPS_TO_CLEAN += debian/stamp/build-strict
 
 build/selinux-policy-refpolicy-targeted:
 	$(REASON)
-	# until module linking is fixed, build everything as modules...
-	test -e debian/stamp/build-targeted                    ||            \
-	  sed -e 's/ = module/ = base/' < debian/modules.conf.targeted >     \
-                   $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	test -e debian/stamp/build-targeted                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                            \
            $(MAKE) NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS) policy all)
