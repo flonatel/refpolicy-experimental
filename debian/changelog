@@ -1,3 +1,33 @@
+refpolicy (0.0.20060813-2) unstable; urgency=low
+
+  * Bug fix: "Needs gawk", thanks to Simon Richard Grint
+                                                         (Closes: #382821).
+  * Bug fix: "Move /etc/selinux/refpolicy/src/policy/man/man8/*
+    manpages?", thanks to Uwe Hermann                    (Closes: #372789).
+  * Fix errors in post installation initial policy creation process in the
+    postinst. 
+  * Add directories required during policy build during postinst. This bug
+    prevented any policies being built when the package was initially
+    installed. Also, create an empty  file_contexts.local file if it does
+    not already exist. 
+  * Make selinux-policy-refpolicy-targeted provide and replace the
+    obsolete package selinux-policy-default; which should in the future be
+    just a virtual package. 
+  * Added postrm packages to strict and targeted policy packages, in order
+    to clean out the directories in which files are created during policy
+    build. 
+  * Rewrote the postinst in perl to allow us to do module dependency
+    checks, and to map policy modules to debian packages, in order to
+    better detect the modules that would be necessary for the target
+    machine. 
+  * Also, compiling with either MCS or MLS produced errors while
+    installing policy, since we lack setrans daemon. So we are now
+    building with out them, created an easy to modify option to re-enable
+    it later.
+  * Updated modules.conf to use the latest offerings from Erich.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 21 Aug 2006 14:59:52 -0500
+
 refpolicy (0.0.20060813-1) unstable; urgency=low
 
   * New upstream SCM HEAD.

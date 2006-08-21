@@ -1,0 +1,231 @@
+#! /usr/bin/perl
+#                              -*- Mode: Cperl -*- 
+# postinst.pl --- 
+# Author           : Manoj Srivastava ( srivasta@glaurung.internal.golden-gryphon.com ) 
+# Created On       : Mon Aug 21 01:14:21 2006
+# Created On Node  : glaurung.internal.golden-gryphon.com
+# Last Modified By : Manoj Srivastava
+# Last Modified On : Mon Aug 21 16:06:00 2006
+# Last Machine Used: glaurung.internal.golden-gryphon.com
+# Update Count     : 18
+# Status           : Unknown, Use with caution!
+# HISTORY          : 
+# Description      : 
+# 
+# arch-tag: 69c85425-4822-4b17-bb54-3b2d22e76687
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# 
+#use strict; #for debugging
+use Cwd 'abs_path';
+$|=1;
+
+# Ignore all invocations except when called on to configure.
+exit 0 if $ARGV[0] =~ /abort-upgrade/;
+exit 0 if $ARGV[0] =~ /abort-remove/;
+exit 0 if $ARGV[0] =~ /abort-deconfigure/;
+exit 0 unless $ARGV[0] =~ /configure/;
+
+my $type        = '=T';
+my $package_name= "selinux-policy-refpolicy-$type";
+my $policy_name = "refpolicy-$type";
+my $basedir     = "/etc/selinux/$policy_name";
+my $src_dir     = "/usr/share/selinux/$policy_name";
+
+# List of all the modules in the policy
+my @all_modules;
+# Full path of all modules in the policy
+my %Module_Path;
+# Dpendencies for policy modules, as determined by semodule_deps
+my %Deps;
+# A hash of all modules already processed
+my %Seen;
+# Policy modules in dependency order (subset of all modules in policy)
+my @ordered;
+# A list of modules already scheduled to be laoded
+my %Loaded;
+# and the order in which the modules should be loaded into policy.
+my @load_order;
+# A mapping of policy modules to Debian package names.
+my %map = (
+           'amavis'     => [ 'amavisd-new' ],
+           'apache'     => [ 'apache*' ],
+           'automount'  => [ 'autofs*' ],
+           'bind'       => [ 'bind9' ],
+           'bootloader' => [ 'grub', 'lilo' ],
+           'clock'      => [ 'util-linux' ],
+           'courier'    => [ 'courier*' ],
+           'cyrus'      => [ 'cyrus*' ],
+           'dhcp'       => [ 'dhcp*', 'dhclient*', 'pump' ],
+           'finger'     => [ 'finger', '*fingerd' ],
+           'ftp'        => [ 'ftp', '*ftpd' ],
+           'gpg'        => [ 'gnupg' ],
+           'inetd'      => [ '*-inetd', 'rinetd', 'rlinetd', 'xinetd' ],
+           'java'       => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
+                             'java*', 'jvm*', 'jre*', 'jsdk*' ],
+           'ldap'       => [ 'slapd' ],
+           'lpd'        => [ 'cupsys*', 'lprng', 'rlpr' ],
+           'loadkeys'   => [ 'console-tools' ],
+           'munin'      => [ 'munin-node' ],
+           'mysql'      => [ 'mysql-server*' ],
+           'mozilla'    => [ 'mozilla-*', 'firefox*' ],
+           'netutils'   => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
+           'radius'     => [ 'freeradius*', 'radiusd*' ],
+           'raid'       => [ 'mdadm' ],
+           'rpc'        => [ 'nfs-common', 'nfs-kernel-server' ],
+           'sasl'       => [ 'libsasl2' ],
+           'su'         => [ 'login' ],
+           'sysstat'    => [ 'atsar' ],
+           'telnet'     => [ 'telnet', '*telnetd*' ],
+           'uml'        => [ 'linux-uml*' ],
+           'uptime'     => [ 'uptimed' ],
+           'usermanage' => [ 'passwd' ],
+          );
+
+#  List all th modules, except the base module, in the policy
+#  directory. This sets @all_modules and %Module_Path 
+sub list_modules {
+  my $src_dir = shift;
+  print STDERR "Locating modules\n";
+  opendir(DIR, $src_dir) || die "can't opendir $src_dir: $!";
+
+  @all_modules = grep { ! m/^base\.pp$/ && m/\.pp/ && -f "$src_dir/$_" }
+    readdir(DIR);
+  %Module_Path = map { +"$src_dir/$_" => 0 } @all_modules;
+  closedir DIR;
+}
+
+# Using the hash array %Module_Path created in the last step, run
+# semodule_deps to get the dependency relationships. This creates the
+# %Deps dependency hash.
+sub get_dependencies {
+  my $src_dir = shift;
+  print STDERR "Calculating dependencies between modules\n";
+  open(COMMAND, '-|', "semodule_deps -g  $src_dir/base.pp " .
+       join(' ', keys %Module_Path)) || die "Could not run semodule_deps";
+  while (<COMMAND>) {
+    chomp;
+    next unless m/\-\>/;
+    next unless m/\s*(\S+)\s*\-\>\s*(\S+)\s*$/;
+    if (defined $Deps{$1}) {
+      $Deps{$1} = "$Deps{$1} $2";
+    }
+    else {
+      $Deps{$1} = $2;
+    }
+  }
+  close COMMAND;
+}
+
+# In this step, use the dependecy hash %Deps created in the last step,
+# and feed the information to tsort to get an ordered list of
+# modules. This creates the array @ordered
+sub get_ordering {
+  print STDERR "Ordering modules based on dependencies\n";
+  my $tempfile=`tempfile -p tsrt -m 0600`;
+  open(SORT, "| tsort > $tempfile") || die "can't open pipe to tsort: $!";
+  for my $pkg (keys %Deps) {
+    for my $dep (split(/ /, $Deps{$pkg})) {
+      print SORT "$dep $pkg\n";
+    }
+  }
+  close SORT;
+
+  open(RESULTS, $tempfile) || die "can't read $tempfile: $!";
+  while (<RESULTS>) {
+    chomp;
+    push @ordered, $_;
+  }
+  unlink $tempfile;
+  close RESULTS;
+}
+
+# Cycle over all the modules installed, starting with the dependency
+# ordered modules, taking care that we only look at a module once. For
+# each module, we look to see a mapping ogf the packages that need
+# this policy module. We then query dpkg to see if any of the package
+# patterns that are associated with a policy module are installed on
+# this system, if so, we schedule the module to be loaded, ensuring
+# that the dependent policy modules are also targeted for installation
+# before the current module is installed. This creates the Seen hash,
+# and the Load_Order array, as well as the Loaded hash.
+sub installed_modules {
+  print STDERR "Selecting modules based on installed packages\n";
+  foreach my $module (@ordered, @all_modules) {
+    $module =~ s/\.pp$//o;
+
+    next if $Seen{$module};
+    $Seen{$module}++;
+
+    if (! defined $map{$module}) { $map{$module} = [ $module ]; }
+
+  PACKAGE:
+    for my $pkg (@{ $map{$module} }) {
+      if (system("dpkg-query -W $pkg > /dev/null 2>\&1") == 0) {
+        if (defined $Deps{$module}) {
+          for my $dep (split(' ', $Deps{$module})) {
+            next if $Loaded{$dep};
+            push @Load_Order, $dep;
+            $Loaded{$dep}++
+          }
+        }
+        push @Load_Order, $module;
+        $Loaded{$module}++;
+        last PACKAGE;
+      }
+    }
+  }
+}
+
+sub main {
+  if (-e "$BASEDIR/modules/active/base.pp" ) {
+    print STDERR "You already have a $policy_name policy installed.\n";
+    print STDERR "I am leaving it alone. Please check and update manually.\n";
+  }
+  elsif (-e "$src_dir/base.pp") {
+    print STDERR "Notice: Trying to link (but not load) a $policy_name policy.\n";
+    print STDERR "This process may fail -- you should check the results, and \n";
+    print STDERR "you need to switch to this policy yourself anyway.\n\n";
+    &list_modules("$src_dir");
+    &get_dependencies("$src_dir");
+    &get_ordering();
+    &installed_modules();
+    if (system("semodule -b $src_dir/base.pp -s $policy_name -n ") == 0) {
+      print STDERR "Loaded base policy\n";
+      for my $mod (@Load_Order) {
+        if (system("semodule -i $src_dir/${mod}.pp -s $policy_name -n ") == 0) {
+          print STDERR "Loaded module ${mod}.pp\n";
+        }
+        else {
+          print STDERR "Failed to load module ${mod}.pp\n";
+        }
+      }
+    }
+    else {
+      print STDERR "Could not load $src_dir/base.pp for $policy_name.\n";
+      print STDERR "Failed to load base policy, please load policy manually.\n";
+    }
+  }
+  else {
+    print STDERR ".\n";
+  }
+}
+
+&main;
+
+exit 0;
+
+__END__

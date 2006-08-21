@@ -1,0 +1,10 @@
+Revision: debian-dir--refpolicy--1.0--patch-15
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Mon Aug 21 16:06:18 CDT 2006
+Standard-date: 2006-08-21 21:06:18 GMT
+Modified-files: postinst.policy
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-15
+Summary: Give progress reports in postinst
+Keywords: 
+

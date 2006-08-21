@@ -163,7 +163,8 @@ certwatch = off
 #
 # Determine of the console connected to the controlling terminal.
 # 
-consoletype = module
+# Not in Debian.
+consoletype = off
 
 # Layer: admin
 # Module: ddcprobe
@@ -522,7 +523,7 @@ usernetctl = module
 #
 # VMWare Workstation virtual machines
 # 
-vmware = module
+vmware = off
 
 # Layer: apps
 # Module: webalizer
@@ -687,6 +688,14 @@ raid = module
 selinuxutil = base
 
 # Layer: system
+# Module: setrans
+#
+# SELinux MLS/MCS label translation service.
+# 
+# not yet in debian AFIAK.
+setrans = off
+
+# Layer: system
 # Module: sysnetwork
 #
 # Policy for network configuration: ifconfig and dhcp client.
@@ -712,7 +721,7 @@ unconfined = module
 #
 # Policy for user domains
 # 
-userdomain = module
+userdomain = base
 
 # Layer: system
 # Module: xen
@@ -825,7 +834,8 @@ clamav = module
 #
 # Clockspeed simple network time protocol client
 # 
-clockspeed = module
+# not in debian?
+clockspeed = off
 
 # Layer: services
 # Module: comsat
@@ -1169,6 +1179,14 @@ ntop = module
 # Network time protocol daemon
 # 
 ntp = module
+
+# Layer: services
+# Module: nx
+#
+# NX remote desktop
+# 
+# Not officially in Debian, but being worked on.
+nx = module
 
 # Layer: services
 # Module: oav

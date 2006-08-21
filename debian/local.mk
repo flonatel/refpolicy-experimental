@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Tue Aug 15 10:08:05 2006
+## Last Modified On : Mon Aug 21 14:48:16 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 48
+## Update Count     : 64
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -57,10 +57,12 @@ CONFIG/selinux-policy-refpolicy-strict::
                 README man $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp/config-strict  ||                             \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
-                   NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS) bare
+                   NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) bare
 	test -e debian/stamp/config-strict  ||                             \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
-           $(MAKE) NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS) conf)
+           $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) conf)
+	cp debian/modules.conf.strict                                      \
+                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	echo done > debian/stamp/config-strict
 STAMPS_TO_CLEAN += debian/stamp/config-strict
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-strict
@@ -78,10 +80,12 @@ CONFIG/selinux-policy-refpolicy-targeted::
                 README man $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp/config-targeted  ||                           \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
-                 NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS) bare
+                 NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) bare
 	test -e debian/stamp/config-targeted  ||                           \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
-           $(MAKE) NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS) conf)
+           $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) conf)
+	cp debian/modules.conf.targeted                                    \
+                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	echo done > debian/stamp/config-targeted
 STAMPS_TO_CLEAN += debian/stamp/config-targeted
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-targeted
@@ -122,12 +126,14 @@ CONFIG/selinux-policy-refpolicy-doc::
 STAMPS_TO_CLEAN += debian/stamp/config-doc
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-doc
 
+BUILD-common::
+	perl -wc debian/postinst.policy
 
 build/selinux-policy-refpolicy-strict:
 	$(REASON)
 	test -e debian/stamp/build-strict                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
-           $(MAKE) NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS) policy all)
+           $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) policy all)
 	echo done > debian/stamp/build-strict   
 STAMPS_TO_CLEAN += debian/stamp/build-strict   
 
@@ -135,7 +141,7 @@ build/selinux-policy-refpolicy-targeted:
 	$(REASON)
 	test -e debian/stamp/build-targeted                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                            \
-           $(MAKE) NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS) policy all)
+           $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) policy all)
 	echo done > debian/stamp/build-targeted 
 STAMPS_TO_CLEAN += debian/stamp/build-targeted   
 
@@ -151,10 +157,13 @@ install/selinux-policy-refpolicy-strict:
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(MENUDIR)
-	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/modules
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/policy
 	$(make_directory)    $(TMPTOP)/usr/share/selinux/
+	test -f $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active/file_contexts.local || \
+	touch $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active/file_contexts.local
 	(cd $(SRCTOP)/debian/build-$(package);                      \
-            $(MAKE) NAME=refpolicy-strict TYPE=strict-mcs $(OPTIONS)\
+            $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS)\
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/system.users)
@@ -172,10 +181,13 @@ install/selinux-policy-refpolicy-targeted:
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(MENUDIR)
-	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/modules
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active
+	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/policy
 	$(make_directory)    $(TMPTOP)/usr/share/selinux/
+	test -f $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active/file_contexts.local || \
+	touch $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active/file_contexts.local
 	(cd $(SRCTOP)/debian/build-$(package);                      \
-            $(MAKE) NAME=refpolicy-targeted TYPE=targeted-mcs $(OPTIONS)\
+            $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS)\
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/system.users)
@@ -199,6 +211,7 @@ install/selinux-policy-refpolicy-src:
 	find $(TMPTOP) -type d -name .arch-ids -print0 | xargs -0r rm -rf
 	test ! -e $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING || \
            rm -f $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING
+	rm -rf   $(TMPTOP)/etc/selinux/refpolicy/src/policy/man
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
@@ -236,7 +249,9 @@ binary/selinux-policy-refpolicy-strict:
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
-	$(install_program)   debian/strict.postinst      $(TMPTOP)/DEBIAN/postinst
+	sed -e 's/=T/strict/g' debian/postinst.policy  > $(TMPTOP)/DEBIAN/postinst
+	chmod 755                                      $(TMPTOP)/DEBIAN/postinst
+	$(install_program)   debian/strict.postrm      $(TMPTOP)/DEBIAN/postrm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
 	chown -R root:root $(TMPTOP)
@@ -247,8 +262,10 @@ binary/selinux-policy-refpolicy-targeted:
 	$(REASON)
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
-	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
-	$(install_program)   debian/targeted.postinst $(TMPTOP)/DEBIAN/postinst
+	(cd $(TMPTOP); find etc -type f | sed 's,^,/,'  > DEBIAN/conffiles)
+	sed -e 's/=T/targeted/g' debian/postinst.policy >$(TMPTOP)/DEBIAN/postinst
+	chmod 755                                       $(TMPTOP)/DEBIAN/postinst
+	$(install_program)   debian/targeted.postrm     $(TMPTOP)/DEBIAN/postrm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
 	chown -R root:root $(TMPTOP)

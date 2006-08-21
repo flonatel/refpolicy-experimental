@@ -5,9 +5,9 @@
 # Created On       : Fri Nov 14 11:25:07 2003
 # Created On Node  : glaurung.green-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Fri May 12 02:32:00 2006
+# Last Modified On : Sun Aug 20 16:26:45 2006
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 15
+# Update Count     : 16
 # Status           : Unknown, Use with caution!
 # HISTORY          : 
 # Description      : 
@@ -47,6 +47,7 @@ fi
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
 #        * <old-postinst> `abort-upgrade' <new version>
+#        * <old-postinst> abort-remove  # if prerm fails during removal
 #        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
 #          <new-version>
 #        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'

@@ -1,0 +1,23 @@
+Revision: debian-dir--refpolicy--1.0--patch-14
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Mon Aug 21 15:41:26 CDT 2006
+Standard-date: 2006-08-21 20:41:26 GMT
+New-files: postinst.policy
+Removed-files: strict.postinst targeted.postinst
+Modified-files: changelog local-vars.mk local.mk
+    modules.conf.strict modules.conf.targeted
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-14
+Summary: Major changes to useability of reference policy
+Keywords: 
+
+Rewrote the policy postinst in perl to allow us to do module dependency
+checks, and to map policy modules to debian packages, in order to better
+detect the modules that would be necessary for the target machine.  This
+is a common postinst for all policy packages we build.
+
+Also, compiling with either MCS or MLS produced errors while installing
+policy, since we lack setrans daemon. So we are now building with out
+them, created an easy to modify option to re-enable it later.
+
+Updated modules.conf to use the latest offerings from Erich.

@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:43:00 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Tue Aug 15 09:53:55 2006
+## Last Modified On : Sun Aug 20 21:57:04 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 12
+## Update Count     : 14
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -39,10 +39,14 @@ INFODIR = $(TMPTOP)/usr/share/info
 DOCTOP  = $(TMPTOP)/usr/share/doc
 DOCDIR  = $(DOCTOP)/$(package)
 MENUDIR   = $(TMPTOP)/usr/lib/menu/
+
 OPTIONS=DISTRO=debian DIRECT_INITRC=y MONOLITHIC=n
+
 PYDEFAULT  =$(strip $(shell pyversions -vd))
 MODULES_DIR=$(TMPTOP)/usr/share/python-support/$(package)
 
+# set this to -mcs, -mls, or -mcs-mls
+MCS_MLS_TYPE=
 
 
 define checkdir

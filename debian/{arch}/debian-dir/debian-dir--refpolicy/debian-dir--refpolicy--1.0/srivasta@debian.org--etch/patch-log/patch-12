@@ -1,0 +1,22 @@
+Revision: debian-dir--refpolicy--1.0--patch-12
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Sun Aug 20 20:23:42 CDT 2006
+Standard-date: 2006-08-21 01:23:42 GMT
+Modified-files: changelog control doc.postinst local.mk
+    strict.postinst targeted.postinst
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-12
+Summary: Add missing dependency on gawk
+Keywords: 
+
+* control (Depends): The policy build process now requires gawk
+
+* local.mk (install/selinux-policy-refpolicy-strict): Add directories
+  required during policy build during postinst. Also, create an empty
+  file_contexts.local file if it does not already exist.
+  (install/selinux-policy-refpolicy-targeted): Ditto
+
+* strict.postinst (SRCDIR): Install the setrans module by default, since
+  we build MCS in 
+
+* targeted.postinst (SRCDIR): Ditto
