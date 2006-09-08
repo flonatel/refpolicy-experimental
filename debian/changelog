@@ -1,3 +1,17 @@
+refpolicy (0.0.20060907-2) unstable; urgency=low
+
+  * Update the module/package mapping.
+  * In the selinux-policy-refpolicy-src package, now ship the
+    modules.conf.strict and the modules.conf.targeted files which are used
+    to build the corresponding policy packages, snce the raw modules.conf
+    package has issues on Debian.
+  * With this version, we no longer ship the selinux-policy-refpolicy-src
+    unpacked into /etc with a gazillion conffiles; instead, we now ship a
+    compressed tarball in /usr/src, which the user may unpack where they
+    wish, and install policies as they wish.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri,  8 Sep 2006 10:49:40 -0500
+
 refpolicy (0.0.20060907-1) unstable; urgency=low
 
   * New upstream SCM HEAD.

@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Tue Sep  5 22:32:14 2006
+## Last Modified On : Fri Sep  8 11:27:35 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 68
+## Update Count     : 75
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -104,6 +104,14 @@ CONFIG/selinux-policy-refpolicy-src::
 	test -e debian/stamp/config-src         ||                        \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                         \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf)
+	cp debian/modules.conf.strict                                      \
+                     $(SRCTOP)/debian/build-$(package)/policy/
+	cp debian/modules.conf.targeted                                    \
+                     $(SRCTOP)/debian/build-$(package)/policy/
+	mv $(SRCTOP)/debian/build-$(package)/policy/modules.conf           \
+                 $(SRCTOP)/debian/build-$(package)/policy/modules.conf.dist
+	ln -s modules.conf.strict                                          \
+                 $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	echo done > debian/stamp/config-src
 STAMPS_TO_CLEAN += debian/stamp/config-src
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-src
@@ -156,7 +164,6 @@ install/selinux-policy-refpolicy-strict:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
-	$(make_directory)    $(MENUDIR)
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/policy
 	$(make_directory)    $(TMPTOP)/usr/share/selinux/
@@ -180,7 +187,6 @@ install/selinux-policy-refpolicy-targeted:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
-	$(make_directory)    $(MENUDIR)
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/policy
 	$(make_directory)    $(TMPTOP)/usr/share/selinux/
@@ -204,14 +210,16 @@ install/selinux-policy-refpolicy-src:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
-	$(make_directory)    $(MENUDIR)
-	$(make_directory)    $(TMPTOP)/usr/share/$(package)/
+	$(make_directory)    $(TMPTOP)/usr/src
 	(cd $(SRCTOP)/debian/build-$(package);                                 \
          $(MAKE) NAME=refpolicy $(OPTIONS) DESTDIR=$(TMPTOP) bare conf install-src; )
 	find $(TMPTOP) -type d -name .arch-ids -print0 | xargs -0r rm -rf
 	test ! -e $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING || \
            rm -f $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING
 	rm -rf   $(TMPTOP)/etc/selinux/refpolicy/src/policy/man
+	(cd $(TMPTOP)/etc/selinux/refpolicy/src/; mv policy $(package); \
+         tar jfc $(TMPTOP)/usr/src/$(package).tar.bz2 $(package))
+	rm -rf               $(TMPTOP)/etc
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
@@ -225,8 +233,7 @@ install/selinux-policy-refpolicy-doc:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)
-	$(make_directory)   $(DOCBASEDIR)
-	$(make_directory)    $(MENUDIR)
+	$(make_directory)    $(DOCBASEDIR)
 	$(make_directory)    $(MAN8DIR)
 	cp -a man/man8/*.8   $(MAN8DIR)
 	$(install_file)      VERSION              $(DOCDIR)/
@@ -234,6 +241,7 @@ install/selinux-policy-refpolicy-doc:
 	$(install_file)      debian/README.Debian $(DOCDIR)/
 	$(install_file)      Changelog            $(DOCDIR)/changelog
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
+	$(install_file)      debian/docentry      $(DOCBASEDIR)/$(package)
 	gzip -9fqr           $(MANDIR)
 	gzip -9fqr           $(DOCDIR)
 	(cd $(SRCTOP)/debian/build-$(package);                                   \
@@ -278,7 +286,6 @@ binary/selinux-policy-refpolicy-src:
 	$(REASON)
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
-	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
 	$(create_md5sum)   $(TMPTOP)

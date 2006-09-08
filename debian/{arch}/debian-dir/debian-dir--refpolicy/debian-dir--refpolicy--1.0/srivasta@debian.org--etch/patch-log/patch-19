@@ -1,0 +1,14 @@
+Revision: debian-dir--refpolicy--1.0--patch-19
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Fri Sep  8 10:32:02 CDT 2006
+Standard-date: 2006-09-08 15:32:02 GMT
+Modified-files: changelog local.mk postinst.policy
+New-patches: srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-19
+Summary: A bug fix update
+Keywords: 
+
+* postinst.policy: Update the module/package mapping.
+
+* local.mk (CONFIG/selinux-policy-refpolicy-src): copy the strict and
+  targeted modules.conf files over, and link to the strict version.

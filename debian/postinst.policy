@@ -5,9 +5,9 @@
 # Created On       : Mon Aug 21 01:14:21 2006
 # Created On Node  : glaurung.internal.golden-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Mon Aug 21 16:06:00 2006
+# Last Modified On : Fri Sep  8 10:25:04 2006
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 18
+# Update Count     : 19
 # Status           : Unknown, Use with caution!
 # HISTORY          : 
 # Description      : 
@@ -63,11 +63,14 @@ my @load_order;
 my %map = (
            'amavis'     => [ 'amavisd-new' ],
            'apache'     => [ 'apache*' ],
+           'apm'        => [ 'acpid' ],
            'automount'  => [ 'autofs*' ],
+           'avahi'      => [ 'avahi-*' ],
            'bind'       => [ 'bind9' ],
            'bootloader' => [ 'grub', 'lilo' ],
            'clock'      => [ 'util-linux' ],
            'courier'    => [ 'courier*' ],
+           'cups'       => [ 'cupsys*' ],
            'cyrus'      => [ 'cyrus*' ],
            'dhcp'       => [ 'dhcp*', 'dhclient*', 'pump' ],
            'finger'     => [ 'finger', '*fingerd' ],
@@ -77,22 +80,27 @@ my %map = (
            'java'       => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
                              'java*', 'jvm*', 'jre*', 'jsdk*' ],
            'ldap'       => [ 'slapd' ],
-           'lpd'        => [ 'cupsys*', 'lprng', 'rlpr' ],
+           'lpd'        => [ 'lprng', 'rlpr' ],
            'loadkeys'   => [ 'console-tools' ],
+           'mono'       => [ 'mono*' ],
            'munin'      => [ 'munin-node' ],
-           'mysql'      => [ 'mysql-server*' ],
-           'mozilla'    => [ 'mozilla-*', 'firefox*' ],
+           'mysql'      => [ 'mysql-server', 'mysql-server*' ],
+           'mozilla'    => [ 'mozilla-browser', 'firefox', 'galeon',
+                             'mozilla-*', 'firefox*', 'epiphany-browser' ],
            'netutils'   => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
            'radius'     => [ 'freeradius*', 'radiusd*' ],
            'raid'       => [ 'mdadm' ],
            'rpc'        => [ 'nfs-common', 'nfs-kernel-server' ],
            'sasl'       => [ 'libsasl2' ],
+           'ssh'        => [ 'openssh*' ],
            'su'         => [ 'login' ],
            'sysstat'    => [ 'atsar' ],
            'telnet'     => [ 'telnet', '*telnetd*' ],
            'uml'        => [ 'linux-uml*' ],
            'uptime'     => [ 'uptimed' ],
+           'usbmodules' => [ 'usbutils' ],
            'usermanage' => [ 'passwd' ],
+           'xserver'    => [ 'gdm', 'kdm', 'xdm', 'xserver*' ]
           );
 
 #  List all th modules, except the base module, in the policy
