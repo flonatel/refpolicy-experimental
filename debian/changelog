@@ -1,3 +1,15 @@
+refpolicy (0.0.20060907-1) unstable; urgency=low
+
+  * New upstream SCM HEAD.
+  * Bug fix: "selinux-policy-refpolicy-src: Compile failure of modular
+    targeted policy", thanks to Simon Richard Grint. Put a wrapper around
+    the offending lines to only take effect when running a strict policy.
+                                                            (Closes: #384502).
+  * Bug fix: "make: /usr/sbin/setfiles: Command not found", thanks to Uwe
+    Hermann. Fixed upstream.                                (Closes: #384850).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri,  8 Sep 2006 00:27:39 -0500
+
 refpolicy (0.0.20060813-2) unstable; urgency=low
 
   * Bug fix: "Needs gawk", thanks to Simon Richard Grint

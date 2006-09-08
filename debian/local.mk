@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Mon Aug 21 14:48:16 2006
+## Last Modified On : Tue Sep  5 22:32:14 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 64
+## Update Count     : 68
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -254,6 +254,7 @@ binary/selinux-policy-refpolicy-strict:
 	$(install_program)   debian/strict.postrm      $(TMPTOP)/DEBIAN/postrm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
+	$(create_md5sum)     $(TMPTOP)
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
@@ -268,6 +269,7 @@ binary/selinux-policy-refpolicy-targeted:
 	$(install_program)   debian/targeted.postrm     $(TMPTOP)/DEBIAN/postrm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
+	$(create_md5sum)   $(TMPTOP)
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
@@ -279,6 +281,7 @@ binary/selinux-policy-refpolicy-src:
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
+	$(create_md5sum)   $(TMPTOP)
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
@@ -292,6 +295,7 @@ binary/selinux-policy-refpolicy-doc:
 	$(install_program)   debian/doc.prerm         $(TMPTOP)/DEBIAN/prerm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
+	$(create_md5sum)   $(TMPTOP)
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..

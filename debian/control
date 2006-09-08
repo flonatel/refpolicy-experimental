@@ -4,7 +4,7 @@ Section: admin
 Maintainer: Manoj Srivastava <srivasta@debian.org>
 Uploaders: Erich Schubert <erich@debian.org>
 Standards-Version: 3.7.2.0
-Build-Depends: policycoreutils (>= 1.30.26), checkpolicy (>= 1.30.10), python, m4, bzip2, gawk
+Build-Depends: policycoreutils (>= 1.30.28), checkpolicy (>= 1.30.11), python, m4, bzip2, gawk
 
 Package: selinux-policy-refpolicy-strict
 Architecture: all
@@ -39,9 +39,7 @@ Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 1.30.26)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-default
 Recommends: checkpolicy, setools
-Provides: selinux-policy-default
 Suggests: logcheck, syslog-summary
-Replaces: selinux-policy-default
 Description: Targeted variant of the SELinux reference policy
  The SELinux Reference Policy (refpolicy) is a complete SELinux
  policy, as an alternative to the existing strict and targeted
