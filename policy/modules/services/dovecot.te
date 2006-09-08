@@ -1,5 +1,5 @@
 
-policy_module(dovecot,1.2.5)
+policy_module(dovecot,1.2.7)
 
 ########################################
 #
@@ -46,7 +46,6 @@ allow dovecot_t self:fifo_file rw_file_perms;
 allow dovecot_t self:tcp_socket create_stream_socket_perms;
 allow dovecot_t self:unix_dgram_socket create_socket_perms;
 allow dovecot_t self:unix_stream_socket { create_stream_socket_perms connectto };
-allow dovecot_t self:netlink_route_socket r_netlink_socket_perms;
 
 domain_auto_trans(dovecot_t, dovecot_auth_exec_t, dovecot_auth_t)
 allow dovecot_t dovecot_auth_t:fd use;
@@ -185,6 +184,7 @@ files_read_etc_runtime_files(dovecot_auth_t)
 files_search_pids(dovecot_auth_t)
 files_read_usr_symlinks(dovecot_auth_t)
 files_search_tmp(dovecot_auth_t)
+files_read_var_lib_files(dovecot_t)
 
 libs_use_ld_so(dovecot_auth_t)
 libs_use_shared_libs(dovecot_auth_t)
@@ -201,12 +201,4 @@ optional_policy(`
 
 optional_policy(`
 	logging_send_syslog_msg(dovecot_auth_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(dovecot_auth_t)
-')
-
-optional_policy(`
-	nscd_socket_use(dovecot_auth_t)
 ')

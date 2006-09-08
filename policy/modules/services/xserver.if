@@ -45,7 +45,6 @@ template(`xserver_common_domain_template',`
 	allow $1_xserver_t self:capability { dac_override fsetid setgid setuid ipc_owner sys_rawio sys_admin sys_nice sys_tty_config mknod net_bind_service };
 	dontaudit $1_xserver_t self:capability chown;
 	allow $1_xserver_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
-	allow $1_xserver_t self:process { execmem execheap execstack setsched };
 	allow $1_xserver_t self:fd use;
 	allow $1_xserver_t self:fifo_file rw_file_perms;
 	allow $1_xserver_t self:sock_file r_file_perms;
@@ -109,7 +108,7 @@ template(`xserver_common_domain_template',`
 	corenet_sendrecv_xserver_server_packets($1_xserver_t)
 	corenet_sendrecv_all_client_packets($1_xserver_t)
 
-	dev_read_sysfs($1_xserver_t)
+	dev_rw_sysfs($1_xserver_t)
 	dev_rw_mouse($1_xserver_t)
 	dev_rw_mtrr($1_xserver_t)
 	dev_rw_apm_bios($1_xserver_t)
@@ -120,7 +119,7 @@ template(`xserver_common_domain_template',`
 	dev_setattr_generic_dirs($1_xserver_t)
 	# raw memory access is needed if not using the frame buffer
 	dev_read_raw_memory($1_xserver_t)
-	dev_write_raw_memory($1_xserver_t)
+	dev_wx_raw_memory($1_xserver_t)
 	# for other device nodes such as the NVidia binary-only driver
 	dev_rw_xserver_misc($1_xserver_t)
 	# read events - the synaptics touchpad driver reads raw events
@@ -159,6 +158,18 @@ template(`xserver_common_domain_template',`
 
 	sysnet_read_config($1_xserver_t)
 
+	ifndef(`distro_redhat',`
+		allow $1_xserver_t self:process { execmem execheap execstack };
+	')
+
+	ifdef(`distro_rhel4',`
+		allow $1_xserver_t self:process { execmem execheap execstack };
+	')
+
+	optional_policy(`
+		apm_stream_connect($1_xserver_t)
+	')
+
 	optional_policy(`
 		auth_search_pam_console_data($1_xserver_t)
 	')
@@ -178,7 +189,7 @@ template(`xserver_common_domain_template',`
 
 #######################################
 ## <summary>
-##	The per user domain template for the xserver module.
+##	The per role template for the xserver module.
 ## </summary>
 ## <desc>
 ##	<p>
@@ -209,7 +220,7 @@ template(`xserver_common_domain_template',`
 ##	</summary>
 ## </param>
 #
-template(`xserver_per_userdomain_template',`
+template(`xserver_per_role_template',`
 
 	##############################
 	#
@@ -564,12 +575,6 @@ template(`xserver_user_client_template',`
 		allow $2 $1_xserver_t:shm rw_shm_perms;
 		allow $2 $1_xserver_tmpfs_t:file rw_file_perms;
 	')
-
-	# for X over a ssh tunnel
-	optional_policy(`
-		kernel_tcp_recvfrom($2)
-		ssh_tcp_connect($2)
-	')
 ')
 
 ########################################
@@ -772,9 +777,12 @@ interface(`xserver_rw_xdm_pipes',`
 #
 interface(`xserver_stream_connect_xdm',`
 	gen_require(`
-		type xdm_t;
+		type xdm_t, xdm_tmp_t;
 	')
 
+	files_search_tmp($1)
+	allow $1 xdm_tmp_t:dir search_dir_perms;
+	allow $1 xdm_tmp_t:sock_file write;
 	allow $1 xdm_t:unix_stream_socket connectto;
 ')
 
@@ -1047,6 +1055,43 @@ interface(`xserver_read_xdm_xserver_tmp_files',`
 	')
 
 	allow $1 xdm_xserver_tmp_t:file { getattr read };
+')
+
+########################################
+## <summary>
+##	Read xdm temporary files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit
+##	</summary>
+## </param>
+#
+interface(`xserver_read_xdm_tmp_files',`
+	gen_require(`
+		type xdm_tmp_t;
+	')
+
+	allow $1 xdm_tmp_t:dir search_dir_perms;
+	allow $1 xdm_tmp_t:file { getattr read };
+')
+
+########################################
+## <summary>
+##	Signal XDM X servers
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit
+##	</summary>
+## </param>
+#
+interface(`xserver_signal_xdm_xserver',`
+	gen_require(`
+		type xdm_xserver_t;
+	')
+
+	allow $1 xdm_xserver_t:process signal;
 ')
 
 ########################################

@@ -1,3 +1,9 @@
+refpolicy (0.0.20060907-3) unstable; urgency=low
+
+  * Updated a few more policy modules to latest versions for Debian.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri,  8 Sep 2006 12:42:22 -0500
+
 refpolicy (0.0.20060907-2) unstable; urgency=low
 
   * Update the module/package mapping.

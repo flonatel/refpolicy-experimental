@@ -9,14 +9,18 @@
 
 /etc/rc\.d/init\.d/.*	--	gen_context(system_u:object_r:initrc_exec_t,s0)
 
-ifdef(`targeted_policy', `', `
+ifdef(`distro_gentoo',`
+/etc/vmware/init\.d/vmware --	gen_context(system_u:object_r:initrc_exec_t,s0)
+')
+
+ifdef(`strict_policy',`
 /etc/X11/prefdm		--	gen_context(system_u:object_r:initrc_exec_t,s0)
 ')
 
 #
 # /dev
 #
-/dev/initctl		-p	gen_context(system_u:object_r:initctl_t,s0)
+/dev(/\.static/dev)?/initctl		-p	gen_context(system_u:object_r:initctl_t,s0)
 
 #
 # /sbin

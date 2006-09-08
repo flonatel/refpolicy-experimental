@@ -31,6 +31,7 @@ interface(`logging_log_file',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_read_audit_log',`
 	gen_require(`
@@ -85,6 +86,7 @@ interface(`logging_domtrans_auditctl',`
 ##	The type of the terminal allow the auditctl domain to use.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_run_auditctl',`
 	gen_require(`
@@ -151,6 +153,27 @@ interface(`logging_run_auditd',`
 
 ########################################
 ## <summary>
+##	Connect to auditdstored over an unix stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_stream_connect_auditd',`
+	gen_require(`
+		type auditd_t, auditd_var_run_t;
+	')
+
+	files_search_pids($1)
+	allow $1 auditd_var_run_t:dir search_dir_perms;
+	allow $1 auditd_var_run_t:sock_file rw_file_perms;
+	allow $1 auditd_t:unix_stream_socket connectto;
+')
+
+########################################
+## <summary>
 ##	Manage the auditd configuration files.
 ## </summary>
 ## <param name="domain">
@@ -158,6 +181,7 @@ interface(`logging_run_auditd',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_manage_audit_config',`
 	gen_require(`
@@ -178,6 +202,7 @@ interface(`logging_manage_audit_config',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_manage_audit_log',`
 	gen_require(`
@@ -281,6 +306,7 @@ interface(`logging_send_syslog_msg',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_read_audit_config',`
 	gen_require(`
@@ -418,6 +444,7 @@ interface(`logging_append_all_logs',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_read_all_logs',`
 	gen_require(`
@@ -461,6 +488,7 @@ interface(`logging_exec_all_logs',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_manage_all_logs',`
 	gen_require(`
@@ -482,6 +510,7 @@ interface(`logging_manage_all_logs',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_read_generic_logs',`
 	gen_require(`
@@ -543,6 +572,7 @@ interface(`logging_rw_generic_logs',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`logging_manage_generic_logs',`
 	gen_require(`

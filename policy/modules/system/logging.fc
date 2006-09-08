@@ -1,5 +1,5 @@
 
-/dev/log		-s	gen_context(system_u:object_r:devlog_t,s0)
+/dev(/\.static/dev)?/log		-s	gen_context(system_u:object_r:devlog_t,s0)
 
 /etc/audit(/.*)?		gen_context(system_u:object_r:auditd_etc_t,s15:c0.c255)
 
@@ -30,6 +30,9 @@ ifdef(`distro_suse', `
 
 /var/log/audit(/.*)?		gen_context(system_u:object_r:auditd_log_t,s15:c0.c255)
 
+/var/run/audit_events	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+/var/run/auditd\.pid	--	gen_context(system_u:object_r:auditd_var_run_t,s0)
+/var/run/auditd_sock	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
 /var/run/klogd\.pid	--	gen_context(system_u:object_r:klogd_var_run_t,s0)
 /var/run/log		-s	gen_context(system_u:object_r:devlog_t,s0)
 /var/run/metalog\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)

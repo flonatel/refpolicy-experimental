@@ -1,5 +1,5 @@
 
-policy_module(spamassassin,1.3.9)
+policy_module(spamassassin,1.3.11)
 
 ########################################
 #
@@ -66,7 +66,6 @@ files_pid_filetrans(spamd_t,spamd_var_run_t,file)
 
 kernel_read_all_sysctls(spamd_t)
 kernel_read_system_state(spamd_t)
-kernel_tcp_recvfrom(spamd_t)
 
 corenet_non_ipsec_sendrecv(spamd_t)
 corenet_tcp_sendrecv_all_if(spamd_t)
@@ -133,8 +132,11 @@ userdom_dontaudit_search_sysadm_home_dirs(spamd_t)
 ifdef(`targeted_policy',`
 	term_dontaudit_use_unallocated_ttys(spamd_t)
 	term_dontaudit_use_generic_ptys(spamd_t)
+
 	files_dontaudit_read_root_files(spamd_t)
+
 	tunable_policy(`spamd_enable_home_dirs',`
+		userdom_home_filetrans_generic_user_home_dir(spamd_t)
 		userdom_manage_generic_user_home_content_dirs(spamd_t)
 		userdom_manage_generic_user_home_content_files(spamd_t)
 		userdom_manage_generic_user_home_content_symlinks(spamd_t)
@@ -168,6 +170,10 @@ optional_policy(`
 
 optional_policy(`
 	nis_use_ypbind(spamd_t)
+')
+
+optional_policy(`
+	postfix_read_config(spamd_t)
 ')
 
 optional_policy(`

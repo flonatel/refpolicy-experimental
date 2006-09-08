@@ -1,0 +1,18 @@
+Revision: refpolicy--devo--0.0--patch-20
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Fri Sep  8 13:23:32 CDT 2006
+Standard-date: 2006-09-08 18:23:32 GMT
+Modified-files: policy/modules/system/userdomain.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-20
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-20
+Summary: add a netuser_t domain
+Keywords: 
+
+add a netuser_t domain
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-20
+   Add a netuser_t class
+

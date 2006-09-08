@@ -1,32 +1,38 @@
 
-/dev/.*tty[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/[pt]ty[abcdepqrstuvwxyz][0-9a-f]	-c gen_context(system_u:object_r:bsdpty_device_t,s0)
-/dev/adb.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/capi.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/cu.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/dcbri[0-9]+		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/hvc.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/hvsi.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/ircomm[0-9]+	-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/ip2[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/isdn.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/ptmx		-c	gen_context(system_u:object_r:ptmx_t,s0)
-/dev/rfcomm[0-9]+	-c	gen_context(system_u:object_r:tty_device_t,s0)
-/dev/tty			-c	gen_context(system_u:object_r:devtty_t,s0)
-/dev/ttySG.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/.*tty[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/[pt]ty[a-ep-z][0-9a-f] -c	gen_context(system_u:object_r:bsdpty_device_t,s0)
+/dev(/\.static/dev)?/adb.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/capi.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/console		-c	gen_context(system_u:object_r:console_device_t,s0)
+/dev(/\.static/dev)?/cu.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/dcbri[0-9]+	-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/hvc.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/hvsi.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/ircomm[0-9]+	-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/ip2[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/isdn.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/ptmx		-c	gen_context(system_u:object_r:ptmx_t,s0)
+/dev(/\.static/dev)?/rfcomm[0-9]+	-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/tty		-c	gen_context(system_u:object_r:devtty_t,s0)
+/dev(/\.static/dev)?/ttySG.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
 
-/dev/pty/.*		-c	gen_context(system_u:object_r:bsdpty_device_t,s0)
+/dev(/\.static/dev)?/pty/.*		-c	gen_context(system_u:object_r:bsdpty_device_t,s0)
 
-/dev/pts			-d	gen_context(system_u:object_r:devpts_t,s0-s15:c0.c255)
+/dev(/\.static/dev)?/pts		-d	gen_context(system_u:object_r:devpts_t,s0-s15:c0.c255)
 
-/dev/tts/[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/tts/[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
 
-/dev/vcc?/.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/usb/tty.*		-c	gen_context(system_u:object_r:usbtty_device_t,s0)
 
-/dev/vcs[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+/dev(/\.static/dev)?/vcc?/.*		-c	gen_context(system_u:object_r:tty_device_t,s0)
 
-/dev/usb/tty.*		-c	gen_context(system_u:object_r:usbtty_device_t,s0)
+/dev(/\.static/dev)?/vcs[^/]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+
+/dev(/\.static/dev)?/xvc[0-9]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
 
 ifdef(`distro_gentoo',`
 /dev/tts/[0-9]*		-c	gen_context(system_u:object_r:tty_device_t,s0)
+
+# used by init scripts to initally populate udev /dev
+/lib/udev/devices/console -c	gen_context(system_u:object_r:console_device_t,s0)
 ')

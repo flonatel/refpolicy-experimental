@@ -40,45 +40,31 @@ template(`authlogin_common_auth_domain_template',`
 	dev_read_rand($1_chkpwd_t)
 	dev_read_urand($1_chkpwd_t)
 
-	fs_dontaudit_getattr_xattr_fs($1_chkpwd_t)
-
-	libs_use_ld_so($1_chkpwd_t)
-	libs_use_shared_libs($1_chkpwd_t)
-
 	files_read_etc_files($1_chkpwd_t)
 	# for nscd
 	files_dontaudit_search_var($1_chkpwd_t)
 
+	fs_dontaudit_getattr_xattr_fs($1_chkpwd_t)
+
+	auth_use_nsswitch($1_chkpwd_t)
+
+	libs_use_ld_so($1_chkpwd_t)
+	libs_use_shared_libs($1_chkpwd_t)
+
 	logging_send_syslog_msg($1_chkpwd_t)
 
-	miscfiles_read_certs($1_chkpwd_t)
 	miscfiles_read_localization($1_chkpwd_t)
 
 	seutil_read_config($1_chkpwd_t)
 
-	sysnet_dns_name_resolve($1_chkpwd_t)
-	sysnet_use_ldap($1_chkpwd_t)
-
 	optional_policy(`
 		kerberos_use($1_chkpwd_t)
-	')
-
-	optional_policy(`
-		nis_use_ypbind($1_chkpwd_t)
-	')
-
-	optional_policy(`
-		nscd_socket_use($1_chkpwd_t)
-	')
-
-	optional_policy(`
-		samba_stream_connect_winbind($1_chkpwd_t)
 	')
 ')
 
 #######################################
 ## <summary>
-##	The per user domain template for the authlogin module.
+##	The per role template for the authlogin module.
 ## </summary>
 ## <desc>
 ##	<p>
@@ -110,7 +96,7 @@ template(`authlogin_common_auth_domain_template',`
 ##	</summary>
 ## </param>
 #
-template(`authlogin_per_userdomain_template',`
+template(`authlogin_per_role_template',`
 
 	gen_require(`
 		type system_chkpwd_t, shadow_t;
@@ -121,6 +107,7 @@ template(`authlogin_per_userdomain_template',`
 	role $3 types $1_chkpwd_t;
 	role $3 types system_chkpwd_t;
 
+	# cjp: is this really needed?
 	allow $2 self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
 
 	dontaudit $2 shadow_t:file { getattr read };
@@ -128,7 +115,6 @@ template(`authlogin_per_userdomain_template',`
 	# Transition from the user domain to this domain.
 	domain_auto_trans($2,chkpwd_exec_t,$1_chkpwd_t)
 	allow $1_chkpwd_t $2:fd use;
-	allow $2 $1_chkpwd_t:fd use;
 	allow $1_chkpwd_t $2:fifo_file rw_file_perms;
 	allow $1_chkpwd_t $2:process sigchld;
 
@@ -289,8 +275,6 @@ interface(`auth_domtrans_login_program',`
 
 	corecmd_search_bin($1)
 	domain_auto_trans($1,login_exec_t,$2)
-
-	allow $1 $2:fd use;
 	allow $2 $1:fd use;
 	allow $2 $1:fifo_file rw_file_perms;
 	allow $2 $1:process sigchld;
@@ -311,13 +295,12 @@ interface(`auth_domtrans_chk_passwd',`
 		type system_chkpwd_t, chkpwd_exec_t, shadow_t;
 	')
 
-	corecmd_search_sbin($1)
-	domain_auto_trans($1,chkpwd_exec_t,system_chkpwd_t)
 
 	allow $1 self:capability { audit_write audit_control };
 	allow $1 self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
 
-	allow $1 system_chkpwd_t:fd use;
+	corecmd_search_sbin($1)
+	domain_auto_trans($1,chkpwd_exec_t,system_chkpwd_t)
 	allow system_chkpwd_t $1:fd use;
 	allow system_chkpwd_t $1:fifo_file rw_file_perms;
 	allow system_chkpwd_t $1:process sigchld;
@@ -513,7 +496,7 @@ interface(`auth_manage_shadow',`
 		type shadow_t;
 	')
 
-	allow $1 shadow_t:file create_file_perms;
+	allow $1 shadow_t:file manage_file_perms;
 	typeattribute $1 can_read_shadow_passwords, can_write_shadow_passwords;
 ')
 
@@ -626,6 +609,7 @@ interface(`auth_rw_faillog',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`auth_read_lastlog',`
 	gen_require(`
@@ -671,7 +655,7 @@ interface(`auth_rw_lastlog',`
 	')
 
 	logging_search_logs($1)
-	allow $1 lastlog_t:file { getattr read write setattr };
+	allow $1 lastlog_t:file { getattr read write lock setattr };
 ')
 
 ########################################
@@ -690,8 +674,6 @@ interface(`auth_domtrans_pam',`
 	')
 
 	domain_auto_trans($1,pam_exec_t,pam_t)
-
-	allow $1 pam_t:fd use;
 	allow pam_t $1:fd use;
 	allow pam_t $1:fifo_file rw_file_perms;
 	allow pam_t $1:process sigchld;
@@ -762,7 +744,7 @@ interface(`auth_manage_var_auth',`
 	')
 
 	files_search_var($1)
-	allow $1 var_auth_t:dir create_dir_perms;
+	allow $1 var_auth_t:dir manage_dir_perms;
 	allow $1 var_auth_t:file rw_file_perms;
 	allow $1 var_auth_t:lnk_file rw_file_perms;
 ')
@@ -782,9 +764,8 @@ interface(`auth_read_pam_pid',`
 		type pam_var_run_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
-	allow $1 pam_var_run_t:dir r_dir_perms;
+	allow $1 pam_var_run_t:dir list_dir_perms;
 	allow $1 pam_var_run_t:file r_file_perms;
 ')
 
@@ -821,7 +802,6 @@ interface(`auth_delete_pam_pid',`
 		type pam_var_run_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
 	allow $1 pam_var_run_t:dir { getattr search read write remove_name };
 	allow $1 pam_var_run_t:file { getattr unlink };
@@ -843,8 +823,8 @@ interface(`auth_manage_pam_pid',`
 	')
 
 	files_search_pids($1)
-	allow $1 pam_var_run_t:dir create_dir_perms;
-	allow $1 pam_var_run_t:file create_file_perms;
+	allow $1 pam_var_run_t:dir manage_dir_perms;
+	allow $1 pam_var_run_t:file manage_file_perms;
 ')
 
 ########################################
@@ -863,8 +843,6 @@ interface(`auth_domtrans_pam_console',`
 	')
 
 	domain_auto_trans($1,pam_console_exec_t,pam_console_t)
-
-	allow $1 pam_console_t:fd use;
 	allow pam_console_t $1:fd use;
 	allow pam_console_t $1:fifo_file rw_file_perms;
 	allow pam_console_t $1:process sigchld;
@@ -886,7 +864,6 @@ interface(`auth_search_pam_console_data',`
 		type pam_var_console_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
 	allow $1 pam_var_console_t:dir search_dir_perms;
 ')
@@ -907,9 +884,8 @@ interface(`auth_list_pam_console_data',`
 		type pam_var_console_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
-	allow $1 pam_var_console_t:dir r_dir_perms;
+	allow $1 pam_var_console_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -927,9 +903,8 @@ interface(`auth_read_pam_console_data',`
 		type pam_var_console_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
-	allow $1 pam_var_console_t:dir r_dir_perms;
+	allow $1 pam_var_console_t:dir list_dir_perms;
 	allow $1 pam_var_console_t:file r_file_perms;
 ')
 
@@ -949,10 +924,9 @@ interface(`auth_manage_pam_console_data',`
 		type pam_var_console_t;
 	')
 
-	files_search_var($1)
 	files_search_pids($1)
 	allow $1 pam_var_console_t:dir rw_dir_perms;
-	allow $1 pam_var_console_t:file create_file_perms;
+	allow $1 pam_var_console_t:file manage_file_perms;
 	allow $1 pam_var_console_t:lnk_file create_lnk_perms;
 ')
 
@@ -1018,6 +992,7 @@ interface(`auth_read_all_dirs_except_shadow',`
 ##	must be negated by the caller.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`auth_read_all_files_except_shadow',`
 	gen_require(`
@@ -1120,8 +1095,6 @@ interface(`auth_domtrans_utempter',`
 	')
 
 	domain_auto_trans($1,utempter_exec_t,utempter_t)
-
-	allow $1 utempter_t:fd use;
 	allow utempter_t $1:fd use;
 	allow utempter_t $1:fifo_file rw_file_perms;
 	allow utempter_t $1:process sigchld;
@@ -1203,6 +1176,7 @@ interface(`auth_setattr_login_records',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`auth_read_login_records',`
 	gen_require(`
@@ -1323,7 +1297,7 @@ interface(`auth_manage_login_records',`
 	')
 
 	logging_rw_generic_log_dirs($1)
-	allow $1 wtmp_t:file create_file_perms;
+	allow $1 wtmp_t:file manage_file_perms;
 ')
 
 ########################################
@@ -1343,8 +1317,8 @@ interface(`auth_use_nsswitch',`
 
 	allow $1 self:netlink_route_socket r_netlink_socket_perms;
 
-	allow $1 var_auth_t:dir r_dir_perms;
-	allow $1 var_auth_t:file create_file_perms;
+	allow $1 var_auth_t:dir list_dir_perms;
+	allow $1 var_auth_t:file manage_file_perms;
 	files_list_var_lib($1)
 
 	miscfiles_read_certs($1)
@@ -1354,6 +1328,10 @@ interface(`auth_use_nsswitch',`
 
 	optional_policy(`
 		nis_use_ypbind($1)
+	')
+
+	optional_policy(`
+		nscd_socket_use($1)
 	')
 
 	optional_policy(`

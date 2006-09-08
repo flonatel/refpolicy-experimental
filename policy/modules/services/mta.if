@@ -144,7 +144,7 @@ template(`mta_base_mail_template',`
 
 #######################################
 ## <summary>
-##	The per user domain template for the mta module.
+##	The per role template for the mta module.
 ## </summary>
 ## <desc>
 ##	<p>
@@ -175,7 +175,7 @@ template(`mta_base_mail_template',`
 ##	</summary>
 ## </param>
 #
-template(`mta_per_userdomain_template',`
+template(`mta_per_role_template',`
 
 	##############################
 	#
@@ -198,11 +198,6 @@ template(`mta_per_userdomain_template',`
 	allow $1_mail_t $2:fd use;
 	allow $1_mail_t $2:fifo_file rw_file_perms;
 	allow $1_mail_t $2:process sigchld;
-
-	# For when the user wants to send mail via port 25 localhost
-	kernel_tcp_recvfrom($2)
-	allow $2 mailserver_domain:tcp_socket { connectto recvfrom };
-	allow mailserver_domain $2:tcp_socket { acceptfrom recvfrom };
 
 	domain_use_interactive_fds($1_mail_t)
 
@@ -260,6 +255,7 @@ template(`mta_per_userdomain_template',`
 ##	The type of the user domain.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 template(`mta_admin_template',`
 	gen_require(`
@@ -313,9 +309,6 @@ interface(`mta_mailserver',`
 		attribute mailserver_domain;
 	')
 
-	# For when the user wants to send mail via port 25 localhost
-	kernel_tcp_recvfrom($1)
-
 	init_daemon_domain($1,$2)
 	typeattribute $1 mailserver_domain;
 ')
@@ -354,9 +347,6 @@ interface(`mta_sendmail_mailserver',`
 		attribute mailserver_domain;
 		type sendmail_exec_t;
 	')
-
-	# For when the user wants to send mail via port 25 localhost
-	kernel_tcp_recvfrom($1)
 
 	init_system_domain($1,sendmail_exec_t)
 	typeattribute $1 mailserver_domain;
@@ -534,6 +524,7 @@ interface(`mta_sendmail_exec',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`mta_read_config',`
 	gen_require(`
@@ -593,6 +584,7 @@ interface(`mta_etc_filetrans_aliases',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`mta_rw_aliases',`
 	gen_require(`
@@ -624,7 +616,7 @@ interface(`mta_dontaudit_rw_delivery_tcp_sockets',`
 
 #######################################
 ## <summary>
-##	Connect to all mail servers over TCP.
+##	Connect to all mail servers over TCP.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -633,13 +625,7 @@ interface(`mta_dontaudit_rw_delivery_tcp_sockets',`
 ## </param>
 #
 interface(`mta_tcp_connect_all_mailservers',`
-	gen_require(`
-		attribute mailserver_domain;
-	')
-
-	allow $1 mailserver_domain:tcp_socket { connectto recvfrom };
-	allow mailserver_domain $1:tcp_socket { acceptfrom recvfrom };
-	kernel_tcp_recvfrom($1)
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 #######################################

@@ -1,0 +1,278 @@
+Revision: refpolicy--devo--0.0--patch-16
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Thu Sep  7 23:45:47 CDT 2006
+Standard-date: 2006-09-08 04:45:47 GMT
+New-files: policy/modules/services/.arch-ids/setroubleshoot.fc.id
+    policy/modules/services/.arch-ids/setroubleshoot.if.id
+    policy/modules/services/.arch-ids/setroubleshoot.te.id
+    policy/modules/services/setroubleshoot.fc
+    policy/modules/services/setroubleshoot.if
+    policy/modules/services/setroubleshoot.te
+Modified-files: Changelog Makefile Rules.modular
+    Rules.monolithic doc/policy.dtd policy/constraints
+    policy/flask/access_vectors policy/global_tunables
+    policy/mls policy/modules/admin/amanda.fc
+    policy/modules/admin/amanda.if
+    policy/modules/admin/amanda.te
+    policy/modules/admin/anaconda.te
+    policy/modules/admin/apt.if policy/modules/admin/apt.te
+    policy/modules/admin/backup.if
+    policy/modules/admin/bootloader.if
+    policy/modules/admin/bootloader.te
+    policy/modules/admin/certwatch.if
+    policy/modules/admin/consoletype.if
+    policy/modules/admin/consoletype.te
+    policy/modules/admin/ddcprobe.if
+    policy/modules/admin/dmesg.if
+    policy/modules/admin/dmidecode.if
+    policy/modules/admin/dpkg.if
+    policy/modules/admin/firstboot.fc
+    policy/modules/admin/firstboot.if
+    policy/modules/admin/firstboot.te
+    policy/modules/admin/kudzu.if
+    policy/modules/admin/logrotate.if
+    policy/modules/admin/mrtg.te
+    policy/modules/admin/netutils.if
+    policy/modules/admin/portage.if
+    policy/modules/admin/portage.te
+    policy/modules/admin/prelink.te
+    policy/modules/admin/quota.if
+    policy/modules/admin/rpm.if policy/modules/admin/su.if
+    policy/modules/admin/sudo.if
+    policy/modules/admin/sxid.if
+    policy/modules/admin/sxid.te
+    policy/modules/admin/tripwire.if
+    policy/modules/admin/usbmodules.if
+    policy/modules/admin/usbmodules.te
+    policy/modules/admin/usermanage.if
+    policy/modules/admin/usermanage.te
+    policy/modules/admin/vpn.if
+    policy/modules/apps/calamaris.te
+    policy/modules/apps/cdrecord.if
+    policy/modules/apps/ethereal.if
+    policy/modules/apps/evolution.if
+    policy/modules/apps/games.if
+    policy/modules/apps/games.te
+    policy/modules/apps/gift.if policy/modules/apps/gpg.if
+    policy/modules/apps/irc.if policy/modules/apps/java.fc
+    policy/modules/apps/java.if policy/modules/apps/java.te
+    policy/modules/apps/loadkeys.if
+    policy/modules/apps/lockdev.if
+    policy/modules/apps/mono.te
+    policy/modules/apps/mozilla.if
+    policy/modules/apps/mozilla.te
+    policy/modules/apps/mplayer.if
+    policy/modules/apps/rssh.if
+    policy/modules/apps/screen.if
+    policy/modules/apps/thunderbird.if
+    policy/modules/apps/tvtime.if
+    policy/modules/apps/uml.if policy/modules/apps/uml.te
+    policy/modules/apps/userhelper.if
+    policy/modules/apps/usernetctl.if
+    policy/modules/apps/vmware.if
+    policy/modules/apps/webalizer.if
+    policy/modules/apps/wine.te policy/modules/apps/yam.if
+    policy/modules/kernel/corecommands.fc
+    policy/modules/kernel/corecommands.if
+    policy/modules/kernel/corecommands.te
+    policy/modules/kernel/corenetwork.te.in
+    policy/modules/kernel/devices.fc
+    policy/modules/kernel/devices.if
+    policy/modules/kernel/devices.te
+    policy/modules/kernel/domain.if
+    policy/modules/kernel/files.fc
+    policy/modules/kernel/files.if
+    policy/modules/kernel/files.te
+    policy/modules/kernel/filesystem.if
+    policy/modules/kernel/filesystem.te
+    policy/modules/kernel/kernel.if
+    policy/modules/kernel/kernel.te
+    policy/modules/kernel/mcs.if
+    policy/modules/kernel/mls.if
+    policy/modules/kernel/selinux.if
+    policy/modules/kernel/terminal.fc
+    policy/modules/kernel/terminal.if
+    policy/modules/kernel/terminal.te
+    policy/modules/services/afs.te
+    policy/modules/services/amavis.fc
+    policy/modules/services/amavis.te
+    policy/modules/services/apache.if
+    policy/modules/services/apache.te
+    policy/modules/services/avahi.te
+    policy/modules/services/bind.if
+    policy/modules/services/bind.te
+    policy/modules/services/bluetooth.if
+    policy/modules/services/clockspeed.if
+    policy/modules/services/cpucontrol.te
+    policy/modules/services/cron.if
+    policy/modules/services/cron.te
+    policy/modules/services/cups.if
+    policy/modules/services/cups.te
+    policy/modules/services/cyrus.te
+    policy/modules/services/dbus.if
+    policy/modules/services/dbus.te
+    policy/modules/services/dcc.if
+    policy/modules/services/dictd.if
+    policy/modules/services/dictd.te
+    policy/modules/services/dovecot.te
+    policy/modules/services/finger.if
+    policy/modules/services/finger.te
+    policy/modules/services/ftp.if
+    policy/modules/services/ftp.te
+    policy/modules/services/gatekeeper.te
+    policy/modules/services/hal.te
+    policy/modules/services/i18n_input.if
+    policy/modules/services/i18n_input.te
+    policy/modules/services/inetd.if
+    policy/modules/services/inetd.te
+    policy/modules/services/inn.if
+    policy/modules/services/inn.te
+    policy/modules/services/jabber.if
+    policy/modules/services/jabber.te
+    policy/modules/services/kerberos.if
+    policy/modules/services/ldap.fc
+    policy/modules/services/ldap.if
+    policy/modules/services/ldap.te
+    policy/modules/services/lpd.if
+    policy/modules/services/lpd.te
+    policy/modules/services/mailman.te
+    policy/modules/services/mta.fc
+    policy/modules/services/mta.if
+    policy/modules/services/mta.te
+    policy/modules/services/munin.if
+    policy/modules/services/mysql.if
+    policy/modules/services/mysql.te
+    policy/modules/services/nagios.if
+    policy/modules/services/nessus.if
+    policy/modules/services/nessus.te
+    policy/modules/services/networkmanager.te
+    policy/modules/services/nis.if
+    policy/modules/services/nis.te
+    policy/modules/services/nsd.if
+    policy/modules/services/nsd.te
+    policy/modules/services/ntp.te
+    policy/modules/services/oav.if
+    policy/modules/services/openvpn.if
+    policy/modules/services/openvpn.te
+    policy/modules/services/pegasus.te
+    policy/modules/services/perdition.if
+    policy/modules/services/perdition.te
+    policy/modules/services/portmap.if
+    policy/modules/services/portmap.te
+    policy/modules/services/portslave.te
+    policy/modules/services/postfix.if
+    policy/modules/services/postfix.te
+    policy/modules/services/postgresql.if
+    policy/modules/services/postgresql.te
+    policy/modules/services/ppp.if
+    policy/modules/services/procmail.te
+    policy/modules/services/pyzor.if
+    policy/modules/services/pyzor.te
+    policy/modules/services/qmail.if
+    policy/modules/services/radius.if
+    policy/modules/services/radius.te
+    policy/modules/services/razor.if
+    policy/modules/services/rhgb.te
+    policy/modules/services/rpc.if
+    policy/modules/services/rpc.te
+    policy/modules/services/rsync.if
+    policy/modules/services/samba.if
+    policy/modules/services/samba.te
+    policy/modules/services/sendmail.if
+    policy/modules/services/snmp.if
+    policy/modules/services/snmp.te
+    policy/modules/services/soundserver.if
+    policy/modules/services/soundserver.te
+    policy/modules/services/spamassassin.if
+    policy/modules/services/spamassassin.te
+    policy/modules/services/squid.if
+    policy/modules/services/squid.te
+    policy/modules/services/ssh.if
+    policy/modules/services/ssh.te
+    policy/modules/services/stunnel.te
+    policy/modules/services/sysstat.if
+    policy/modules/services/sysstat.te
+    policy/modules/services/tcpd.te
+    policy/modules/services/tor.te
+    policy/modules/services/xfs.te
+    policy/modules/services/xserver.if
+    policy/modules/services/xserver.te
+    policy/modules/services/zebra.if
+    policy/modules/services/zebra.te
+    policy/modules/system/authlogin.if
+    policy/modules/system/authlogin.te
+    policy/modules/system/clock.if
+    policy/modules/system/clock.te
+    policy/modules/system/daemontools.if
+    policy/modules/system/fstools.fc
+    policy/modules/system/fstools.if
+    policy/modules/system/fstools.te
+    policy/modules/system/getty.if
+    policy/modules/system/hostname.if
+    policy/modules/system/hostname.te
+    policy/modules/system/hotplug.if
+    policy/modules/system/hotplug.te
+    policy/modules/system/init.fc
+    policy/modules/system/init.if
+    policy/modules/system/init.te
+    policy/modules/system/ipsec.if
+    policy/modules/system/iptables.if
+    policy/modules/system/libraries.fc
+    policy/modules/system/libraries.if
+    policy/modules/system/libraries.te
+    policy/modules/system/locallogin.te
+    policy/modules/system/logging.fc
+    policy/modules/system/logging.if
+    policy/modules/system/logging.te
+    policy/modules/system/lvm.fc
+    policy/modules/system/lvm.if
+    policy/modules/system/lvm.te
+    policy/modules/system/miscfiles.fc
+    policy/modules/system/miscfiles.if
+    policy/modules/system/miscfiles.te
+    policy/modules/system/modutils.fc
+    policy/modules/system/modutils.if
+    policy/modules/system/modutils.te
+    policy/modules/system/mount.if
+    policy/modules/system/mount.te
+    policy/modules/system/pcmcia.if
+    policy/modules/system/selinuxutil.fc
+    policy/modules/system/selinuxutil.if
+    policy/modules/system/selinuxutil.te
+    policy/modules/system/setrans.te
+    policy/modules/system/sysnetwork.fc
+    policy/modules/system/sysnetwork.if
+    policy/modules/system/sysnetwork.te
+    policy/modules/system/udev.fc
+    policy/modules/system/udev.te
+    policy/modules/system/unconfined.fc
+    policy/modules/system/unconfined.if
+    policy/modules/system/unconfined.te
+    policy/modules/system/userdomain.if
+    policy/modules/system/userdomain.te
+    policy/modules/system/xen.if
+    policy/modules/system/xen.te support/Makefile.devel
+    support/genclassperms.py support/genhomedircon
+    support/pyplate.py support/sedoctool.py
+    support/segenxml.py
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-18
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-16
+    srivasta@debian.org--etch/refpolicy--netuser--0.0--patch-4
+    srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-4
+Summary: Synch with upstream and other branches
+Keywords: 
+
+Synch with upstream and other branches
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-18
+   Synch with upstream.
+
+ * srivasta@debian.org--etch/refpolicy--netuser--0.0--patch-4
+   Synch with upstream.
+
+ * srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-4
+   Imported refpolicy_0.0.20060907.orig
+
