@@ -1,7 +1,7 @@
 #
 # /dev
 #
-/dev(/\.static/dev)?/printer		-s	gen_context(system_u:object_r:printer_t,s0)
+/dev/printer		-s	gen_context(system_u:object_r:printer_t,s0)
 
 #
 # /usr

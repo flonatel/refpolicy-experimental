@@ -624,6 +624,10 @@ ifdef(`targeted_policy',`
 	userdom_read_generic_user_home_content_files(semanage_t)
 ')
 
+optional_policy(`
+	pythonsupport_compiled_read(semanage_t)
+')
+
 ########################################
 #
 # Setfiles local policy

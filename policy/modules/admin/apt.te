@@ -125,6 +125,10 @@ ifdef(`targeted_policy',`
 #')
 
 optional_policy(`
+	pythonsupport_domtrans(apt_t)
+')
+
+optional_policy(`
 	# dpkg interaction
 	dpkg_read_db(apt_t)
 	dpkg_domtrans(apt_t)

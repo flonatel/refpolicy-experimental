@@ -1,0 +1,29 @@
+Revision: refpolicy--devo--0.0--patch-23
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Mon Sep 11 18:19:05 CDT 2006
+Standard-date: 2006-09-11 23:19:05 GMT
+Modified-files: policy/modules/kernel/corenetwork.te.m4
+    policy/modules/services/cups.te
+    policy/modules/services/samba.te
+    policy/modules/system/userdomain.if
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-23
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-23
+    srivasta@debian.org--etch/refpolicy--netuser--0.0--patch-5
+    srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-5
+Summary: Synch with upstream and other branches
+Keywords: 
+
+Synch with upstream and other branches
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-23
+   Synch with upstream
+
+ * srivasta@debian.org--etch/refpolicy--netuser--0.0--patch-5
+   Synch with upstream
+
+ * srivasta@debian.org--etch/refpolicy--upstream--0.0--patch-5
+   Synch with upstream.
+

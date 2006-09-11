@@ -1,0 +1,19 @@
+Revision: refpolicy--devo--0.0--patch-24
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Mon Sep 11 19:13:50 CDT 2006
+Standard-date: 2006-09-12 00:13:50 GMT
+Modified-files: policy/modules/services/ssh.te
+    policy/modules/system/init.te
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-24
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-24
+Summary: Synch with Erich
+Keywords: 
+
+Synch with Erich
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-24
+   Synch with Erich
+

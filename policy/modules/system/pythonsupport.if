@@ -1,0 +1,55 @@
+## <summary>Support for precompiling python modules</summary>
+## <desc>
+##	<p>
+##		Debians python-support will precompile installed python
+##		packages for installed python versions. This way,
+##		the python2.3-foobar and python2.4-foobar (and 2.5) packages
+##		could be merged into one python-foobar while keeping the
+##		dependency information useful.
+##	</p>
+## </desc>
+#
+
+########################################
+## <summary>
+##	Execute the python-support utility to precompile modules.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`pythonsupport_domtrans',`
+	gen_require(`
+		type pythoncompile_t, pythoncompile_exec_t;
+	')
+
+	domain_auto_trans($1,pythoncompile_exec_t,pythoncompile_t)
+
+	allow $1 pythoncompile_t:fd use;
+	allow pythoncompile_t $1:fd use;
+	allow $1 pythoncompile_t:fifo_file rw_file_perms;
+	allow $1 pythoncompile_t:process sigchld;
+')
+
+########################################
+## <summary>
+##	Read compiled python modules
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to read the compiled python modules.
+##	</summary>
+## </param>
+#
+interface(`pythonsupport_compiled_read',`
+	gen_require(`
+		type python_compiled_t;
+	')
+
+	files_search_var_lib($1)
+	allow $1 python_compiled_t:dir r_dir_perms;
+	allow $1 python_compiled_t:file r_file_perms;
+	allow $1 python_compiled_t:lnk_file r_file_perms;
+')

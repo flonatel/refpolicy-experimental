@@ -92,6 +92,9 @@ ifdef(`strict_policy',`
 
 		userdom_spec_domtrans_all_users(sshd_t)
 		userdom_signal_all_users(sshd_t)
+
+		# actually getattr should be enough
+		userdom_search_all_users_home_dirs(sshd_t)
 	',`
 		userdom_spec_domtrans_unpriv_users(sshd_t)
 		userdom_signal_unpriv_users(sshd_t)
@@ -99,6 +102,10 @@ ifdef(`strict_policy',`
 		userdom_setattr_unpriv_users_ptys(sshd_t)
 		userdom_relabelto_unpriv_users_ptys(sshd_t)
 		userdom_use_unpriv_users_ptys(sshd_t)
+
+		# actually getattr should be enough
+		userdom_search_generic_user_home_dirs(sshd_t)
+		userdom_search_staff_home_dirs(sshd_t)
 	')
 
 	optional_policy(`

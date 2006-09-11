@@ -1,0 +1,18 @@
+Revision: refpolicy--devo--0.0--patch-25
+Archive: srivasta@debian.org--etch
+Creator: Manoj Srivastava <srivasta@debian.org>
+Date: Tue Sep 12 00:26:51 CDT 2006
+Standard-date: 2006-09-12 05:26:51 GMT
+Modified-files: policy/modules/services/amavis.fc
+New-patches: srivasta@debian.org--etch/refpolicy--debian--0.0--patch-25
+    srivasta@debian.org--etch/refpolicy--devo--0.0--patch-25
+Summary: Remove duplicate defs for amavisd for targeted policy.
+Keywords: 
+
+Remove duplicate defs for amavisd for targeted policy.
+
+Patches applied:
+
+ * srivasta@debian.org--etch/refpolicy--debian--0.0--patch-25
+   handle multiple defs of amavisd daemon
+

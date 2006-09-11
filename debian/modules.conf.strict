@@ -674,6 +674,13 @@ mount = base
 pcmcia = module
 
 # Layer: system
+# Module: pythonsupport
+#
+# Support for precompiling python modules
+# 
+pythonsupport = module
+
+# Layer: system
 # Module: raid
 #
 # RAID array management tools
@@ -1421,6 +1428,13 @@ sasl = module
 # Policy for sendmail.
 # 
 sendmail = module
+
+# Layer: services
+# Module: setroubleshoot
+#
+# SELinux troubleshooting service
+# 
+setroubleshoot = module
 
 # Layer: services
 # Module: slrnpull

@@ -16,7 +16,7 @@
 #
 # /dev
 #
-/dev(/\.static/dev)?/MAKEDEV			--	gen_context(system_u:object_r:sbin_t,s0)
+/dev/MAKEDEV			--	gen_context(system_u:object_r:sbin_t,s0)
 
 #
 # /emul

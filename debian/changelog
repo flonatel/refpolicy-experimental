@@ -1,3 +1,26 @@
+refpolicy (0.0.20060911-1) unstable; urgency=low
+
+  * New upstream SCM HEAD.
+  * Synched with Erich Schubert <erich@debian.org>
+    + Added first draft of python-support. You'll want to relabel these files.
+    + Build python-support and setroubleshoot modules
+    + Removed modules from guessing hintfile that are included in base.
+
+  * Bug fix: "Defaults should match the strict/targeted policy", thanks to
+    Uwe Hermann. Makde them match strict.                     (Closes: #386931).
+  * Bug fix: "selinux-policy-refpolicy-src: Duplicate entries in policy
+    files", thanks to Simon Richard Grint                     (Closes: #386909).
+  * Bug fix: "modules.conf vs. modules.conf.dist", thanks to Uwe Hermann
+                                                              (Closes: #386887).
+  * Bug fix: "OUTPUT_POLICY and policy-version comments", thanks to Uwe
+    Hermann                                                  (Closes: #386930).
+  * Bug fix: "s/bzip2/gzip/?", thanks to Uwe Hermann         (Closes: #386885).
+  * Bug fix: "selinux-refpolicy-src: include modules.conf files of strict
+    and targeted for -src package", thanks to Erich Schubert
+                                                              (Closes: #386573).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 11 Sep 2006 17:46:10 -0500
+
 refpolicy (0.0.20060907-3) unstable; urgency=low
 
   * Updated a few more policy modules to latest versions for Debian.

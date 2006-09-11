@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Fri Sep  8 11:27:35 2006
+## Last Modified On : Mon Sep 11 23:46:23 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 75
+## Update Count     : 83
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -104,14 +104,8 @@ CONFIG/selinux-policy-refpolicy-src::
 	test -e debian/stamp/config-src         ||                        \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                         \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf)
-	cp debian/modules.conf.strict                                      \
-                     $(SRCTOP)/debian/build-$(package)/policy/
-	cp debian/modules.conf.targeted                                    \
-                     $(SRCTOP)/debian/build-$(package)/policy/
-	mv $(SRCTOP)/debian/build-$(package)/policy/modules.conf           \
-                 $(SRCTOP)/debian/build-$(package)/policy/modules.conf.dist
-	ln -s modules.conf.strict                                          \
-                 $(SRCTOP)/debian/build-$(package)/policy/modules.conf
+	cp debian/modules.conf.* $(SRCTOP)/debian/build-$(package)/policy/
+	cp debian/build.conf     $(SRCTOP)/debian/build-$(package)/policy/
 	echo done > debian/stamp/config-src
 STAMPS_TO_CLEAN += debian/stamp/config-src
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-src
@@ -155,6 +149,7 @@ STAMPS_TO_CLEAN += debian/stamp/build-targeted
 
 build/selinux-policy-refpolicy-src:
 	$(REASON)
+
 
 build/selinux-policy-refpolicy-doc:
 	$(REASON)
@@ -217,8 +212,13 @@ install/selinux-policy-refpolicy-src:
 	test ! -e $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING || \
            rm -f $(TMPTOP)/etc/selinux/refpolicy/src/policy/COPYING
 	rm -rf   $(TMPTOP)/etc/selinux/refpolicy/src/policy/man
+	(cd $(TMPTOP)/etc/selinux/refpolicy/src/policy;                   \
+          if test -f modules.conf; then                                   \
+              mv modules.conf modules.conf.dist;                          \
+          fi;                                                             \
+          ln -sf modules.conf.strict modules.conf)
 	(cd $(TMPTOP)/etc/selinux/refpolicy/src/; mv policy $(package); \
-         tar jfc $(TMPTOP)/usr/src/$(package).tar.bz2 $(package))
+         tar zfc $(TMPTOP)/usr/src/$(package).tar.gz $(package))
 	rm -rf               $(TMPTOP)/etc
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/

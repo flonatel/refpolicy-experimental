@@ -20,7 +20,7 @@ ifdef(`strict_policy',`
 #
 # /dev
 #
-/dev(/\.static/dev)?/initctl		-p	gen_context(system_u:object_r:initctl_t,s0)
+/dev/initctl		-p	gen_context(system_u:object_r:initctl_t,s0)
 
 #
 # /sbin

@@ -675,6 +675,7 @@ optional_policy(`
 
 optional_policy(`
 	postfix_list_spool(initrc_t)
+	postfix_read_config(initrc_t)
 ')
 
 optional_policy(`
