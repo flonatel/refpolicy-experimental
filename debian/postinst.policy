@@ -5,9 +5,9 @@
 # Created On       : Mon Aug 21 01:14:21 2006
 # Created On Node  : glaurung.internal.golden-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Fri Sep  8 10:25:04 2006
+# Last Modified On : Tue Sep 12 10:23:37 2006
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 19
+# Update Count     : 23
 # Status           : Unknown, Use with caution!
 # HISTORY          : 
 # Description      : 
@@ -163,6 +163,7 @@ sub get_ordering {
   close RESULTS;
 }
 
+my @Load_Order;
 # Cycle over all the modules installed, starting with the dependency
 # ordered modules, taking care that we only look at a module once. For
 # each module, we look to see a mapping ogf the packages that need
@@ -201,7 +202,7 @@ sub installed_modules {
 }
 
 sub main {
-  if (-e "$BASEDIR/modules/active/base.pp" ) {
+  if (-e "$basedir/modules/active/base.pp" ) {
     print STDERR "You already have a $policy_name policy installed.\n";
     print STDERR "I am leaving it alone. Please check and update manually.\n";
   }
