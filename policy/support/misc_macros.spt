@@ -28,6 +28,7 @@ define(`ifndef',`ifdef(`$1',`$3',`$2')')
 define(`__endline__',`
 ')
 
+########################################
 #
 # refpolwarn(message)
 #
@@ -35,6 +36,7 @@ define(`__endline__',`
 #
 define(`refpolicywarn',`errprint(__file__:__line__: Warning: `$1'__endline__)')
 
+########################################
 #
 # refpolerr(message)
 #

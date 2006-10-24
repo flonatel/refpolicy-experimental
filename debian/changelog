@@ -1,3 +1,17 @@
+refpolicy (0.0.20061018-1) unstable; urgency=low
+
+  * New upstream release
+  * Updated copyright file with the new location of the sources, and added
+    a watch file.
+  * Bug fix: "selinux-policy-refpolicy-targeted: postinst package list
+    retrieval suggestion", thanks to Alexander Buerger. Thanks to the
+    provided suggestion, the selection of policy modules to install is not
+    only faster, it is actually correct :)                 (Closes: #388744).
+  * Bug fix: "Makefile for building policy modules?", thanks to Uwe
+    Hermann.  Provided an intial version, may have bugs.   (Closes: #389116).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Tue, 24 Oct 2006 14:31:22 -0500
+
 refpolicy (0.0.20060911-2) unstable; urgency=low
 
   * Fixed a typo in policy postinst that made all the policies reload at

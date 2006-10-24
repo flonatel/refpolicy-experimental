@@ -407,6 +407,13 @@ games = module
 gift = module
 
 # Layer: apps
+# Module: gnome
+#
+# GNU network object model environment (GNOME)
+# 
+gnome = module
+
+# Layer: apps
 # Module: gpg
 #
 # Policy for GNU Privacy Guard and related programs.

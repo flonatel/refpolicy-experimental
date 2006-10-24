@@ -1,4 +1,8 @@
 arch ancestry version 1
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-31
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-30
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-29
+arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-28
 arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-27
 arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-26
 arch:patch:srivasta@debian.org--etch/debian-dir--refpolicy--1.0--patch-25

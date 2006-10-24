@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Mon Sep 11 23:46:23 2006
+## Last Modified On : Tue Oct 24 14:24:43 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 83
+## Update Count     : 98
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -169,6 +169,7 @@ install/selinux-policy-refpolicy-strict:
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/system.users)
+	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-strict/
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
@@ -192,6 +193,7 @@ install/selinux-policy-refpolicy-targeted:
                     DESTDIR=$(TMPTOP) install                       \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/system.users)
+	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-targeted/
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
@@ -204,7 +206,7 @@ DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-targeted
 install/selinux-policy-refpolicy-src:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
-	$(make_directory)    $(DOCDIR)/
+	$(make_directory)    $(DOCDIR)/examples
 	$(make_directory)    $(TMPTOP)/usr/src
 	(cd $(SRCTOP)/debian/build-$(package);                                 \
          $(MAKE) NAME=refpolicy $(OPTIONS) DESTDIR=$(TMPTOP) bare conf install-src; )
@@ -217,8 +219,19 @@ install/selinux-policy-refpolicy-src:
               mv modules.conf modules.conf.dist;                          \
           fi;                                                             \
           ln -sf modules.conf.strict modules.conf)
-	(cd $(TMPTOP)/etc/selinux/refpolicy/src/; mv policy $(package); \
-         tar zfc $(TMPTOP)/usr/src/$(package).tar.gz $(package))
+	$(install_file)      policy/rolemap                               \
+			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	$(install_file)      debian/build.conf                            \
+			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	$(install_file)      debian/global_booleans.xml                   \
+			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	$(install_file)      debian/global_tunables.xml                   \
+			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	$(install_file)      debian/Makefile.src                          \
+                             $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	(cd $(TMPTOP)/etc/selinux/refpolicy/src/; mv policy $(package);   \
+                                                  mv support $(package)/; \
+	  tar zfc $(TMPTOP)/usr/src/$(package).tar.gz $(package))
 	rm -rf               $(TMPTOP)/etc
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
@@ -227,6 +240,11 @@ install/selinux-policy-refpolicy-src:
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
 	$(install_file)      debian/copyright     $(DOCDIR)/
+	$(install_file)      debian/example.fc    $(DOCDIR)/examples/
+	$(install_file)      debian/example.if    $(DOCDIR)/examples/
+	$(install_file)      debian/example.te    $(DOCDIR)/examples/
+	$(install_file)      debian/example.mk    $(DOCDIR)/examples/Makefile
+	$(install_program)   debian/policygentool $(DOCDIR)/examples/
 DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-src
 
 install/selinux-policy-refpolicy-doc:

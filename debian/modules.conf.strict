@@ -407,6 +407,13 @@ games = module
 gift = module
 
 # Layer: apps
+# Module: gnome
+#
+# GNU network object model environment (GNOME)
+# 
+gnome = module
+
+# Layer: apps
 # Module: gpg
 #
 # Policy for GNU Privacy Guard and related programs.
@@ -523,7 +530,7 @@ usernetctl = module
 #
 # VMWare Workstation virtual machines
 # 
-vmware = off
+vmware = module
 
 # Layer: apps
 # Module: webalizer
@@ -544,7 +551,7 @@ wine = module
 #
 # Yum/Apt Mirroring
 # 
-yam = off
+yam = module
 
 # Layer: system
 # Module: authlogin
@@ -699,8 +706,7 @@ selinuxutil = base
 #
 # SELinux MLS/MCS label translation service.
 # 
-# not yet in debian AFIAK.
-setrans = off
+setrans = module
 
 # Layer: system
 # Module: sysnetwork
@@ -1201,6 +1207,15 @@ nx = module
 # Open AntiVirus scannerdaemon and signature update
 # 
 oav = module
+
+# Layer: services
+# Module: oddjob
+#
+# Oddjob provides a mechanism by which unprivileged applications can
+# request that specified privileged operations be performed on their
+# behalf.
+# 
+oddjob = module
 
 # Layer: services
 # Module: openca

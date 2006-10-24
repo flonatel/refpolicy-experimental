@@ -1,6 +1,6 @@
 This is the Debian package for the SELinux Reference policy, and it is
 built from sources obtained from:
- http://serefpolicy.sourceforge.net/
+ http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
 
 This package was originally debianized by Erich Schubert
 <erich@debian.org> on Mon, 13 Feb 2006 22:50:03 +0100.

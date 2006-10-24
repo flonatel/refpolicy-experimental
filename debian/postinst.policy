@@ -1,19 +1,19 @@
 #! /usr/bin/perl
-#                              -*- Mode: Cperl -*- 
-# postinst.pl --- 
-# Author           : Manoj Srivastava ( srivasta@glaurung.internal.golden-gryphon.com ) 
+#                              -*- Mode: Cperl -*-
+# postinst.pl ---
+# Author           : Manoj Srivastava ( srivasta@glaurung.internal.golden-gryphon.com )
 # Created On       : Mon Aug 21 01:14:21 2006
 # Created On Node  : glaurung.internal.golden-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Tue Sep 12 10:23:37 2006
+# Last Modified On : Tue Oct 24 11:55:51 2006
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 23
+# Update Count     : 28
 # Status           : Unknown, Use with caution!
-# HISTORY          : 
-# Description      : 
-# 
+# HISTORY          :
+# Description      :
+#
 # arch-tag: 69c85425-4822-4b17-bb54-3b2d22e76687
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -28,7 +28,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# 
+#
 #use strict; #for debugging
 use Cwd 'abs_path';
 $|=1;
@@ -53,6 +53,8 @@ my %Module_Path;
 my %Deps;
 # A hash of all modules already processed
 my %Seen;
+# A hash of all packages installed on this machine
+my %Installed;
 # Policy modules in dependency order (subset of all modules in policy)
 my @ordered;
 # A list of modules already scheduled to be laoded
@@ -106,7 +108,7 @@ my %map = (
           );
 
 #  List all th modules, except the base module, in the policy
-#  directory. This sets @all_modules and %Module_Path 
+#  directory. This sets @all_modules and %Module_Path
 sub list_modules {
   my $src_dir = shift;
   print STDERR "Locating modules\n";
@@ -175,6 +177,15 @@ my @Load_Order;
 # and the Load_Order array, as well as the Loaded hash.
 sub installed_modules {
   print STDERR "Selecting modules based on installed packages\n";
+
+  # This suggestion from Alexander Bürger <buerger@iskp.uni-bonn.de>
+  open( my $PACKAGES, "dpkg-query -W |" )
+    or die("Cannot run 'dpkg-query -W'. $!");
+  while( my $p = <$PACKAGES> ) {
+    $Installed{$1} = $2 if( $p =~ /^(.*)\t(.+)$/ );
+  }
+ close($PACKAGES) or die("Could not close pipe.");
+
   foreach my $module (@ordered, @all_modules) {
     $module =~ s/\.pp$//o;
 
@@ -185,7 +196,7 @@ sub installed_modules {
 
   PACKAGE:
     for my $pkg (@{ $map{$module} }) {
-      if (system("dpkg-query -W $pkg > /dev/null 2>\&1") == 0) {
+      if ($Installed{$pkg}) {
         if (defined $Deps{$module}) {
           for my $dep (split(' ', $Deps{$module})) {
             next if $Loaded{$dep};

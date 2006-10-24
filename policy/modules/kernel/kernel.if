@@ -37,6 +37,45 @@ interface(`kernel_domtrans_to',`
 
 ########################################
 ## <summary>
+##	Allows to start userland processes
+##	by transitioning to the specified domain,
+##	with a range transition.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The process type entered by kernel.
+##	</summary>
+## </param>
+## <param name="entrypoint">
+##	<summary>
+##	The executable type for the entrypoint.
+##	</summary>
+## </param>
+## <param name="range">
+##	<summary>
+##	Range for the domain.
+##	</summary>
+## </param>
+#
+interface(`kernel_ranged_domtrans_to',`
+	gen_require(`
+		type kernel_t;
+	')
+
+
+	kernel_domtrans_to($1,$2)
+
+	ifdef(`enable_mcs',`
+		range_transition kernel_t $2:process $3;
+	')
+
+	ifdef(`enable_mls',`
+		range_transition kernel_t $2:process $3;
+	')
+')
+
+########################################
+## <summary>
 ##	Allows the kernel to mount filesystems on
 ##	the specified directory type.
 ## </summary>
@@ -2129,6 +2168,161 @@ interface(`kernel_sendrecv_unlabeled_association',`
 
 	# temporary hack until labeling on packets is supported
 	allow $1 unlabeled_t:packet { send recv };
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive messages
+##	from an	unlabeled IPSEC association.
+## </summary>
+## <desc>
+##	<p>
+##	Do not audit attempts to send and receive messages
+##	from an	unlabeled IPSEC association.  Network
+##	connections that are not protected
+##	by IPSEC have use an unlabeled
+##	assocation.
+##	</p>
+##	<p>
+##	The corenetwork interface
+##	corenet_dontaudit_non_ipsec_sendrecv() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_sendrecv_unlabeled_association',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	dontaudit $1 unlabeled_t:association { sendto recvfrom };
+')
+
+########################################
+## <summary>
+##      Receive TCP packets from a NetLabel connection.
+## </summary>
+## <desc>
+##	<p>
+##      Receive TCP packets from a NetLabel connection, NetLabel is an
+##      explicit packet labeling framework which implements CIPSO and
+##      similar protocols.
+##      </p>
+##	<p>
+##	The corenetwork interface
+##	corenet_tcp_recv_netlabel() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_tcp_recvfrom_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:tcp_socket recvfrom;
+')
+
+########################################
+## <summary>
+##      Do not audit attempts to receive TCP packets from a NetLabel
+##      connection.
+## </summary>
+## <desc>
+##	<p>
+##      Do not audit attempts to receive TCP packets from a NetLabel
+##      connection.  NetLabel is an explicit packet labeling framework
+##      which implements CIPSO and similar protocols.
+##      </p>
+##	<p>
+##	The corenetwork interface
+##	corenet_dontaudit_tcp_recv_netlabel() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_tcp_recvfrom_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	dontaudit $1 unlabeled_t:tcp_socket recvfrom;
+')
+
+########################################
+## <summary>
+##      Receive UDP packets from a NetLabel connection.
+## </summary>
+## <desc>
+##	<p>
+##      Receive UDP packets from a NetLabel connection, NetLabel is an
+##      explicit packet labeling framework which implements CIPSO and
+##      similar protocols.
+##      </p>
+##	<p>
+##	The corenetwork interface
+##	corenet_udp_recv_netlabel() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_udp_recvfrom_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:udp_socket recvfrom;
+')
+
+########################################
+## <summary>
+##      Do not audit attempts to receive UDP packets from a NetLabel
+##      connection.
+## </summary>
+## <desc>
+##	<p>
+##      Do not audit attempts to receive UDP packets from a NetLabel
+##      connection.  NetLabel is an explicit packet labeling framework
+##      which implements CIPSO and similar protocols.
+##      </p>
+##	<p>
+##	The corenetwork interface
+##	corenet_dontaudit_udp_recv_netlabel() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_udp_recvfrom_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	dontaudit $1 unlabeled_t:udp_socket recvfrom;
 ')
 
 ########################################

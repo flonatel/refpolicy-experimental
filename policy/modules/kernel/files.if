@@ -386,7 +386,7 @@ interface(`files_write_non_security_dirs',`
 		attribute file_type, security_file_type;
 	')
 
-	allow $1 file_type:dir write;
+	allow $1 { file_type -security_file_type }:dir write;
 ')
 
 ########################################
@@ -1765,6 +1765,24 @@ interface(`files_list_etc',`
 
 ########################################
 ## <summary>
+##	Add and remove entries from /etc directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_rw_etc_dirs',`
+	gen_require(`
+		type etc_t;
+	')
+
+	allow $1 etc_t:dir rw_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Read generic files in /etc.
 ## </summary>
 ## <param name="domain">
@@ -1901,6 +1919,25 @@ interface(`files_relabel_etc_files',`
 
 	allow $1 etc_t:dir list_dir_perms;
 	allow $1 etc_t:file { relabelfrom relabelto };
+')
+
+########################################
+## <summary>
+##	Read symbolic links in /etc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_read_etc_symlinks',`
+	gen_require(`
+		type etc_t;
+	')
+
+	allow $1 etc_t:dir search_dir_perms;
+	allow $1 etc_t:lnk_file { getattr read };
 ')
 
 ########################################
@@ -3334,27 +3371,6 @@ interface(`files_usr_filetrans',`
 
 ########################################
 ## <summary>
-##	Execute programs in /usr/src in the caller domain.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`files_exec_usr_src_files',`
-	gen_require(`
-		type usr_t, src_t;
-	')
-
-	allow $1 usr_t:dir search;
-	allow $1 src_t:dir r_dir_perms;
-	allow $1 src_t:lnk_file r_file_perms;
-	can_exec($1,src_t)
-')
-
-########################################
-## <summary>
 ##	Do not audit attempts to search /usr/src.
 ## </summary>
 ## <param name="domain">
@@ -3369,6 +3385,27 @@ interface(`files_dontaudit_search_src',`
 	')
 
 	dontaudit $1 src_t:dir search;
+')
+
+########################################
+## <summary>
+##	Get the attributes of files in /usr/src.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_getattr_usr_src_files',`
+	gen_require(`
+		type usr_t, src_t;
+	')
+
+	allow $1 { usr_t src_t }:dir search_dir_perms;
+
+	allow $1 src_t:lnk_file { getattr read };
+	allow $1 src_t:file getattr;
 ')
 
 ########################################
@@ -3389,6 +3426,27 @@ interface(`files_read_usr_src_files',`
 	allow $1 usr_t:dir search;
 	allow $1 src_t:dir r_dir_perms;
 	allow $1 src_t:{ file lnk_file } r_file_perms;
+')
+
+########################################
+## <summary>
+##	Execute programs in /usr/src in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_exec_usr_src_files',`
+	gen_require(`
+		type usr_t, src_t;
+	')
+
+	allow $1 usr_t:dir search;
+	allow $1 src_t:dir r_dir_perms;
+	allow $1 src_t:lnk_file r_file_perms;
+	can_exec($1,src_t)
 ')
 
 ########################################
@@ -4460,4 +4518,48 @@ interface(`files_unconfined',`
 	')
 
 	typeattribute $1 files_unconfined_type;
+')
+
+########################################
+## <summary>
+##	Allow attempts to monage any directory
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to allow
+##	</summary>
+## </param>
+#
+interface(`files_manage_non_security_dirs',`
+	gen_require(`
+		attribute file_type, security_file_type;
+	')
+
+	allow $1 { file_type -security_file_type }:dir create_dir_perms;
+')
+
+########################################
+## <summary>
+##	Create a aliased type to etc_runtime_t files.
+## </summary>
+## <desc>
+##	<p>
+##	Create a aliased type to etc runtime files.
+##	</p>
+##	<p>
+##	This is added to remove types that should have been etc_runtime_t
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Alias type for etc_runtime_t.
+##	</summary>
+## </param>
+#
+interface(`corecmd_etc_runtime_alias',`
+	gen_require(`
+		type etc_runtime_t;
+	')
+
+	typealias etc_runtime_t alias $1;
 ')
