@@ -1,0 +1,14 @@
+refpolicy (0.0.20061018-2) unstable; urgency=high
+
+
+  * When installing strict policy, the postinst does not check for the
+    contents of /etc/selinux/config to see if SELINUXTYPE is set to
+    refpolicy-strict or not.  Ideally, if config does not have SELINUXTYPE
+    set to refpolicy-strict, the installer should be prompted to see if
+    they want to change the policy type and relabel; this is not yet
+    done.  Please ensure that the setting for  SELINUXTYPE in the
+    configuration file /etc/selinux/config matches what you want it to
+    be. 
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri, 22 Dec 2006 10:40:38 -0600
+

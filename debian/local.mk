@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Tue Oct 24 14:24:43 2006
+## Last Modified On : Fri Dec 22 10:43:28 2006
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 98
+## Update Count     : 99
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -14,6 +14,8 @@
 ## arch-tag: b07b1015-30ba-4b46-915f-78c776a808f4
 ## 
 ###############################################################################
+
+MCS_MLS_TYPE=-mcs
 
 testdir:
 	$(testdir)
@@ -173,6 +175,7 @@ install/selinux-policy-refpolicy-strict:
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/
+	$(install_file)      debian/NEWS.Debian   $(DOCDIR)/NEWS.Debian 
 	$(install_file)      Changelog            $(DOCDIR)/changelog
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)

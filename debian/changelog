@@ -1,3 +1,22 @@
+refpolicy (0.0.20061018-2) unstable; urgency=high
+
+  * The This update enables MCS for targeted and strict, uses 1024
+    categories (as Fedora uses - necessary for compatability). Please note
+    that enabling MCS categories is required for compatibility with
+    filesystems created on Fedora Core 5 and above, RHEL 5 and above, and
+    CentOS 5 and above.  MCS categories is also a feature that we plan for
+    all future releases of SE Linux and does not have a nice upgrade path
+    - releasing etch without MCS will make things painful for SE Linux
+    users on the upgrade to lenny. This feature has been extensively
+    tested by Russel Coker and myself, and does not otherwise impact the
+    install. 
+  * Allow semanage to use the initrd file descriptor in targeted policy.
+  * Fix a bug with restorecon.
+  * Bug fix: "refpolicy: qemu should have execmem permissions", thanks to
+    David Härdeman                                       (Closes: #402293).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri, 22 Dec 2006 10:33:22 -0600
+
 refpolicy (0.0.20061018-1) unstable; urgency=low
 
   * New upstream release

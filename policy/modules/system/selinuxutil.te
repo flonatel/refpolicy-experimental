@@ -85,6 +85,9 @@ domain_obj_id_change_exemption(restorecon_t)
 init_system_domain(restorecon_t,restorecon_exec_t)
 role system_r types restorecon_t;
 
+# for initial labeling of tmpfs /dev
+allow restorecon_t tmpfs_t:chr_file { read write };
+
 type restorecond_t;
 type restorecond_exec_t;
 init_daemon_domain(restorecond_t,restorecond_exec_t)
@@ -560,6 +563,10 @@ allow semanage_t policy_config_t:file { read write };
 allow semanage_t semanage_tmp_t:dir create_dir_perms;
 allow semanage_t semanage_tmp_t:file create_file_perms;
 files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
+
+ifdef(`targeted_policy',`
+	allow semanage_t initrc_t:fd use;
+')
 
 kernel_read_system_state(semanage_t)
 kernel_read_kernel_sysctls(semanage_t)
