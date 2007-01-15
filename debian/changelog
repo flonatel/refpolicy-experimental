@@ -1,3 +1,35 @@
+refpolicy (0.0.20061018-3) unstable; urgency=high
+
+  * Bug fix: "refpolicy: FTBFS: /bin/sh: debian/stamp/config-strict: No
+    such file or directory", thanks to Lucas Nussbaum. This was fixed by
+    moving all the stamps into ./debian instead. I'll re-visit the
+    ./debian/stamp/ directory in lenny. This is a pretty minor packaging
+    change.                                                 (Closes: #405613).
+  * Bug fix: "selinux-policy-refpolicy-targeted: Policy for dcc misses
+    Debian's FHS paths", thanks to Devin Carraway. From the bug report:
+    Many of the files in these packages are overlooked when labelling
+    files, because refpolicy's dcc module stipulates paths not consistent
+    with the Debian FHS layout.  The files go unlabelled and dcc-client
+    (at least) stops working. The two major problems  are the references
+    to /usr/libexec/dcc (damons, placed in /usr/sbin by the Debian
+    packages) and to /var/dcc (all sorts of things, placed under
+    /var/lib/dcc).  A side effect of the latter is that dccifd_t and
+    probably others need search on var_lib_t, through which it must pass
+    to get to /var/lib/dcc.  Fixed the policy; will send upstream.
+                                                             (Closes: #404309).
+  * Bug fix: "selinux-policy-refpolicy-targeted: clamav policy forbids
+    clamd_t search on /var/lib", thanks to Devin Carraway.  This is a
+    simple one line change, and obviously an oversight; I think getting
+    clamd to work is fairly important.                        (Closes: #404895).
+  * Bug fix: "selinux-policy-refpolicy-targeted: Multiple problems with
+    courier policy", thanks to Devin Carraway.  There is detailed
+    information of the changes made in the bug report, and in the commit
+    logs. Again, fixing courier daemons seems pretty important; SELinux
+    tends to get used a lot on remote mail servers, and this fixes issues
+    with the policy.                                          (Closes: #405103).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 15 Jan 2007 13:20:30 -0600
+
 refpolicy (0.0.20061018-2) unstable; urgency=high
 
   * The This update enables MCS for targeted and strict, uses 1024

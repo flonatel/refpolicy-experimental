@@ -103,6 +103,7 @@ domain_use_interactive_fds(clamd_t)
 files_read_etc_files(clamd_t)
 files_read_etc_runtime_files(clamd_t)
 files_search_spool(clamd_t)
+files_search_var_lib(clamd_t)
 
 init_use_fds(clamd_t)
 init_use_script_ptys(clamd_t)

@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Fri Dec 22 10:43:28 2006
+## Last Modified On : Mon Jan 15 10:43:46 2007
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 99
+## Update Count     : 100
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -48,86 +48,86 @@ CLEAN/selinux-policy-refpolicy-strict CLEAN/selinux-policy-refpolicy-targeted CL
 
 CONFIG/selinux-policy-refpolicy-strict::
 	$(REASON)
-	test -e debian/stamp/config-strict  ||                             \
+	test -e debian/stamp-config-strict  ||                             \
 	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-strict  ||                             \
+	test -e debian/stamp-config-strict  ||                             \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-strict  ||                             \
+	test -e debian/stamp-config-strict  ||                             \
 	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-strict  ||                             \
+	test -e debian/stamp-config-strict  ||                             \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                    NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) bare
-	test -e debian/stamp/config-strict  ||                             \
+	test -e debian/stamp-config-strict  ||                             \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) conf)
 	cp debian/modules.conf.strict                                      \
                      $(SRCTOP)/debian/build-$(package)/policy/modules.conf
-	echo done > debian/stamp/config-strict
-STAMPS_TO_CLEAN += debian/stamp/config-strict
+	echo done > debian/stamp-config-strict
+STAMPS_TO_CLEAN += debian/stamp-config-strict
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-strict
 
 CONFIG/selinux-policy-refpolicy-targeted::
 	$(REASON)
-	test -e debian/stamp/config-targeted  ||                           \
+	test -e debian/stamp-config-targeted  ||                           \
 	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-targeted  ||                           \
+	test -e debian/stamp-config-targeted  ||                           \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-targeted  ||                           \
+	test -e debian/stamp-config-targeted  ||                           \
 	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-targeted  ||                           \
+	test -e debian/stamp-config-targeted  ||                           \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                  NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) bare
-	test -e debian/stamp/config-targeted  ||                           \
+	test -e debian/stamp-config-targeted  ||                           \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) conf)
 	cp debian/modules.conf.targeted                                    \
                      $(SRCTOP)/debian/build-$(package)/policy/modules.conf
-	echo done > debian/stamp/config-targeted
-STAMPS_TO_CLEAN += debian/stamp/config-targeted
+	echo done > debian/stamp-config-targeted
+STAMPS_TO_CLEAN += debian/stamp-config-targeted
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-targeted
 
 CONFIG/selinux-policy-refpolicy-src::
 	$(REASON)
-	test -e debian/stamp/config-src         ||                        \
+	test -e debian/stamp-config-src         ||                        \
 	  test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-src         ||                        \
+	test -e debian/stamp-config-src         ||                        \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-src         ||                        \
+	test -e debian/stamp-config-src         ||                        \
 	  cp -lr policy support Makefile build.conf Rules.modular  doc    \
                Rules.monolithic config VERSION Changelog COPYING INSTALL  \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-src         ||                        \
+	test -e debian/stamp-config-src         ||                        \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                         \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf)
 	cp debian/modules.conf.* $(SRCTOP)/debian/build-$(package)/policy/
 	cp debian/build.conf     $(SRCTOP)/debian/build-$(package)/policy/
-	echo done > debian/stamp/config-src
-STAMPS_TO_CLEAN += debian/stamp/config-src
+	echo done > debian/stamp-config-src
+STAMPS_TO_CLEAN += debian/stamp-config-src
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-src
 
 CONFIG/selinux-policy-refpolicy-doc::
 	$(REASON)
-	test -e debian/stamp/config-doc         ||                         \
+	test -e debian/stamp-config-doc         ||                         \
 	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-doc         ||                         \
+	test -e debian/stamp-config-doc         ||                         \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-doc         ||                         \
+	test -e debian/stamp-config-doc         ||                         \
 	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp/config-doc         ||                         \
+	test -e debian/stamp-config-doc         ||                         \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf )
-	echo done > debian/stamp/config-doc
-STAMPS_TO_CLEAN += debian/stamp/config-doc
+	echo done > debian/stamp-config-doc
+STAMPS_TO_CLEAN += debian/stamp-config-doc
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-doc
 
 BUILD-common::
@@ -135,19 +135,19 @@ BUILD-common::
 
 build/selinux-policy-refpolicy-strict:
 	$(REASON)
-	test -e debian/stamp/build-strict                    ||            \
+	test -e debian/stamp-build-strict                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) policy all)
-	echo done > debian/stamp/build-strict   
-STAMPS_TO_CLEAN += debian/stamp/build-strict   
+	echo done > debian/stamp-build-strict   
+STAMPS_TO_CLEAN += debian/stamp-build-strict   
 
 build/selinux-policy-refpolicy-targeted:
 	$(REASON)
-	test -e debian/stamp/build-targeted                    ||            \
+	test -e debian/stamp-build-targeted                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                            \
            $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) policy all)
-	echo done > debian/stamp/build-targeted 
-STAMPS_TO_CLEAN += debian/stamp/build-targeted   
+	echo done > debian/stamp-build-targeted 
+STAMPS_TO_CLEAN += debian/stamp-build-targeted   
 
 build/selinux-policy-refpolicy-src:
 	$(REASON)
