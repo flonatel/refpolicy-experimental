@@ -19,7 +19,8 @@ endif
 
 TYPE ?= $(NAME)${MCSFLAG}
 
-HEADERDIR := /path/to/where/selinux-policy-refpolicy-src/tarball/was/unpacked
+# This can also be changed to /usr/share/selinux/refpolicy-strict/include
+HEADERDIR := /usr/share/selinux/refpolicy-targeted/include
 include $(HEADERDIR)/Makefile
 
 # arch-tag: 56a0db1b-e624-4696-9882-9b7147b719f9

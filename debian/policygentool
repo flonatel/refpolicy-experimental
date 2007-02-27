@@ -237,11 +237,13 @@ will be written in the te file.  Use the File Context file to associate file
 paths with security context.  Use the interface rules to allow other protected
 domains to interact with the newly defined domains.
 
-After generating these files use the /usr/share/selinux/devel/Makefile to
+After generating these files use the /usr/share/selinux/POLICY-NAME/include/Makefile to
 compile your policy package.  Then use the semodule tool to load it.
 
-# /usr/share/selinux/devel/policygentool myapp /usr/bin/myapp
-# make -f /usr/share/selinux/devel/Makefile
+# /usr/bin/policygentool myapp /usr/bin/myapp
+# echo 'HEADERDIR:=/usr/share/selinux/refpolicy-targeted/include' >Makefile
+# echo 'include $(HEADERDIR)/Makefile' >> Makefile
+# make
 # semodule -l myapp.pp
 # restorecon -R -v /usr/bin/myapp "all files defined in myapp.fc"
 
@@ -250,7 +252,7 @@ will be generated.  You can use audit2allow to help translate the avc messages
 into policy.
 
 # setenforce 0
-# service myapp start
+# /etc/init.d/myapp start
 # audit2allow -R -i /var/log/audit/audit.log
 
 Return to continue:"""

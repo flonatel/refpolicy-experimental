@@ -92,6 +92,32 @@ Description: Source of the SELinux reference policy for customization
  This is the source of the policy, provided so that local variations of
  SELinux policy may be created.
 
+Package: selinux-policy-refpolicy-dev
+Architecture: all
+Depends: python, policycoreutils, checkpolicy (>= 1.32), gawk
+Recommends: setools
+Description: Headers from the SELinux reference policy for building modules
+ The SELinux Reference Policy (refpolicy) is a complete SELinux
+ policy, as an alternative to the existing strict and targeted
+ policies available from http://selinux.sf.net. The goal is to have
+ this policy as the system policy, be and used as the basis for
+ creating other policies. Refpolicy is based on the current strict and
+ targeted policies, but aims to accomplish many additional
+ goals:
+  + Strong Modularity
+  + Clearly stated security Goals
+  + Documentation
+  + Development Tool Support
+  + Forward Looking
+  + Configurability
+  + Flexible Base Policy
+  + Application Policy Variations
+  + Multi-Level Security
+ Homepage: http://serefpolicy.sourceforge.net/
+ .
+ This package provides header files for building your own SELinux
+ policy packages compatible with official policy packages.
+
 Package: selinux-policy-refpolicy-doc
 Architecture: all
 Section: doc

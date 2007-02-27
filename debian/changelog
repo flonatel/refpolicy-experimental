@@ -1,3 +1,38 @@
+refpolicy (0.0.20061018-4) unstable; urgency=low
+
+  * Bug fix: "selinux-policy-refpolicy-targeted: does not suggest a way to
+    fix the 'maybe failing' attempt in postinst", thanks to Eddy Petrisor.
+    While this does not belong in the postinst, I have addedthis to the 
+    README.Debian file. This should be a low risk change. (Closes: #407691).
+  * Bug fix: "Default build.conf doesn't match default strict/targeted
+    policy", thanks to Stefan.The build.conf included in the reference
+    source policy describe to build a policy of the type "strict". The
+    default binary policies coming with Debian are build with the policy
+    type "strict-mcs" or "targeted-mcs". Change the build.conf shipped in
+    source to conform to what we really use. (changes TYPE=strict to 
+    TYPE=strict-mcs, very low risk change.                (Closes: #411256).
+  * Bug fix: "selinux-policy-refpolicy-targeted: openvpn policy do not
+    allow tcp connection mode", thanks to Rafal Kupka. This bug really
+    should be at least important, and we should fully support a class of
+    security product like OpenVPN on machines which are running SELinux,
+    and this is a very low risk change.                    (Closes: #409041).
+  * Install header files required for policy building for both strict and
+    targeted policies in a new -dev package, so it becomes really useful
+    to work with the source package. Moved the examples from the -src
+    package to this new -dev package, since the example is only useful in
+    with the headers provided. This is a new package, but it contains only
+    files already in the sources (No upstream changes at all), and is the
+    result of make install-headers. This new package has no rdepends, and
+    should be a very low risk addition to Debian.
+  * This release should be a whole lot better for building local policies,
+    including the policygentool for creating a new policy from scratch,
+    and ability to build local policy modular packages. The build.conf
+    files have been cleaned up, and the source policy defaults to targeted
+    policy, which is standard in Debian, as opposed to the strict policy,
+    which has priority optional.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 26 Feb 2007 22:37:17 -0600
+
 refpolicy (0.0.20061018-3) unstable; urgency=high
 
   * Bug fix: "refpolicy: FTBFS: /bin/sh: debian/stamp/config-strict: No

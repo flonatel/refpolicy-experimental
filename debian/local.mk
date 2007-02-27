@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Mon Jan 15 10:43:46 2007
+## Last Modified On : Mon Feb 26 23:11:36 2007
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 100
+## Update Count     : 104
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -14,8 +14,6 @@
 ## arch-tag: b07b1015-30ba-4b46-915f-78c776a808f4
 ## 
 ###############################################################################
-
-MCS_MLS_TYPE=-mcs
 
 testdir:
 	$(testdir)
@@ -28,6 +26,10 @@ BIN/selinux-policy-refpolicy-strict::      binary/selinux-policy-refpolicy-stric
 BUILD/selinux-policy-refpolicy-targeted::   build/selinux-policy-refpolicy-targeted
 INST/selinux-policy-refpolicy-targeted::    install/selinux-policy-refpolicy-targeted
 BIN/selinux-policy-refpolicy-targeted::     binary/selinux-policy-refpolicy-targeted
+
+BUILD/selinux-policy-refpolicy-dev::    build/selinux-policy-refpolicy-dev
+INST/selinux-policy-refpolicy-dev::     install/selinux-policy-refpolicy-dev
+BIN/selinux-policy-refpolicy-dev::      binary/selinux-policy-refpolicy-dev
 
 
 BUILD/selinux-policy-refpolicy-src::    build/selinux-policy-refpolicy-src
@@ -54,9 +56,11 @@ CONFIG/selinux-policy-refpolicy-strict::
 	test -e debian/stamp-config-strict  ||                             \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-strict  ||                             \
-	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
+	  cp -lr policy support Makefile Rules.modular  doc                \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
+	test -e debian/stamp-config-strict  ||                             \
+	  cp debian/build.conf.strict $(SRCTOP)/debian/build-$(package)/build.conf
 	test -e debian/stamp-config-strict  ||                             \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                    NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) bare
@@ -77,9 +81,11 @@ CONFIG/selinux-policy-refpolicy-targeted::
 	test -e debian/stamp-config-targeted  ||                           \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-targeted  ||                           \
-	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
+	  cp -lr policy support Makefile  Rules.modular  doc               \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
+	test -e debian/stamp-config-targeted  ||                           \
+	  cp debian/build.conf.targeted $(SRCTOP)/debian/build-$(package)/build.conf
 	test -e debian/stamp-config-targeted  ||                           \
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                  NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) bare
@@ -100,17 +106,30 @@ CONFIG/selinux-policy-refpolicy-src::
 	test -e debian/stamp-config-src         ||                        \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-src         ||                        \
-	  cp -lr policy support Makefile build.conf Rules.modular  doc    \
+	  cp -lr policy support Makefile Rules.modular  doc               \
                Rules.monolithic config VERSION Changelog COPYING INSTALL  \
                 README man $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-src         ||                        \
+           cp  debian/build.conf.targeted $(SRCTOP)/debian/build-$(package)/build.conf
+	test -e debian/stamp-config-src         ||                        \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                         \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf)
-	cp debian/modules.conf.* $(SRCTOP)/debian/build-$(package)/policy/
-	cp debian/build.conf     $(SRCTOP)/debian/build-$(package)/policy/
+	cp debian/modules.conf.*      $(SRCTOP)/debian/build-$(package)/policy/
+	cp debian/build.conf.targeted $(SRCTOP)/debian/build-$(package)/policy/
 	echo done > debian/stamp-config-src
 STAMPS_TO_CLEAN += debian/stamp-config-src
 DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-src
+
+CONFIG/selinux-policy-refpolicy-dev::
+	$(REASON)
+	test -e debian/stamp-config-dev         ||                        \
+	  test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
+            rm -rf $(SRCTOP)/debian/build-$(package)
+	test -e debian/stamp-config-dev         ||                        \
+	  mkdir -p    $(SRCTOP)/debian/build-$(package)
+	echo done > debian/stamp-config-dev
+STAMPS_TO_CLEAN += debian/stamp-config-dev
+DIRS_TO_CLEAN  += debian/build-selinux-policy-refpolicy-dev
 
 CONFIG/selinux-policy-refpolicy-doc::
 	$(REASON)
@@ -120,9 +139,11 @@ CONFIG/selinux-policy-refpolicy-doc::
 	test -e debian/stamp-config-doc         ||                         \
 	  mkdir -p    $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-doc         ||                         \
-	  cp -lr policy support Makefile build.conf Rules.modular  doc     \
+	  cp -lr policy support Makefile Rules.modular  doc                \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
+	test -e debian/stamp-config-doc         ||                        \
+           cp  debian/build.conf.targeted $(SRCTOP)/debian/build-$(package)/build.conf
 	test -e debian/stamp-config-doc         ||                         \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=refpolicy $(OPTIONS) conf )
@@ -152,6 +173,8 @@ STAMPS_TO_CLEAN += debian/stamp-build-targeted
 build/selinux-policy-refpolicy-src:
 	$(REASON)
 
+build/selinux-policy-refpolicy-dev:
+	$(REASON)
 
 build/selinux-policy-refpolicy-doc:
 	$(REASON)
@@ -163,13 +186,12 @@ install/selinux-policy-refpolicy-strict:
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-strict/policy
-	$(make_directory)    $(TMPTOP)/usr/share/selinux/
 	test -f $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active/file_contexts.local || \
 	touch $(TMPTOP)/etc/selinux/refpolicy-strict/modules/active/file_contexts.local
-	(cd $(SRCTOP)/debian/build-$(package);                      \
-            $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS)\
-                    DESTDIR=$(TMPTOP) install                       \
-          $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users \
+	(cd $(SRCTOP)/debian/build-$(package);                                  \
+            $(MAKE) NAME=refpolicy-strict TYPE=strict$(MCS_MLS_TYPE) $(OPTIONS) \
+                    DESTDIR=$(TMPTOP) install  install-headers                  \
+          $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users              \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/system.users)
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-strict/
 	$(install_file)      VERSION              $(DOCDIR)/
@@ -188,13 +210,12 @@ install/selinux-policy-refpolicy-targeted:
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active
 	$(make_directory)    $(TMPTOP)/etc/selinux/refpolicy-targeted/policy
-	$(make_directory)    $(TMPTOP)/usr/share/selinux/
 	test -f $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active/file_contexts.local || \
 	touch $(TMPTOP)/etc/selinux/refpolicy-targeted/modules/active/file_contexts.local
-	(cd $(SRCTOP)/debian/build-$(package);                      \
-            $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS)\
-                    DESTDIR=$(TMPTOP) install                       \
-          $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users \
+	(cd $(SRCTOP)/debian/build-$(package);                                      \
+            $(MAKE) NAME=refpolicy-targeted TYPE=targeted$(MCS_MLS_TYPE) $(OPTIONS) \
+                    DESTDIR=$(TMPTOP) install  install-headers                      \
+          $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users                \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/system.users)
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-targeted/
 	$(install_file)      VERSION              $(DOCDIR)/
@@ -209,7 +230,7 @@ DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-targeted
 install/selinux-policy-refpolicy-src:
 	$(REASON)
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
-	$(make_directory)    $(DOCDIR)/examples
+	$(make_directory)    $(DOCDIR)
 	$(make_directory)    $(TMPTOP)/usr/src
 	(cd $(SRCTOP)/debian/build-$(package);                                 \
          $(MAKE) NAME=refpolicy $(OPTIONS) DESTDIR=$(TMPTOP) bare conf install-src; )
@@ -224,8 +245,8 @@ install/selinux-policy-refpolicy-src:
           ln -sf modules.conf.strict modules.conf)
 	$(install_file)      policy/rolemap                               \
 			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
-	$(install_file)      debian/build.conf                            \
-			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
+	$(install_file)      debian/build.conf.targeted                   \
+			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/build.conf
 	$(install_file)      debian/global_booleans.xml                   \
 			     $(TMPTOP)/etc/selinux/refpolicy/src/policy/
 	$(install_file)      debian/global_tunables.xml                   \
@@ -243,12 +264,58 @@ install/selinux-policy-refpolicy-src:
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
 	$(install_file)      debian/copyright     $(DOCDIR)/
-	$(install_file)      debian/example.fc    $(DOCDIR)/examples/
-	$(install_file)      debian/example.if    $(DOCDIR)/examples/
-	$(install_file)      debian/example.te    $(DOCDIR)/examples/
-	$(install_file)      debian/example.mk    $(DOCDIR)/examples/Makefile
-	$(install_program)   debian/policygentool $(DOCDIR)/examples/
 DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-src
+
+install/selinux-policy-refpolicy-dev: install/selinux-policy-refpolicy-strict install/selinux-policy-refpolicy-targeted
+	$(REASON)
+	rm -rf               $(TMPTOP) $(TMPTOP).deb
+	$(make_directory)    $(DOCDIR)/examples
+	$(make_directory)    $(MAN1DIR)
+	$(make_directory)    $(TMPTOP)/usr/bin
+	$(make_directory)    $(TMPTOP)/usr/share/selinux/refpolicy-strict/include
+	$(make_directory)    $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include
+	find $(TMPTOP) -type d -name .arch-ids -print0 | xargs -0r rm -rf
+	(cd $(SRCTOP)/debian/selinux-policy-refpolicy-strict/usr/share/selinux/refpolicy-strict; \
+         tar cfh - include | (cd $(TMPTOP)/usr/share/selinux/refpolicy-strict; umask 000;        \
+           tar xpsf -))
+	(cd $(SRCTOP)/debian/selinux-policy-refpolicy-targeted/usr/share/selinux/refpolicy-targeted; \
+         tar cfh - include | (cd $(TMPTOP)/usr/share/selinux/refpolicy-targeted; umask 000;      \
+             tar xpsf -))
+	rm -rf $(SRCTOP)/debian/selinux-policy-refpolicy-strict/usr/share/selinux/refpolicy-strict/include
+	rm -rf $(SRCTOP)/debian/selinux-policy-refpolicy-targeted/usr/share/selinux/refpolicy-targeted/include
+	$(install_file)      policy/rolemap                                                   \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include/support
+	$(install_file)      debian/global_booleans.xml                                       \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include/support
+	$(install_file)      debian/global_tunables.xml                                       \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include/support
+	$(install_file)      debian/build.conf.targeted                                       \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include/build.conf
+	$(install_file)      policy/rolemap                                                   \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-strict/include/support
+	$(install_file)      debian/global_booleans.xml                                       \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-strict/include/support
+	$(install_file)      debian/global_tunables.xml                                       \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-strict/include/support
+	$(install_file)      debian/build.conf.strict                                         \
+                             $(TMPTOP)/usr/share/selinux/refpolicy-strict/include/build.conf
+	chmod +x             $(TMPTOP)/usr/share/selinux/refpolicy-targeted/include/support/segenxml.py
+	chmod +x             $(TMPTOP)/usr/share/selinux/refpolicy-strict/include/support/segenxml.py
+	$(install_file)      VERSION                $(DOCDIR)/
+	$(install_file)      README                 $(DOCDIR)/
+	$(install_file)      debian/README.Debian   $(DOCDIR)/
+	$(install_file)      Changelog              $(DOCDIR)/changelog
+	$(install_file)      debian/changelog       $(DOCDIR)/changelog.Debian
+	gzip -9fqr           $(DOCDIR)
+	$(install_file)      debian/copyright       $(DOCDIR)/
+	$(install_file)      debian/example.fc      $(DOCDIR)/examples/
+	$(install_file)      debian/example.if      $(DOCDIR)/examples/
+	$(install_file)      debian/example.te      $(DOCDIR)/examples/
+	$(install_file)      debian/example.mk      $(DOCDIR)/examples/Makefile
+	$(install_program)   debian/policygentool   $(TMPTOP)/usr/bin
+	$(install_file)      debian/policygentool.1 $(MAN1DIR)
+	gzip -9fqr           $(MAN1DIR)
+DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-dev
 
 install/selinux-policy-refpolicy-doc:
 	$(REASON)
@@ -304,6 +371,17 @@ binary/selinux-policy-refpolicy-targeted:
 	dpkg --build       $(TMPTOP) ..
 
 binary/selinux-policy-refpolicy-src:
+	$(REASON)
+	$(checkdir)
+	$(make_directory)    $(TMPTOP)/DEBIAN
+	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
+                              -p$(package) -isp   -P$(TMPTOP)
+	$(create_md5sum)   $(TMPTOP)
+	chown -R root:root $(TMPTOP)
+	chmod -R u+w,go=rX $(TMPTOP)
+	dpkg --build       $(TMPTOP) ..
+
+binary/selinux-policy-refpolicy-dev:
 	$(REASON)
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN

@@ -15,7 +15,7 @@
 ## 
 ###############################################################################
 
-FILES_TO_CLEAN  = 
+FILES_TO_CLEAN  = debian/files
 STAMPS_TO_CLEAN = 
 DIRS_TO_CLEAN   = $(TMPTOP)
 
@@ -46,7 +46,7 @@ PYDEFAULT  =$(strip $(shell pyversions -vd))
 MODULES_DIR=$(TMPTOP)/usr/share/python-support/$(package)
 
 # set this to -mcs, -mls, or -mcs-mls
-MCS_MLS_TYPE=
+MCS_MLS_TYPE=-mcs
 
 
 define checkdir
