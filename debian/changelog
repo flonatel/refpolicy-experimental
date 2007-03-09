@@ -1,3 +1,21 @@
+refpolicy (0.0.20061018-5) unstable; urgency=high
+
+  * Add policy for log and lock files for aptitude. This is needed for
+    proper function; so one does not need to go into permissive mode to
+    run aptitude.  Stolen from Erich. This is a low risk change.
+  * Debian puts grub in /usr/sbin/grub. Reflect that in the initial file
+    context. 
+  * Debian creates /dev/xconsole independently of whether or not a xserver
+    has been installed or not. So move the policy related to /dev/sconsole
+    out of the xserver policy, and into places where relevant (init.te,
+    logging.fc), to reflect the status that /dev/console is present
+    anyway.
+  * Add support for /etc/network/run  and /dev/shm/network, which seem to
+    be Debian specific as well.
+  * Allow udev to manage configuration files.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri,  9 Mar 2007 00:22:19 -0600
+
 refpolicy (0.0.20061018-4) unstable; urgency=low
 
   * Bug fix: "selinux-policy-refpolicy-targeted: does not suggest a way to

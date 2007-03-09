@@ -564,6 +564,41 @@ interface(`logging_rw_generic_logs',`
 
 ########################################
 ## <summary>
+##	Set the attributes of the xconsole named pipes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_setattr_xconsole',`
+	gen_require(`
+		type xconsole_device_t;
+	')
+
+	allow $1 xconsole_device_t:fifo_file setattr;
+')
+
+########################################
+## <summary>
+##	Read the xconsole named pipe.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_r_xconsole',`
+	gen_require(`
+		type xconsole_device_t;
+	')
+
+	allow $1 xconsole_device_t:fifo_file { getattr read };
+')
+########################################
+## <summary>
 ##	Create, read, write, and delete
 ##	generic log files.
 ## </summary>

@@ -54,6 +54,12 @@ files_pid_file(syslogd_var_run_t)
 type var_log_t;
 logging_log_file(var_log_t)
 
+# this is not actually a device, its a pipe
+type xconsole_device_t;
+files_type(xconsole_device_t)
+fs_associate_tmpfs(xconsole_device_t)
+files_associate_tmp(xconsole_device_t)
+
 ifdef(`enable_mls',`
 	init_ranged_daemon_domain(auditd_t,auditd_exec_t,mls_systemhigh)
 ')
@@ -296,6 +302,9 @@ allow syslogd_t syslogd_var_run_t:file create_file_perms;
 allow syslogd_t syslogd_var_run_t:dir rw_dir_perms;
 files_pid_filetrans(syslogd_t,syslogd_var_run_t,file)
 
+# log to xconsole
+allow syslogd_t xconsole_device_t:fifo_file rw_file_perms;
+
 kernel_read_kernel_sysctls(syslogd_t)
 kernel_read_proc_symlinks(syslogd_t)
 # Allow access to /proc/kmsg for syslog-ng
@@ -389,9 +398,4 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(syslogd_t)
-')
-
-optional_policy(`
-	# log to the xconsole
-	xserver_rw_console(syslogd_t)
 ')
