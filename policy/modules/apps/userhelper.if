@@ -49,7 +49,7 @@ template(`userhelper_per_role_template',`
 	domain_obj_id_change_exemption($1_userhelper_t)
 	domain_interactive_fd($1_userhelper_t)
 	domain_subj_id_change_exemption($1_userhelper_t)
-	role system_r types $1_userhelper_t;
+	role $3 types $1_userhelper_t;
 	
 	########################################
 	#
@@ -57,8 +57,9 @@ template(`userhelper_per_role_template',`
 	#
 	allow $1_userhelper_t self:capability { setuid setgid net_bind_service dac_override chown sys_tty_config };
 	allow $1_userhelper_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
+	allow $1_userhelper_t self:process setexec;
 	allow $1_userhelper_t self:fd use;
-	allow $1_userhelper_t self:fifo_file rw_file_perms;
+	allow $1_userhelper_t self:fifo_file rw_fifo_file_perms;
 	allow $1_userhelper_t self:shm create_shm_perms;
 	allow $1_userhelper_t self:sem create_sem_perms;
 	allow $1_userhelper_t self:msgq create_msgq_perms;
@@ -67,19 +68,13 @@ template(`userhelper_per_role_template',`
 	allow $1_userhelper_t self:unix_stream_socket create_stream_socket_perms;
 	allow $1_userhelper_t self:unix_dgram_socket sendto;
 	allow $1_userhelper_t self:unix_stream_socket connectto;
-	allow $1_userhelper_t self:sock_file r_file_perms;
+	allow $1_userhelper_t self:sock_file read_sock_file_perms;
 
 	#Transition to the derived domain.
-	domain_auto_trans($2,userhelper_exec_t,$1_userhelper_t)
-	allow $2 $1_userhelper_t:fd use;
-	allow $1_userhelper_t $2:fd use;
-	allow $1_userhelper_t $2:fifo_file rw_file_perms;
-	allow $1_userhelper_t $2:process sigchld;
+	domtrans_pattern($2,userhelper_exec_t,$1_userhelper_t)
 
-	allow $1_userhelper_t self:process setexec;
-
-	allow $1_userhelper_t userhelper_conf_t:file rw_file_perms;
 	allow $1_userhelper_t userhelper_conf_t:dir rw_dir_perms;
+	rw_files_pattern($1_userhelper_t,userhelper_conf_t,userhelper_conf_t)
 
 	can_exec($1_userhelper_t, userhelper_exec_t)
 
@@ -93,7 +88,6 @@ template(`userhelper_per_role_template',`
 	corecmd_exec_shell($1_userhelper_t)
 	# By default, revert to the calling domain when a program is executed
 	corecmd_bin_domtrans($1_userhelper_t,$2)
-	corecmd_sbin_domtrans($1_userhelper_t,$2)
 
 	# Inherit descriptors from the current session.
 	domain_use_interactive_fds($1_userhelper_t)
@@ -157,7 +151,6 @@ template(`userhelper_per_role_template',`
 	userdom_use_unpriv_users_fds($1_userhelper_t)
 	# Allow $1_userhelper_t to transition to user domains.
 	userdom_bin_spec_domtrans_unpriv_users($1_userhelper_t)
-	userdom_sbin_spec_domtrans_unpriv_users($1_userhelper_t)
 	userdom_entry_spec_domtrans_unpriv_users($1_userhelper_t)
 
 	ifdef(`distro_redhat',`
@@ -170,7 +163,6 @@ template(`userhelper_per_role_template',`
 	tunable_policy(`! secure_mode',`
 		#if we are not in secure mode then we can transition to sysadm_t
 		userdom_bin_spec_domtrans_sysadm($1_userhelper_t)
-		userdom_sbin_spec_domtrans_sysadm($1_userhelper_t)
 		userdom_entry_spec_domtrans_sysadm($1_userhelper_t)
 	')
 	
@@ -199,11 +191,11 @@ template(`userhelper_per_role_template',`
 			allow $1_userhelper_t gphdomain:fd use;
 		')
 		optional_policy(`
-			domain_auto_trans($1_userhelper_t, xauth_exec_t, $1_xauth_t)
+			domtrans_pattern($1_userhelper_t, xauth_exec_t, $1_xauth_t)
 			allow $1_userhelper_t $1_xauth_home_t:file { getattr read };
 		')
 		optional_policy(`
-			domain_auto_trans($1_mozilla_t, userhelper_exec_t, $1_userhelper_t)
+			domtrans_pattern($1_mozilla_t, userhelper_exec_t, $1_userhelper_t)
 		')
 		# for when the network connection is killed
 		dontaudit unpriv_userdomain $1_userhelper_t:process signal;
@@ -269,6 +261,7 @@ template(`userhelper_use_user_fd',`
 
 	allow $2 $1_userhelper_t:fd use;
 ')
+
 ########################################
 ## <summary>
 ##	Allow domain to send sigchld to userhelper.
@@ -290,4 +283,22 @@ template(`userhelper_sigchld_user',`
 	')
 
 	allow $2 $1_userhelper_t:process sigchld;
+')
+
+########################################
+## <summary>
+##	Execute the userhelper program in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`userhelper_exec',`
+	gen_require(`
+		type userhelper_exec_t;
+	')
+
+	can_exec($1,userhelper_exec_t)
 ')

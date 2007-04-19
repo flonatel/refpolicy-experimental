@@ -1,0 +1,95 @@
+<module name="inn" filename="policy/modules/services/inn.if">
+<summary>Internet News NNTP server</summary>
+<interface name="inn_exec" lineno="14">
+<summary>
+Allow the specified domain to execute innd
+in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_exec_config" lineno="33">
+<summary>
+Allow the specified domain to execute
+inn configuration files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_manage_log" lineno="51">
+<summary>
+Create, read, write, and delete the innd log.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_manage_pid" lineno="71">
+<summary>
+Create, read, write, and delete the innd pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_read_config" lineno="92">
+<summary>
+Read innd configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_read_news_lib" lineno="112">
+<summary>
+Read innd news library files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_read_news_spool" lineno="132">
+<summary>
+Read innd news library files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_dgram_send" lineno="152">
+<summary>
+Send to a innd unix dgram socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inn_domtrans" lineno="171">
+<summary>
+Execute inn in the inn domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

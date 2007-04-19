@@ -1,0 +1,142 @@
+<module name="mailman" filename="policy/modules/services/mailman.if">
+<summary>Mailman is for managing electronic mail discussion and e-newsletter lists</summary>
+<template name="mailman_domain_template" lineno="19">
+<summary>
+The template to define a mailmain domain.
+</summary>
+<desc>
+<p>
+This template creates a domain to be used for
+a new mailman daemon.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The type of daemon to be used eg, cgi would give mailman_cgi_
+</summary>
+</param>
+</template>
+<interface name="mailman_domtrans" lineno="102">
+<summary>
+Execute mailman in the mailman domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_domtrans_cgi" lineno="121">
+<summary>
+Execute mailman CGI scripts in the
+mailman CGI domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_exec" lineno="139">
+<summary>
+Execute mailman in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowd access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_signal_cgi" lineno="157">
+<summary>
+Send generic signals to the mailman cgi domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_search_data" lineno="175">
+<summary>
+Allow domain to search data directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_read_data_files" lineno="193">
+<summary>
+Allow domain to to read mailman data files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_manage_data_files" lineno="212">
+<summary>
+Allow domain to to create mailman data files
+and write the directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_list_data" lineno="230">
+<summary>
+List the contents of mailman data directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_read_data_symlinks" lineno="248">
+<summary>
+Allow read acces to mailman data symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_manage_log" lineno="267">
+<summary>
+Create, read, write, and delete
+mailman logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_read_archive" lineno="286">
+<summary>
+Allow domain to read mailman archive files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mailman_domtrans_queue" lineno="306">
+<summary>
+Execute mailman_queue in the mailman_queue domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

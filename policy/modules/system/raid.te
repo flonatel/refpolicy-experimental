@@ -1,5 +1,5 @@
 
-policy_module(raid,1.1.0)
+policy_module(raid,1.3.0)
 
 ########################################
 #
@@ -22,8 +22,9 @@ files_pid_file(mdadm_var_run_t)
 allow mdadm_t self:capability { dac_override sys_admin ipc_lock };
 dontaudit mdadm_t self:capability sys_tty_config;
 allow mdadm_t self:process { sigchld sigkill sigstop signull signal };
+allow mdadm_t self:fifo_file rw_fifo_file_perms;
 
-allow mdadm_t mdadm_var_run_t:file create_file_perms;
+manage_files_pattern(mdadm_t,mdadm_var_run_t,mdadm_var_run_t)
 files_pid_filetrans(mdadm_t,mdadm_var_run_t,file)
 
 kernel_read_system_state(mdadm_t)
@@ -36,27 +37,27 @@ dev_read_sysfs(mdadm_t)
 dev_dontaudit_getattr_all_blk_files(mdadm_t)
 dev_dontaudit_getattr_all_chr_files(mdadm_t)
 dev_dontaudit_getattr_generic_files(mdadm_t)
+dev_dontaudit_getattr_generic_chr_files(mdadm_t)
+dev_dontaudit_getattr_generic_blk_files(mdadm_t)
 
 fs_search_auto_mountpoints(mdadm_t)
 fs_dontaudit_list_tmpfs(mdadm_t)
 
 # RAID block device access
 storage_manage_fixed_disk(mdadm_t)
+storage_dev_filetrans_fixed_disk(mdadm_t)
 
-term_dontaudit_use_console(mdadm_t)
 term_dontaudit_list_ptys(mdadm_t)
 
 # Helper program access
 corecmd_exec_bin(mdadm_t)
-corecmd_exec_sbin(mdadm_t)
+corecmd_exec_shell(mdadm_t)
 
 domain_use_interactive_fds(mdadm_t)
 
 files_read_etc_files(mdadm_t)
 files_read_etc_runtime_files(mdadm_t)
 
-init_use_fds(mdadm_t)
-init_use_script_ptys(mdadm_t)
 init_dontaudit_getattr_initctl(mdadm_t)
 
 libs_use_ld_so(mdadm_t)
@@ -75,6 +76,10 @@ ifdef(`targeted_policy',`
 	term_dontaudit_use_unallocated_ttys(mdadm_t)
 	term_dontaudit_use_generic_ptys(mdadm_t)
 	files_dontaudit_read_root_files(mdadm_t)
+')
+
+optional_policy(`
+	gpm_dontaudit_getattr_gpmctl(mdadm_t)
 ')
 
 optional_policy(`

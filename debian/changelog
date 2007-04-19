@@ -1,16 +1,13 @@
-refpolicy (0.0.20061018-5.1+etch1) stable-security; urgency=high
+refpolicy (0.0.20070417-1) unstable; urgency=low
 
-  * Non-maintainer upload by the security team.
-  * Allow named_t to bind to all UDP ports, not just the DNS port;
-    this enables DNS port randomization, introduced by bind9
-    1:9.3.4-2etch3 in response to DSA-1603-1 / CVE-2008-1447.  The
-    change does not represent a vulnerability in refpolicy, rather
-    a compatibility fix for an urgent and widely-deployed package.
-    (Closes: #490271).
-  * Upgrade the bind policy module at upgrade, if and only if the
-    previously-installed refpolicy package was <= 0.0.20061018-5
+  * New upstream release.
+  * Added XS-VCS-Arch and XS-VCS-Browse to debian/control, and updated
+    build dependencies.
+  * Bug fix: "selinux-policy-refpolicy-targeted: need file_contexts for
+    gcj-dbtool-4.1 and /var/log/account", thanks to Russell Coker
+                                                           (Closes: #416910).
 
- -- Devin Carraway <devin@debian.org>  Sat, 12 Jul 2008 09:33:09 +0000
+ -- Manoj Srivastava <srivasta@debian.org>  Thu, 19 Apr 2007 02:28:29 -0500
 
 refpolicy (0.0.20061018-5) unstable; urgency=high
 

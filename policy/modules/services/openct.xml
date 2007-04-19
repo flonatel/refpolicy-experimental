@@ -1,0 +1,3 @@
+<module name="openct" filename="policy/modules/services/openct.if">
+<summary>Service for handling smart card readers.</summary>
+</module>

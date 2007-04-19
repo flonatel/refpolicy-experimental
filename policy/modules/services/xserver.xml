@@ -1,0 +1,549 @@
+<module name="xserver" filename="policy/modules/services/xserver.if">
+<summary>X Windows Server</summary>
+<template name="xserver_common_domain_template" lineno="15">
+<summary>
+Template to create types and rules common to
+all X server domains.
+</summary>
+<param name="prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+</template>
+<template name="xserver_per_role_template" lineno="228">
+<summary>
+The per role template for the xserver module.
+</summary>
+<desc>
+<p>
+Define a derived domain for the X server when executed
+by a user domain (e.g. via startx).  See the xdm module
+if using an X Display Manager.
+</p>
+<p>
+This is invoked automatically for each user and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="xserver_ro_session_template" lineno="453">
+<summary>
+Template for creating sessions on a
+prefix X server, with read-only
+access to the X server shared
+memory segments.
+</summary>
+<param name="prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="tmpfs_type">
+<summary>
+The type of the domain SYSV tmpfs files.
+</summary>
+</param>
+</template>
+<template name="xserver_rw_session_template" lineno="500">
+<summary>
+Template for creating sessions on a
+prefix X server, with read and write
+access to the X server shared
+memory segments.
+</summary>
+<param name="prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="tmpfs_type">
+<summary>
+The type of the domain SYSV tmpfs files.
+</summary>
+</param>
+</template>
+<template name="xserver_user_client_template" lineno="532">
+<summary>
+Template for creating full client sessions
+on a user X server.
+</summary>
+<param name="prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="tmpfs_type">
+<summary>
+The type of the domain SYSV tmpfs files.
+</summary>
+</param>
+</template>
+<template name="xserver_use_user_fonts" lineno="603">
+<summary>
+Read user fonts, user font configuration,
+and manage the user font cache.
+</summary>
+<desc>
+<p>
+Read user fonts, user font configuration,
+and manage the user font cache.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<template name="xserver_domtrans_user_xauth" lineno="648">
+<summary>
+Transition to a user Xauthority domain.
+</summary>
+<desc>
+<p>
+Transition to a user Xauthority domain.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<template name="xserver_user_home_dir_filetrans_user_xauth" lineno="681">
+<summary>
+Transition to a user Xauthority domain.
+</summary>
+<desc>
+<p>
+Transition to a user Xauthority domain.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<interface name="xserver_use_all_users_fonts" lineno="700">
+<summary>
+Read all users fonts, user font configurations,
+and manage all users font caches.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_setattr_console_pipes" lineno="730">
+<summary>
+Set the attributes of the X windows console named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_rw_console" lineno="748">
+<summary>
+Read and write the X windows console named pipe.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_use_xdm_fds" lineno="766">
+<summary>
+Use file descriptors for xdm.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_use_xdm_fds" lineno="785">
+<summary>
+Do not audit attempts to inherit
+XDM file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="xserver_rw_xdm_pipes" lineno="803">
+<summary>
+Read and write XDM unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_rw_xdm_pipes" lineno="822">
+<summary>
+Do not audit attempts to read and write
+XDM unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="xserver_stream_connect_xdm" lineno="842">
+<summary>
+Connect to XDM over a unix domain
+stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xdm_rw_config" lineno="861">
+<summary>
+Read xdm-writable configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_setattr_xdm_tmp_dirs" lineno="880">
+<summary>
+Set the attributes of XDM temporary directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_create_xdm_tmp_sockets" lineno="899">
+<summary>
+Create a named socket in a XDM
+temporary directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xdm_pid" lineno="919">
+<summary>
+Read XDM pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xdm_lib_files" lineno="938">
+<summary>
+Read XDM var lib files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_domtrans_xdm_xserver" lineno="956">
+<summary>
+Execute the X server in the XDM X server domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_xsession_entry_type" lineno="975">
+<summary>
+Make an X session script an entrypoint for the specified domain.
+</summary>
+<param name="domain">
+<summary>
+The domain for which the shell is an entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="xserver_xsession_spec_domtrans" lineno="1012">
+<summary>
+Execute an X session in the target domain.  This
+is an explicit transition, requiring the
+caller to use setexeccon().
+</summary>
+<desc>
+<p>
+Execute an Xsession in the target domain.  This
+is an explicit transition, requiring the
+caller to use setexeccon().
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the shell process.
+</summary>
+</param>
+</interface>
+<interface name="xserver_getattr_log" lineno="1030">
+<summary>
+Get the attributes of X server logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_write_log" lineno="1050">
+<summary>
+Do not audit attempts to write the X server
+log files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_delete_log" lineno="1069">
+<summary>
+Do not audit attempts to write the X server
+log files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xkb_libs" lineno="1090">
+<summary>
+Read X keyboard extension libraries.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xdm_xserver_tmp_files" lineno="1111">
+<summary>
+Read xdm temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_read_xdm_tmp_files" lineno="1129">
+<summary>
+Read xdm temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_read_xdm_tmp_files" lineno="1148">
+<summary>
+Do not audit attempts to read xdm temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_rw_xdm_tmp_files" lineno="1167">
+<summary>
+Read write xdm temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_manage_xdm_tmp_files" lineno="1186">
+<summary>
+Create, read, write, and delete xdm temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_getattr_xdm_tmp_sockets" lineno="1204">
+<summary>
+dontaudit getattr xdm temporary named sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_signal_xdm_xserver" lineno="1222">
+<summary>
+Signal XDM X servers
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_kill_xdm_xserver" lineno="1240">
+<summary>
+Kill XDM X servers
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_rw_xdm_xserver_tcp_sockets" lineno="1259">
+<summary>
+Do not audit attempts to read and write to
+a XDM X server socket.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit
+</summary>
+</param>
+</interface>
+<interface name="xserver_dontaudit_rw_xdm_stream_sockets" lineno="1278">
+<summary>
+Do not audit attempts to read and write xdm_xserver
+unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xserver_stream_connect_xdm_xserver" lineno="1297">
+<summary>
+Connect to xdm_xserver over a unix domain
+stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<tunable name="allow_write_xshm" dftval="false">
+<desc>
+<p>
+Allows clients to write to the X server shared
+memory segments.
+</p>
+</desc>
+</tunable>
+<tunable name="xdm_sysadm_login" dftval="false">
+<desc>
+<p>
+Allow xdm logins as sysadm
+</p>
+</desc>
+</tunable>
+</module>

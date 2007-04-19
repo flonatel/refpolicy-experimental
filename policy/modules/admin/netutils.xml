@@ -1,0 +1,200 @@
+<module name="netutils" filename="policy/modules/admin/netutils.if">
+<summary>Network analysis utilities</summary>
+<interface name="netutils_domtrans" lineno="13">
+<summary>
+Execute network utilities in the netutils domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_run" lineno="43">
+<summary>
+Execute network utilities in the netutils domain, and
+allow the specified role the netutils domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the netutils domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the netutils domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="netutils_exec" lineno="63">
+<summary>
+Execute network utilities in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_domtrans_ping" lineno="81">
+<summary>
+Execute ping in the ping domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_kill_ping" lineno="99">
+<summary>
+Send a kill (SIGKILL) signal to ping.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_signal_ping" lineno="117">
+<summary>
+Send generic signals to ping.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_run_ping" lineno="147">
+<summary>
+Execute ping in the ping domain, and
+allow the specified role the ping domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the ping domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the ping domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="netutils_run_ping_cond" lineno="179">
+<summary>
+Conditionally execute ping in the ping domain, and
+allow the specified role the ping domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the ping domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the ping domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="netutils_exec_ping" lineno="203">
+<summary>
+Execute ping in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_domtrans_traceroute" lineno="221">
+<summary>
+Execute traceroute in the traceroute domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="netutils_run_traceroute" lineno="251">
+<summary>
+Execute traceroute in the traceroute domain, and
+allow the specified role the traceroute domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the traceroute domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the traceroute domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="netutils_run_traceroute_cond" lineno="283">
+<summary>
+Conditionally execute traceroute in the traceroute domain, and
+allow the specified role the traceroute domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the traceroute domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the traceroute domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="netutils_exec_traceroute" lineno="307">
+<summary>
+Execute traceroute in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<tunable name="user_ping" dftval="false">
+<desc>
+<p>
+Control users use of ping and traceroute
+</p>
+</desc>
+</tunable>
+</module>

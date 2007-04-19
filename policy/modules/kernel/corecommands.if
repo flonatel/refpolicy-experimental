@@ -84,7 +84,7 @@ interface(`corecmd_bin_entry_type',`
 ########################################
 ## <summary>
 ##	Make general progams in sbin an entrypoint for
-##	the specified domain.
+##	the specified domain.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -93,11 +93,8 @@ interface(`corecmd_bin_entry_type',`
 ## </param>
 #
 interface(`corecmd_sbin_entry_type',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	domain_entry_file($1,sbin_t)
+	corecmd_bin_entry_type($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_bin_entry_type() instead.')
 ')
 
 ########################################
@@ -133,7 +130,25 @@ interface(`corecmd_search_bin',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
+	search_dirs_pattern($1,bin_t,bin_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to search the contents of bin directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corecmd_dontaudit_search_bin',`
+	gen_require(`
+		type bin_t;
+	')
+
+	dontaudit $1 bin_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -151,7 +166,25 @@ interface(`corecmd_list_bin',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir r_dir_perms;
+	list_dirs_pattern($1,bin_t,bin_t)
+')
+
+########################################
+## <summary>
+##	Do not auidt attempts to write bin directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corecmd_dontaudit_write_bin_dirs',`
+	gen_require(`
+		type bin_t;
+	')
+
+	dontaudit $1 bin_t:dir write;
 ')
 
 ########################################
@@ -169,7 +202,7 @@ interface(`corecmd_getattr_bin_files',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:file getattr;
+	getattr_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -187,8 +220,7 @@ interface(`corecmd_read_bin_files',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
-	allow $1 bin_t:file r_file_perms;
+	read_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -206,8 +238,7 @@ interface(`corecmd_read_bin_symlinks',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
-	allow $1 bin_t:lnk_file r_file_perms;
+	read_lnk_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -225,8 +256,7 @@ interface(`corecmd_read_bin_pipes',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
-	allow $1 bin_t:fifo_file r_file_perms;
+	read_fifo_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -244,8 +274,7 @@ interface(`corecmd_read_bin_sockets',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
-	allow $1 bin_t:sock_file r_file_perms;
+	read_sock_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -264,10 +293,9 @@ interface(`corecmd_exec_bin',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir r_dir_perms;
-	allow $1 bin_t:lnk_file r_file_perms;
+	read_lnk_files_pattern($1,bin_t,bin_t)
+	list_dirs_pattern($1,bin_t,bin_t)
 	can_exec($1,bin_t)
-
 ')
 
 ########################################
@@ -285,8 +313,7 @@ interface(`corecmd_manage_bin_files',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir rw_dir_perms;
-	allow $1 bin_t:file manage_file_perms;
+	manage_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -304,8 +331,7 @@ interface(`corecmd_relabel_bin_files',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search_dir_perms;
-	allow $1 bin_t:file { relabelfrom relabelto };
+	relabel_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -368,10 +394,8 @@ interface(`corecmd_bin_spec_domtrans',`
 		type bin_t;
 	')
 
-	allow $1 bin_t:dir search;
-	allow $1 bin_t:lnk_file { getattr read };
-
-	domain_trans($1,bin_t,$2)
+	read_lnk_files_pattern($1,bin_t,bin_t)
+	domain_transition_pattern($1,bin_t,$2)
 ')
 
 ########################################
@@ -419,7 +443,7 @@ interface(`corecmd_bin_domtrans',`
 
 ########################################
 ## <summary>
-##	Search the contents of sbin directories.
+##	Search the contents of sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -428,17 +452,14 @@ interface(`corecmd_bin_domtrans',`
 ## </param>
 #
 interface(`corecmd_search_sbin',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search_dir_perms;
+	corecmd_search_bin($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_search_bin() instead.')
 ')
 
 ########################################
 ## <summary>
 ##	Do not audit attempts to search
-##	sbin directories.
+##	sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -447,16 +468,13 @@ interface(`corecmd_search_sbin',`
 ## </param>
 #
 interface(`corecmd_dontaudit_search_sbin',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	dontaudit $1 sbin_t:dir search_dir_perms;
+	corecmd_dontaudit_search_bin($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_dontaudit_search_bin() instead.')
 ')
 
 ########################################
 ## <summary>
-##	List the contents of sbin directories.
+##	List the contents of sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -465,16 +483,29 @@ interface(`corecmd_dontaudit_search_sbin',`
 ## </param>
 #
 interface(`corecmd_list_sbin',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir r_dir_perms;
+	corecmd_list_bin($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_list_bin() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Get the attributes of sbin files.
+##	Do not audit attempts to write
+##	sbin directories.  (Deprecated)
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corecmd_dontaudit_write_sbin_dirs',`
+	corecmd_dontaudit_write_bin_dirs($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_dontaudit_write_bin_dirs() instead.')
+')
+
+########################################
+## <summary>
+##	Get the attributes of sbin files.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -483,17 +514,14 @@ interface(`corecmd_list_sbin',`
 ## </param>
 #
 interface(`corecmd_getattr_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:file getattr;
+	corecmd_getattr_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_getattr_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
 ##	Do not audit attempts to get the attibutes
-##	of sbin files.
+##	of sbin files.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -502,16 +530,13 @@ interface(`corecmd_getattr_sbin_files',`
 ## </param>
 #
 interface(`corecmd_dontaudit_getattr_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	dontaudit $1 sbin_t:file getattr;
+	corecmd_dontaudit_getattr_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_dontaudit_getattr_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Read files in sbin directories.
+##	Read files in sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -520,17 +545,13 @@ interface(`corecmd_dontaudit_getattr_sbin_files',`
 ## </param>
 #
 interface(`corecmd_read_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:file r_file_perms;
+	corecmd_read_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_read_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Read symbolic links in sbin directories.
+##	Read symbolic links in sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -539,17 +560,13 @@ interface(`corecmd_read_sbin_files',`
 ## </param>
 #
 interface(`corecmd_read_sbin_symlinks',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:lnk_file r_file_perms;
+	corecmd_read_bin_symlinks($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_read_bin_symlinks() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Read named pipes in sbin directories.
+##	Read named pipes in sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -558,17 +575,13 @@ interface(`corecmd_read_sbin_symlinks',`
 ## </param>
 #
 interface(`corecmd_read_sbin_pipes',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:fifo_file r_file_perms;
+	corecmd_read_bin_pipes($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_read_bin_pipes() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Read named sockets in sbin directories.
+##	Read named sockets in sbin directories.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -577,18 +590,14 @@ interface(`corecmd_read_sbin_pipes',`
 ## </param>
 #
 interface(`corecmd_read_sbin_sockets',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:sock_file r_file_perms;
+	corecmd_read_bin_sockets($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_read_bin_sockets() instead.')
 ')
 
 ########################################
 ## <summary>
 ##	Execute generic programs in sbin directories,
-##	in the caller domain.
+##	in the caller domain.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -597,18 +606,13 @@ interface(`corecmd_read_sbin_sockets',`
 ## </param>
 #
 interface(`corecmd_exec_sbin',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir r_dir_perms;
-	allow $1 sbin_t:lnk_file r_file_perms;
-	can_exec($1,sbin_t)
+	corecmd_exec_bin($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_exec_bin() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Create, read, write, and delete sbin files.
+##	Create, read, write, and delete sbin files.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -618,17 +622,13 @@ interface(`corecmd_exec_sbin',`
 #
 # cjp: added for prelink
 interface(`corecmd_manage_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir rw_dir_perms;
-	allow $1 sbin_t:file manage_file_perms;
+	corecmd_manage_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_manage_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Relabel to and from the sbin type.
+##	Relabel to and from the sbin type.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -638,17 +638,13 @@ interface(`corecmd_manage_sbin_files',`
 #
 # cjp: added for prelink
 interface(`corecmd_relabel_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search_dir_perms;
-	allow $1 sbin_t:file { relabelfrom relabelto };
+	corecmd_relabel_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_relabel_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
-##	Mmap a sbin file as executable.
+##	Mmap a sbin file as executable.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -658,18 +654,14 @@ interface(`corecmd_relabel_sbin_files',`
 #
 # cjp: added for prelink
 interface(`corecmd_mmap_sbin_files',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search_dir_perms;
-	allow $1 sbin_t:file { getattr read execute };
+	corecmd_mmap_bin_files($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_mmap_bin_files() instead.')
 ')
 
 ########################################
 ## <summary>
 ##	Execute a file in a sbin directory
-##	in the specified domain.
+##	in the specified domain.  (Deprecated)
 ## </summary>
 ## <desc>
 ##	<p>
@@ -677,7 +669,7 @@ interface(`corecmd_mmap_sbin_files',`
 ##	in the specified domain.  This allows
 ##	the specified domain to execute any file
 ##	on these filesystems in the specified
-##	domain.  This is not suggested.
+##	domain.  This is not suggested.  (Deprecated)
 ##	</p>
 ##	<p>
 ##	No interprocess communication (signals, pipes,
@@ -701,14 +693,8 @@ interface(`corecmd_mmap_sbin_files',`
 ## </param>
 #
 interface(`corecmd_sbin_domtrans',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:lnk_file { getattr read };
-
-	domain_auto_trans($1,sbin_t,$2)
+	corecmd_bin_domtrans($1,$2,$3)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_bin_domtrans() instead.')
 ')
 
 ########################################
@@ -716,7 +702,7 @@ interface(`corecmd_sbin_domtrans',`
 ##	Execute a file in a sbin directory
 ##	in the specified domain but do not
 ##	do it automatically. This is an explicit
-##	transition, requiring the caller to use setexeccon().
+##	transition, requiring the caller to use setexeccon().  (Deprecated)
 ## </summary>
 ## <desc>
 ##	<p>
@@ -724,7 +710,7 @@ interface(`corecmd_sbin_domtrans',`
 ##	in the specified domain.  This allows
 ##	the specified domain to execute any file
 ##	on these filesystems in the specified
-##	domain.  This is not suggested.
+##	domain.  This is not suggested.  (Deprecated)
 ##	</p>
 ##	<p>
 ##	No interprocess communication (signals, pipes,
@@ -748,14 +734,8 @@ interface(`corecmd_sbin_domtrans',`
 ## </param>
 #
 interface(`corecmd_sbin_spec_domtrans',`
-	gen_require(`
-		type sbin_t;
-	')
-
-	allow $1 sbin_t:dir search;
-	allow $1 sbin_t:lnk_file { getattr read };
-
-	domain_trans($1,sbin_t,$2)
+	corecmd_bin_spec_domtrans($1,$2,$3)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_bin_spec_domtrans() instead.')
 ')
 
 ########################################
@@ -773,8 +753,8 @@ interface(`corecmd_check_exec_shell',`
 		type bin_t, shell_exec_t;
 	')
 
-	allow $1 bin_t:dir r_dir_perms;
-	allow $1 bin_t:lnk_file r_file_perms;
+	list_dirs_pattern($1,bin_t,bin_t)
+	read_lnk_files_pattern($1,bin_t,bin_t)
 	allow $1 shell_exec_t:file execute;
 ')
 
@@ -793,14 +773,14 @@ interface(`corecmd_exec_shell',`
 		type bin_t, shell_exec_t;
 	')
 
-	allow $1 bin_t:dir r_dir_perms;
-	allow $1 bin_t:lnk_file r_file_perms;
+	list_dirs_pattern($1,bin_t,bin_t)
+	read_lnk_files_pattern($1,bin_t,bin_t)
 	can_exec($1,shell_exec_t)
 ')
 
 ########################################
 ## <summary>
-##	Execute ls in the caller domain.
+##	Execute ls in the caller domain.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -809,13 +789,8 @@ interface(`corecmd_exec_shell',`
 ## </param>
 #
 interface(`corecmd_exec_ls',`
-	gen_require(`
-		type bin_t, ls_exec_t;
-	')
-
-	allow $1 bin_t:dir r_dir_perms;
-	allow $1 bin_t:lnk_file r_file_perms;
-	can_exec($1,ls_exec_t)
+	corecmd_exec_bin($1)
+	refpolicywarn(`$0() has been deprecated, please use corecmd_exec_bin() instead.')
 ')
 
 ########################################
@@ -852,10 +827,9 @@ interface(`corecmd_shell_spec_domtrans',`
 		type bin_t, shell_exec_t;
 	')
 
-	allow $1 bin_t:dir r_dir_perms;
-	allow $1 bin_t:lnk_file r_file_perms;
-
-	domain_trans($1,shell_exec_t,$2)
+	list_dirs_pattern($1,bin_t,bin_t)
+	read_lnk_files_pattern($1,bin_t,bin_t)
+	domain_transition_pattern($1,shell_exec_t,$2)
 ')
 
 ########################################
@@ -907,8 +881,30 @@ interface(`corecmd_exec_chroot',`
 		type chroot_exec_t;
 	')
 
+	read_lnk_files_pattern($1,bin_t,bin_t)
 	can_exec($1,chroot_exec_t)
 	allow $1 self:capability sys_chroot;
+')
+
+########################################
+## <summary>
+##	Get the attributes of all executable files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`corecmd_getattr_all_executables',`
+	gen_require(`
+		attribute exec_type;
+		type bin_t;
+	')
+
+	allow $1 bin_t:dir list_dir_perms;
+	getattr_files_pattern($1,bin_t,exec_type)
 ')
 
 ########################################
@@ -925,12 +921,12 @@ interface(`corecmd_exec_chroot',`
 interface(`corecmd_exec_all_executables',`
 	gen_require(`
 		attribute exec_type;
-		type bin_t, sbin_t;
+		type bin_t;
 	')
 
 	can_exec($1,exec_type)
-	allow $1 { bin_t sbin_t }:dir list_dir_perms;
-	allow $1 { bin_t sbin_t }:lnk_file read_file_perms;
+	list_dirs_pattern($1,bin_t,bin_t)
+	read_lnk_files_pattern($1,bin_t,exec_type)
 ')
 
 ########################################
@@ -947,12 +943,11 @@ interface(`corecmd_exec_all_executables',`
 interface(`corecmd_manage_all_executables',`
 	gen_require(`
 		attribute exec_type;
-		type bin_t, sbin_t;
+		type bin_t;
 	')
 
-	allow $1 exec_type:file manage_file_perms;
-	allow $1 { bin_t sbin_t }:dir rw_dir_perms;
-	allow $1 { bin_t sbin_t }:lnk_file create_lnk_perms;
+	manage_files_pattern($1,bin_t,exec_type)
+	manage_lnk_files_pattern($1,bin_t,bin_t)
 ')
 
 ########################################
@@ -969,9 +964,10 @@ interface(`corecmd_manage_all_executables',`
 interface(`corecmd_relabel_all_executables',`
 	gen_require(`
 		attribute exec_type;
+		type bin_t;
 	')
 
-	allow $1 exec_type:file { relabelfrom relabelto };
+	relabel_files_pattern($1,bin_t,exec_type)
 ')
 
 ########################################
@@ -987,7 +983,8 @@ interface(`corecmd_relabel_all_executables',`
 interface(`corecmd_mmap_all_executables',`
 	gen_require(`
 		attribute exec_type;
+		type bin_t;
 	')
 
-	allow $1 exec_type:file { getattr read execute };
+	mmap_files_pattern($1,bin_t,exec_type)
 ')

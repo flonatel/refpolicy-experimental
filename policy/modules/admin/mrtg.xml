@@ -1,0 +1,13 @@
+<module name="mrtg" filename="policy/modules/admin/mrtg.if">
+<summary>Network traffic graphing</summary>
+<interface name="mrtg_append_create_logs" lineno="13">
+<summary>
+Create and append mrtg logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

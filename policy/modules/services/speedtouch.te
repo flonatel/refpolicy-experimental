@@ -1,5 +1,5 @@
 
-policy_module(speedtouch,1.0.0)
+policy_module(speedtouch,1.1.0)
 
 #######################################
 #
@@ -24,12 +24,11 @@ files_pid_file(speedmgmt_var_run_t)
 dontaudit speedmgmt_t self:capability sys_tty_config;
 allow speedmgmt_t self:process signal_perms;
 
-allow speedmgmt_t speedmgmt_tmp_t:dir create_dir_perms;
-allow speedmgmt_t speedmgmt_tmp_t:file create_file_perms;
+manage_dirs_pattern(speedmgmt_t,speedmgmt_tmp_t,speedmgmt_tmp_t)
+manage_files_pattern(speedmgmt_t,speedmgmt_tmp_t,speedmgmt_tmp_t)
 files_tmp_filetrans(speedmgmt_t, speedmgmt_tmp_t, { file dir })
 
-allow speedmgmt_t speedmgmt_var_run_t:file create_file_perms;
-allow speedmgmt_t speedmgmt_var_run_t:dir rw_dir_perms;
+manage_files_pattern(speedmgmt_t,speedmgmt_var_run_t,speedmgmt_var_run_t)
 files_pid_filetrans(speedmgmt_t,speedmgmt_var_run_t,file)
 
 kernel_read_kernel_sysctls(speedmgmt_t)
@@ -46,11 +45,6 @@ files_read_usr_files(speedmgmt_t)
 
 fs_getattr_all_fs(speedmgmt_t)
 fs_search_auto_mountpoints(speedmgmt_t)
-
-term_dontaudit_use_console(speedmgmt_t)
-
-init_use_fds(speedmgmt_t)
-init_use_script_ptys(speedmgmt_t)
 
 libs_use_ld_so(speedmgmt_t)
 libs_use_shared_libs(speedmgmt_t)

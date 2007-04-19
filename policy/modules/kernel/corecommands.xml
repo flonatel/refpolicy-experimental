@@ -1,0 +1,638 @@
+<module name="corecommands" filename="policy/modules/kernel/corecommands.if">
+<summary>
+Core policy for shells, and generic programs
+in /bin, /sbin, /usr/bin, and /usr/sbin.
+</summary>
+<required val="true">
+Contains the base bin and sbin directory types
+which need to be searched for the kernel to
+run init.
+</required>
+<interface name="corecmd_executable_file" lineno="23">
+<summary>
+Make the specified type usable for files
+that are exectuables, such as binary programs.
+This does not include shared libraries.
+</summary>
+<param name="type">
+<summary>
+Type to be used for files.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_bin_alias" lineno="53">
+<summary>
+Create a aliased type to generic bin files.
+</summary>
+<desc>
+<p>
+Create a aliased type to generic bin files.
+</p>
+<p>
+This is added to support targeted policy.  Its
+use should be limited.  It has no effect
+on the strict policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Alias type for bin_t.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_bin_entry_type" lineno="76">
+<summary>
+Make general progams in bin an entrypoint for
+the specified domain.
+</summary>
+<param name="domain">
+<summary>
+The domain for which bin_t is an entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_sbin_entry_type" lineno="95">
+<summary>
+Make general progams in sbin an entrypoint for
+the specified domain.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+The domain for which sbin programs are an entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_shell_entry_type" lineno="110">
+<summary>
+Make the shell an entrypoint for the specified domain.
+</summary>
+<param name="domain">
+<summary>
+The domain for which the shell is an entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_search_bin" lineno="128">
+<summary>
+Search the contents of bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_dontaudit_search_bin" lineno="146">
+<summary>
+Do not audit attempts to search the contents of bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_list_bin" lineno="164">
+<summary>
+List the contents of bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_dontaudit_write_bin_dirs" lineno="182">
+<summary>
+Do not auidt attempts to write bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_getattr_bin_files" lineno="200">
+<summary>
+Get the attributes of files in bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_bin_files" lineno="218">
+<summary>
+Read files in bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_bin_symlinks" lineno="236">
+<summary>
+Read symbolic links in bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_bin_pipes" lineno="254">
+<summary>
+Read pipes in bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_bin_sockets" lineno="272">
+<summary>
+Read named sockets in bin directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_exec_bin" lineno="291">
+<summary>
+Execute generic programs in bin directories,
+in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_manage_bin_files" lineno="311">
+<summary>
+Create, read, write, and delete bin files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_relabel_bin_files" lineno="329">
+<summary>
+Relabel to and from the bin type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_mmap_bin_files" lineno="347">
+<summary>
+Mmap a bin file as executable.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_bin_spec_domtrans" lineno="392">
+<summary>
+Execute a file in a bin directory
+in the specified domain but do not
+do it automatically. This is an explicit
+transition, requiring the caller to use setexeccon().
+</summary>
+<desc>
+<p>
+Execute a file in a bin directory
+in the specified domain.  This allows
+the specified domain to execute any file
+on these filesystems in the specified
+domain.  This is not suggested.
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+<p>
+This interface was added to handle
+the userhelper policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the new process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_bin_domtrans" lineno="435">
+<summary>
+Execute a file in a bin directory
+in the specified domain.
+</summary>
+<desc>
+<p>
+Execute a file in a bin directory
+in the specified domain.  This allows
+the specified domain to execute any file
+on these filesystems in the specified
+domain.  This is not suggested.
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+<p>
+This interface was added to handle
+the ssh-agent policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the new process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_search_sbin" lineno="454">
+<summary>
+Search the contents of sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_dontaudit_search_sbin" lineno="470">
+<summary>
+Do not audit attempts to search
+sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_list_sbin" lineno="485">
+<summary>
+List the contents of sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_dontaudit_write_sbin_dirs" lineno="501">
+<summary>
+Do not audit attempts to write
+sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_getattr_sbin_files" lineno="516">
+<summary>
+Get the attributes of sbin files.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_dontaudit_getattr_sbin_files" lineno="532">
+<summary>
+Do not audit attempts to get the attibutes
+of sbin files.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_sbin_files" lineno="547">
+<summary>
+Read files in sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_sbin_symlinks" lineno="562">
+<summary>
+Read symbolic links in sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_sbin_pipes" lineno="577">
+<summary>
+Read named pipes in sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_read_sbin_sockets" lineno="592">
+<summary>
+Read named sockets in sbin directories.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_exec_sbin" lineno="608">
+<summary>
+Execute generic programs in sbin directories,
+in the caller domain.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_manage_sbin_files" lineno="624">
+<summary>
+Create, read, write, and delete sbin files.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_relabel_sbin_files" lineno="640">
+<summary>
+Relabel to and from the sbin type.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_mmap_sbin_files" lineno="656">
+<summary>
+Mmap a sbin file as executable.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_sbin_domtrans" lineno="695">
+<summary>
+Execute a file in a sbin directory
+in the specified domain.  (Deprecated)
+</summary>
+<desc>
+<p>
+Execute a file in a sbin directory
+in the specified domain.  This allows
+the specified domain to execute any file
+on these filesystems in the specified
+domain.  This is not suggested.  (Deprecated)
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+<p>
+This interface was added to handle
+the ssh-agent policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the new process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_sbin_spec_domtrans" lineno="736">
+<summary>
+Execute a file in a sbin directory
+in the specified domain but do not
+do it automatically. This is an explicit
+transition, requiring the caller to use setexeccon().  (Deprecated)
+</summary>
+<desc>
+<p>
+Execute a file in a sbin directory
+in the specified domain.  This allows
+the specified domain to execute any file
+on these filesystems in the specified
+domain.  This is not suggested.  (Deprecated)
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+<p>
+This interface was added to handle
+the userhelper policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the new process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_check_exec_shell" lineno="751">
+<summary>
+Check if a shell is executable (DAC-wise).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_exec_shell" lineno="771">
+<summary>
+Execute a shell in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_exec_ls" lineno="791">
+<summary>
+Execute ls in the caller domain.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_shell_spec_domtrans" lineno="825">
+<summary>
+Execute a shell in the target domain.  This
+is an explicit transition, requiring the
+caller to use setexeccon().
+</summary>
+<desc>
+<p>
+Execute a shell in the target domain.  This
+is an explicit transition, requiring the
+caller to use setexeccon().
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the shell process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_shell_domtrans" lineno="860">
+<summary>
+Execute a shell in the specified domain.
+</summary>
+<desc>
+<p>
+Execute a shell in the specified domain.
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+The type of the shell process.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_exec_chroot" lineno="879">
+<summary>
+Execute chroot in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="corecmd_getattr_all_executables" lineno="900">
+<summary>
+Get the attributes of all executable files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="corecmd_exec_all_executables" lineno="921">
+<summary>
+Execute all executable files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="corecmd_manage_all_executables" lineno="943">
+<summary>
+Create, read, write, and all executable files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="corecmd_relabel_all_executables" lineno="964">
+<summary>
+Relabel to and from the bin type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="corecmd_mmap_all_executables" lineno="983">
+<summary>
+Mmap all executables as executable.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

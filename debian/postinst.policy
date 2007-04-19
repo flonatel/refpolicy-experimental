@@ -212,39 +212,10 @@ sub installed_modules {
   }
 }
 
-# hugely oversimplified version comparison, just adequate to match on
-# versions of refpolicy up through 0.0.20061018-5
-sub bind_version_upgradeable {
-  my ($old_version) = @_;
-
-  if ($old_version =~ /^(?:0\.0\.)?(\d+)-(\d+(?:\.\d*)?)$/) {
-    my ($upstream, $release) = ($1, $2);
-    if (($upstream == 20061018 && $release <= 5) ||
-        ($upstream < 20061018)) {
-      return 1;
-    }
-  }
-  return 0;
-}
-
 sub main {
   if (-e "$basedir/modules/active/base.pp" ) {
     print STDERR "You already have a $policy_name policy installed.\n";
-    if (-e "$basedir/modules/active/modules/bind.pp" and
-        $ARGV[1] and &bind_version_upgradeable($ARGV[1])) {
-      print STDERR
-        "You also have a bind policy module predating 0.0.20061018; for\n".
-        "compatibility with bind security updates, a newer bind policy\n".
-        "will be installed.  Other policy modules will not be altered;\n".
-        "you should check and update these manually.\n";
-      if (system("semodule -i $src_dir/bind.pp -s $policy_name") == 0) {
-        print STDERR "Upgraded module bind.pp\n";
-      } else {
-        print STDERR "Upgrade of bind.pp module failed.\n";
-      }
-    } else {
-      print STDERR "I am leaving it alone. Please check and update manually.\n";
-    }
+    print STDERR "I am leaving it alone. Please check and update manually.\n";
   }
   elsif (-e "$src_dir/base.pp") {
     print STDERR "Notice: Trying to link (but not load) a $policy_name policy.\n";

@@ -1,5 +1,5 @@
 
-policy_module(ntp,1.2.0)
+policy_module(ntp,1.3.0)
 
 ########################################
 #
@@ -41,22 +41,20 @@ allow ntpd_t self:unix_stream_socket create_socket_perms;
 allow ntpd_t self:tcp_socket create_stream_socket_perms;
 allow ntpd_t self:udp_socket create_socket_perms;
 
-allow ntpd_t ntp_drift_t:dir rw_dir_perms;
-allow ntpd_t ntp_drift_t:file create_file_perms;
+manage_files_pattern(ntpd_t,ntp_drift_t,ntp_drift_t)
 
 can_exec(ntpd_t,ntpd_exec_t)
 
-allow ntpd_t ntpd_log_t:file create_file_perms;
-allow ntpd_t ntpd_log_t:dir { rw_dir_perms setattr };
+allow ntpd_t ntpd_log_t:dir setattr;
+manage_files_pattern(ntpd_t,ntpd_log_t,ntpd_log_t)
 logging_log_filetrans(ntpd_t,ntpd_log_t,{ file dir })
 
 # for some reason it creates a file in /tmp
-allow ntpd_t ntpd_tmp_t:dir create_dir_perms;
-allow ntpd_t ntpd_tmp_t:file create_file_perms;
+manage_dirs_pattern(ntpd_t,ntpd_tmp_t,ntpd_tmp_t)
+manage_files_pattern(ntpd_t,ntpd_tmp_t,ntpd_tmp_t)
 files_tmp_filetrans(ntpd_t, ntpd_tmp_t, { file dir })
 
-allow ntpd_t ntpd_var_run_t:file create_file_perms;
-allow ntpd_t ntpd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(ntpd_t,ntpd_var_run_t,ntpd_var_run_t)
 files_pid_filetrans(ntpd_t,ntpd_var_run_t,file)
 
 kernel_read_kernel_sysctls(ntpd_t)
@@ -84,13 +82,9 @@ dev_read_urand(ntpd_t)
 fs_getattr_all_fs(ntpd_t)
 fs_search_auto_mountpoints(ntpd_t)
 
-term_dontaudit_use_console(ntpd_t)
-
 auth_use_nsswitch(ntpd_t)
 
 corecmd_exec_bin(ntpd_t)
-corecmd_exec_sbin(ntpd_t)
-corecmd_exec_ls(ntpd_t)
 corecmd_exec_shell(ntpd_t)
 
 domain_use_interactive_fds(ntpd_t)
@@ -102,8 +96,6 @@ files_read_usr_files(ntpd_t)
 files_list_var_lib(ntpd_t)
 
 init_exec_script_files(ntpd_t)
-init_use_fds(ntpd_t)
-init_use_script_ptys(ntpd_t)
 
 libs_use_ld_so(ntpd_t)
 libs_use_shared_libs(ntpd_t)
@@ -137,6 +129,7 @@ optional_policy(`
 
 optional_policy(`
 	firstboot_dontaudit_use_fds(ntpd_t)
+	firstboot_dontaudit_rw_pipes(ntpd_t)
 ')
 
 optional_policy(`

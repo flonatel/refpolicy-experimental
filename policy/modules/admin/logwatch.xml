@@ -1,0 +1,23 @@
+<module name="logwatch" filename="policy/modules/admin/logwatch.if">
+<summary>System log analyzer and reporter</summary>
+<interface name="logwatch_read_tmp_files" lineno="13">
+<summary>
+Read logwatch temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logwatch_search_cache_dir" lineno="32">
+<summary>
+Search logwatch cache directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

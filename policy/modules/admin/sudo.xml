@@ -1,0 +1,36 @@
+<module name="sudo" filename="policy/modules/admin/sudo.if">
+<summary>Execute a command with a substitute user</summary>
+<template name="sudo_per_role_template" lineno="36">
+<summary>
+The per role template for the sudo module.
+</summary>
+<desc>
+<p>
+This template creates a derived domain which is allowed
+to change the linux user id, to run commands as a different
+user.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+</module>

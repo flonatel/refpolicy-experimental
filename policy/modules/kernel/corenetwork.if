@@ -9,6 +9,90 @@
 
 ########################################
 ## <summary>
+##	Define type to be a network port type
+## </summary>
+## <desc>
+##	<p>
+##	Define type to be a network port type
+##	</p>
+##	<p>
+##	This is a template to support third party modules
+##	and its use is not allowed in upstream reference
+##	policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used for network ports.
+##	</summary>
+## </param>
+#
+interface(`corenet_port',`
+	gen_require(`
+		attribute port_type;
+	')
+
+	typeattribute $1 port_type;
+')
+
+########################################
+## <summary>
+##	Define network type to be a reserved port (lt 1024)
+## </summary>
+## <desc>
+##	<p>
+##	Define network type to be a reserved port (lt 1024)
+##	</p>
+##	<p>
+##	This is a template to support third party modules
+##	and its use is not allowed in upstream reference
+##	policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used for network ports.
+##	</summary>
+## </param>
+#
+interface(`corenet_reserved_port',`
+	gen_require(`
+		attribute reserved_port_type;
+	')
+
+	typeattribute $1 reserved_port_type;
+')
+
+########################################
+## <summary>
+##	Define network type to be a rpc port ( 512 lt PORT lt 1024)
+## </summary>
+## <desc>
+##	<p>
+##	Define network type to be a rpc port ( 512 lt PORT lt 1024)
+##	</p>
+##	<p>
+##	This is a template to support third party modules
+##	and its use is not allowed in upstream reference
+##	policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used for network ports.
+##	</summary>
+## </param>
+#
+interface(`corenet_rpc_port',`
+	gen_require(`
+		attribute rpc_port_type;
+	')
+
+	typeattribute $1 rpc_port_type;
+')
+
+########################################
+## <summary>
 ##	Send and receive TCP network traffic on the generic interfaces.
 ## </summary>
 ## <param name="domain">
@@ -973,6 +1057,24 @@ interface(`corenet_udp_bind_all_ports',`
 
 ########################################
 ## <summary>
+##	Do not audit attepts to bind UDP sockets to any ports.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corenet_dontaudit_udp_bind_all_ports',`
+	gen_require(`
+		attribute port_type;
+	')
+
+	dontaudit $1 port_type:udp_socket name_bind;
+')
+
+########################################
+## <summary>
 ##	Connect TCP sockets to all ports.
 ## </summary>
 ## <param name="domain">
@@ -987,6 +1089,25 @@ interface(`corenet_tcp_connect_all_ports',`
 	')
 
 	allow $1 port_type:tcp_socket name_connect;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to connect TCP sockets
+##	to all ports.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corenet_dontaudit_tcp_connect_all_ports',`
+	gen_require(`
+		attribute port_type;
+	')
+
+	dontaudit $1 port_type:tcp_socket name_connect;
 ')
 
 ########################################
@@ -1259,6 +1380,42 @@ interface(`corenet_dontaudit_udp_bind_all_reserved_ports',`
 
 ########################################
 ## <summary>
+##	Bind TCP sockets to all ports > 1024.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_bind_all_unreserved_ports',`
+	gen_require(`
+		attribute port_type, reserved_port_type;
+	')
+
+	allow $1 { port_type -reserved_port_type }:tcp_socket name_bind;
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to all ports > 1024.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`corenet_udp_bind_all_unreserved_ports',`
+	gen_require(`
+		attribute port_type, reserved_port_type;
+	')
+
+	allow $1 { port_type -reserved_port_type }:udp_socket name_bind;
+')
+
+########################################
+## <summary>
 ##      Connect TCP sockets to reserved ports.
 ## </summary>
 ## <param name="domain">
@@ -1494,6 +1651,35 @@ interface(`corenet_udp_recv_netlabel',`
 #
 interface(`corenet_dontaudit_udp_recv_netlabel',`
 	kernel_dontaudit_udp_recvfrom_unlabeled($1)
+')
+
+########################################
+## <summary>
+##      Receive Raw IP packets from a NetLabel connection.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_raw_recv_netlabel',`
+	kernel_raw_recvfrom_unlabeled($1)
+')
+
+########################################
+## <summary>
+##      Do not audit attempts to receive Raw IP packets from a NetLabel
+##      connection.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corenet_dontaudit_raw_recv_netlabel',`
+	kernel_dontaudit_raw_recvfrom_unlabeled($1)
 ')
 
 ########################################
@@ -7703,6 +7889,449 @@ interface(`corenet_relabelto_clockspeed_server_packets',`
 	')
 
 	allow $1 clockspeed_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
+##	Send and receive TCP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	dontaudit $1 cluster_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	dontaudit $1 cluster_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_cluster_port',`
+	corenet_udp_send_cluster_port($1)
+	corenet_udp_receive_cluster_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_cluster_port',`
+	corenet_dontaudit_udp_send_cluster_port($1)
+	corenet_dontaudit_udp_receive_cluster_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the cluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_cluster_port',`
+	gen_require(`
+		type cluster_port_t;
+	')
+
+	allow $1 cluster_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_cluster_client_packets',`
+	gen_require(`
+		type cluster_client_packet_t;
+	')
+
+	allow $1 cluster_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_cluster_client_packets',`
+	gen_require(`
+		type cluster_client_packet_t;
+	')
+
+	dontaudit $1 cluster_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_cluster_client_packets',`
+	gen_require(`
+		type cluster_client_packet_t;
+	')
+
+	allow $1 cluster_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_cluster_client_packets',`
+	gen_require(`
+		type cluster_client_packet_t;
+	')
+
+	dontaudit $1 cluster_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_cluster_client_packets',`
+	corenet_send_cluster_client_packets($1)
+	corenet_receive_cluster_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive cluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_cluster_client_packets',`
+	corenet_dontaudit_send_cluster_client_packets($1)
+	corenet_dontaudit_receive_cluster_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to cluster_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_cluster_client_packets',`
+	gen_require(`
+		type cluster_client_packet_t;
+	')
+
+	allow $1 cluster_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_cluster_server_packets',`
+	gen_require(`
+		type cluster_server_packet_t;
+	')
+
+	allow $1 cluster_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_cluster_server_packets',`
+	gen_require(`
+		type cluster_server_packet_t;
+	')
+
+	dontaudit $1 cluster_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_cluster_server_packets',`
+	gen_require(`
+		type cluster_server_packet_t;
+	')
+
+	allow $1 cluster_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_cluster_server_packets',`
+	gen_require(`
+		type cluster_server_packet_t;
+	')
+
+	dontaudit $1 cluster_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_cluster_server_packets',`
+	corenet_send_cluster_server_packets($1)
+	corenet_receive_cluster_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive cluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_cluster_server_packets',`
+	corenet_dontaudit_send_cluster_server_packets($1)
+	corenet_dontaudit_receive_cluster_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to cluster_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_cluster_server_packets',`
+	gen_require(`
+		type cluster_server_packet_t;
+	')
+
+	allow $1 cluster_server_packet_t:packet relabelto;
 ')
 
 
@@ -19228,6 +19857,449 @@ interface(`corenet_relabelto_isakmp_server_packets',`
 
 ########################################
 ## <summary>
+##	Send and receive TCP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	dontaudit $1 iscsi_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	dontaudit $1 iscsi_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_iscsi_port',`
+	corenet_udp_send_iscsi_port($1)
+	corenet_udp_receive_iscsi_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_iscsi_port',`
+	corenet_dontaudit_udp_send_iscsi_port($1)
+	corenet_dontaudit_udp_receive_iscsi_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the iscsi port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_iscsi_port',`
+	gen_require(`
+		type iscsi_port_t;
+	')
+
+	allow $1 iscsi_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_iscsi_client_packets',`
+	gen_require(`
+		type iscsi_client_packet_t;
+	')
+
+	allow $1 iscsi_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_iscsi_client_packets',`
+	gen_require(`
+		type iscsi_client_packet_t;
+	')
+
+	dontaudit $1 iscsi_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_iscsi_client_packets',`
+	gen_require(`
+		type iscsi_client_packet_t;
+	')
+
+	allow $1 iscsi_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_iscsi_client_packets',`
+	gen_require(`
+		type iscsi_client_packet_t;
+	')
+
+	dontaudit $1 iscsi_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_iscsi_client_packets',`
+	corenet_send_iscsi_client_packets($1)
+	corenet_receive_iscsi_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive iscsi_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_iscsi_client_packets',`
+	corenet_dontaudit_send_iscsi_client_packets($1)
+	corenet_dontaudit_receive_iscsi_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to iscsi_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_iscsi_client_packets',`
+	gen_require(`
+		type iscsi_client_packet_t;
+	')
+
+	allow $1 iscsi_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_iscsi_server_packets',`
+	gen_require(`
+		type iscsi_server_packet_t;
+	')
+
+	allow $1 iscsi_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_iscsi_server_packets',`
+	gen_require(`
+		type iscsi_server_packet_t;
+	')
+
+	dontaudit $1 iscsi_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_iscsi_server_packets',`
+	gen_require(`
+		type iscsi_server_packet_t;
+	')
+
+	allow $1 iscsi_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_iscsi_server_packets',`
+	gen_require(`
+		type iscsi_server_packet_t;
+	')
+
+	dontaudit $1 iscsi_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_iscsi_server_packets',`
+	corenet_send_iscsi_server_packets($1)
+	corenet_receive_iscsi_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive iscsi_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_iscsi_server_packets',`
+	corenet_dontaudit_send_iscsi_server_packets($1)
+	corenet_dontaudit_receive_iscsi_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to iscsi_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_iscsi_server_packets',`
+	gen_require(`
+		type iscsi_server_packet_t;
+	')
+
+	allow $1 iscsi_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
 ##	Send and receive TCP traffic on the jabber_client port.
 ## </summary>
 ## <param name="domain">
@@ -24544,6 +25616,449 @@ interface(`corenet_relabelto_nessus_server_packets',`
 
 ########################################
 ## <summary>
+##	Send and receive TCP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	dontaudit $1 netsupport_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	dontaudit $1 netsupport_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_netsupport_port',`
+	corenet_udp_send_netsupport_port($1)
+	corenet_udp_receive_netsupport_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_netsupport_port',`
+	corenet_dontaudit_udp_send_netsupport_port($1)
+	corenet_dontaudit_udp_receive_netsupport_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the netsupport port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_netsupport_port',`
+	gen_require(`
+		type netsupport_port_t;
+	')
+
+	allow $1 netsupport_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_netsupport_client_packets',`
+	gen_require(`
+		type netsupport_client_packet_t;
+	')
+
+	allow $1 netsupport_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_netsupport_client_packets',`
+	gen_require(`
+		type netsupport_client_packet_t;
+	')
+
+	dontaudit $1 netsupport_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_netsupport_client_packets',`
+	gen_require(`
+		type netsupport_client_packet_t;
+	')
+
+	allow $1 netsupport_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_netsupport_client_packets',`
+	gen_require(`
+		type netsupport_client_packet_t;
+	')
+
+	dontaudit $1 netsupport_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_netsupport_client_packets',`
+	corenet_send_netsupport_client_packets($1)
+	corenet_receive_netsupport_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive netsupport_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_netsupport_client_packets',`
+	corenet_dontaudit_send_netsupport_client_packets($1)
+	corenet_dontaudit_receive_netsupport_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to netsupport_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_netsupport_client_packets',`
+	gen_require(`
+		type netsupport_client_packet_t;
+	')
+
+	allow $1 netsupport_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_netsupport_server_packets',`
+	gen_require(`
+		type netsupport_server_packet_t;
+	')
+
+	allow $1 netsupport_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_netsupport_server_packets',`
+	gen_require(`
+		type netsupport_server_packet_t;
+	')
+
+	dontaudit $1 netsupport_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_netsupport_server_packets',`
+	gen_require(`
+		type netsupport_server_packet_t;
+	')
+
+	allow $1 netsupport_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_netsupport_server_packets',`
+	gen_require(`
+		type netsupport_server_packet_t;
+	')
+
+	dontaudit $1 netsupport_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_netsupport_server_packets',`
+	corenet_send_netsupport_server_packets($1)
+	corenet_receive_netsupport_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive netsupport_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_netsupport_server_packets',`
+	corenet_dontaudit_send_netsupport_server_packets($1)
+	corenet_dontaudit_receive_netsupport_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to netsupport_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_netsupport_server_packets',`
+	gen_require(`
+		type netsupport_server_packet_t;
+	')
+
+	allow $1 netsupport_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
 ##	Send and receive TCP traffic on the nmbd port.
 ## </summary>
 ## <param name="domain">
@@ -25423,6 +26938,449 @@ interface(`corenet_relabelto_ntp_server_packets',`
 	')
 
 	allow $1 ntp_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
+##	Send and receive TCP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	dontaudit $1 ocsp_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	dontaudit $1 ocsp_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_ocsp_port',`
+	corenet_udp_send_ocsp_port($1)
+	corenet_udp_receive_ocsp_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_ocsp_port',`
+	corenet_dontaudit_udp_send_ocsp_port($1)
+	corenet_dontaudit_udp_receive_ocsp_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the ocsp port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_ocsp_port',`
+	gen_require(`
+		type ocsp_port_t;
+	')
+
+	allow $1 ocsp_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ocsp_client_packets',`
+	gen_require(`
+		type ocsp_client_packet_t;
+	')
+
+	allow $1 ocsp_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ocsp_client_packets',`
+	gen_require(`
+		type ocsp_client_packet_t;
+	')
+
+	dontaudit $1 ocsp_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ocsp_client_packets',`
+	gen_require(`
+		type ocsp_client_packet_t;
+	')
+
+	allow $1 ocsp_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ocsp_client_packets',`
+	gen_require(`
+		type ocsp_client_packet_t;
+	')
+
+	dontaudit $1 ocsp_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ocsp_client_packets',`
+	corenet_send_ocsp_client_packets($1)
+	corenet_receive_ocsp_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ocsp_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ocsp_client_packets',`
+	corenet_dontaudit_send_ocsp_client_packets($1)
+	corenet_dontaudit_receive_ocsp_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ocsp_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ocsp_client_packets',`
+	gen_require(`
+		type ocsp_client_packet_t;
+	')
+
+	allow $1 ocsp_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ocsp_server_packets',`
+	gen_require(`
+		type ocsp_server_packet_t;
+	')
+
+	allow $1 ocsp_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ocsp_server_packets',`
+	gen_require(`
+		type ocsp_server_packet_t;
+	')
+
+	dontaudit $1 ocsp_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ocsp_server_packets',`
+	gen_require(`
+		type ocsp_server_packet_t;
+	')
+
+	allow $1 ocsp_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ocsp_server_packets',`
+	gen_require(`
+		type ocsp_server_packet_t;
+	')
+
+	dontaudit $1 ocsp_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ocsp_server_packets',`
+	corenet_send_ocsp_server_packets($1)
+	corenet_receive_ocsp_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ocsp_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ocsp_server_packets',`
+	corenet_dontaudit_send_ocsp_server_packets($1)
+	corenet_dontaudit_receive_ocsp_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ocsp_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ocsp_server_packets',`
+	gen_require(`
+		type ocsp_server_packet_t;
+	')
+
+	allow $1 ocsp_server_packet_t:packet relabelto;
 ')
 
 
@@ -31625,6 +33583,892 @@ interface(`corenet_relabelto_razor_server_packets',`
 	')
 
 	allow $1 razor_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
+##	Send and receive TCP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	dontaudit $1 ricci_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	dontaudit $1 ricci_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_ricci_port',`
+	corenet_udp_send_ricci_port($1)
+	corenet_udp_receive_ricci_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_ricci_port',`
+	corenet_dontaudit_udp_send_ricci_port($1)
+	corenet_dontaudit_udp_receive_ricci_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the ricci port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_ricci_port',`
+	gen_require(`
+		type ricci_port_t;
+	')
+
+	allow $1 ricci_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ricci_client_packets',`
+	gen_require(`
+		type ricci_client_packet_t;
+	')
+
+	allow $1 ricci_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ricci_client_packets',`
+	gen_require(`
+		type ricci_client_packet_t;
+	')
+
+	dontaudit $1 ricci_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ricci_client_packets',`
+	gen_require(`
+		type ricci_client_packet_t;
+	')
+
+	allow $1 ricci_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ricci_client_packets',`
+	gen_require(`
+		type ricci_client_packet_t;
+	')
+
+	dontaudit $1 ricci_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ricci_client_packets',`
+	corenet_send_ricci_client_packets($1)
+	corenet_receive_ricci_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ricci_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ricci_client_packets',`
+	corenet_dontaudit_send_ricci_client_packets($1)
+	corenet_dontaudit_receive_ricci_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ricci_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ricci_client_packets',`
+	gen_require(`
+		type ricci_client_packet_t;
+	')
+
+	allow $1 ricci_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ricci_server_packets',`
+	gen_require(`
+		type ricci_server_packet_t;
+	')
+
+	allow $1 ricci_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ricci_server_packets',`
+	gen_require(`
+		type ricci_server_packet_t;
+	')
+
+	dontaudit $1 ricci_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ricci_server_packets',`
+	gen_require(`
+		type ricci_server_packet_t;
+	')
+
+	allow $1 ricci_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ricci_server_packets',`
+	gen_require(`
+		type ricci_server_packet_t;
+	')
+
+	dontaudit $1 ricci_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ricci_server_packets',`
+	corenet_send_ricci_server_packets($1)
+	corenet_receive_ricci_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ricci_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ricci_server_packets',`
+	corenet_dontaudit_send_ricci_server_packets($1)
+	corenet_dontaudit_receive_ricci_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ricci_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ricci_server_packets',`
+	gen_require(`
+		type ricci_server_packet_t;
+	')
+
+	allow $1 ricci_server_packet_t:packet relabelto;
+')
+
+
+
+
+########################################
+## <summary>
+##	Send and receive TCP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_tcp_sendrecv_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:tcp_socket { send_msg recv_msg };
+')
+
+########################################
+## <summary>
+##	Send UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_udp_send_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_send_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	dontaudit $1 ricci_modcluster_port_t:udp_socket send_msg;
+')
+
+########################################
+## <summary>
+##	Receive UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_udp_receive_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_receive_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	dontaudit $1 ricci_modcluster_port_t:udp_socket recv_msg;
+')
+
+########################################
+## <summary>
+##	Send and receive UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_udp_sendrecv_ricci_modcluster_port',`
+	corenet_udp_send_ricci_modcluster_port($1)
+	corenet_udp_receive_ricci_modcluster_port($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive
+##	UDP traffic on the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_udp_sendrecv_ricci_modcluster_port',`
+	corenet_dontaudit_udp_send_ricci_modcluster_port($1)
+	corenet_dontaudit_udp_receive_ricci_modcluster_port($1)
+')
+
+########################################
+## <summary>
+##	Bind TCP sockets to the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_tcp_bind_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:tcp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Bind UDP sockets to the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_udp_bind_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:udp_socket name_bind;
+	
+')
+
+########################################
+## <summary>
+##	Make a TCP connection to the ricci_modcluster port.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_tcp_connect_ricci_modcluster_port',`
+	gen_require(`
+		type ricci_modcluster_port_t;
+	')
+
+	allow $1 ricci_modcluster_port_t:tcp_socket name_connect;
+')
+
+
+########################################
+## <summary>
+##	Send ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ricci_modcluster_client_packets',`
+	gen_require(`
+		type ricci_modcluster_client_packet_t;
+	')
+
+	allow $1 ricci_modcluster_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ricci_modcluster_client_packets',`
+	gen_require(`
+		type ricci_modcluster_client_packet_t;
+	')
+
+	dontaudit $1 ricci_modcluster_client_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ricci_modcluster_client_packets',`
+	gen_require(`
+		type ricci_modcluster_client_packet_t;
+	')
+
+	allow $1 ricci_modcluster_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ricci_modcluster_client_packets',`
+	gen_require(`
+		type ricci_modcluster_client_packet_t;
+	')
+
+	dontaudit $1 ricci_modcluster_client_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ricci_modcluster_client_packets',`
+	corenet_send_ricci_modcluster_client_packets($1)
+	corenet_receive_ricci_modcluster_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ricci_modcluster_client packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ricci_modcluster_client_packets',`
+	corenet_dontaudit_send_ricci_modcluster_client_packets($1)
+	corenet_dontaudit_receive_ricci_modcluster_client_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ricci_modcluster_client the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ricci_modcluster_client_packets',`
+	gen_require(`
+		type ricci_modcluster_client_packet_t;
+	')
+
+	allow $1 ricci_modcluster_client_packet_t:packet relabelto;
+')
+
+
+########################################
+## <summary>
+##	Send ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="write" weight="10"/>
+#
+interface(`corenet_send_ricci_modcluster_server_packets',`
+	gen_require(`
+		type ricci_modcluster_server_packet_t;
+	')
+
+	allow $1 ricci_modcluster_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_send_ricci_modcluster_server_packets',`
+	gen_require(`
+		type ricci_modcluster_server_packet_t;
+	')
+
+	dontaudit $1 ricci_modcluster_server_packet_t:packet send;
+')
+
+########################################
+## <summary>
+##	Receive ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="10"/>
+#
+interface(`corenet_receive_ricci_modcluster_server_packets',`
+	gen_require(`
+		type ricci_modcluster_server_packet_t;
+	')
+
+	allow $1 ricci_modcluster_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to receive ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_receive_ricci_modcluster_server_packets',`
+	gen_require(`
+		type ricci_modcluster_server_packet_t;
+	')
+
+	dontaudit $1 ricci_modcluster_server_packet_t:packet recv;
+')
+
+########################################
+## <summary>
+##	Send and receive ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <infoflow type="both" weight="10"/>
+#
+interface(`corenet_sendrecv_ricci_modcluster_server_packets',`
+	corenet_send_ricci_modcluster_server_packets($1)
+	corenet_receive_ricci_modcluster_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send and receive ricci_modcluster_server packets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="none"/>
+#
+interface(`corenet_dontaudit_sendrecv_ricci_modcluster_server_packets',`
+	corenet_dontaudit_send_ricci_modcluster_server_packets($1)
+	corenet_dontaudit_receive_ricci_modcluster_server_packets($1)
+')
+
+########################################
+## <summary>
+##	Relabel packets to ricci_modcluster_server the packet type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corenet_relabelto_ricci_modcluster_server_packets',`
+	gen_require(`
+		type ricci_modcluster_server_packet_t;
+	')
+
+	allow $1 ricci_modcluster_server_packet_t:packet relabelto;
 ')
 
 

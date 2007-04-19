@@ -1,0 +1,64 @@
+<module name="sendmail" filename="policy/modules/services/sendmail.if">
+<summary>Policy for sendmail.</summary>
+<interface name="sendmail_stub" lineno="13">
+<summary>
+Sendmail stub interface.  No access allowed.
+</summary>
+<param name="domain" optional="true">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+<interface name="sendmail_domtrans" lineno="29">
+<summary>
+Domain transition to sendmail.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sendmail_rw_tcp_sockets" lineno="52">
+<summary>
+Read and write sendmail TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sendmail_rw_unix_stream_sockets" lineno="69">
+<summary>
+Read and write sendmail unix_stream_sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sendmail_manage_log" lineno="88">
+<summary>
+Create, read, write, and delete sendmail logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sendmail_create_log" lineno="107">
+<summary>
+Create sendmail logs with the correct type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

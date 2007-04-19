@@ -1,0 +1,13 @@
+<module name="wine" filename="policy/modules/apps/wine.if">
+<summary>Wine Is Not an Emulator.  Run Windows programs in Linux.</summary>
+<interface name="wine_domtrans" lineno="13">
+<summary>
+Execute the wine program in the wine domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

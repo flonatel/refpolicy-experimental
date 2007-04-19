@@ -1,0 +1,13 @@
+<module name="rshd" filename="policy/modules/services/rshd.if">
+<summary>Remote shell service.</summary>
+<interface name="rshd_domtrans" lineno="13">
+<summary>
+Domain transition to rshd.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

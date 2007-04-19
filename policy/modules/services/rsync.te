@@ -1,10 +1,18 @@
 
-policy_module(rsync,1.3.0)
+policy_module(rsync,1.4.0)
 
 ########################################
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+## Allow rsync to modify public files
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(allow_rsync_anon_write,false)
 
 type rsync_t;
 type rsync_exec_t;
@@ -27,7 +35,7 @@ files_pid_file(rsync_var_run_t)
 
 allow rsync_t self:capability sys_chroot;
 allow rsync_t self:process signal_perms;
-allow rsync_t self:fifo_file rw_file_perms;
+allow rsync_t self:fifo_file rw_fifo_file_perms;
 allow rsync_t self:tcp_socket create_stream_socket_perms;
 allow rsync_t self:udp_socket connected_socket_perms;
 
@@ -38,16 +46,15 @@ allow rsync_t self:netlink_tcpdiag_socket r_netlink_socket_perms;
 allow rsync_t self:capability { setuid setgid };
 #end for identd
 
-allow rsync_t rsync_data_t:dir r_dir_perms;
-allow rsync_t rsync_data_t:file r_file_perms;
-allow rsync_t rsync_data_t:lnk_file r_file_perms;
+allow rsync_t rsync_data_t:dir list_dir_perms;
+read_files_pattern(rsync_t,rsync_data_t,rsync_data_t)
+read_lnk_files_pattern(rsync_t,rsync_data_t,rsync_data_t)
 
-allow rsync_t rsync_tmp_t:dir create_dir_perms;
-allow rsync_t rsync_tmp_t:file create_file_perms;
+manage_dirs_pattern(rsync_t,rsync_tmp_t,rsync_tmp_t)
+manage_files_pattern(rsync_t,rsync_tmp_t,rsync_tmp_t)
 files_tmp_filetrans(rsync_t, rsync_tmp_t, { file dir })
 
-allow rsync_t rsync_var_run_t:file create_file_perms;
-allow rsync_t rsync_var_run_t:dir rw_dir_perms;
+manage_files_pattern(rsync_t,rsync_var_run_t,rsync_var_run_t)
 files_pid_filetrans(rsync_t,rsync_var_run_t,file)
 
 kernel_read_kernel_sysctls(rsync_t)
@@ -71,8 +78,6 @@ fs_getattr_xattr_fs(rsync_t)
 
 files_read_etc_files(rsync_t)
 files_search_home(rsync_t)
-
-init_dontaudit_use_fds(rsync_t)
 
 libs_use_ld_so(rsync_t)
 libs_use_shared_libs(rsync_t)

@@ -1,0 +1,13 @@
+<module name="canna" filename="policy/modules/services/canna.if">
+<summary>Canna - kana-kanji conversion server</summary>
+<interface name="canna_stream_connect" lineno="13">
+<summary>
+Connect to Canna using a unix domain stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

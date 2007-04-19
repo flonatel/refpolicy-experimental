@@ -1,0 +1,13 @@
+<module name="tor" filename="policy/modules/services/tor.if">
+<summary>TOR, the onion router</summary>
+<interface name="tor_domtrans" lineno="13">
+<summary>
+Execute a domain transition to run TOR.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+</module>

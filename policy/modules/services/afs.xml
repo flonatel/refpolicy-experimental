@@ -1,0 +1,3 @@
+<module name="afs" filename="policy/modules/services/afs.if">
+<summary>Andrew Filesystem server</summary>
+</module>

@@ -1,5 +1,5 @@
 
-policy_module(hotplug,1.3.0)
+policy_module(hotplug,1.5.0)
 
 ########################################
 #
@@ -33,15 +33,14 @@ allow hotplug_t self:netlink_route_socket r_netlink_socket_perms;
 allow hotplug_t self:udp_socket create_socket_perms;
 allow hotplug_t self:tcp_socket connected_stream_socket_perms;
 
-allow hotplug_t hotplug_etc_t:file r_file_perms;
-allow hotplug_t hotplug_etc_t:dir r_dir_perms;
-allow hotplug_t hotplug_etc_t:lnk_file r_file_perms;
+read_files_pattern(hotplug_t,hotplug_etc_t,hotplug_etc_t)
+read_lnk_files_pattern(hotplug_t,hotplug_etc_t,hotplug_etc_t)
 can_exec(hotplug_t,hotplug_etc_t)
+allow hotplug_t hotplug_etc_t:dir list_dir_perms;
 
 can_exec(hotplug_t,hotplug_exec_t)
 
-allow hotplug_t hotplug_var_run_t:file manage_file_perms;
-allow hotplug_t hotplug_var_run_t:dir rw_dir_perms;
+manage_files_pattern(hotplug_t,hotplug_var_run_t,hotplug_var_run_t)
 files_pid_filetrans(hotplug_t,hotplug_var_run_t,file)
 
 kernel_sigchld(hotplug_t)
@@ -73,12 +72,8 @@ fs_search_auto_mountpoints(hotplug_t)
 storage_setattr_fixed_disk_dev(hotplug_t)
 storage_setattr_removable_dev(hotplug_t)
 
-term_dontaudit_use_console(hotplug_t)
-
 corecmd_exec_bin(hotplug_t)
 corecmd_exec_shell(hotplug_t)
-corecmd_exec_sbin(hotplug_t)
-corecmd_exec_ls(hotplug_t)
 
 domain_use_interactive_fds(hotplug_t)
 # for ps
@@ -92,8 +87,6 @@ files_exec_etc_files(hotplug_t)
 # for when filesystems are not mounted early in the boot:
 files_dontaudit_search_isid_type_dirs(hotplug_t)
 
-init_use_fds(hotplug_t)
-init_use_script_ptys(hotplug_t)
 init_read_script_state(hotplug_t)
 # Allow hotplug (including /sbin/ifup-local) to start/stop services and
 # run sendmail -q

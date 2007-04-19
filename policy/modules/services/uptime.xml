@@ -1,0 +1,3 @@
+<module name="uptime" filename="policy/modules/services/uptime.if">
+<summary>Uptime daemon</summary>
+</module>

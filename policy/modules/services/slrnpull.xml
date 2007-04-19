@@ -1,0 +1,24 @@
+<module name="slrnpull" filename="policy/modules/services/slrnpull.if">
+<summary>Service for downloading news feeds the slrn newsreader.</summary>
+<interface name="slrnpull_search_spool" lineno="13">
+<summary>
+Allow the domain to search slrnpull spools.
+</summary>
+<param name="pty_type">
+<summary>
+domain allowed access
+</summary>
+</param>
+</interface>
+<interface name="slrnpull_manage_spool" lineno="33">
+<summary>
+Allow the domain to create, read,
+write, and delete slrnpull spools.
+</summary>
+<param name="pty_type">
+<summary>
+domain allowed access
+</summary>
+</param>
+</interface>
+</module>

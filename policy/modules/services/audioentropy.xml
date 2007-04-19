@@ -1,0 +1,3 @@
+<module name="audioentropy" filename="policy/modules/services/audioentropy.if">
+<summary>Generate entropy from audio input</summary>
+</module>

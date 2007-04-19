@@ -1,0 +1,45 @@
+<module name="zabbix" filename="policy/modules/services/zabbix.if">
+<summary>Distributed infrastructure monitoring</summary>
+<interface name="zabbix_domtrans" lineno="13">
+<summary>
+Execute a domain transition to run zabbix.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="zabbix_read_log" lineno="32">
+<summary>
+Allow the specified domain to read zabbix's log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="zabbix_append_log" lineno="52">
+<summary>
+Allow the specified domain to append
+zabbix log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="zabbix_read_pid_files" lineno="71">
+<summary>
+Read zabbix PID files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

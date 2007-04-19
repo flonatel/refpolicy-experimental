@@ -1,0 +1,158 @@
+<module name="lpd" filename="policy/modules/services/lpd.if">
+<summary>Line printer daemon</summary>
+<template name="lpd_per_role_template" lineno="35">
+<summary>
+The per role template for the lpd module.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for lpr printing client.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="lpr_admin_template" lineno="217">
+<summary>
+The administrative functions template for the lpd module.
+</summary>
+<desc>
+<p>
+This template creates rules for administrating the ldp service,
+allowing the specified user to manage lpr files.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<rolecap/>
+</template>
+<interface name="lpd_domtrans_checkpc" lineno="245">
+<summary>
+Execute lpd in the lpd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="lpd_run_checkpc" lineno="275">
+<summary>
+Execute amrecover in the lpd domain, and
+allow the specified role the lpd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the lpd domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the lpd domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="lpd_list_spool" lineno="295">
+<summary>
+List the contents of the printer spool directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="lpd_manage_spool" lineno="314">
+<summary>
+Create, read, write, and delete printer spool files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="lpd_relabel_spool" lineno="336">
+<summary>
+Relabel from and to the spool files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="lpd_read_config" lineno="356">
+<summary>
+List the contents of the printer spool directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<template name="lpd_domtrans_user_lpr" lineno="390">
+<summary>
+Transition to a user lpr domain.
+</summary>
+<desc>
+<p>
+Transition to a user lpr domain.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<tunable name="use_lpd_server" dftval="false">
+<desc>
+<p>
+Use lpd server instead of cups
+</p>
+</desc>
+</tunable>
+</module>

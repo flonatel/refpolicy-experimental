@@ -1,0 +1,44 @@
+<module name="cdrecord" filename="policy/modules/apps/cdrecord.if">
+<summary>Policy for cdrecord</summary>
+<template name="cdrecord_per_role_template" lineno="35">
+<summary>
+The per role template for the cdrecord module.
+</summary>
+<desc>
+<p>
+This template creates derived domains which are used
+for cdrecord.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<tunable name="cdrecord_read_content" dftval="false">
+<desc>
+<p>
+Allow cdrecord to read various content.
+nfs, samba, removable devices, user temp
+and untrusted content files
+</p>
+</desc>
+</tunable>
+</module>

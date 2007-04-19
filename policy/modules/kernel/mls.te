@@ -1,5 +1,5 @@
 
-policy_module(mls,1.4.0)
+policy_module(mls,1.5.0)
 
 ########################################
 #
@@ -10,6 +10,7 @@ attribute mlsfileread;
 attribute mlsfilereadtoclr;
 attribute mlsfilewrite;
 attribute mlsfilewritetoclr;
+attribute mlsfilewriteinrange;
 attribute mlsfileupgrade;
 attribute mlsfiledowngrade;
 
@@ -49,3 +50,5 @@ attribute mlsrangetrans;
 
 attribute mlsfduse; 
 attribute mlsfdshare;
+
+attribute mlstranslate;

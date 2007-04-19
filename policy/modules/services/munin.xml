@@ -1,0 +1,35 @@
+<module name="munin" filename="policy/modules/services/munin.if">
+<summary>Munin network-wide load graphing (formerly LRRD)</summary>
+<interface name="munin_stream_connect" lineno="14">
+<summary>
+Connect to munin over a unix domain
+stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="munin_read_config" lineno="35">
+<summary>
+Read munin configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="munin_search_lib" lineno="56">
+<summary>
+Search munin library directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -24,13 +24,15 @@
 ## </param>
 #
 template(`ftp_per_role_template',`
-	tunable_policy(`ftpd_is_daemon',`
-		userdom_manage_user_home_content_files($1,ftpd_t)
-		userdom_manage_user_home_content_symlinks($1,ftpd_t)
-		userdom_manage_user_home_content_sockets($1,ftpd_t)
-		userdom_manage_user_home_content_pipes($1,ftpd_t)
-		userdom_user_home_dir_filetrans_user_home_content($1,ftpd_t,{ dir file lnk_file sock_file fifo_file })
+	gen_require(`
+		type ftpd_t;
 	')
+
+	userdom_manage_user_home_content_files($1,ftpd_t)
+	userdom_manage_user_home_content_symlinks($1,ftpd_t)
+	userdom_manage_user_home_content_sockets($1,ftpd_t)
+	userdom_manage_user_home_content_pipes($1,ftpd_t)
+	userdom_user_home_dir_filetrans_user_home_content($1,ftpd_t,{ dir file lnk_file sock_file fifo_file })
 ')
 
 ########################################
@@ -81,7 +83,7 @@ interface(`ftp_check_exec',`
 		type ftpd_exec_t;
 	')
 
-	corecmd_search_sbin($1)
+	corecmd_search_bin($1)
 	allow $1 ftpd_exec_t:file x_file_perms;
 ')
 
@@ -101,7 +103,7 @@ interface(`ftp_read_log',`
 	')
 
 	logging_search_logs($1)
-	allow $1 xferlog_t:file r_file_perms;
+	allow $1 xferlog_t:file read_file_perms;
 ')
 
 ########################################
@@ -120,9 +122,5 @@ interface(`ftp_domtrans_ftpdctl',`
 	')
 
 	corecmd_search_bin($1)
-	domain_auto_trans($1, ftpdctl_exec_t, ftpdctl_t)
-
-	allow ftpdctl_t $1:fd use;
-	allow ftpdctl_t $1:fifo_file rw_file_perms;
-	allow ftpdctl_t $1:process sigchld;
+	domtrans_pattern($1, ftpdctl_exec_t, ftpdctl_t)
 ')

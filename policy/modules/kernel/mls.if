@@ -93,6 +93,27 @@ interface(`mls_file_downgrade',`
 
 ########################################
 ## <summary>
+##	Make specified domain trusted to
+##	be written to within its MLS range.
+##	The subject's MLS range must be a
+##	proper subset of the object's MLS range.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mls_file_write_within_range',`
+	gen_require(`
+		attribute mlsfilewriteinrange;
+	')
+
+	typeattribute $1 mlsfilewriteinrange;
+')
+
+########################################
+## <summary>
 ##	Make specified domain MLS trusted
 ##	for reading from sockets at any level.
 ## </summary>
@@ -450,4 +471,23 @@ interface(`mls_fd_share_all_levels',`
 	')
 
 	typeattribute $1 mlsfdshare;
+')
+
+########################################
+## <summary>
+##	Make specified domain MLS trusted
+##	for translating contexts at all levels.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mls_context_translate_all_levels',`
+	gen_require(`
+		attribute mlstranslate;
+	')
+
+	typeattribute $1 mlstranslate;
 ')

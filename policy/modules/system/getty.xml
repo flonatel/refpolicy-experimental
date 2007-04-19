@@ -1,0 +1,56 @@
+<module name="getty" filename="policy/modules/system/getty.if">
+<summary>Policy for getty.</summary>
+<interface name="getty_domtrans" lineno="13">
+<summary>
+Execute gettys in the getty domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="getty_use_fds" lineno="32">
+<summary>
+Inherit and use getty file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="getty_read_log" lineno="51">
+<summary>
+Allow process to read getty log file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="getty_read_config" lineno="71">
+<summary>
+Allow process to read getty config file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="getty_rw_config" lineno="91">
+<summary>
+Allow process to edit getty config file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

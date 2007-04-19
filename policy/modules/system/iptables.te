@@ -1,5 +1,5 @@
 
-policy_module(iptables,1.1.0)
+policy_module(iptables,1.3.0)
 
 ########################################
 #
@@ -25,17 +25,16 @@ files_pid_file(iptables_var_run_t)
 allow iptables_t self:capability { net_admin net_raw };
 dontaudit iptables_t self:capability sys_tty_config;
 allow iptables_t self:process { sigchld sigkill sigstop signull signal };
+allow iptables_t self:rawip_socket create_socket_perms;
 
 allow iptables_t iptables_var_run_t:dir rw_dir_perms;
 files_pid_filetrans(iptables_t,iptables_var_run_t,file)
 
 can_exec(iptables_t,iptables_exec_t)
 
-allow iptables_t iptables_tmp_t:dir create_dir_perms;
-allow iptables_t iptables_tmp_t:file create_file_perms;
+allow iptables_t iptables_tmp_t:dir manage_dir_perms;
+allow iptables_t iptables_tmp_t:file manage_file_perms;
 files_tmp_filetrans(iptables_t, iptables_tmp_t, { file dir })
-
-allow iptables_t self:rawip_socket create_socket_perms;
 
 kernel_read_system_state(iptables_t)
 kernel_read_network_state(iptables_t)
@@ -78,14 +77,15 @@ sysnet_dns_name_resolve(iptables_t)
 userdom_use_all_users_fds(iptables_t)
 
 ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(iptables_t)
-	term_dontaudit_use_generic_ptys(iptables_t)
+	term_use_unallocated_ttys(iptables_t)
+	term_use_generic_ptys(iptables_t)
 	files_dontaudit_read_root_files(iptables_t)
+ 	unconfined_rw_pipes(iptables_t)
 ')
 
 optional_policy(`
 	firstboot_use_fds(iptables_t)
-	firstboot_write_pipes(iptables_t)
+	firstboot_rw_pipes(iptables_t)
 ')
 
 optional_policy(`
@@ -95,6 +95,14 @@ optional_policy(`
 optional_policy(`
 	# for iptables -L
 	nis_use_ypbind(iptables_t)
+')
+
+optional_policy(`
+	nscd_socket_use(iptables_t)
+')
+
+optional_policy(`
+	ppp_dontaudit_use_fds(iptables_t)
 ')
 
 optional_policy(`

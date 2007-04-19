@@ -1,0 +1,3 @@
+<module name="irqbalance" filename="policy/modules/services/irqbalance.if">
+<summary>IRQ balancing daemon</summary>
+</module>

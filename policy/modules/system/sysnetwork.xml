@@ -1,0 +1,303 @@
+<module name="sysnetwork" filename="policy/modules/system/sysnetwork.if">
+<summary>Policy for network configuration: ifconfig and dhcp client.</summary>
+<interface name="sysnet_domtrans_dhcpc" lineno="13">
+<summary>
+Execute dhcp client in dhcpc domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_run_dhcpc" lineno="44">
+<summary>
+Execute DHCP clients in the dhcpc domain, and
+allow the specified role the dhcpc domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the clock domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the clock domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sysnet_sigchld_dhcpc" lineno="64">
+<summary>
+Send a SIGCHLD signal to the dhcp client.
+</summary>
+<param name="domain">
+<summary>
+The domain sending the SIGCHLD.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_kill_dhcpc" lineno="83">
+<summary>
+Send a kill signal to the dhcp client.
+</summary>
+<param name="domain">
+<summary>
+The domain sending the SIGKILL.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sysnet_sigstop_dhcpc" lineno="101">
+<summary>
+Send a SIGSTOP signal to the dhcp client.
+</summary>
+<param name="domain">
+<summary>
+The domain sending the SIGSTOP.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_signull_dhcpc" lineno="119">
+<summary>
+Send a null signal to the dhcp client.
+</summary>
+<param name="domain">
+<summary>
+The domain sending the null signal.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_signal_dhcpc" lineno="138">
+<summary>
+Send a generic signal to the dhcp client.
+</summary>
+<param name="domain">
+<summary>
+The domain sending the signal.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sysnet_dbus_chat_dhcpc" lineno="157">
+<summary>
+Send and receive messages from
+dhcpc over dbus.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_rw_dhcp_config" lineno="177">
+<summary>
+Read and write dhcp configuration files.
+</summary>
+<param name="domain">
+<summary>
+The domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_read_dhcpc_state" lineno="196">
+<summary>
+Read dhcp client state files.
+</summary>
+<param name="domain">
+<summary>
+The domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_read_config" lineno="214">
+<summary>
+Allow network init to read network config files.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_dontaudit_read_config" lineno="233">
+<summary>
+Do not audit attempts to read network config files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_etc_filetrans_config" lineno="252">
+<summary>
+Create files in /etc with the type used for
+the network config files.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_manage_config" lineno="270">
+<summary>
+Create, read, write, and delete network config files.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_read_dhcpc_pid" lineno="288">
+<summary>
+Read the dhcp client pid file.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_delete_dhcpc_pid" lineno="307">
+<summary>
+Delete the dhcp client pid file.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_domtrans_ifconfig" lineno="325">
+<summary>
+Execute ifconfig in the ifconfig domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_run_ifconfig" lineno="357">
+<summary>
+Execute ifconfig in the ifconfig domain, and
+allow the specified role the ifconfig domain,
+and use the caller's terminal.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the ifconfig domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the ifconfig domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sysnet_exec_ifconfig" lineno="378">
+<summary>
+Execute ifconfig in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_read_dhcp_config" lineno="397">
+<summary>
+Read the DHCP configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_search_dhcp_state" lineno="416">
+<summary>
+Search the DHCP state data directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_dhcp_state_filetrans" lineno="455">
+<summary>
+Create DHCP state data.
+</summary>
+<desc>
+<p>
+Create DHCP state data.
+</p>
+<p>
+This is added for DHCP server, as
+the server and client put their state
+files in the same directory.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+The type of the object to be created
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_dns_name_resolve" lineno="475">
+<summary>
+Perform a DNS name resolution.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="sysnet_use_ldap" lineno="507">
+<summary>
+Connect and use a LDAP server.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="sysnet_use_portmap" lineno="535">
+<summary>
+Connect and use remote port mappers.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

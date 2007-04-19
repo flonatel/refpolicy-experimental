@@ -1,5 +1,5 @@
 
-policy_module(fstools,1.4.0)
+policy_module(fstools,1.6.0)
 
 ########################################
 #
@@ -9,7 +9,6 @@ policy_module(fstools,1.4.0)
 type fsadm_t;
 type fsadm_exec_t;
 init_system_domain(fsadm_t,fsadm_exec_t)
-mls_file_read_up(fsadm_t)
 role system_r types fsadm_t;
 
 type fsadm_log_t;
@@ -27,7 +26,7 @@ files_type(swapfile_t)
 #
 
 # ipc_lock is for losetup
-allow fsadm_t self:capability { ipc_lock sys_rawio sys_admin sys_tty_config dac_override dac_read_search };
+allow fsadm_t self:capability { ipc_lock sys_rawio sys_admin sys_resource sys_tty_config dac_override dac_read_search };
 allow fsadm_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execmem execheap };
 allow fsadm_t self:fd use;
 allow fsadm_t self:fifo_file rw_file_perms;
@@ -43,17 +42,17 @@ allow fsadm_t self:msg { send receive };
 
 can_exec(fsadm_t, fsadm_exec_t)
 
-allow fsadm_t fsadm_tmp_t:dir create_dir_perms;
-allow fsadm_t fsadm_tmp_t:file create_file_perms;
+allow fsadm_t fsadm_tmp_t:dir manage_dir_perms;
+allow fsadm_t fsadm_tmp_t:file manage_file_perms;
 files_tmp_filetrans(fsadm_t, fsadm_tmp_t, { file dir })
 
 # log files
-allow fsadm_t fsadm_log_t:file manage_file_perms;
-allow fsadm_t fsadm_log_t:dir { rw_dir_perms setattr };
+allow fsadm_t fsadm_log_t:dir setattr;
+manage_files_pattern(fsadm_t,fsadm_log_t,fsadm_log_t)
 logging_log_filetrans(fsadm_t,fsadm_log_t,file)
 
 # Enable swapping to files
-allow fsadm_t swapfile_t:file { read write getattr swapon };
+allow fsadm_t swapfile_t:file { rw_file_perms swapon };
 
 kernel_read_system_state(fsadm_t)
 kernel_read_kernel_sysctls(fsadm_t)
@@ -97,6 +96,7 @@ fs_search_tmpfs(fsadm_t)
 fs_getattr_tmpfs_dirs(fsadm_t)
 fs_read_tmpfs_symlinks(fsadm_t)
 
+mls_file_read_up(fsadm_t)
 mls_file_write_down(fsadm_t)
 
 storage_raw_read_fixed_disk(fsadm_t)
@@ -109,9 +109,7 @@ storage_swapon_fixed_disk(fsadm_t)
 term_use_console(fsadm_t)
 
 corecmd_list_bin(fsadm_t)
-corecmd_list_sbin(fsadm_t)
 corecmd_read_bin_symlinks(fsadm_t)
-corecmd_read_sbin_symlinks(fsadm_t)
 #RedHat bug #201164
 corecmd_exec_shell(fsadm_t)
 
@@ -119,9 +117,6 @@ corecmd_exec_shell(fsadm_t)
 corecmd_read_bin_files(fsadm_t)
 corecmd_read_bin_pipes(fsadm_t)
 corecmd_read_bin_sockets(fsadm_t)
-corecmd_read_sbin_files(fsadm_t)
-corecmd_read_sbin_pipes(fsadm_t)
-corecmd_read_sbin_sockets(fsadm_t)
 
 domain_use_interactive_fds(fsadm_t)
 

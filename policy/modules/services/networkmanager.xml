@@ -1,0 +1,45 @@
+<module name="networkmanager" filename="policy/modules/services/networkmanager.if">
+<summary>Manager for dynamically switching between networks.</summary>
+<interface name="networkmanager_rw_udp_sockets" lineno="14">
+<summary>
+Read and write NetworkManager UDP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="networkmanager_rw_packet_sockets" lineno="33">
+<summary>
+Read and write NetworkManager packet sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="networkmanager_rw_routing_sockets" lineno="53">
+<summary>
+Read and write NetworkManager netlink
+routing sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="networkmanager_dbus_chat" lineno="72">
+<summary>
+Send and receive messages from
+NetworkManager over dbus.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,687 @@
+<module name="init" filename="policy/modules/system/init.if">
+<summary>System initialization programs (init and init scripts).</summary>
+<interface name="init_domain" lineno="18">
+<summary>
+Create a domain which can be started by init.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+</interface>
+<interface name="init_ranged_domain" lineno="61">
+<summary>
+Create a domain which can be started by init,
+with a range transition.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+<param name="range">
+<summary>
+Range for the domain.
+</summary>
+</param>
+</interface>
+<interface name="init_daemon_domain" lineno="93">
+<summary>
+Create a domain for long running processes
+(daemons) which can be started by init scripts.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+</interface>
+<interface name="init_ranged_daemon_domain" lineno="161">
+<summary>
+Create a domain for long running processes
+(daemons) which can be started by init scripts.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+<param name="range">
+<summary>
+Range for the domain.
+</summary>
+</param>
+</interface>
+<interface name="init_system_domain" lineno="193">
+<summary>
+Create a domain for short running processes
+which can be started by init scripts.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+</interface>
+<interface name="init_ranged_system_domain" lineno="236">
+<summary>
+Create a domain for short running processes
+which can be started by init scripts.
+</summary>
+<param name="domain">
+<summary>
+Type to be used as a domain.
+</summary>
+</param>
+<param name="entry_point">
+<summary>
+Type of the program to be used as an entry point to this domain.
+</summary>
+</param>
+<param name="range">
+<summary>
+Range for the domain.
+</summary>
+</param>
+</interface>
+<interface name="init_domtrans" lineno="262">
+<summary>
+Execute init (/sbin/init) with a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_exec" lineno="281">
+<summary>
+Execute the init program in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="init_getpgid" lineno="300">
+<summary>
+Get the process group of init.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_signull" lineno="321">
+<summary>
+Send init a null signal.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_sigchld" lineno="342">
+<summary>
+Send init a SIGCHLD signal.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_use_fds" lineno="363">
+<summary>
+Inherit and use file descriptors from init.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_use_fds" lineno="385">
+<summary>
+Do not audit attempts to inherit file
+descriptors from init.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_udp_send" lineno="406">
+<summary>
+Send UDP network traffic to init.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_getattr_initctl" lineno="420">
+<summary>
+Get the attributes of initctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_getattr_initctl" lineno="439">
+<summary>
+Do not audit attempts to get the
+attributes of initctl.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="init_write_initctl" lineno="457">
+<summary>
+Write to initctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_telinit" lineno="477">
+<summary>
+Use telinit (Read and write initctl).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="init_rw_initctl" lineno="498">
+<summary>
+Read and write initctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_rw_initctl" lineno="518">
+<summary>
+Do not audit attempts to read and
+write initctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_script_file_entry_type" lineno="537">
+<summary>
+Make init scripts an entry point for
+the specified domain.
+</summary>
+<param name="domain">
+<summary>
+The domain for which init scripts are an entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="init_spec_domtrans_script" lineno="555">
+<summary>
+Execute init scripts with a specified domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_domtrans_script" lineno="582">
+<summary>
+Execute init scripts with an automatic domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_script_file_domtrans" lineno="624">
+<summary>
+Execute a init script in a specified domain.
+</summary>
+<desc>
+<p>
+Execute a init script in a specified domain.
+</p>
+<p>
+No interprocess communication (signals, pipes,
+etc.) is provided by this interface since
+the domains are not owned by this module.
+</p>
+</desc>
+<param name="source_domain">
+<summary>
+Domain to transition from.
+</summary>
+</param>
+<param name="target_domain">
+<summary>
+Domain to transition to.
+</summary>
+</param>
+</interface>
+<interface name="init_run_daemon" lineno="660">
+<summary>
+Start and stop daemon programs directly.
+</summary>
+<desc>
+<p>
+Start and stop daemon programs directly
+in the traditional "/etc/init.d/daemon start"
+style, and do not require run_init.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be performing this action.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal of the user.
+</summary>
+</param>
+</interface>
+<interface name="init_write_script_pipes" lineno="681">
+<summary>
+Write an init script unnamed pipe.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_getattr_script_files" lineno="699">
+<summary>
+Get the attribute of init script entrypoint files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_exec_script_files" lineno="718">
+<summary>
+Execute init scripts in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_read_script_state" lineno="737">
+<summary>
+Read the process state (/proc/pid) of the init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_use_script_fds" lineno="761">
+<summary>
+Inherit and use init script file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_use_script_fds" lineno="780">
+<summary>
+Do not audit attempts to inherit
+init script file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_getpgid_script" lineno="798">
+<summary>
+Get the process group ID of init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_sigchld_script" lineno="816">
+<summary>
+Send SIGCHLD signals to init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_signal_script" lineno="834">
+<summary>
+Send generic signals to init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_signull_script" lineno="852">
+<summary>
+Send null signals to init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_rw_script_pipes" lineno="870">
+<summary>
+Read and write init script unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_udp_send_script" lineno="888">
+<summary>
+Send UDP network traffic to init scripts.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_stream_connect_script" lineno="903">
+<summary>
+Allow the specified domain to connect to
+init scripts with a unix socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_rw_script_stream_sockets" lineno="922">
+<summary>
+Allow the specified domain to read/write to
+init scripts with a unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_stream_connect_script" lineno="941">
+<summary>
+Dont audit the specified domain connecting to
+init scripts with a unix domain stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dbus_chat_script" lineno="960">
+<summary>
+Send and receive messages from
+init scripts over dbus.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_use_script_ptys" lineno="989">
+<summary>
+Read and write the init script pty.
+</summary>
+<desc>
+<p>
+Read and write the init script pty.  This
+pty is generally opened by the open_init_pty
+portion of the run_init program so that the
+daemon does not require direct access to
+the administrator terminal.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_use_script_ptys" lineno="1009">
+<summary>
+Do not audit attempts to read and
+write the init script pty.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="init_read_script_files" lineno="1027">
+<summary>
+Read init scripts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_getattr_script_status_files" lineno="1047">
+<summary>
+Get the attributes of init script
+status files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_read_script_status_files" lineno="1066">
+<summary>
+Do not audit attempts to read init script
+status files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_rw_script_tmp_files" lineno="1085">
+<summary>
+Read and write init script temporary data.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_script_tmp_filetrans" lineno="1115">
+<summary>
+Create files in a init script
+temporary data directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+The type of the object to be created
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class.
+</summary>
+</param>
+</interface>
+<interface name="init_getattr_utmp" lineno="1134">
+<summary>
+Get the attributes of init script process id files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_read_utmp" lineno="1152">
+<summary>
+Read utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_write_utmp" lineno="1171">
+<summary>
+Do not audit attempts to write utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_write_utmp" lineno="1189">
+<summary>
+Write to utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_lock_utmp" lineno="1209">
+<summary>
+Do not audit attempts to lock
+init script pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_rw_utmp" lineno="1227">
+<summary>
+Read and write utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_dontaudit_rw_utmp" lineno="1246">
+<summary>
+Do not audit attempts to read and write utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="init_manage_utmp" lineno="1264">
+<summary>
+Create, read, write, and delete utmp.
+</summary>
+<param name="domain">
+<summary>
+Domain access allowed.
+</summary>
+</param>
+</interface>
+<tunable name="allow_daemons_use_tty" dftval="false">
+<desc>
+<p>
+Allow all daemons the ability to use unallocated ttys
+</p>
+</desc>
+</tunable>
+</module>

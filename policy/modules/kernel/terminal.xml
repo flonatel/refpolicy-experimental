@@ -1,0 +1,605 @@
+<module name="terminal" filename="policy/modules/kernel/terminal.if">
+<summary>Policy for terminals.</summary>
+<required val="true">
+Depended on by other required modules.
+</required>
+<interface name="term_pty" lineno="16">
+<summary>
+Transform specified type into a pty type.
+</summary>
+<param name="pty_type">
+<summary>
+An object type that will applied to a pty.
+</summary>
+</param>
+</interface>
+<interface name="term_user_pty" lineno="45">
+<summary>
+Transform specified type into an user
+pty type. This allows it to be relabeled via
+type change by login programs such as ssh.
+</summary>
+<param name="userdomain">
+<summary>
+The type of the user domain associated with
+this pty.
+</summary>
+</param>
+<param name="object_type">
+<summary>
+An object type that will applied to a pty.
+</summary>
+</param>
+</interface>
+<interface name="term_login_pty" lineno="65">
+<summary>
+Transform specified type into a pty type
+used by login programs, such as sshd.
+</summary>
+<param name="pty_type">
+<summary>
+An object type that will applied to a pty.
+</summary>
+</param>
+</interface>
+<interface name="term_tty" lineno="84">
+<summary>
+Transform specified type into a tty type.
+</summary>
+<param name="tty_type">
+<summary>
+An object type that will applied to a tty.
+</summary>
+</param>
+</interface>
+<interface name="term_user_tty" lineno="110">
+<summary>
+Transform specified type into a user tty type.
+</summary>
+<param name="domain">
+<summary>
+User domain that is related to this tty.
+</summary>
+</param>
+<param name="tty_type">
+<summary>
+An object type that will applied to a tty.
+</summary>
+</param>
+</interface>
+<interface name="term_create_pty" lineno="142">
+<summary>
+Create a pty in the /dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+The type of the process creating the pty.
+</summary>
+</param>
+<param name="pty_type">
+<summary>
+The type of the pty.
+</summary>
+</param>
+</interface>
+<interface name="term_use_all_terms" lineno="168">
+<summary>
+Read and write the console, all
+ttys and all ptys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_write_console" lineno="190">
+<summary>
+Write to the console.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_read_console" lineno="210">
+<summary>
+Read from the console.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_use_console" lineno="230">
+<summary>
+Read from and write to the console.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_use_console" lineno="250">
+<summary>
+Do not audit attemtps to read from
+or write to the console.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_setattr_console" lineno="270">
+<summary>
+Set the attributes of the console
+device node.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_create_console_dev" lineno="289">
+<summary>
+Create the console device (/dev/console).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_getattr_pty_fs" lineno="309">
+<summary>
+Get the attributes of a pty filesystem
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_getattr_pty_dirs" lineno="328">
+<summary>
+Do not audit attempts to get the
+attributes of the /dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_search_ptys" lineno="346">
+<summary>
+Search the contents of the /dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_search_ptys" lineno="366">
+<summary>
+Do not audit attempts to search the
+contents of the /dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_list_ptys" lineno="386">
+<summary>
+Read the /dev/pts directory to
+list all ptys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_list_ptys" lineno="406">
+<summary>
+Do not audit attempts to read the
+/dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_manage_pty_dirs" lineno="425">
+<summary>
+Do not audit attempts to create, read,
+write, or delete the /dev/pts directory.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_ioctl_generic_ptys" lineno="444">
+<summary>
+ioctl of generic pty devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_setattr_generic_ptys" lineno="466">
+<summary>
+Allow setting the attributes of
+generic pty devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_setattr_generic_ptys" lineno="486">
+<summary>
+Dontaudit setting the attributes of
+generic pty devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_use_generic_ptys" lineno="506">
+<summary>
+Read and write the generic pty
+type.  This is generally only used in
+the targeted policy.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_use_generic_ptys" lineno="528">
+<summary>
+Dot not audit attempts to read and
+write the generic pty type.  This is
+generally only used in the targeted policy.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_use_controlling_term" lineno="547">
+<summary>
+Read and write the controlling
+terminal (/dev/tty).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_use_ptmx" lineno="566">
+<summary>
+Read and write the pty multiplexor (/dev/ptmx).
+</summary>
+<param name="domain">
+<summary>
+The type of the process to allow access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_use_ptmx" lineno="586">
+<summary>
+Do not audit attempts to read and
+write the pty multiplexor (/dev/ptmx).
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_getattr_all_user_ptys" lineno="606">
+<summary>
+Get the attributes of all user
+pty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_getattr_all_user_ptys" lineno="628">
+<summary>
+Do not audit attempts to get the
+attributes of any user pty
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_setattr_all_user_ptys" lineno="648">
+<summary>
+Set the attributes of all user
+pty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_relabelto_all_user_ptys" lineno="668">
+<summary>
+Relabel to all user ptys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_use_all_user_ptys" lineno="687">
+<summary>
+Read and write all user ptys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_use_all_user_ptys" lineno="709">
+<summary>
+Do not audit attempts to read any
+user ptys.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_relabel_all_user_ptys" lineno="728">
+<summary>
+Relabel from and to all user
+user pty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_getattr_unallocated_ttys" lineno="750">
+<summary>
+Get the attributes of all unallocated
+tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_getattr_unallocated_ttys" lineno="770">
+<summary>
+Do not audit attempts to get the attributes
+of all unallocated tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_setattr_unallocated_ttys" lineno="790">
+<summary>
+Set the attributes of all unallocated
+tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_setattr_unallocated_ttys" lineno="810">
+<summary>
+Do not audit attempts to set the attributes
+of unallocated tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_dontaudit_ioctl_unallocated_ttys" lineno="829">
+<summary>
+Do not audit attempts to ioctl
+unallocated tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_relabel_unallocated_ttys" lineno="848">
+<summary>
+Relabel from and to the unallocated
+tty type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_reset_tty_labels" lineno="868">
+<summary>
+Relabel from all user tty types to
+the unallocated tty type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_append_unallocated_ttys" lineno="889">
+<summary>
+Append to unallocated ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_write_unallocated_ttys" lineno="908">
+<summary>
+Write to unallocated ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_use_unallocated_ttys" lineno="928">
+<summary>
+Read and write unallocated ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_use_unallocated_ttys" lineno="948">
+<summary>
+Do not audit attempts to read or
+write unallocated ttys.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="term_getattr_all_user_ttys" lineno="968">
+<summary>
+Get the attributes of all user tty
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_getattr_all_user_ttys" lineno="989">
+<summary>
+Do not audit attempts to get the
+attributes of any user tty
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_setattr_all_user_ttys" lineno="1010">
+<summary>
+Set the attributes of all user tty
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_relabel_all_user_ttys" lineno="1030">
+<summary>
+Relabel from and to all user
+user tty device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_write_all_user_ttys" lineno="1049">
+<summary>
+Write to all user ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="term_use_all_user_ttys" lineno="1069">
+<summary>
+Read and write all user to all user ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="term_dontaudit_use_all_user_ttys" lineno="1089">
+<summary>
+Do not audit attempts to read or write
+any user ttys.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

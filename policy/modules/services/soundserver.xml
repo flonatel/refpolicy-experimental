@@ -1,0 +1,13 @@
+<module name="soundserver" filename="policy/modules/services/soundserver.if">
+<summary>sound server for network audio server programs, nasd, yiff, etc</summary>
+<interface name="soundserver_tcp_connect" lineno="13">
+<summary>
+Connect to the sound server over a TCP socket  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,114 @@
+<module name="rhgb" filename="policy/modules/services/rhgb.if">
+<summary> Red Hat Graphical Boot </summary>
+<interface name="rhgb_stub" lineno="13">
+<summary>
+RHGB stub interface.  No access allowed.
+</summary>
+<param name="domain">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+<interface name="rhgb_use_fds" lineno="29">
+<summary>
+Use a rhgb file descriptor.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_getpgid" lineno="47">
+<summary>
+Get the process group of rhgb.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_signal" lineno="65">
+<summary>
+Send a signal to rhgb.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_rw_stream_sockets" lineno="83">
+<summary>
+Read and write to unix stream sockets.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_dontaudit_rw_stream_sockets" lineno="102">
+<summary>
+Do not audit attempts to read and write
+rhgb unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_stream_connect" lineno="120">
+<summary>
+Connected to rhgb unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_rw_shm" lineno="138">
+<summary>
+Read and write to rhgb shared memory.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_use_ptys" lineno="156">
+<summary>
+Read from and write to the rhgb devpts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_dontaudit_use_ptys" lineno="174">
+<summary>
+dontaudit Read from and write to the rhgb devpts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="rhgb_rw_tmpfs_files" lineno="192">
+<summary>
+Read and write to rhgb temporary file system.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

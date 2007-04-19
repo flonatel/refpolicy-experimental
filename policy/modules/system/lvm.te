@@ -1,5 +1,5 @@
 
-policy_module(lvm,1.4.0)
+policy_module(lvm,1.6.0)
 
 ########################################
 #
@@ -30,6 +30,9 @@ files_lock_file(lvm_lock_t)
 type lvm_metadata_t;
 files_type(lvm_metadata_t)
 
+type lvm_var_lib_t;
+files_type(lvm_var_lib_t)
+
 type lvm_var_run_t;
 files_pid_file(lvm_var_run_t)
 
@@ -41,21 +44,30 @@ files_tmp_file(lvm_tmp_t)
 # Cluster LVM daemon local policy
 #
 
+allow clvmd_t self:capability { sys_admin mknod };
 dontaudit clvmd_t self:capability sys_tty_config;
 allow clvmd_t self:process signal_perms;
+dontaudit clvmd_t self:process ptrace;
 allow clvmd_t self:socket create_socket_perms;
-allow clvmd_t self:fifo_file { read write };
+allow clvmd_t self:fifo_file rw_fifo_file_perms;
 allow clvmd_t self:unix_stream_socket { connectto create_stream_socket_perms };
 allow clvmd_t self:tcp_socket create_stream_socket_perms;
 allow clvmd_t self:udp_socket create_socket_perms;
 
-allow clvmd_t clvmd_var_run_t:file create_file_perms;
-allow clvmd_t clvmd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(clvmd_t,clvmd_var_run_t,clvmd_var_run_t)
 files_pid_filetrans(clvmd_t,clvmd_var_run_t,file)
 
+read_files_pattern(clvmd_t,lvm_metadata_t,lvm_metadata_t)
+
 kernel_read_kernel_sysctls(clvmd_t)
+kernel_read_system_state(clvmd_t)
 kernel_list_proc(clvmd_t)
 kernel_read_proc_symlinks(clvmd_t)
+kernel_search_debugfs(clvmd_t)
+kernel_dontaudit_getattr_core_if(clvmd_t)
+
+corecmd_exec_shell(clvmd_t)
+corecmd_getattr_bin_files(clvmd_t)
 
 corenet_non_ipsec_sendrecv(clvmd_t)
 corenet_tcp_sendrecv_all_if(clvmd_t)
@@ -72,18 +84,24 @@ corenet_dontaudit_tcp_bind_all_reserved_ports(clvmd_t)
 corenet_sendrecv_generic_server_packets(clvmd_t)
 
 dev_read_sysfs(clvmd_t)
+dev_manage_generic_chr_files(clvmd_t)
+dev_rw_lvm_control(clvmd_t)
+dev_dontaudit_getattr_all_blk_files(clvmd_t)
+dev_dontaudit_getattr_all_chr_files(clvmd_t)
+
+files_read_etc_files(clvmd_t)
+files_list_usr(clvmd_t)
 
 fs_getattr_all_fs(clvmd_t)
 fs_search_auto_mountpoints(clvmd_t)
+fs_dontaudit_list_tmpfs(clvmd_t)
+fs_dontaudit_read_removable_files(clvmd_t)
 
-term_dontaudit_use_console(clvmd_t)
+storage_dontaudit_getattr_removable_dev(clvmd_t)
 
 domain_use_interactive_fds(clvmd_t)
 
-files_list_usr(clvmd_t)
-
-init_use_fds(clvmd_t)
-init_use_script_ptys(clvmd_t)
+storage_raw_read_fixed_disk(clvmd_t)
 
 libs_use_ld_so(clvmd_t)
 libs_use_shared_libs(clvmd_t)
@@ -100,6 +118,9 @@ sysnet_read_config(clvmd_t)
 userdom_dontaudit_use_unpriv_user_fds(clvmd_t)
 userdom_dontaudit_search_sysadm_home_dirs(clvmd_t)
 
+lvm_domtrans(clvmd_t)
+lvm_read_config(clvmd_t)
+
 ifdef(`targeted_policy', `
 	term_dontaudit_use_unallocated_ttys(clvmd_t)
 	term_dontaudit_use_generic_ptys(clvmd_t)
@@ -107,7 +128,20 @@ ifdef(`targeted_policy', `
 ')
 
 optional_policy(`
+	ccs_stream_connect(clvmd_t)
+')
+
+optional_policy(`
+	gpm_dontaudit_getattr_gpmctl(clvmd_t)
+')
+
+optional_policy(`
 	nis_use_ypbind(clvmd_t)
+')
+
+optional_policy(`
+	ricci_dontaudit_rw_modcluster_pipes(clvmd_t)
+	ricci_dontaudit_use_modcluster_fds(clvmd_t)
 ')
 
 optional_policy(`
@@ -131,34 +165,37 @@ allow lvm_t self:fifo_file rw_file_perms;
 allow lvm_t self:unix_dgram_socket create_socket_perms;
 allow lvm_t self:netlink_kobject_uevent_socket create_socket_perms;
 
-allow lvm_t lvm_tmp_t:dir create_dir_perms;
-allow lvm_t lvm_tmp_t:file create_file_perms;
+allow lvm_t clvmd_t:unix_stream_socket connectto;
+
+manage_dirs_pattern(lvm_t,lvm_tmp_t,lvm_tmp_t)
+manage_files_pattern(lvm_t,lvm_tmp_t,lvm_tmp_t)
 files_tmp_filetrans(lvm_t, lvm_tmp_t, { file dir })
 
 # /lib/lvm-<version> holds the actual LVM binaries (and symlinks)
-allow lvm_t lvm_exec_t:dir search;
-allow lvm_t lvm_exec_t:{ file lnk_file } r_file_perms;
+read_files_pattern(lvm_t,lvm_exec_t,lvm_exec_t)
+read_lnk_files_pattern(lvm_t,lvm_exec_t,lvm_exec_t)
 
 # LVM is split into many individual binaries
 can_exec(lvm_t, lvm_exec_t)
 
 # Creating lock files
-allow lvm_t lvm_lock_t:dir rw_dir_perms;
-allow lvm_t lvm_lock_t:file create_file_perms;
+manage_files_pattern(lvm_t,lvm_lock_t,lvm_lock_t)
 files_lock_filetrans(lvm_t,lvm_lock_t,file)
 
-allow lvm_t lvm_var_run_t:file manage_file_perms;
-allow lvm_t lvm_var_run_t:sock_file manage_file_perms;
-allow lvm_t lvm_var_run_t:dir manage_dir_perms;
+manage_dirs_pattern(lvm_t,lvm_var_lib_t,lvm_var_lib_t)
+manage_files_pattern(lvm_t,lvm_var_lib_t,lvm_var_lib_t)
+files_var_lib_filetrans(lvm_t,lvm_var_lib_t,{ dir file })
+
+manage_dirs_pattern(lvm_t,lvm_var_run_t,lvm_var_run_t)
+manage_files_pattern(lvm_t,lvm_var_run_t,lvm_var_run_t)
+manage_sock_files_pattern(lvm_t,lvm_var_run_t,lvm_var_run_t)
 files_pid_filetrans(lvm_t,lvm_var_run_t,{ file sock_file })
 
-allow lvm_t lvm_etc_t:file r_file_perms;
-allow lvm_t lvm_etc_t:lnk_file r_file_perms;
+read_files_pattern(lvm_t,lvm_etc_t,lvm_etc_t)
+read_lnk_files_pattern(lvm_t,lvm_etc_t,lvm_etc_t)
 # Write to /etc/lvm, /etc/lvmtab, /etc/lvmtab.d
-allow lvm_t lvm_etc_t:dir rw_dir_perms;
-allow lvm_t lvm_metadata_t:file create_file_perms;
-allow lvm_t lvm_metadata_t:dir rw_dir_perms;
-type_transition lvm_t lvm_etc_t:file lvm_metadata_t;
+manage_files_pattern(lvm_t,lvm_metadata_t,lvm_metadata_t)
+filetrans_pattern(lvm_t,lvm_etc_t,lvm_metadata_t,file)
 files_etc_filetrans(lvm_t,lvm_metadata_t,file)
 
 kernel_read_system_state(lvm_t)
@@ -176,6 +213,7 @@ selinux_compute_relabel_context(lvm_t)
 selinux_compute_user_contexts(lvm_t)
 
 dev_create_generic_chr_files(lvm_t)
+dev_delete_generic_dirs(lvm_t)
 dev_read_rand(lvm_t)
 dev_read_urand(lvm_t)
 dev_rw_lvm_control(lvm_t)
@@ -201,6 +239,7 @@ fs_search_auto_mountpoints(lvm_t)
 fs_list_tmpfs(lvm_t)
 fs_read_tmpfs_symlinks(lvm_t)
 fs_dontaudit_read_removable_files(lvm_t)
+fs_dontaudit_getattr_tmpfs_files(lvm_t)
 
 storage_relabel_fixed_disk(lvm_t)
 storage_dontaudit_read_removable_device(lvm_t)
@@ -213,11 +252,10 @@ storage_dev_filetrans_fixed_disk(lvm_t)
 # Access raw devices and old /dev/lvm (c 109,0).  Is this needed?
 storage_manage_fixed_disk(lvm_t)
 
-term_dontaudit_getattr_all_user_ttys(lvm_t)
-term_dontaudit_getattr_pty_dirs(lvm_t)
+term_getattr_all_user_ttys(lvm_t)
+term_list_ptys(lvm_t)
 
-corecmd_search_sbin(lvm_t)
-corecmd_dontaudit_getattr_sbin_files(lvm_t)
+corecmd_exec_bin(lvm_t)
 
 domain_use_interactive_fds(lvm_t)
 
@@ -248,14 +286,18 @@ ifdef(`distro_redhat',`
 ')
 
 ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(lvm_t)
-	term_dontaudit_use_generic_ptys(lvm_t)
+	term_use_unallocated_ttys(lvm_t)
+	term_use_generic_ptys(lvm_t)
 
 	files_dontaudit_read_root_files(lvm_t)
 ')
 
 optional_policy(`
 	bootloader_rw_tmp_files(lvm_t)
+')
+
+optional_policy(`
+	ccs_stream_connect(lvm_t)
 ')
 
 optional_policy(`

@@ -1,5 +1,5 @@
 
-policy_module(cpucontrol,1.1.0)
+policy_module(cpucontrol,1.2.0)
 
 ########################################
 #
@@ -29,9 +29,9 @@ allow cpucontrol_t self:capability { ipc_lock sys_rawio };
 dontaudit cpucontrol_t self:capability sys_tty_config;
 allow cpucontrol_t self:process signal_perms;
 
-allow cpucontrol_t cpucontrol_conf_t:dir r_dir_perms;
-allow cpucontrol_t cpucontrol_conf_t:file r_file_perms;
-allow cpucontrol_t cpucontrol_conf_t:lnk_file { getattr read };
+allow cpucontrol_t cpucontrol_conf_t:dir list_dir_perms;
+read_files_pattern(cpucontrol_t,cpucontrol_conf_t,cpucontrol_conf_t)
+read_lnk_files_pattern(cpucontrol_t,cpucontrol_conf_t,cpucontrol_conf_t)
 
 kernel_list_proc(cpucontrol_t)
 kernel_read_proc_symlinks(cpucontrol_t)
@@ -91,6 +91,7 @@ files_pid_filetrans(cpuspeed_t,cpuspeed_var_run_t,file)
 kernel_read_system_state(cpuspeed_t)
 kernel_read_kernel_sysctls(cpuspeed_t)
 
+dev_write_sysfs_dirs(cpuspeed_t)
 dev_rw_sysfs(cpuspeed_t)
 
 domain_use_interactive_fds(cpuspeed_t)

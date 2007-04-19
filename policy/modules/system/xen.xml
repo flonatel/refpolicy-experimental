@@ -1,0 +1,87 @@
+<module name="xen" filename="policy/modules/system/xen.if">
+<summary>Xen hypervisor</summary>
+<interface name="xen_domtrans" lineno="13">
+<summary>
+Execute a domain transition to run xend.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="xen_use_fds" lineno="31">
+<summary>
+Inherit and use xen file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="xen_dontaudit_use_fds" lineno="50">
+<summary>
+Do not audit attempts to inherit
+xen file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="xen_append_log" lineno="69">
+<summary>
+Allow the specified domain to append
+xend log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="xen_dontaudit_rw_unix_stream_sockets" lineno="91">
+<summary>
+Do not audit attempts to read and write
+Xen unix domain stream sockets.  These
+are leaked file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="xen_stream_connect_xenstore" lineno="109">
+<summary>
+Connect to xenstored over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xen_stream_connect" lineno="128">
+<summary>
+Connect to xend over an unix domain stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="xen_domtrans_xm" lineno="147">
+<summary>
+Execute a domain transition to run xm.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+</module>

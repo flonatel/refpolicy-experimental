@@ -1,0 +1,35 @@
+<module name="tvtime" filename="policy/modules/apps/tvtime.if">
+<summary> tvtime - a high quality television application </summary>
+<template name="tvtime_per_role_template" lineno="35">
+<summary>
+The per role template for the tvtime module.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for tvtime.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+</module>

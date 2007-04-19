@@ -1,0 +1,142 @@
+<module name="dbus" filename="policy/modules/services/dbus.if">
+<summary>Desktop messaging bus</summary>
+<interface name="dbus_stub" lineno="13">
+<summary>
+DBUS stub interface.  No access allowed.
+</summary>
+<param name="domain" optional="true">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+<template name="dbus_per_role_template" lineno="51">
+<summary>
+The per role template for the dbus module.
+</summary>
+<desc>
+<p>
+This template creates a derived domain which is
+used for the user dbus.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="dbus_system_bus_client_template" lineno="191">
+<summary>
+Template for creating connections to
+the system DBUS.
+</summary>
+<param name="domain_prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+The type of the domain.
+</summary>
+</param>
+</template>
+<template name="dbus_user_bus_client_template" lineno="232">
+<summary>
+Template for creating connections to
+a user DBUS.
+</summary>
+<param name="user_prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain_prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+The type of the domain.
+</summary>
+</param>
+</template>
+<template name="dbus_send_user_bus" lineno="264">
+<summary>
+Send a message on user/application specific DBUS.
+</summary>
+<param name="domain_prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<interface name="dbus_read_config" lineno="284">
+<summary>
+Read dbus configuration.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dbus_connect_system_bus" lineno="303">
+<summary>
+Connect to the the system DBUS
+for service (acquire_svc).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dbus_send_system_bus" lineno="322">
+<summary>
+Send a message on the system DBUS.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dbus_system_bus_unconfined" lineno="341">
+<summary>
+Allow unconfined access to the system DBUS.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

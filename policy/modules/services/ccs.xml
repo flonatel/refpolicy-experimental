@@ -1,0 +1,43 @@
+<module name="ccs" filename="policy/modules/services/ccs.if">
+<summary>Cluster Configuration System</summary>
+<interface name="ccs_domtrans" lineno="13">
+<summary>
+Execute a domain transition to run ccs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ccs_stream_connect" lineno="31">
+<summary>
+Connect to ccs over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ccs_read_config" lineno="50">
+<summary>
+Read cluster configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ccs_manage_config" lineno="68">
+<summary>
+Manage cluster configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

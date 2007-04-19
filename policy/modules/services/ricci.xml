@@ -1,0 +1,95 @@
+<module name="ricci" filename="policy/modules/services/ricci.if">
+<summary>Ricci cluster management agent</summary>
+<interface name="ricci_domtrans" lineno="13">
+<summary>
+Execute a domain transition to run ricci.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ricci_domtrans_modcluster" lineno="31">
+<summary>
+Execute a domain transition to run ricci_modcluster.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ricci_dontaudit_use_modcluster_fds" lineno="50">
+<summary>
+Do not audit attempts to use
+ricci_modcluster file descriptors.
+</summary>
+<param name="domain">
+<summary>
+The type of process not to audit.
+</summary>
+</param>
+</interface>
+<interface name="ricci_dontaudit_rw_modcluster_pipes" lineno="69">
+<summary>
+Do not audit attempts to read write
+ricci_modcluster unamed pipes.
+</summary>
+<param name="domain">
+<summary>
+The type of process not to audit.
+</summary>
+</param>
+</interface>
+<interface name="ricci_stream_connect_modclusterd" lineno="87">
+<summary>
+Connect to ricci_modclusterd over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ricci_domtrans_modlog" lineno="107">
+<summary>
+Execute a domain transition to run ricci_modlog.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ricci_domtrans_modrpm" lineno="125">
+<summary>
+Execute a domain transition to run ricci_modrpm.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ricci_domtrans_modservice" lineno="143">
+<summary>
+Execute a domain transition to run ricci_modservice.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="ricci_domtrans_modstorage" lineno="161">
+<summary>
+Execute a domain transition to run ricci_modstorage.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+</module>

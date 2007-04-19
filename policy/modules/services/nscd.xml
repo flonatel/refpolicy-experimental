@@ -1,0 +1,107 @@
+<module name="nscd" filename="policy/modules/services/nscd.if">
+<summary>Name service cache daemon</summary>
+<interface name="nscd_signal" lineno="13">
+<summary>
+Send generic signals to NSCD.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_domtrans" lineno="31">
+<summary>
+Execute NSCD in the nscd domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="nscd_exec" lineno="51">
+<summary>
+Allow the specified domain to execute nscd
+in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_socket_use" lineno="70">
+<summary>
+Use NSCD services by connecting using
+a unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_shm_use" lineno="98">
+<summary>
+Use NSCD services by mapping the database from
+an inherited NSCD file descriptor.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_dontaudit_search_pid" lineno="131">
+<summary>
+Do not audit attempts to search the NSCD pid directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_read_pid" lineno="149">
+<summary>
+Read NSCD pid file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_unconfined" lineno="168">
+<summary>
+Unconfined access to NSCD services.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="nscd_run" lineno="198">
+<summary>
+Execute nscd in the nscd domain, and
+allow the specified role the nscd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the nscd domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the role's terminal.
+</summary>
+</param>
+</interface>
+</module>

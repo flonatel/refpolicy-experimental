@@ -1,5 +1,5 @@
 
-policy_module(tftp,1.2.0)
+policy_module(tftp,1.4.0)
 
 ########################################
 #
@@ -32,8 +32,7 @@ allow tftpd_t tftpdir_t:dir { getattr read search };
 allow tftpd_t tftpdir_t:file { read getattr };
 allow tftpd_t tftpdir_t:lnk_file { getattr read };
 
-allow tftpd_t tftpd_var_run_t:file create_file_perms;
-allow tftpd_t tftpd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(tftpd_t,tftpd_var_run_t,tftpd_var_run_t)
 files_pid_filetrans(tftpd_t,tftpd_var_run_t,file)
 
 kernel_read_kernel_sysctls(tftpd_t)
@@ -57,17 +56,12 @@ dev_read_sysfs(tftpd_t)
 fs_getattr_all_fs(tftpd_t)
 fs_search_auto_mountpoints(tftpd_t)
 
-term_dontaudit_use_console(tftpd_t)
-
 domain_use_interactive_fds(tftpd_t)
 
 files_read_etc_files(tftpd_t);
 files_read_var_files(tftpd_t)
 files_read_var_symlinks(tftpd_t)
 files_search_var(tftpd_t)
-
-init_use_fds(tftpd_t)
-init_use_script_ptys(tftpd_t)
 
 libs_use_ld_so(tftpd_t)
 libs_use_shared_libs(tftpd_t)
@@ -91,6 +85,10 @@ ifdef(`targeted_policy', `
 
 optional_policy(`
 	inetd_udp_service_domain(tftpd_t,tftpd_exec_t)
+')
+
+optional_policy(`
+	nis_use_ypbind(tftpd_t)
 ')
 
 optional_policy(`

@@ -1,0 +1,13 @@
+<module name="setroubleshoot" filename="policy/modules/services/setroubleshoot.if">
+<summary>SELinux troubleshooting service</summary>
+<interface name="setroubleshoot_stream_connect" lineno="13">
+<summary>
+Connect to setroubleshootd over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

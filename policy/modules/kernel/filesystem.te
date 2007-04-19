@@ -1,5 +1,5 @@
 
-policy_module(filesystem,1.4.0)
+policy_module(filesystem,1.6.0)
 
 ########################################
 #
@@ -21,8 +21,10 @@ sid fs gen_context(system_u:object_r:fs_t,s0)
 
 # Use xattrs for the following filesystem types.
 # Requires that a security xattr handler exist for the filesystem.
+fs_use_xattr encfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr ext2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr ext3 gen_context(system_u:object_r:fs_t,s0);
+fs_use_xattr gfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr gfs2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jffs2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jfs gen_context(system_u:object_r:fs_t,s0);
@@ -101,6 +103,7 @@ genfscon cramfs / gen_context(system_u:object_r:romfs_t,s0)
 type rpc_pipefs_t;
 fs_type(rpc_pipefs_t)
 genfscon rpc_pipefs / gen_context(system_u:object_r:rpc_pipefs_t,s0)
+files_mountpoint(rpc_pipefs_t)
 
 #
 # tmpfs_t is the type for tmpfs filesystems
@@ -137,6 +140,7 @@ genfscon automount / gen_context(system_u:object_r:autofs_t,s0)
 #
 type cifs_t alias sambafs_t;
 fs_noxattr_type(cifs_t)
+files_mountpoint(cifs_t)
 genfscon cifs / gen_context(system_u:object_r:cifs_t,s0)
 genfscon smbfs / gen_context(system_u:object_r:cifs_t,s0)
 
@@ -149,6 +153,7 @@ fs_noxattr_type(dosfs_t)
 allow dosfs_t fs_t:filesystem associate;
 genfscon fat / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon msdos / gen_context(system_u:object_r:dosfs_t,s0)
+genfscon ntfs-3g / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon ntfs / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon vfat / gen_context(system_u:object_r:dosfs_t,s0)
 
@@ -182,7 +187,6 @@ genfscon afs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfsplus / gen_context(system_u:object_r:nfs_t,s0)
 genfscon reiserfs / gen_context(system_u:object_r:nfs_t,s0)
-genfscon gfs / gen_context(system_u:object_r:nfs_t,s0)
 
 ########################################
 #
@@ -190,6 +194,14 @@ genfscon gfs / gen_context(system_u:object_r:nfs_t,s0)
 #
 
 allow filesystem_type self:filesystem associate;
+
+########################################
+#
+# Rules for filesystems without xattr support
+#
+
+# Allow me to mv from one noxattrfs to another nfs_t to dosfs_t for example
+fs_associate_noxattr(noxattrfs)
 
 ########################################
 #

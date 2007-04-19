@@ -1,0 +1,310 @@
+<module name="logging" filename="policy/modules/system/logging.if">
+<summary>Policy for the kernel message logger and system logging daemon.</summary>
+<interface name="logging_log_file" lineno="14">
+<summary>
+Make the specified type a file
+used for logs.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a log.
+</summary>
+</param>
+</interface>
+<interface name="logging_read_audit_log" lineno="36">
+<summary>
+Read the audit log.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_domtrans_auditctl" lineno="56">
+<summary>
+Execute auditctl in the auditctl domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_run_auditctl" lineno="86">
+<summary>
+Execute auditctl in the auditctl domain, and
+allow the specified role the auditctl domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the auditctl domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the auditctl domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_domtrans_auditd" lineno="106">
+<summary>
+Execute auditd in the auditd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_run_auditd" lineno="135">
+<summary>
+Execute auditd in the auditd domain, and
+allow the specified role the auditd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the auditd domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the auditd domain to use.
+</summary>
+</param>
+</interface>
+<interface name="logging_stream_connect_auditd" lineno="155">
+<summary>
+Connect to auditdstored over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_manage_audit_config" lineno="175">
+<summary>
+Manage the auditd configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_manage_audit_log" lineno="195">
+<summary>
+Manage the audit log.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_domtrans_syslog" lineno="215">
+<summary>
+Execute syslogd in the syslog domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_log_filetrans" lineno="245">
+<summary>
+Create an object in the log directory, with a private
+type using a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="logging_send_syslog_msg" lineno="264">
+<summary>
+Send system log messages.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_read_audit_config" lineno="293">
+<summary>
+Read the auditd configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_search_logs" lineno="315">
+<summary>
+Allows the domain to open a file in the
+log directory, but does not allow the listing
+of the contents of the log directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_dontaudit_search_logs" lineno="334">
+<summary>
+Do not audit attempts to search the var log directory.
+</summary>
+<param name="domain">
+<summary>
+Domain not to audit.
+</summary>
+</param>
+</interface>
+<interface name="logging_list_logs" lineno="352">
+<summary>
+List the contents of the generic log directory (/var/log).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_rw_generic_log_dirs" lineno="371">
+<summary>
+Read and write the generic log directory (/var/log).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_dontaudit_getattr_all_logs" lineno="391">
+<summary>
+Do not audit attempts to get the atttributes
+of any log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_append_all_logs" lineno="409">
+<summary>
+Append to all log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_read_all_logs" lineno="431">
+<summary>
+Read all log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_exec_all_logs" lineno="454">
+<summary>
+Execute all log files in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_manage_all_logs" lineno="475">
+<summary>
+Create, read, write, and delete all log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_read_generic_logs" lineno="496">
+<summary>
+Read generic log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logging_write_generic_logs" lineno="516">
+<summary>
+Write generic log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_rw_generic_logs" lineno="536">
+<summary>
+Read and write generic log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logging_manage_generic_logs" lineno="558">
+<summary>
+Create, read, write, and delete
+generic log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

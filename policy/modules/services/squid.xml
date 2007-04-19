@@ -1,0 +1,75 @@
+<module name="squid" filename="policy/modules/services/squid.if">
+<summary>Squid caching http proxy server</summary>
+<interface name="squid_domtrans" lineno="13">
+<summary>
+Execute squid in the squid domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="squid_read_config" lineno="33">
+<summary>
+Read squid configuration file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="squid_read_log" lineno="53">
+<summary>
+Append squid logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="squid_append_log" lineno="72">
+<summary>
+Append squid logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="squid_manage_logs" lineno="93">
+<summary>
+Create, read, write, and delete
+squid logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="squid_use" lineno="112">
+<summary>
+Use squid services by connecting over TCP.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<tunable name="squid_connect_any" dftval="false">
+<desc>
+<p>
+Allow squid to connect to all ports, not just
+HTTP, FTP, and Gopher ports.
+</p>
+</desc>
+</tunable>
+</module>

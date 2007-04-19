@@ -1,5 +1,5 @@
 
-policy_module(openvpn,1.1.0)
+policy_module(openvpn,1.2.0)
 
 ########################################
 #
@@ -28,21 +28,21 @@ files_pid_file(openvpn_var_run_t)
 # openvpn local policy
 #
 
-allow openvpn_t self:capability { net_admin setgid setuid sys_tty_config };
+allow openvpn_t self:capability { net_bind_service net_admin setgid setuid sys_tty_config };
 allow openvpn_t self:unix_dgram_socket { create_socket_perms sendto };
 allow openvpn_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow openvpn_t self:udp_socket create_socket_perms;
-allow openvpn_t self:tcp_socket create_socket_perms;
+allow openvpn_t self:tcp_socket server_stream_socket_perms;
 allow openvpn_t self:netlink_route_socket rw_netlink_socket_perms;
 
-allow openvpn_t openvpn_etc_t:dir r_dir_perms;
-allow openvpn_t openvpn_etc_t:file r_file_perms;
-allow openvpn_t openvpn_etc_t:lnk_file { getattr read };
+allow openvpn_t openvpn_etc_t:dir list_dir_perms;
+read_files_pattern(openvpn_t,openvpn_etc_t,openvpn_etc_t)
+read_lnk_files_pattern(openvpn_t,openvpn_etc_t,openvpn_etc_t)
 
-allow openvpn_t openvpn_var_log_t:file create_file_perms;
+allow openvpn_t openvpn_var_log_t:file manage_file_perms;
 logging_log_filetrans(openvpn_t,openvpn_var_log_t,file)
 
-allow openvpn_t openvpn_var_run_t:file create_file_perms;
+allow openvpn_t openvpn_var_run_t:file manage_file_perms;
 files_pid_filetrans(openvpn_t, openvpn_var_run_t, file)
 
 kernel_read_kernel_sysctls(openvpn_t)
@@ -51,7 +51,6 @@ kernel_read_network_state(openvpn_t)
 kernel_read_system_state(openvpn_t)
 
 corecmd_exec_bin(openvpn_t)
-corecmd_exec_sbin(openvpn_t)
 corecmd_exec_shell(openvpn_t)
 
 corenet_non_ipsec_sendrecv(openvpn_t)
@@ -74,8 +73,6 @@ dev_read_urand(openvpn_t)
 
 files_read_etc_files(openvpn_t)
 files_read_etc_runtime_files(openvpn_t)
-
-init_use_fds(openvpn_t)
 
 libs_use_ld_so(openvpn_t)
 libs_use_shared_libs(openvpn_t)

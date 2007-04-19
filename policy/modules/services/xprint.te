@@ -1,5 +1,5 @@
 
-policy_module(xprint,1.1.0)
+policy_module(xprint,1.2.0)
 
 ########################################
 #
@@ -24,16 +24,13 @@ allow xprint_t self:fifo_file rw_file_perms;
 allow xprint_t self:tcp_socket create_stream_socket_perms;
 allow xprint_t self:udp_socket create_socket_perms;
 
-allow xprint_t xprint_var_run_t:file create_file_perms;
-allow xprint_t xprint_var_run_t:dir rw_dir_perms;
+manage_files_pattern(xprint_t,xprint_var_run_t,xprint_var_run_t)
 files_pid_filetrans(xprint_t,xprint_var_run_t,file)
 
 kernel_read_system_state(xprint_t)
 kernel_read_kernel_sysctls(xprint_t)
 
 corecmd_exec_bin(xprint_t)
-corecmd_exec_sbin(xprint_t)
-corecmd_exec_ls(xprint_t)
 corecmd_exec_shell(xprint_t)
 
 corenet_non_ipsec_sendrecv(xprint_t)
@@ -57,11 +54,6 @@ files_search_tmp(xprint_t)
 
 fs_getattr_all_fs(xprint_t)
 fs_search_auto_mountpoints(xprint_t)
-
-term_dontaudit_use_console(xprint_t)
-
-init_use_fds(xprint_t)
-init_use_script_ptys(xprint_t)
 
 libs_use_ld_so(xprint_t)
 libs_use_shared_libs(xprint_t)

@@ -1,5 +1,5 @@
 
-policy_module(cipe,1.1.0)
+policy_module(cipe,1.2.0)
 
 ########################################
 #
@@ -18,7 +18,7 @@ init_daemon_domain(ciped_t,ciped_exec_t)
 allow ciped_t self:capability { net_admin ipc_lock sys_tty_config };
 dontaudit ciped_t self:capability sys_tty_config;
 allow ciped_t self:process signal_perms;
-allow ciped_t self:fifo_file rw_file_perms;
+allow ciped_t self:fifo_file rw_fifo_file_perms;
 allow ciped_t self:unix_dgram_socket create_socket_perms;
 allow ciped_t self:unix_stream_socket create_socket_perms;
 allow ciped_t self:udp_socket create_socket_perms;
@@ -28,7 +28,6 @@ kernel_read_system_state(ciped_t)
 
 corecmd_exec_shell(ciped_t)
 corecmd_exec_bin(ciped_t)
-corecmd_exec_sbin(ciped_t)
 
 corenet_non_ipsec_sendrecv(ciped_t)
 corenet_udp_sendrecv_generic_if(ciped_t)
@@ -51,11 +50,6 @@ files_read_etc_runtime_files(ciped_t)
 files_dontaudit_search_var(ciped_t)
 
 fs_search_auto_mountpoints(ciped_t)
-
-term_dontaudit_use_console(ciped_t)
-
-init_use_fds(ciped_t)
-init_use_script_ptys(ciped_t)
 
 libs_use_ld_so(ciped_t)
 libs_use_shared_libs(ciped_t)

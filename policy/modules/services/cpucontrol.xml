@@ -1,0 +1,13 @@
+<module name="cpucontrol" filename="policy/modules/services/cpucontrol.if">
+<summary>Services for loading CPU microcode and CPU frequency scaling.</summary>
+<interface name="cpucontrol_stub" lineno="13">
+<summary>
+CPUcontrol stub interface.  No access allowed.
+</summary>
+<param name="domain" optional="true">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+</module>

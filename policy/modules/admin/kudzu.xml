@@ -1,0 +1,45 @@
+<module name="kudzu" filename="policy/modules/admin/kudzu.if">
+<summary>Hardware detection and configuration tools</summary>
+<interface name="kudzu_domtrans" lineno="13">
+<summary>
+Execute kudzu in the kudzu domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="kudzu_run" lineno="43">
+<summary>
+Execute kudzu in the kudzu domain, and
+allow the specified role the kudzu domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the kudzu domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the kudzu domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kudzu_getattr_exec_files" lineno="64">
+<summary>
+Get attributes of kudzu executable.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

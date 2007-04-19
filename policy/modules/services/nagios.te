@@ -1,5 +1,5 @@
 
-policy_module(nagios,1.1.0)
+policy_module(nagios,1.2.0)
 
 ########################################
 #
@@ -45,21 +45,19 @@ allow nagios_t self:fifo_file rw_file_perms;
 allow nagios_t self:tcp_socket create_stream_socket_perms;
 allow nagios_t self:udp_socket create_socket_perms;
 
-allow nagios_t nagios_etc_t:file r_file_perms;
-allow nagios_t nagios_etc_t:dir r_dir_perms;
-allow nagios_t nagios_etc_t:lnk_file { getattr read };
+read_files_pattern(nagios_t,nagios_etc_t,nagios_etc_t)
+read_lnk_files_pattern(nagios_t,nagios_etc_t,nagios_etc_t)
+allow nagios_t nagios_etc_t:dir list_dir_perms;
 
-allow nagios_t nagios_log_t:file manage_file_perms;
-allow nagios_t nagios_log_t:fifo_file manage_file_perms;
-allow nagios_t nagios_log_t:dir rw_dir_perms;
+manage_files_pattern(nagios_t,nagios_log_t,nagios_log_t)
+manage_fifo_files_pattern(nagios_t,nagios_log_t,nagios_log_t)
 logging_log_filetrans(nagios_t,nagios_log_t,{ file dir })
 
-allow nagios_t nagios_tmp_t:dir create_dir_perms;
-allow nagios_t nagios_tmp_t:file create_file_perms;
+manage_dirs_pattern(nagios_t,nagios_tmp_t,nagios_tmp_t)
+manage_files_pattern(nagios_t,nagios_tmp_t,nagios_tmp_t)
 files_tmp_filetrans(nagios_t, nagios_tmp_t, { file dir })
 
-allow nagios_t nagios_var_run_t:file create_file_perms;
-allow nagios_t nagios_var_run_t:dir rw_dir_perms;
+manage_files_pattern(nagios_t,nagios_var_run_t,nagios_var_run_t)
 files_pid_filetrans(nagios_t,nagios_var_run_t,file)
 
 kernel_read_system_state(nagios_t)
@@ -89,10 +87,6 @@ files_read_kernel_symbol_table(nagios_t)
 fs_getattr_all_fs(nagios_t)
 fs_search_auto_mountpoints(nagios_t)
 
-term_dontaudit_use_console(nagios_t)
-
-init_use_fds(nagios_t)
-init_use_script_ptys(nagios_t)
 # for who
 init_read_utmp(nagios_t)
 
@@ -148,20 +142,19 @@ optional_policy(`
 # Nagios CGI local policy
 #
 
-allow nagios_cgi_t self:process { fork signal_perms };
-allow nagios_cgi_t self:fifo_file rw_file_perms;
+allow nagios_cgi_t self:process signal_perms;
+allow nagios_cgi_t self:fifo_file rw_fifo_file_perms;
 
-allow nagios_cgi_t nagios_t:dir r_dir_perms;
-allow nagios_cgi_t nagios_t:file r_file_perms;
-allow nagios_cgi_t nagios_t:lnk_file { getattr read };
+read_files_pattern(nagios_cgi_t,nagios_t,nagios_t)
+read_lnk_files_pattern(nagios_cgi_t,nagios_t,nagios_t)
 
-allow nagios_cgi_t nagios_etc_t:dir r_dir_perms;
-allow nagios_cgi_t nagios_etc_t:file r_file_perms;
-allow nagios_cgi_t nagios_etc_t:lnk_file { getattr read };
+allow nagios_cgi_t nagios_etc_t:dir list_dir_perms;
+read_files_pattern(nagios_cgi_t,nagios_etc_t,nagios_etc_t)
+read_lnk_files_pattern(nagios_cgi_t,nagios_etc_t,nagios_etc_t)
 
-allow nagios_cgi_t nagios_log_t:dir r_dir_perms;
-allow nagios_cgi_t nagios_log_t:file r_file_perms;
-allow nagios_cgi_t nagios_log_t:lnk_file { getattr read };
+allow nagios_cgi_t nagios_log_t:dir list_dir_perms;
+read_files_pattern(nagios_cgi_t,nagios_etc_t,nagios_log_t)
+read_lnk_files_pattern(nagios_cgi_t,nagios_etc_t,nagios_log_t)
 
 kernel_read_system_state(nagios_cgi_t)
 
@@ -192,7 +185,7 @@ optional_policy(`
 
 dontaudit nrpe_t self:capability sys_tty_config;
 allow nrpe_t self:process { setpgid signal_perms };
-allow nrpe_t self:fifo_file rw_file_perms;
+allow nrpe_t self:fifo_file rw_fifo_file_perms;
 
 allow nrpe_t nrpe_etc_t:file { getattr read };
 files_search_etc(nrpe_t)
@@ -202,7 +195,6 @@ kernel_read_kernel_sysctls(nrpe_t)
 
 corecmd_exec_bin(nrpe_t)
 corecmd_exec_shell(nrpe_t)
-corecmd_exec_ls(nrpe_t)
 
 dev_read_sysfs(nrpe_t)
 dev_read_urand(nrpe_t)
@@ -212,11 +204,6 @@ domain_use_interactive_fds(nrpe_t)
 files_read_etc_runtime_files(nrpe_t)
 
 fs_search_auto_mountpoints(nrpe_t)
-
-term_dontaudit_use_console(nrpe_t)
-
-init_use_fds(nrpe_t)
-init_use_script_ptys(nrpe_t)
 
 libs_use_ld_so(nrpe_t)
 libs_use_shared_libs(nrpe_t)

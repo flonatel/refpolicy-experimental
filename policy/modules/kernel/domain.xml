@@ -1,0 +1,739 @@
+<module name="domain" filename="policy/modules/kernel/domain.if">
+<summary>Core policy for domains.</summary>
+<required val="true">
+Contains the concept of a domain.
+</required>
+<interface name="domain_base_type" lineno="26">
+<summary>
+Make the specified type usable as a basic domain.
+</summary>
+<desc>
+<p>
+Make the specified type usable as a basic domain.
+</p>
+<p>
+This is primarily used for kernel threads;
+generally the domain_type() interface is
+more appropriate for userland processes.
+</p>
+</desc>
+<param name="type">
+<summary>
+Type to be used as a basic domain type.
+</summary>
+</param>
+</interface>
+<interface name="domain_type" lineno="44">
+<summary>
+Make the specified type usable as a domain.
+</summary>
+<param name="type">
+<summary>
+Type to be used as a domain type.
+</summary>
+</param>
+</interface>
+<interface name="domain_entry_file" lineno="92">
+<summary>
+Make the specified type usable as
+an entry point for the domain.
+</summary>
+<param name="domain">
+<summary>
+Domain to be entered.
+</summary>
+</param>
+<param name="type">
+<summary>
+Type of program used for entering
+the domain.
+</summary>
+</param>
+</interface>
+<interface name="domain_interactive_fd" lineno="116">
+<summary>
+Make the file descriptors of the specified
+domain for interactive use (widely inheritable)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dyntrans_type" lineno="145">
+<summary>
+Allow the specified domain to perform
+dynamic transitions.
+</summary>
+<desc>
+<p>
+Allow the specified domain to perform
+dynamic transitions.
+</p>
+<p>
+This violates process tranquility, and it
+is strongly suggested that this not be used.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_system_change_exemption" lineno="165">
+<summary>
+Makes caller and execption to the constraint
+preventing changing to the system user
+identity and system role.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_subj_id_change_exemption" lineno="184">
+<summary>
+Makes caller an exception to the constraint preventing
+changing of user identity.
+</summary>
+<param name="domain">
+<summary>
+The process type to make an exception to the constraint.
+</summary>
+</param>
+</interface>
+<interface name="domain_role_change_exemption" lineno="203">
+<summary>
+Makes caller an exception to the constraint preventing
+changing of role.
+</summary>
+<param name="domain">
+<summary>
+The process type to make an exception to the constraint.
+</summary>
+</param>
+</interface>
+<interface name="domain_obj_id_change_exemption" lineno="223">
+<summary>
+Makes caller an exception to the constraint preventing
+changing the user identity in object contexts.
+</summary>
+<param name="domain">
+<summary>
+The process type to make an exception to the constraint.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_user_exemption_target" lineno="258">
+<summary>
+Make the specified domain the target of
+the user domain exception of the
+SELinux role and identity change
+constraints.
+</summary>
+<desc>
+<p>
+Make the specified domain the target of
+the user domain exception of the
+SELinux role and identity change
+constraints.
+</p>
+<p>
+This interface is needed to decouple
+the user domains from the base module.
+It should not be used other than on
+user domains.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+</interface>
+<interface name="domain_cron_exemption_source" lineno="293">
+<summary>
+Make the specified domain the source of
+the cron domain exception of the
+SELinux role and identity change
+constraints.
+</summary>
+<desc>
+<p>
+Make the specified domain the source of
+the cron domain exception of the
+SELinux role and identity change
+constraints.
+</p>
+<p>
+This interface is needed to decouple
+the cron domains from the base module.
+It should not be used other than on
+cron domains.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+</interface>
+<interface name="domain_cron_exemption_target" lineno="328">
+<summary>
+Make the specified domain the target of
+the cron domain exception of the
+SELinux role and identity change
+constraints.
+</summary>
+<desc>
+<p>
+Make the specified domain the target of
+the cron domain exception of the
+SELinux role and identity change
+constraints.
+</p>
+<p>
+This interface is needed to decouple
+the cron domains from the base module.
+It should not be used other than on
+user cron jobs.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+</interface>
+<interface name="domain_use_interactive_fds" lineno="347">
+<summary>
+Inherit and use file descriptors from
+domains with interactive programs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_use_interactive_fds" lineno="367">
+<summary>
+Do not audit attempts to inherit file
+descriptors from domains with interactive
+programs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_sigchld_interactive_fds" lineno="387">
+<summary>
+Send a SIGCHLD signal to domains whose file
+discriptors are widely inheritable.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_setpriority_all_domains" lineno="406">
+<summary>
+Set the nice level of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_signal_all_domains" lineno="425">
+<summary>
+Send general signals to all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_signull_all_domains" lineno="444">
+<summary>
+Send a null signal to all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_sigstop_all_domains" lineno="463">
+<summary>
+Send a stop signal to all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_sigchld_all_domains" lineno="482">
+<summary>
+Send a child terminated signal to all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_kill_all_domains" lineno="501">
+<summary>
+Send a kill signal to all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_search_all_domains_state" lineno="520">
+<summary>
+Search the process state directory (/proc/pid) of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_search_all_domains_state" lineno="540">
+<summary>
+Do not audit attempts to search the process
+state directory (/proc/pid) of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="domain_read_all_domains_state" lineno="559">
+<summary>
+Read the process state (/proc/pid) of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_getattr_all_domains" lineno="581">
+<summary>
+Get the attributes of all domains of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_dontaudit_getattr_all_domains" lineno="599">
+<summary>
+Get the attributes of all domains of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_read_confined_domains_state" lineno="618">
+<summary>
+Read the process state (/proc/pid) of all confined domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_getattr_confined_domains" lineno="643">
+<summary>
+Get the attributes of all confined domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_ptrace_all_domains" lineno="662">
+<summary>
+Ptrace all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_dontaudit_ptrace_all_domains" lineno="691">
+<summary>
+Do not audit attempts to ptrace all domains.
+</summary>
+<desc>
+<p>
+Do not audit attempts to ptrace all domains.
+</p>
+<p>
+Generally this needs to be suppressed because procps tries to access
+/proc/pid/environ and this now triggers a ptrace check in recent kernels
+(2.4 and 2.6).
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_ptrace_confined_domains" lineno="719">
+<summary>
+Do not audit attempts to ptrace confined domains.
+</summary>
+<desc>
+<p>
+Do not audit attempts to ptrace confined domains.
+</p>
+<p>
+Generally this needs to be suppressed because procps tries to access
+/proc/pid/environ and this now triggers a ptrace check in recent kernels
+(2.4 and 2.6).
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_read_all_domains_state" lineno="738">
+<summary>
+Do not audit attempts to read the process
+state (/proc/pid) of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_list_all_domains_state" lineno="763">
+<summary>
+Do not audit attempts to read the process state
+directories of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_getsession_all_domains" lineno="781">
+<summary>
+Get the session ID of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getsession_all_domains" lineno="800">
+<summary>
+Do not audit attempts to get the
+session ID of all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_getattr_all_sockets" lineno="829">
+<summary>
+Get the attributes of all domains
+sockets, for all socket types.
+</summary>
+<desc>
+<p>
+Get the attributes of all domains
+sockets, for all socket types.
+</p>
+<p>
+This is commonly used for domains
+that can use lsof on all domains.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_sockets" lineno="858">
+<summary>
+Do not audit attempts to get the attributes
+of all domains sockets, for all socket types.
+</summary>
+<desc>
+<p>
+Do not audit attempts to get the attributes
+of all domains sockets, for all socket types.
+</p>
+<p>
+This interface was added for PCMCIA cardmgr
+and is probably excessive.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_tcp_sockets" lineno="877">
+<summary>
+Do not audit attempts to get the attributes
+of all domains TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_udp_sockets" lineno="896">
+<summary>
+Do not audit attempts to get the attributes
+of all domains UDP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_rw_all_udp_sockets" lineno="915">
+<summary>
+Do not audit attempts to read or write
+all domains UDP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_key_sockets" lineno="934">
+<summary>
+Do not audit attempts to get attribues of
+all domains IPSEC key management sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_packet_sockets" lineno="953">
+<summary>
+Do not audit attempts to get attribues of
+all domains packet sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_raw_sockets" lineno="972">
+<summary>
+Do not audit attempts to get attribues of
+all domains raw sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_rw_all_key_sockets" lineno="991">
+<summary>
+Do not audit attempts to read or write
+all domains key sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_dgram_sockets" lineno="1010">
+<summary>
+Do not audit attempts to get the attributes
+of all domains unix datagram sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_stream_sockets" lineno="1029">
+<summary>
+Do not audit attempts to get the attributes
+of all domains unix datagram sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_dontaudit_getattr_all_pipes" lineno="1048">
+<summary>
+Do not audit attempts to get the attributes
+of all domains unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_ipsec_setcontext_all_domains" lineno="1067">
+<summary>
+Allow specified type to set context of all
+domains IPSEC associations.
+</summary>
+<param name="type">
+<summary>
+Type of subject to be allowed this.
+</summary>
+</param>
+</interface>
+<interface name="domain_getattr_all_entry_files" lineno="1086">
+<summary>
+Get the attributes of entry point
+files for all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_read_all_entry_files" lineno="1105">
+<summary>
+Read the entry point files for all domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_exec_all_entry_files" lineno="1126">
+<summary>
+Execute the entry point files for all
+domains in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="domain_dontaudit_exec_all_entry_files" lineno="1144">
+<summary>
+dontaudit checking for execute on all entry point files
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="domain_manage_all_entry_files" lineno="1164">
+<summary>
+Create, read, write, and delete all
+entrypoint files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_relabel_all_entry_files" lineno="1184">
+<summary>
+Relabel to and from all entry point
+file types.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_mmap_all_entry_files" lineno="1203">
+<summary>
+Mmap all entry point files as executable.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_entry_file_spec_domtrans" lineno="1222">
+<summary>
+Execute an entry_type in the specified domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="domain_unconfined" lineno="1240">
+<summary>
+Unconfined access to domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

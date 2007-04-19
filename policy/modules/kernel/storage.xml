@@ -1,0 +1,376 @@
+<module name="storage" filename="policy/modules/kernel/storage.if">
+<summary>Policy controlling access to storage devices</summary>
+<interface name="storage_getattr_fixed_disk_dev" lineno="14">
+<summary>
+Allow the caller to get the attributes of fixed disk
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_getattr_fixed_disk_dev" lineno="34">
+<summary>
+Do not audit attempts made by the caller to get
+the attributes of fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_setattr_fixed_disk_dev" lineno="54">
+<summary>
+Allow the caller to set the attributes of fixed disk
+device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_setattr_fixed_disk_dev" lineno="74">
+<summary>
+Do not audit attempts made by the caller to set
+the attributes of fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_raw_read_fixed_disk" lineno="95">
+<summary>
+Allow the caller to directly read from a fixed disk.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_read_fixed_disk" lineno="117">
+<summary>
+Do not audit attempts made by the caller to read
+fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_raw_write_fixed_disk" lineno="139">
+<summary>
+Allow the caller to directly write to a fixed disk.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_write_fixed_disk" lineno="161">
+<summary>
+Do not audit attempts made by the caller to write
+fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_manage_fixed_disk" lineno="180">
+<summary>
+Create, read, write, and delete fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dev_filetrans_fixed_disk" lineno="202">
+<summary>
+Create block devices in /dev with the fixed disk type
+via an automatic type transition.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_tmpfs_filetrans_fixed_disk" lineno="221">
+<summary>
+Create block devices in on a tmpfs filesystem with the
+fixed disk type via an automatic type transition.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_relabel_fixed_disk" lineno="239">
+<summary>
+Relabel fixed disk device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_swapon_fixed_disk" lineno="258">
+<summary>
+Enable a fixed disk device as swap space
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_getattr_scsi_generic_dev" lineno="278">
+<summary>
+Allow the caller to get the attributes of
+the generic SCSI interface device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_setattr_scsi_generic_dev" lineno="298">
+<summary>
+Allow the caller to set the attributes of
+the generic SCSI interface device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_read_scsi_generic" lineno="321">
+<summary>
+Allow the caller to directly read, in a
+generic fashion, from any SCSI device.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_write_scsi_generic" lineno="346">
+<summary>
+Allow the caller to directly write, in a
+generic fashion, from any SCSI device.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_setattr_scsi_generic_dev_dev" lineno="368">
+<summary>
+Set attributes of the device nodes
+for the SCSI generic inerface.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_rw_scsi_generic" lineno="388">
+<summary>
+Do not audit attempts to read or write
+SCSI generic device interfaces.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_getattr_removable_dev" lineno="407">
+<summary>
+Allow the caller to get the attributes of removable
+devices device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_getattr_removable_dev" lineno="427">
+<summary>
+Do not audit attempts made by the caller to get
+the attributes of removable devices device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_read_removable_device" lineno="446">
+<summary>
+Do not audit attempts made by the caller to read
+removable devices device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_setattr_removable_dev" lineno="466">
+<summary>
+Allow the caller to set the attributes of removable
+devices device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_setattr_removable_dev" lineno="486">
+<summary>
+Do not audit attempts made by the caller to set
+the attributes of removable devices device nodes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_raw_read_removable_device" lineno="508">
+<summary>
+Allow the caller to directly read from
+a removable device.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_raw_read_removable_device" lineno="527">
+<summary>
+Do not audit attempts to directly read removable devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_raw_write_removable_device" lineno="549">
+<summary>
+Allow the caller to directly write to
+a removable device.
+This is extremly dangerous as it can bypass the
+SELinux protections for filesystem objects, and
+should only be used by trusted domains.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_dontaudit_raw_write_removable_device" lineno="568">
+<summary>
+Do not audit attempts to directly write removable devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="storage_read_tape" lineno="587">
+<summary>
+Allow the caller to directly read
+a tape device.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_write_tape" lineno="607">
+<summary>
+Allow the caller to directly read
+a tape device.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_getattr_tape_dev" lineno="627">
+<summary>
+Allow the caller to get the attributes
+of device nodes of tape devices.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_setattr_tape_dev" lineno="647">
+<summary>
+Allow the caller to set the attributes
+of device nodes of tape devices.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="storage_unconfined" lineno="666">
+<summary>
+Unconfined access to storage devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

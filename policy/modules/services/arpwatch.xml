@@ -1,0 +1,54 @@
+<module name="arpwatch" filename="policy/modules/services/arpwatch.if">
+<summary>Ethernet activity monitor.</summary>
+<interface name="arpwatch_search_data" lineno="13">
+<summary>
+Search arpwatch's data file directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="arpwatch_manage_data_files" lineno="31">
+<summary>
+Create arpwatch data files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="arpwatch_rw_tmp_files" lineno="49">
+<summary>
+Read and write arpwatch temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="arpwatch_manage_tmp_files" lineno="67">
+<summary>
+Read and write arpwatch temporary files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="arpwatch_dontaudit_rw_packet_sockets" lineno="86">
+<summary>
+Do not audit attempts to read and write
+arpwatch packet sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+</module>

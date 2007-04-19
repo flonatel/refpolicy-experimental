@@ -1,10 +1,12 @@
 Source: refpolicy
+XS-VCS-Arch: http://arch.debian.org/arch/private/srivasta/grab/refpolicy
+XS-VCS-Browse: http://arch.debian.org/cgi-bin/archzoom.cgi/srivasta@debian.org--lenny/refpolicy?expand
 Priority: optional
 Section: admin
 Maintainer: Manoj Srivastava <srivasta@debian.org>
 Uploaders: Erich Schubert <erich@debian.org>
 Standards-Version: 3.7.2.0
-Build-Depends: policycoreutils (>= 1.32), checkpolicy (>= 1.32), python, m4, bzip2, gawk
+Build-Depends: policycoreutils (>= 1.34.6), checkpolicy (>= 1.34.1), python, m4, bzip2, gawk
 
 Package: selinux-policy-refpolicy-strict
 Architecture: all

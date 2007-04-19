@@ -1,0 +1,21 @@
+<module name="zebra" filename="policy/modules/services/zebra.if">
+<summary>Zebra border gateway protocol network routing service</summary>
+<interface name="zebra_read_config" lineno="14">
+<summary>
+Read the configuration files for zebra.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<tunable name="allow_zebra_write_config" dftval="false">
+<desc>
+<p>
+Allow zebra daemon to write it configuration files
+</p>
+</desc>
+</tunable>
+</module>

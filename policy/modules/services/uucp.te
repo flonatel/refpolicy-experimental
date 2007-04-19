@@ -1,5 +1,5 @@
 
-policy_module(uucp,1.2.0)
+policy_module(uucp,1.3.0)
 
 ########################################
 #
@@ -28,39 +28,42 @@ files_type(uucpd_spool_t)
 type uucpd_log_t;
 logging_log_file(uucpd_log_t)
 
+type uux_t;
+type uux_exec_t;
+domain_type(uux_t)
+domain_entry_file(uux_t,uux_exec_t)
+role system_r types uux_t;
+
 ########################################
 #
-# Local policy
+# UUCPd Local policy
 #
 allow uucpd_t self:capability { setuid setgid };
 allow uucpd_t self:process signal_perms;
-allow uucpd_t self:fifo_file rw_file_perms;
+allow uucpd_t self:fifo_file rw_fifo_file_perms;
 allow uucpd_t self:tcp_socket connected_stream_socket_perms;
 allow uucpd_t self:udp_socket create_socket_perms;
 allow uucpd_t self:netlink_tcpdiag_socket r_netlink_socket_perms;
 
-allow uucpd_t uucpd_log_t:file create_file_perms;
-allow uucpd_t uucpd_log_t:dir { rw_dir_perms setattr };
+allow uucpd_t uucpd_log_t:dir setattr;
+manage_files_pattern(uucpd_t,uucpd_log_t,uucpd_log_t)
 logging_log_filetrans(uucpd_t,uucpd_log_t,{ file dir })
 
-allow uucpd_t uucpd_ro_t:dir r_dir_perms;
-allow uucpd_t uucpd_ro_t:file r_file_perms;
-allow uucpd_t uucpd_ro_t:lnk_file { getattr read };
+allow uucpd_t uucpd_ro_t:dir list_dir_perms;
+read_files_pattern(uucpd_t,uucpd_ro_t,uucpd_ro_t)
+read_lnk_files_pattern(uucpd_t,uucpd_ro_t,uucpd_ro_t)
 
-allow uucpd_t uucpd_rw_t:dir create_dir_perms;
-allow uucpd_t uucpd_rw_t:file create_file_perms;
-allow uucpd_t uucpd_rw_t:lnk_file create_lnk_perms;
+manage_dirs_pattern(uucpd_t,uucpd_rw_t,uucpd_rw_t)
+manage_files_pattern(uucpd_t,uucpd_rw_t,uucpd_rw_t)
+manage_lnk_files_pattern(uucpd_t,uucpd_rw_t,uucpd_rw_t)
 
-allow uucpd_t uucpd_spool_t:dir create_dir_perms;
-allow uucpd_t uucpd_spool_t:file create_file_perms;
-allow uucpd_t uucpd_spool_t:lnk_file create_lnk_perms;
+uucp_manage_spool(uucpd_t)
 
-allow uucpd_t uucpd_tmp_t:dir create_dir_perms;
-allow uucpd_t uucpd_tmp_t:file create_file_perms;
+manage_dirs_pattern(uucpd_t,uucpd_tmp_t,uucpd_tmp_t)
+manage_files_pattern(uucpd_t,uucpd_tmp_t,uucpd_tmp_t)
 files_tmp_filetrans(uucpd_t, uucpd_tmp_t, { file dir })
 
-allow uucpd_t uucpd_var_run_t:file create_file_perms;
-allow uucpd_t uucpd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(uucpd_t,uucpd_var_run_t,uucpd_var_run_t)
 files_pid_filetrans(uucpd_t,uucpd_var_run_t,file)
 
 kernel_read_kernel_sysctls(uucpd_t)
@@ -79,7 +82,7 @@ dev_read_urand(uucpd_t)
 
 fs_getattr_xattr_fs(uucpd_t)
 
-corecmd_exec_sbin(uucpd_t)
+corecmd_exec_bin(uucpd_t)
 
 files_read_etc_files(uucpd_t)
 files_search_home(uucpd_t)
@@ -104,4 +107,39 @@ optional_policy(`
 
 optional_policy(`
 	nscd_socket_use(uucpd_t)
+')
+
+########################################
+#
+# UUX Local policy
+#
+
+allow uux_t self:capability { setuid setgid };
+allow uux_t self:fifo_file { getattr write };
+
+uucp_append_log(uux_t)
+uucp_manage_spool(uux_t)
+
+corecmd_exec_bin(uux_t)
+
+files_read_etc_files(uux_t)
+
+libs_use_ld_so(uux_t)
+libs_use_shared_libs(uux_t)
+
+logging_send_syslog_msg(uux_t)
+
+miscfiles_read_localization(uux_t)
+
+ifdef(`targeted_policy',`
+	term_use_unallocated_ttys(uux_t)
+	term_use_generic_ptys(uux_t)
+')
+
+optional_policy(`
+	mta_send_mail(uux_t)
+')
+
+optional_policy(`
+	nscd_socket_use(uux_t)
 ')

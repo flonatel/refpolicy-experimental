@@ -1,0 +1,44 @@
+<module name="automount" filename="policy/modules/services/automount.if">
+<summary>Filesystem automounter service.</summary>
+<interface name="automount_domtrans" lineno="13">
+<summary>
+Execute automount in the automount domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="automount_exec_config" lineno="32">
+<summary>
+Execute automount in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="automount_read_state" lineno="51">
+<summary>
+Allow the domain to read state files in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain to allow access.
+</summary>
+</param>
+</interface>
+<interface name="automount_dontaudit_getattr_tmp_dirs" lineno="70">
+<summary>
+Do not audit attempts to get the attributes
+of automount temporary directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+</module>

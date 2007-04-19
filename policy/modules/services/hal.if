@@ -15,12 +15,44 @@ interface(`hal_domtrans',`
 		type hald_t, hald_exec_t;
 	')
 
-	domain_auto_trans($1,hald_exec_t,hald_t)
+	domtrans_pattern($1,hald_exec_t,hald_t)
+')
 
-	allow $1 hald_t:fd use;
-	allow hald_t $1:fd use;
-	allow hald_t $1:fifo_file rw_file_perms;
-	allow hald_t $1:process sigchld;
+########################################
+## <summary>
+##	Do not audit attempts to use file descriptors from hal.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`hal_dontaudit_use_fds',`
+	gen_require(`
+		type hald_t;
+	')
+
+	dontaudit $1 hald_t:fd use; 
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read and write to
+##	hald unnamed pipes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`hal_dontaudit_rw_pipes',`
+	gen_require(`
+		type hald_t;
+	')
+
+	dontaudit $1 hald_t:fifo_file rw_fifo_file_perms; 
 ')
 
 ########################################
@@ -116,7 +148,26 @@ interface(`hal_read_tmp_files',`
 		type hald_tmp_t;
 	')
 
-	allow $1 hald_tmp_t:file r_file_perms;
+	allow $1 hald_tmp_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read or write
+##	HAL libraries files
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`hal_dontaudit_append_lib_files',`
+	gen_require(`
+		type hald_var_lib_t;
+	')
+
+	dontaudit $1 hald_var_lib_t:file { read_file_perms append_file_perms };
 ')
 
 ########################################
@@ -135,7 +186,7 @@ interface(`hal_read_pid_files',`
 	')
 
 	files_search_pids($1)
-	allow $1 hald_var_run_t:file r_file_perms;
+	allow $1 hald_var_run_t:file read_file_perms;
 ')
 
 

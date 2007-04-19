@@ -1,0 +1,56 @@
+<module name="pyzor" filename="policy/modules/services/pyzor.if">
+<summary>Pyzor is a distributed, collaborative spam detection and filtering network.</summary>
+<interface name="pyzor_signal" lineno="13">
+<summary>
+Send generic signals to pyzor
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="pyzor_domtrans" lineno="31">
+<summary>
+Execute pyzor with a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="pyzor_exec" lineno="51">
+<summary>
+Execute pyzor in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<template name="pyzor_per_role_template" lineno="84">
+<summary>
+The per role template for the pyzor module.
+</summary>
+<desc>
+<p>
+This template allows pyzor to manage files in
+a user home directory, creating files with the
+correct type.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+</template>
+</module>

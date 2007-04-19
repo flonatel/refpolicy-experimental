@@ -1,0 +1,93 @@
+<module name="qmail" filename="policy/modules/services/qmail.if">
+<summary>Qmail Mail Server</summary>
+<template name="qmail_per_role_template" lineno="31">
+<summary>
+The per role template for qmail
+</summary>
+<desc>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="qmail_child_domain_template" lineno="61">
+<summary>
+Template for qmail parent/sub-domain pairs
+</summary>
+<param name="child_prefix">
+<summary>
+The prefix of the child domain
+</summary>
+</param>
+<param name="parent_domain">
+<summary>
+The name of the parent domain.
+</summary>
+</param>
+</template>
+<interface name="qmail_domtrans_inject" lineno="106">
+<summary>
+Transition to qmail_inject_t
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access
+</summary>
+</param>
+</interface>
+<interface name="qmail_domtrans_queue" lineno="133">
+<summary>
+Transition to qmail_queue_t
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access
+</summary>
+</param>
+</interface>
+<interface name="qmail_read_config" lineno="161">
+<summary>
+Read qmail configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="qmail_smtpd_service_domain" lineno="193">
+<summary>
+Define the specified domain as a qmail-smtp service.
+Needed by antivirus/antispam filters.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+</module>

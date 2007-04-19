@@ -1,0 +1,97 @@
+<module name="pcmcia" filename="policy/modules/system/pcmcia.if">
+<summary>PCMCIA card management services</summary>
+<interface name="pcmcia_stub" lineno="13">
+<summary>
+PCMCIA stub interface.  No access allowed.
+</summary>
+<param name="domain" optional="true">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_domtrans_cardmgr" lineno="29">
+<summary>
+Execute cardmgr in the cardmgr domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_use_cardmgr_fds" lineno="47">
+<summary>
+Inherit and use file descriptors from cardmgr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_domtrans_cardctl" lineno="65">
+<summary>
+Execute cardctl in the cardmgr domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_run_cardctl" lineno="95">
+<summary>
+Execute cardmgr in the cardctl domain, and
+allow the specified role the cardmgr domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the cardmgr domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the cardmgr domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="pcmcia_read_pid" lineno="115">
+<summary>
+Read cardmgr pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_manage_pid" lineno="135">
+<summary>
+Create, read, write, and delete
+cardmgr pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="pcmcia_manage_pid_chr_files" lineno="155">
+<summary>
+Create, read, write, and delete
+cardmgr runtime character nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

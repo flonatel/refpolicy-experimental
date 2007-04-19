@@ -1,0 +1,85 @@
+<module name="daemontools" filename="policy/modules/system/daemontools.if">
+<summary>Collection of tools for managing UNIX services</summary>
+<desc>
+<p>
+Policy for DJB's daemontools
+</p>
+</desc>
+<interface name="daemontools_ipc_domain" lineno="18">
+<summary>
+An ipc channel between the supervised domain and svc_start_t
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access to svc_start_t.
+</summary>
+</param>
+</interface>
+<interface name="daemontools_service_domain" lineno="44">
+<summary>
+Define a specified domain as a supervised service.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+<interface name="daemontools_domtrans_start" lineno="66">
+<summary>
+Execute in the svc_start_t domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="daemontools_domtrans_run" lineno="84">
+<summary>
+Execute in the svc_run_t domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="daemontools_domtrans_multilog" lineno="102">
+<summary>
+Execute in the svc_multilog_t domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="daemontools_read_svc" lineno="121">
+<summary>
+Allow a domain to read svc_svc_t files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="daemontools_manage_svc" lineno="141">
+<summary>
+Allow a domain to create svc_svc_t files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

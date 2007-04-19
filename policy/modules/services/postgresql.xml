@@ -1,0 +1,65 @@
+<module name="postgresql" filename="policy/modules/services/postgresql.if">
+<summary>PostgreSQL relational database</summary>
+<interface name="postgresql_search_db" lineno="13">
+<summary>
+Allow the specified domain to search postgresql's database directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="postgresql_manage_db" lineno="30">
+<summary>
+Allow the specified domain to manage postgresql's database.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="postgresql_domtrans" lineno="50">
+<summary>
+Execute postgresql in the postgresql domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="postgresql_read_config" lineno="69">
+<summary>
+Allow the specified domain to read postgresql's etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="postgresql_tcp_connect" lineno="90">
+<summary>
+Allow the specified domain to connect to postgresql with a tcp socket.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="postgresql_stream_connect" lineno="105">
+<summary>
+Allow the specified domain to connect to postgresql with a unix socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

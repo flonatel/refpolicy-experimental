@@ -1,0 +1,37 @@
+<module name="certwatch" filename="policy/modules/admin/certwatch.if">
+<summary>Digital Certificate Tracking</summary>
+<interface name="certwatch_domtrans" lineno="13">
+<summary>
+Domain transition to certwatch.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="certwatach_run" lineno="47">
+<summary>
+Execute certwatch in the certwatch domain, and
+allow the specified role the certwatch domain,
+and use the caller's terminal. Has a sigchld
+backchannel.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the certwatch domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the certwatch domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

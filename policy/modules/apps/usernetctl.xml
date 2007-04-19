@@ -1,0 +1,43 @@
+<module name="usernetctl" filename="policy/modules/apps/usernetctl.if">
+<summary>User network interface configuration helper</summary>
+<interface name="usernetctl_domtrans" lineno="13">
+<summary>
+Execute usernetctl in the usernetctl domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="usernetctl_run" lineno="47">
+<summary>
+Execute usernetctl in the usernetctl domain, and
+allow the specified role the usernetctl domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the usernetctl domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the usernetctl domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<tunable name="user_net_control" dftval="false">
+<desc>
+<p>
+Allow users to control network interfaces
+(also needs USERCTL=true)
+</p>
+</desc>
+</tunable>
+</module>

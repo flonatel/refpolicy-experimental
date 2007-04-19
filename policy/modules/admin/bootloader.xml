@@ -1,0 +1,79 @@
+<module name="bootloader" filename="policy/modules/admin/bootloader.if">
+<summary>Policy for the kernel modules, kernel image, and bootloader.</summary>
+<interface name="bootloader_domtrans" lineno="13">
+<summary>
+Execute bootloader in the bootloader domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="bootloader_run" lineno="43">
+<summary>
+Execute bootloader interactively and do
+a domain transition to the bootloader domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the bootloader domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the bootloader domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="bootloader_read_config" lineno="64">
+<summary>
+Read the bootloader configuration file.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="bootloader_rw_config" lineno="84">
+<summary>
+Read and write the bootloader
+configuration file.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="bootloader_rw_tmp_files" lineno="103">
+<summary>
+Read and write the bootloader
+temporary data in /tmp.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="bootloader_create_runtime_file" lineno="123">
+<summary>
+Read and write the bootloader
+temporary data in /tmp.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

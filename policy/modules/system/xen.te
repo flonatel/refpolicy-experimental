@@ -1,5 +1,5 @@
 
-policy_module(xen,1.1.0)
+policy_module(xen,1.3.0)
 
 ########################################
 #
@@ -14,6 +14,11 @@ files_type(xen_devpts_t);
 # Xen Image files
 type xen_image_t; # customizable
 files_type(xen_image_t)
+# xen_image_t can be assigned to blk devices
+dev_node(xen_image_t)
+
+type xenctl_t;
+files_type(xenctl_t)
 
 type xend_t;
 type xend_exec_t;
@@ -68,38 +73,43 @@ init_daemon_domain(xm_t, xm_exec_t)
 # xend local policy
 #
 
-allow xend_t self:capability { dac_override ipc_lock net_admin setuid sys_nice sys_ptrace sys_tty_config net_raw };
+allow xend_t self:capability { mknod dac_override ipc_lock net_admin setuid sys_nice sys_ptrace sys_tty_config net_raw };
 dontaudit xend_t self:capability { sys_ptrace };
 allow xend_t self:process { signal sigkill };
 dontaudit xend_t self:process ptrace;
 # internal communication is often done using fifo and unix sockets.
-allow xend_t self:fifo_file rw_file_perms;
+allow xend_t self:fifo_file rw_fifo_file_perms;
 allow xend_t self:unix_stream_socket create_stream_socket_perms;
 allow xend_t self:unix_dgram_socket create_socket_perms;
 allow xend_t self:netlink_route_socket r_netlink_socket_perms;
 allow xend_t self:tcp_socket create_stream_socket_perms;
 allow xend_t self:packet_socket create_socket_perms;
 
-allow xend_t xen_image_t:dir r_dir_perms;
-allow xend_t xen_image_t:file rw_file_perms;
+allow xend_t xen_image_t:dir list_dir_perms;
+manage_dirs_pattern(xend_t,xen_image_t,xen_image_t)
+manage_files_pattern(xend_t,xen_image_t,xen_image_t)
+rw_blk_files_pattern(xend_t,xen_image_t,xen_image_t)
+
+allow xend_t xenctl_t:fifo_file manage_file_perms;
+dev_filetrans(xend_t, xenctl_t, fifo_file)
 
 # pid file
-allow xend_t xend_var_run_t:file manage_file_perms;
-allow xend_t xend_var_run_t:sock_file manage_file_perms;
-allow xend_t xend_var_run_t:dir { setattr rw_dir_perms };
+allow xend_t xend_var_run_t:dir setattr;
+manage_files_pattern(xend_t,xend_var_run_t,xend_var_run_t)
+manage_sock_files_pattern(xend_t,xend_var_run_t,xend_var_run_t)
 files_pid_filetrans(xend_t,xend_var_run_t, { file sock_file })
 
 # log files
-allow xend_t xend_var_log_t:file create_file_perms;
-allow xend_t xend_var_log_t:sock_file create_file_perms;
-allow xend_t xend_var_log_t:dir { rw_dir_perms setattr };
+allow xend_t xend_var_log_t:dir setattr;
+manage_files_pattern(xend_t,xend_var_log_t,xend_var_log_t)
+manage_sock_files_pattern(xend_t,xend_var_log_t,xend_var_log_t)
 logging_log_filetrans(xend_t,xend_var_log_t,{ sock_file file dir })
 
 # var/lib files for xend
-allow xend_t xend_var_lib_t:file create_file_perms;
-allow xend_t xend_var_lib_t:sock_file create_file_perms;
-allow xend_t xend_var_lib_t:fifo_file create_file_perms;
-allow xend_t xend_var_lib_t:dir create_dir_perms;
+manage_dirs_pattern(xend_t,xend_var_lib_t,xend_var_lib_t)
+manage_files_pattern(xend_t,xend_var_lib_t,xend_var_lib_t)
+manage_sock_files_pattern(xend_t,xend_var_lib_t,xend_var_lib_t)
+manage_fifo_files_pattern(xend_t,xend_var_lib_t,xend_var_lib_t)
 files_var_lib_filetrans(xend_t,xend_var_lib_t,{ file dir })
 
 # transition to store
@@ -119,7 +129,6 @@ kernel_read_xen_state(xend_t)
 kernel_rw_net_sysctls(xend_t)
 kernel_read_network_state(xend_t)
 
-corecmd_exec_sbin(xend_t)
 corecmd_exec_bin(xend_t)
 corecmd_exec_shell(xend_t)
 
@@ -132,7 +141,11 @@ corenet_tcp_bind_xen_port(xend_t)
 corenet_tcp_bind_soundd_port(xend_t)
 corenet_tcp_bind_generic_port(xend_t)
 corenet_tcp_bind_vnc_port(xend_t)
+corenet_tcp_connect_xserver_port(xend_t)
+corenet_tcp_connect_xen_port(xend_t)
+corenet_sendrecv_xserver_client_packets(xend_t)
 corenet_sendrecv_xen_server_packets(xend_t)
+corenet_sendrecv_xen_client_packets(xend_t)
 corenet_sendrecv_soundd_server_packets(xend_t)
 corenet_rw_tun_tap_dev(xend_t)
 
@@ -140,6 +153,7 @@ dev_read_urand(xend_t)
 dev_manage_xen(xend_t)
 dev_filetrans_xen(xend_t)
 dev_rw_sysfs(xend_t)
+dev_rw_xen(xend_t)
 
 domain_read_all_domains_state(xend_t)
 domain_dontaudit_read_all_domains_state(xend_t)
@@ -160,11 +174,10 @@ term_use_generic_ptys(xend_t)
 term_use_ptmx(xend_t)
 term_getattr_pty_fs(xend_t)
 
-init_use_fds(xend_t)
-init_use_script_ptys(xend_t)
-
 libs_use_ld_so(xend_t)
 libs_use_shared_libs(xend_t)
+
+locallogin_dontaudit_use_fds(xend_t)
 
 logging_send_syslog_msg(xend_t)
 
@@ -176,6 +189,7 @@ sysnet_domtrans_ifconfig(xend_t)
 sysnet_dns_name_resolve(xend_t)
 sysnet_delete_dhcpc_pid(xend_t)
 sysnet_read_dhcpc_pid(xend_t)
+sysnet_rw_dhcp_config(xend_t)
 
 userdom_dontaudit_search_sysadm_home_dirs(xend_t)
 
@@ -185,6 +199,15 @@ netutils_domtrans(xend_t)
 
 optional_policy(`
 	consoletype_exec(xend_t)
+')
+
+ifdef(`targeted_policy',`
+	term_dontaudit_use_unallocated_ttys(xend_t)
+	term_dontaudit_use_generic_ptys(xend_t)
+
+	optional_policy(`
+		unconfined_rw_pipes(xend_t)
+	')
 ')
 
 ########################################
@@ -199,16 +222,21 @@ allow xenconsoled_t self:fifo_file { read write };
 allow xenconsoled_t xen_devpts_t:chr_file rw_term_perms;
 
 # pid file
-allow xenconsoled_t xenconsoled_var_run_t:file manage_file_perms;
-allow xenconsoled_t xenconsoled_var_run_t:sock_file manage_file_perms;
-allow xenconsoled_t xenconsoled_var_run_t:dir rw_dir_perms;
+manage_files_pattern(xenconsoled_t,xenconsoled_var_run_t,xenconsoled_var_run_t)
+manage_sock_files_pattern(xenconsoled_t,xenconsoled_var_run_t,xenconsoled_var_run_t)
 files_pid_filetrans(xenconsoled_t,xenconsoled_var_run_t, { file sock_file })
 
 kernel_read_kernel_sysctls(xenconsoled_t)
 kernel_write_xen_state(xenconsoled_t)
 kernel_read_xen_state(xenconsoled_t)
 
+dev_manage_xen(xenconsoled_t)
+dev_filetrans_xen(xenconsoled_t)
+dev_rw_sysfs(xenconsoled_t)
+
 domain_dontaudit_ptrace_all_domains(xenconsoled_t)
+
+files_read_usr_files(xenconsoled_t)
 
 term_create_pty(xenconsoled_t,xen_devpts_t);
 term_use_generic_ptys(xenconsoled_t)
@@ -235,24 +263,26 @@ allow xenstored_t self:unix_stream_socket create_stream_socket_perms;
 allow xenstored_t self:unix_dgram_socket create_socket_perms;
 
 # pid file
-allow xenstored_t xenstored_var_run_t:file manage_file_perms;
-allow xenstored_t xenstored_var_run_t:sock_file manage_file_perms;
-allow xenstored_t xenstored_var_run_t:dir rw_dir_perms;
+manage_files_pattern(xenstored_t,xenstored_var_run_t,xenstored_var_run_t)
+manage_sock_files_pattern(xenstored_t,xenstored_var_run_t,xenstored_var_run_t)
 files_pid_filetrans(xenstored_t,xenstored_var_run_t, { file sock_file })
 
 # var/lib files for xenstored
-allow xenstored_t xenstored_var_lib_t:file create_file_perms;
-allow xenstored_t xenstored_var_lib_t:sock_file create_file_perms;
-allow xenstored_t xenstored_var_lib_t:dir create_dir_perms;
+manage_dirs_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
+manage_files_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
+manage_sock_files_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
 files_var_lib_filetrans(xenstored_t,xenstored_var_lib_t,{ file dir sock_file })
 
 kernel_write_xen_state(xenstored_t)
 kernel_read_xen_state(xenstored_t)
 
 dev_create_generic_dirs(xenstored_t)
-dev_manage_xen(xenconsoled_t)
+dev_manage_xen(xenstored_t)
 dev_filetrans_xen(xenstored_t)
 dev_rw_xen(xenstored_t)
+dev_read_sysfs(xenstored_t)
+
+files_read_usr_files(xenstored_t)
 
 term_use_generic_ptys(xenstored_t)
 term_use_console(xenconsoled_t)
@@ -278,15 +308,15 @@ allow xm_t self:capability { dac_override ipc_lock sys_tty_config };
 
 # internal communication is often done using fifo and unix sockets.
 allow xm_t self:fifo_file { read write };
-allow xm_t self:unix_stream_socket create_stream_socket_perms;
+allow xm_t self:unix_stream_socket { create_stream_socket_perms connectto };
+allow xm_t self:tcp_socket create_stream_socket_perms;
 
-allow xm_t xend_var_lib_t:dir rw_dir_perms;
-allow xm_t xend_var_lib_t:fifo_file create_file_perms;
-allow xm_t xend_var_lib_t:file create_file_perms;
+manage_files_pattern(xm_t,xend_var_lib_t,xend_var_lib_t)
+manage_fifo_files_pattern(xm_t,xend_var_lib_t,xend_var_lib_t)
 files_search_var_lib(xm_t)
 
 allow xm_t xen_image_t:dir rw_dir_perms;
-allow xm_t xen_image_t:file r_file_perms;
+allow xm_t xen_image_t:file read_file_perms;
 
 kernel_read_system_state(xm_t)
 kernel_read_kernel_sysctls(xm_t)
@@ -294,7 +324,10 @@ kernel_read_xen_state(xm_t)
 kernel_write_xen_state(xm_t)
 
 corecmd_exec_bin(xm_t)
-corecmd_exec_sbin(xm_t)
+
+corenet_tcp_sendrecv_generic_if(xm_t)
+corenet_tcp_sendrecv_all_nodes(xm_t)
+corenet_tcp_connect_soundd_port(xm_t)
 
 dev_read_urand(xm_t)
 
@@ -313,6 +346,8 @@ libs_use_ld_so(xm_t)
 libs_use_shared_libs(xm_t)
 
 miscfiles_read_localization(xm_t)
+
+sysnet_read_config(xm_t)
 
 xen_append_log(xm_t)
 xen_stream_connect(xm_t)

@@ -1,0 +1,45 @@
+<module name="iptables" filename="policy/modules/system/iptables.if">
+<summary>Policy for iptables.</summary>
+<interface name="iptables_domtrans" lineno="13">
+<summary>
+Execute iptables in the iptables domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="iptables_run" lineno="44">
+<summary>
+Execute iptables in the iptables domain, and
+allow the specified role the iptables domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the iptables domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the iptables domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="iptables_exec" lineno="64">
+<summary>
+Execute iptables in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

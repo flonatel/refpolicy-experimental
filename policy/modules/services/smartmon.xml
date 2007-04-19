@@ -1,0 +1,13 @@
+<module name="smartmon" filename="policy/modules/services/smartmon.if">
+<summary>Smart disk monitoring daemon policy</summary>
+<interface name="smartmon_read_tmp_files" lineno="13">
+<summary>
+Allow caller to read smartmon temporary files.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the temporary files.
+</summary>
+</param>
+</interface>
+</module>

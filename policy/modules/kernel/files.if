@@ -110,14 +110,7 @@ interface(`files_pid_file',`
 ## </param>
 #
 interface(`files_config_file',`
-	gen_require(`
-		attribute usercanread;
-	')
-
 	files_type($1)
-
-	# this is a hack and should be removed.
-	typeattribute $1 usercanread;
 ')
 
 ########################################
@@ -284,15 +277,12 @@ interface(`files_tmpfs_file',`
 ##	</summary>
 ## </param>
 #
-# cjp: this is an odd interface, because to getattr
-# all dirs, you need to search all the parent directories
-#
 interface(`files_getattr_all_dirs',`
 	gen_require(`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir { getattr search };
+	getattr_dirs_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -329,7 +319,7 @@ interface(`files_list_non_security',`
 		attribute file_type, security_file_type;
 	')
 
-	allow $1 { file_type -security_file_type }:dir r_dir_perms;
+	list_dirs_pattern($1,{ file_type -security_file_type },{ file_type -security_file_type })
 ')
 
 ########################################
@@ -348,7 +338,7 @@ interface(`files_dontaudit_list_non_security',`
 		attribute file_type, security_file_type;
 	')
 
-	dontaudit $1 { file_type -security_file_type }:dir r_dir_perms;
+	dontaudit $1 { file_type -security_file_type }:dir list_dir_perms;
 ')
 
 ########################################
@@ -404,9 +394,8 @@ interface(`files_getattr_all_files',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir search;
-	allow $1 file_type:file getattr;
-	allow $1 file_type:lnk_file getattr;
+	getattr_files_pattern($1,file_type,file_type)
+	getattr_lnk_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -463,7 +452,7 @@ interface(`files_read_all_files',`
 	')
 
 	allow $1 file_type:dir list_dir_perms;
-	allow $1 file_type:file read_file_perms;
+	read_files_pattern($1,file_type,file_type)
 
 	optional_policy(`
 		auth_read_shadow($1)
@@ -517,9 +506,8 @@ interface(`files_read_non_security_files',`
 		attribute file_type, security_file_type;
 	')
 
-	allow $1 { file_type -security_file_type }:dir search_dir_perms;
-	allow $1 { file_type -security_file_type }:file r_file_perms;
-	allow $1 { file_type -security_file_type }:lnk_file { getattr read };
+	read_files_pattern($1,{ file_type -security_file_type },{ file_type -security_file_type })
+	read_lnk_files_pattern($1,{ file_type -security_file_type },{ file_type -security_file_type })
 ')
 
 ########################################
@@ -544,7 +532,7 @@ interface(`files_read_all_dirs_except',`
 		attribute file_type;
 	')
 
-	allow $1 { file_type $2 }:dir r_dir_perms;
+	allow $1 { file_type $2 }:dir list_dir_perms;
 ')
 
 ########################################
@@ -569,9 +557,7 @@ interface(`files_read_all_files_except',`
 		attribute file_type;
 	')
 
-	allow $1 { file_type $2 }:dir search;
-	allow $1 { file_type $2 }:file r_file_perms;
-
+	read_files_pattern($1,{ file_type $2 },{ file_type $2 })
 ')
 
 ########################################
@@ -596,9 +582,7 @@ interface(`files_read_all_symlinks_except',`
 		attribute file_type;
 	')
 
-	allow $1 { file_type $2 }:dir search;
-	allow $1 { file_type $2 }:lnk_file r_file_perms;
-
+	read_lnk_files_pattern($1,{ file_type $2 },{ file_type $2 })
 ')
 
 ########################################
@@ -616,8 +600,7 @@ interface(`files_getattr_all_symlinks',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir search;
-	allow $1 file_type:lnk_file getattr;
+	getattr_lnk_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -637,6 +620,24 @@ interface(`files_dontaudit_getattr_all_symlinks',`
 	')
 
 	dontaudit $1 file_type:lnk_file getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read all symbolic links.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_read_all_symlinks',`
+	gen_require(`
+		attribute file_type;
+	')
+
+	dontaudit $1 file_type:lnk_file read;
 ')
 
 ########################################
@@ -713,7 +714,7 @@ interface(`files_read_all_symlinks',`
 	')
 
 	allow $1 file_type:dir list_dir_perms;
-	allow $1 file_type:lnk_file { getattr read };
+	read_lnk_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -732,7 +733,7 @@ interface(`files_getattr_all_pipes',`
 	')
 
 	allow $1 file_type:dir list_dir_perms;
-	allow $1 file_type:fifo_file getattr;
+	getattr_fifo_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -789,7 +790,7 @@ interface(`files_getattr_all_sockets',`
 	')
 
 	allow $1 file_type:dir list_dir_perms;
-	allow $1 file_type:sock_file getattr;
+	getattr_sock_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -845,8 +846,7 @@ interface(`files_read_all_blk_files',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir search;
-	allow $1 file_type:blk_file { getattr read };
+	read_blk_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -864,8 +864,7 @@ interface(`files_read_all_chr_files',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir search;
-	allow $1 file_type:chr_file { getattr read };
+	read_chr_files_pattern($1,file_type,file_type)
 ')
 
 ########################################
@@ -891,13 +890,14 @@ interface(`files_relabel_all_files',`
 		attribute file_type;
 	')
 
-	allow $1 { file_type $2 }:dir { r_dir_perms relabelfrom relabelto };
-	allow $1 { file_type $2 }:file { getattr relabelfrom relabelto };
-	allow $1 { file_type $2 }:lnk_file { getattr relabelfrom relabelto };
-	allow $1 { file_type $2 }:fifo_file { getattr relabelfrom relabelto };
-	allow $1 { file_type $2 }:sock_file { getattr relabelfrom relabelto };
-	allow $1 { file_type $2 }:blk_file { getattr relabelfrom };
-	allow $1 { file_type $2 }:chr_file { getattr relabelfrom };
+	allow $1 { file_type $2 }:dir list_dir_perms;
+	relabel_dirs_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabel_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabel_lnk_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabel_fifo_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabel_sock_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabelfrom_blk_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	relabelfrom_chr_files_pattern($1,{ file_type $2 },{ file_type $2 })
 
 	# satisfy the assertions:
 	seutil_relabelto_bin_policy($1)
@@ -926,11 +926,11 @@ interface(`files_manage_all_files',`
 		attribute file_type;
 	')
 
-	allow $1 { file_type $2 }:dir create_dir_perms;
-	allow $1 { file_type $2 }:file create_file_perms;
-	allow $1 { file_type $2 }:lnk_file create_lnk_perms;
-	allow $1 { file_type $2 }:fifo_file create_file_perms;
-	allow $1 { file_type $2 }:sock_file create_file_perms;
+	manage_dirs_pattern($1,{ file_type $2 },{ file_type $2 })
+	manage_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	manage_lnk_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	manage_fifo_files_pattern($1,{ file_type $2 },{ file_type $2 })
+	manage_sock_files_pattern($1,{ file_type $2 },{ file_type $2 })
 
 	# satisfy the assertions:
 	seutil_create_bin_policy($1)
@@ -953,7 +953,7 @@ interface(`files_search_all',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir search;
+	allow $1 file_type:dir search_dir_perms;
 ')
 
 ########################################
@@ -972,7 +972,7 @@ interface(`files_list_all',`
 		attribute file_type;
 	')
 
-	allow $1 file_type:dir r_dir_perms;
+	allow $1 file_type:dir list_dir_perms;
 ')
 
 ########################################
@@ -993,6 +993,29 @@ interface(`files_dontaudit_search_all_dirs',`
 	')
 
 	dontaudit $1 file_type:dir search;
+')
+
+########################################
+## <summary>
+##	Get the attributes of all filesystems
+##	with the type of a file.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+# dwalsh: This interface is to allow quotacheck to work on a 
+# a filesystem mounted with the --context switch
+# https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=212957
+#
+interface(`files_getattr_all_file_type_fs',`
+	gen_require(`
+		attribute file_type;
+	')
+
+	allow $1 file_type:filesystem getattr;
 ')
 
 ########################################
@@ -1101,7 +1124,7 @@ interface(`files_list_root',`
 		type root_t;
 	')
 
-	allow $1 root_t:dir r_dir_perms;
+	allow $1 root_t:dir list_dir_perms;
 	allow $1 root_t:lnk_file r_file_perms;
 ')
 
@@ -1131,8 +1154,7 @@ interface(`files_root_filetrans',`
 		type root_t;
 	')
 
-	allow $1 root_t:dir rw_dir_perms;
-	type_transition $1 root_t:$3 $2;
+	filetrans_pattern($1,root_t,$2,$3)
 ')
 
 ########################################
@@ -1345,8 +1367,7 @@ interface(`files_boot_filetrans',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir rw_dir_perms;
-	type_transition $1 boot_t:$3 $2;
+	filetrans_pattern($1,boot_t,$2,$3)
 ')
 
 ########################################
@@ -1366,8 +1387,7 @@ interface(`files_manage_boot_files',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir rw_dir_perms;
-	allow $1 boot_t:file manage_file_perms;
+	manage_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1385,7 +1405,7 @@ interface(`files_relabelfrom_boot_files',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:file relabelfrom;
+	relabelfrom_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1404,8 +1424,8 @@ interface(`files_rw_boot_symlinks',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir r_dir_perms;
-	allow $1 boot_t:lnk_file rw_file_perms;
+	allow $1 boot_t:dir list_dir_perms;
+	rw_lnk_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1424,8 +1444,7 @@ interface(`files_manage_boot_symlinks',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir rw_dir_perms;
-	allow $1 boot_t:lnk_file manage_file_perms;
+	manage_lnk_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1439,13 +1458,13 @@ interface(`files_manage_boot_symlinks',`
 ## </param>
 #
 interface(`files_read_kernel_img',`
-       gen_require(`
-               type boot_t;
-       ')
+	gen_require(`
+		type boot_t;
+	')
 
-       allow $1 boot_t:dir list_dir_perms;
-       allow $1 boot_t:file { getattr read };
-       allow $1 boot_t:lnk_file { getattr read };
+	allow $1 boot_t:dir list_dir_perms;
+	read_files_pattern($1,boot_t,boot_t)
+	read_lnk_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1464,9 +1483,8 @@ interface(`files_create_kernel_img',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir ra_dir_perms;
 	allow $1 boot_t:file { getattr read write create };
-	allow $1 boot_t:lnk_file { getattr read create unlink };
+	manage_lnk_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1485,8 +1503,7 @@ interface(`files_delete_kernel',`
 		type boot_t;
 	')
 
-	allow $1 boot_t:dir { r_dir_perms write remove_name };
-	allow $1 boot_t:file { getattr unlink };
+	delete_files_pattern($1,boot_t,boot_t)
 ')
 
 ########################################
@@ -1541,7 +1558,7 @@ interface(`files_search_default',`
 		type default_t;
 	')
 
-	allow $1 default_t:dir search;
+	allow $1 default_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -1559,7 +1576,7 @@ interface(`files_list_default',`
 		type default_t;
 	')
 
-	allow $1 default_t:dir r_dir_perms;
+	allow $1 default_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -1578,7 +1595,7 @@ interface(`files_dontaudit_list_default',`
 		type default_t;
 	')
 
-	dontaudit $1 default_t:dir r_dir_perms;
+	dontaudit $1 default_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -1633,7 +1650,7 @@ interface(`files_read_default_files',`
 		type default_t;
 	')
 
-	allow $1 default_t:file r_file_perms;
+	allow $1 default_t:file read_file_perms;
 ')
 
 ########################################
@@ -1652,7 +1669,7 @@ interface(`files_dontaudit_read_default_files',`
 		type default_t;
 	')
 
-	dontaudit $1 default_t:file r_file_perms;
+	dontaudit $1 default_t:file read_file_perms;
 ')
 
 ########################################
@@ -1670,7 +1687,7 @@ interface(`files_read_default_symlinks',`
 		type default_t;
 	')
 
-	allow $1 default_t:lnk_file r_file_perms;
+	allow $1 default_t:lnk_file read_lnk_file_perms;
 ')
 
 ########################################
@@ -1688,7 +1705,7 @@ interface(`files_read_default_sockets',`
 		type default_t;
 	')
 
-	allow $1 default_t:sock_file r_file_perms;
+	allow $1 default_t:sock_file read_sock_file_perms;
 ')
 
 ########################################
@@ -1706,7 +1723,7 @@ interface(`files_read_default_pipes',`
 		type default_t;
 	')
 
-	allow $1 default_t:fifo_file r_file_perms;
+	allow $1 default_t:fifo_file read_fifo_file_perms;
 ')
 
 ########################################
@@ -1724,7 +1741,7 @@ interface(`files_search_etc',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir search;
+	allow $1 etc_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -1760,7 +1777,7 @@ interface(`files_list_etc',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
+	allow $1 etc_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -1796,9 +1813,9 @@ interface(`files_read_etc_files',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
-	allow $1 etc_t:file r_file_perms;
-	allow $1 etc_t:lnk_file r_file_perms;
+	allow $1 etc_t:dir list_dir_perms;
+	read_files_pattern($1,etc_t,etc_t)
+	read_lnk_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1835,9 +1852,9 @@ interface(`files_rw_etc_files',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
-	allow $1 etc_t:file rw_file_perms;
-	allow $1 etc_t:lnk_file r_file_perms;
+	allow $1 etc_t:dir list_dir_perms;
+	rw_files_pattern($1,etc_t,etc_t)
+	read_lnk_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1857,9 +1874,8 @@ interface(`files_manage_etc_files',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir rw_dir_perms;
-	allow $1 etc_t:file create_file_perms;
-	allow $1 etc_t:lnk_file r_file_perms;
+	manage_files_pattern($1,etc_t,etc_t)
+	read_lnk_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1877,8 +1893,7 @@ interface(`files_delete_etc_files',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir rw_dir_perms;
-	allow $1 etc_t:file unlink;
+	delete_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1896,10 +1911,9 @@ interface(`files_exec_etc_files',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
-	allow $1 etc_t:lnk_file r_file_perms;
-	can_exec($1,etc_t)
-
+	allow $1 etc_t:dir list_dir_perms;
+	read_lnk_files_pattern($1,etc_t,etc_t)
+	exec_files_pattern($1,etc_t,etc_t)
 ')
 
 #######################################
@@ -1918,7 +1932,7 @@ interface(`files_relabel_etc_files',`
 	')
 
 	allow $1 etc_t:dir list_dir_perms;
-	allow $1 etc_t:file { relabelfrom relabelto };
+	relabel_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1936,8 +1950,25 @@ interface(`files_read_etc_symlinks',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir search_dir_perms;
-	allow $1 etc_t:lnk_file { getattr read };
+	read_lnk_files_pattern($1,etc_t,etc_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete symbolic links in /etc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_manage_etc_symlinks',`
+	gen_require(`
+		type etc_t;
+	')
+
+	manage_lnk_files_pattern($1,etc_t,etc_t)
 ')
 
 ########################################
@@ -1966,8 +1997,7 @@ interface(`files_etc_filetrans',`
 		type etc_t;
 	')
 
-	allow $1 etc_t:dir rw_dir_perms;
-	type_transition $1 etc_t:$3 $2;
+	filetrans_pattern($1,etc_t,$2,$3)
 ')
 
 ########################################
@@ -1992,9 +2022,8 @@ interface(`files_create_boot_flag',`
 		type root_t, etc_runtime_t;
 	')
 
-	allow $1 root_t:dir rw_dir_perms;
-	allow $1 etc_runtime_t:file { create read write setattr unlink };
-	type_transition $1 root_t:file etc_runtime_t;
+	allow $1 etc_runtime_t:file manage_file_perms;
+	filetrans_pattern($1,root_t,etc_runtime_t,file)
 ')
 
 ########################################
@@ -2014,9 +2043,9 @@ interface(`files_read_etc_runtime_files',`
 		type etc_t, etc_runtime_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
-	allow $1 etc_runtime_t:file r_file_perms;
-	allow $1 etc_runtime_t:lnk_file { getattr read };
+	allow $1 etc_t:dir list_dir_perms;
+	read_files_pattern($1,etc_t,etc_runtime_t)
+	read_lnk_files_pattern($1,etc_t,etc_runtime_t)
 ')
 
 ########################################
@@ -2056,8 +2085,8 @@ interface(`files_rw_etc_runtime_files',`
 		type etc_t, etc_runtime_t;
 	')
 
-	allow $1 etc_t:dir r_dir_perms;
-	allow $1 etc_runtime_t:file rw_file_perms;
+	allow $1 etc_t:dir list_dir_perms;
+	rw_files_pattern($1,etc_t,etc_runtime_t)
 ')
 
 ########################################
@@ -2078,9 +2107,7 @@ interface(`files_manage_etc_runtime_files',`
 		type etc_t, etc_runtime_t;
 	')
 
-	allow $1 etc_t:dir rw_dir_perms;
-	allow $1 etc_runtime_t:dir rw_dir_perms;
-	allow $1 etc_runtime_t:file manage_file_perms;
+	manage_files_pattern($1,{ etc_t etc_runtime_t },etc_runtime_t)
 ')
 
 ########################################
@@ -2104,8 +2131,7 @@ interface(`files_etc_filetrans_etc_runtime',`
 		type etc_t, etc_runtime_t;
 	')
 
-	allow $1 etc_t:dir rw_dir_perms;
-	type_transition $1 etc_t:$2 etc_runtime_t;
+	filetrans_pattern($1,etc_t,etc_runtime_t,$2)
 ')
 
 ########################################
@@ -2162,7 +2188,7 @@ interface(`files_list_isid_type_dirs',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir r_dir_perms;
+	allow $1 file_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -2200,7 +2226,7 @@ interface(`files_manage_isid_type_dirs',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir create_dir_perms;
+	allow $1 file_t:dir manage_dir_perms;
 ')
 
 ########################################
@@ -2219,7 +2245,7 @@ interface(`files_mounton_isid_type_dirs',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir { getattr search mounton };
+	allow $1 file_t:dir { search_dir_perms mounton };
 ')
 
 ########################################
@@ -2238,8 +2264,7 @@ interface(`files_read_isid_type_files',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir search;
-	allow $1 file_t:file r_file_perms;
+	allow $1 file_t:file read_file_perms;
 ')
 
 ########################################
@@ -2258,8 +2283,7 @@ interface(`files_manage_isid_type_files',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir rw_dir_perms;
-	allow $1 file_t:file create_file_perms;
+	allow $1 file_t:file manage_file_perms;
 ')
 
 ########################################
@@ -2278,8 +2302,7 @@ interface(`files_manage_isid_type_symlinks',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir rw_dir_perms;
-	allow $1 file_t:lnk_file create_lnk_perms;
+	allow $1 file_t:lnk_file manage_lnk_file_perms;
 ')
 
 ########################################
@@ -2298,8 +2321,7 @@ interface(`files_rw_isid_type_blk_files',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir search;
-	allow $1 file_t:blk_file rw_file_perms;
+	allow $1 file_t:blk_file rw_blk_file_perms;
 ')
 
 ########################################
@@ -2318,8 +2340,7 @@ interface(`files_manage_isid_type_blk_files',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir rw_dir_perms;
-	allow $1 file_t:blk_file create_file_perms;
+	allow $1 file_t:blk_file manage_blk_file_perms;
 ')
 
 ########################################
@@ -2338,8 +2359,7 @@ interface(`files_manage_isid_type_chr_files',`
 		type file_t;
 	')
 
-	allow $1 file_t:dir rw_dir_perms;
-	allow $1 file_t:chr_file create_file_perms;
+	allow $1 file_t:chr_file manage_chr_file_perms;
 ')
 
 ########################################
@@ -2434,7 +2454,7 @@ interface(`files_dontaudit_list_home',`
 		type home_root_t;
 	')
 
-	dontaudit $1 home_root_t:dir r_dir_perms;
+	dontaudit $1 home_root_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -2452,7 +2472,7 @@ interface(`files_list_home',`
 		type home_root_t;
 	')
 
-	allow $1 home_root_t:dir r_dir_perms;
+	allow $1 home_root_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -2480,8 +2500,7 @@ interface(`files_home_filetrans',`
 		type home_root_t;
 	')
 
-	allow $1 home_root_t:dir rw_dir_perms;
-	type_transition $1 home_root_t:$3 $2;
+	filetrans_pattern($1,home_root_t,$2,$3)
 ')
 
 ########################################
@@ -2504,6 +2523,25 @@ interface(`files_getattr_lost_found_dirs',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to get the attributes of
+##	lost+found directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_getattr_lost_found_dirs',`
+	gen_require(`
+		type lost_found_t;
+	')
+
+	dontaudit $1 lost_found_t:dir getattr;
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete objects in
 ##	lost+found directories.
 ## </summary>
@@ -2519,11 +2557,11 @@ interface(`files_manage_lost_found',`
 		type lost_found_t;
 	')
 
-	allow $1 lost_found_t:dir create_dir_perms;
-	allow $1 lost_found_t:file create_file_perms;
-	allow $1 lost_found_t:sock_file create_file_perms;
-	allow $1 lost_found_t:fifo_file create_file_perms;
-	allow $1 lost_found_t:lnk_file create_lnk_perms;
+	manage_dirs_pattern($1,lost_found_t,lost_found_t)
+	manage_files_pattern($1,lost_found_t,lost_found_t)
+	manage_lnk_files_pattern($1,lost_found_t,lost_found_t)
+	manage_fifo_files_pattern($1,lost_found_t,lost_found_t)
+	manage_sock_files_pattern($1,lost_found_t,lost_found_t)
 ')
 
 ########################################
@@ -2540,9 +2578,8 @@ interface(`files_search_mnt',`
 	gen_require(`
 		type mnt_t;
 	')
-
-	allow $1 mnt_t:dir search_dir_perms;
-	allow $1 mnt_t:lnk_file r_file_perms;
+        
+        allow $1 mnt_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -2579,7 +2616,7 @@ interface(`files_list_mnt',`
 		type mnt_t;
 	')
 
-	allow $1 mnt_t:dir r_dir_perms;
+	allow $1 mnt_t:dir list_dir_perms;
 	allow $1 mnt_t:lnk_file r_file_perms;
 ')
 
@@ -2598,7 +2635,7 @@ interface(`files_mounton_mnt',`
 		type mnt_t;
 	')
 
-	allow $1 mnt_t:dir { search mounton };
+	allow $1 mnt_t:dir { search_dir_perms mounton };
 ')
 
 ########################################
@@ -2617,7 +2654,7 @@ interface(`files_manage_mnt_dirs',`
 		type mnt_t;
 	')
 
-	allow $1 mnt_t:dir create_dir_perms;
+	allow $1 mnt_t:dir manage_dir_perms;
 ')
 
 ########################################
@@ -2635,9 +2672,7 @@ interface(`files_manage_mnt_files',`
 		type mnt_t;
 	')
 
-	allow $1 mnt_t:dir rw_dir_perms;
-	allow $1 mnt_t:file create_file_perms;
-	allow $1 mnt_t:lnk_file r_file_perms;
+	manage_files_pattern($1,mnt_t,mnt_t)
 ')
 
 ########################################
@@ -2655,8 +2690,7 @@ interface(`files_manage_mnt_symlinks',`
 		type mnt_t;
 	')
 
-	allow $1 mnt_t:dir rw_dir_perms;
-	allow $1 mnt_t:lnk_file create_lnk_perms;
+	manage_lnk_files_pattern($1,mnt_t,mnt_t)
 ')
 
 ########################################
@@ -2674,7 +2708,7 @@ interface(`files_search_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir search;
+	allow $1 modules_object_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -2692,7 +2726,7 @@ interface(`files_list_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir r_dir_perms;
+	allow $1 modules_object_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -2710,8 +2744,7 @@ interface(`files_getattr_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir search;
-	allow $1 modules_object_t:dir getattr;
+	getattr_files_pattern($1,modules_object_t,modules_object_t)
 ')
 
 ########################################
@@ -2729,9 +2762,9 @@ interface(`files_read_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir r_dir_perms;
-	allow $1 modules_object_t:lnk_file r_file_perms;
-	allow $1 modules_object_t:file r_file_perms;
+	allow $1 modules_object_t:dir list_dir_perms;
+	read_files_pattern($1,modules_object_t,modules_object_t)
+	read_lnk_files_pattern($1,modules_object_t,modules_object_t)
 ')
 
 ########################################
@@ -2749,8 +2782,8 @@ interface(`files_write_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir r_dir_perms;
-	allow $1 modules_object_t:file { write append };
+	allow $1 modules_object_t:dir list_dir_perms;
+	write_files_pattern($1,modules_object_t,modules_object_t)
 ')
 
 ########################################
@@ -2768,8 +2801,7 @@ interface(`files_delete_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir { list_dir_perms write remove_name };
-	allow $1 modules_object_t:file unlink;
+	delete_files_pattern($1,modules_object_t,modules_object_t)
 ')
 
 ########################################
@@ -2789,8 +2821,7 @@ interface(`files_manage_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:file { rw_file_perms create setattr unlink };
-	allow $1 modules_object_t:dir rw_dir_perms;
+	manage_files_pattern($1,modules_object_t,modules_object_t)
 ')
 
 ########################################
@@ -2808,7 +2839,7 @@ interface(`files_relabel_kernel_modules',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:file { relabelfrom relabelto };
+	relabel_files_pattern($1,modules_object_t,modules_object_t)
 	allow $1 modules_object_t:dir list_dir_perms;
 ')
 
@@ -2838,8 +2869,7 @@ interface(`files_kernel_modules_filetrans',`
 		type modules_object_t;
 	')
 
-	allow $1 modules_object_t:dir rw_dir_perms;
-	type_transition $1 modules_object_t:$3 $2;
+	filetrans_pattern($1,modules_object_t,$2,$3)
 ')
 
 ########################################
@@ -2858,7 +2888,7 @@ interface(`files_list_world_readable',`
 		type readable_t;
 	')
 
-	allow $1 readable_t:dir r_dir_perms;
+	allow $1 readable_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -2877,7 +2907,7 @@ interface(`files_read_world_readable_files',`
 		type readable_t;
 	')
 
-	allow $1 readable_t:file r_file_perms;
+	allow $1 readable_t:file read_file_perms;
 ')
 
 ########################################
@@ -2896,7 +2926,7 @@ interface(`files_read_world_readable_symlinks',`
 		type readable_t;
 	')
 
-	allow $1 readable_t:lnk_file r_file_perms;
+	allow $1 readable_t:lnk_file read_lnk_file_perms;
 ')
 
 ########################################
@@ -2914,7 +2944,7 @@ interface(`files_read_world_readable_pipes',`
 		type readable_t;
 	')
 
-	allow $1 readable_t:fifo_file r_file_perms;
+	allow $1 readable_t:fifo_file read_fifo_file_perms;
 ')
 
 ########################################
@@ -2932,7 +2962,7 @@ interface(`files_read_world_readable_sockets',`
 		type readable_t;
 	')
 
-	allow $1 readable_t:sock_file r_file_perms;
+	allow $1 readable_t:sock_file read_sock_file_perms;
 ')
 
 ########################################
@@ -3061,7 +3091,7 @@ interface(`files_dontaudit_list_tmp',`
 		type tmp_t;
 	')
 
-	dontaudit $1 tmp_t:dir { read getattr search };
+	dontaudit $1 tmp_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -3079,8 +3109,7 @@ interface(`files_read_generic_tmp_files',`
 		type tmp_t;
 	')
 
-	allow $1 tmp_t:dir search_dir_perms;
-	allow $1 tmp_t:file r_file_perms;
+	read_files_pattern($1,tmp_t,tmp_t)
 ')
 
 ########################################
@@ -3098,8 +3127,7 @@ interface(`files_manage_generic_tmp_files',`
 		type tmp_t;
 	')
 
-	allow $1 tmp_t:dir rw_dir_perms;
-	allow $1 tmp_t:file manage_file_perms;
+	manage_files_pattern($1,tmp_t,tmp_t)
 ')
 
 ########################################
@@ -3117,8 +3145,7 @@ interface(`files_read_generic_tmp_symlinks',`
 		type tmp_t;
 	')
 
-	allow $1 tmp_t:dir search_dir_perms;
-	allow $1 tmp_t:lnk_file r_file_perms;
+	read_lnk_files_pattern($1,tmp_t,tmp_t)
 ')
 
 ########################################
@@ -3136,8 +3163,7 @@ interface(`files_rw_generic_tmp_sockets',`
 		type tmp_t;
 	')
 
-	allow $1 tmp_t:dir search_dir_perms;
-	allow $1 tmp_t:sock_file { read write };
+	rw_sock_files_pattern($1,tmp_t,tmp_t)
 ')
 
 ########################################
@@ -3155,7 +3181,44 @@ interface(`files_setattr_all_tmp_dirs',`
 		attribute tmpfile;
 	')
 
-	allow $1 tmpfile:dir { search setattr };
+	allow $1 tmpfile:dir { search_dir_perms setattr };
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes
+##	of all tmp files. 
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain not to audit.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_getattr_all_tmp_files',`
+	gen_require(`
+		attribute tmpfile;
+	')
+
+	dontaudit $1 tmpfile:file getattr;
+')
+
+########################################
+## <summary>
+##	Read all tmp files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_read_all_tmp_files',`
+	gen_require(`
+		attribute tmpfile;
+	')
+
+	read_files_pattern($1,tmpfile,tmpfile)
 ')
 
 ########################################
@@ -3184,8 +3247,7 @@ interface(`files_tmp_filetrans',`
 		type tmp_t;
 	')
 
-	allow $1 tmp_t:dir rw_dir_perms;
-	type_transition $1 tmp_t:$3 $2;
+	filetrans_pattern($1,tmp_t,$2,$3)
 ')
 
 ########################################
@@ -3203,8 +3265,12 @@ interface(`files_purge_tmp',`
 		attribute tmpfile;
 	')
 
-	allow $1 tmpfile:dir { rw_dir_perms rmdir };
-	allow $1 tmpfile:notdevfile_class_set { getattr unlink };
+	allow $1 tmpfile:dir list_dir_perms;
+	delete_dirs_pattern($1,tmpfile,tmpfile)
+	delete_files_pattern($1,tmpfile,tmpfile)
+	delete_lnk_files_pattern($1,tmpfile,tmpfile)
+	delete_fifo_files_pattern($1,tmpfile,tmpfile)
+	delete_sock_files_pattern($1,tmpfile,tmpfile)
 ')
 
 ########################################
@@ -3222,7 +3288,7 @@ interface(`files_search_usr',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir search;
+	allow $1 usr_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -3241,7 +3307,7 @@ interface(`files_list_usr',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir r_dir_perms;
+	allow $1 usr_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -3259,8 +3325,7 @@ interface(`files_getattr_usr_files',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir search;
-	allow $1 usr_t:file getattr;
+	getattr_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3278,8 +3343,9 @@ interface(`files_read_usr_files',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir r_dir_perms;
-	allow $1 usr_t:{ file lnk_file } r_file_perms;
+	allow $1 usr_t:dir list_dir_perms;
+	read_files_pattern($1,usr_t,usr_t)
+	read_lnk_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3297,10 +3363,9 @@ interface(`files_exec_usr_files',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir r_dir_perms;
-	allow $1 usr_t:lnk_file r_file_perms;
-	can_exec($1,usr_t)
-
+	allow $1 usr_t:dir list_dir_perms;
+	exec_files_pattern($1,usr_t,usr_t)
+	read_lnk_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3318,7 +3383,7 @@ interface(`files_relabelto_usr_files',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:file relabelto;
+	relabelto_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3336,8 +3401,7 @@ interface(`files_read_usr_symlinks',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir search;
-	allow $1 usr_t:lnk_file r_file_perms;
+	read_lnk_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3365,8 +3429,7 @@ interface(`files_usr_filetrans',`
 		type usr_t;
 	')
 
-	allow $1 usr_t:dir rw_dir_perms;
-	type_transition $1 usr_t:$3 $2;
+	filetrans_pattern($1,usr_t,$2,$3)
 ')
 
 ########################################
@@ -3384,7 +3447,7 @@ interface(`files_dontaudit_search_src',`
 		type src_t;
 	')
 
-	dontaudit $1 src_t:dir search;
+	dontaudit $1 src_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -3402,10 +3465,10 @@ interface(`files_getattr_usr_src_files',`
 		type usr_t, src_t;
 	')
 
-	allow $1 { usr_t src_t }:dir search_dir_perms;
+	getattr_files_pattern($1,src_t,src_t)
 
-	allow $1 src_t:lnk_file { getattr read };
-	allow $1 src_t:file getattr;
+	# /usr/src/linux symlink:
+	read_lnk_files_pattern($1,usr_t,src_t)
 ')
 
 ########################################
@@ -3423,9 +3486,10 @@ interface(`files_read_usr_src_files',`
 		type usr_t, src_t;
 	')
 
-	allow $1 usr_t:dir search;
-	allow $1 src_t:dir r_dir_perms;
-	allow $1 src_t:{ file lnk_file } r_file_perms;
+	allow $1 usr_t:dir search_dir_perms;
+	read_files_pattern($1,{ usr_t src_t },src_t)
+	read_lnk_files_pattern($1,{ usr_t src_t },src_t)
+	allow $1 src_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -3443,10 +3507,9 @@ interface(`files_exec_usr_src_files',`
 		type usr_t, src_t;
 	')
 
-	allow $1 usr_t:dir search;
-	allow $1 src_t:dir r_dir_perms;
-	allow $1 src_t:lnk_file r_file_perms;
-	can_exec($1,src_t)
+	list_dirs_pattern($1,usr_t,src_t)
+	exec_files_pattern($1,src_t,src_t)
+	read_lnk_files_pattern($1,src_t,src_t)
 ')
 
 ########################################
@@ -3483,11 +3546,8 @@ interface(`files_read_kernel_symbol_table',`
 		type boot_t, system_map_t;
 	')
 
-	allow $1 boot_t:dir r_dir_perms;
-	allow $1 system_map_t:file r_file_perms;
-
-	# cjp: this should be dropped:
-	allow $1 boot_t:file { getattr read };
+	allow $1 boot_t:dir list_dir_perms;
+	read_files_pattern($1,boot_t,system_map_t)
 ')
 
 ########################################
@@ -3505,8 +3565,8 @@ interface(`files_delete_kernel_symbol_table',`
 		type boot_t, system_map_t;
 	')
 
-	allow $1 boot_t:dir { r_dir_perms write remove_name };
-	allow $1 system_map_t:file { getattr unlink };
+	allow $1 boot_t:dir list_dir_perms;
+	delete_files_pattern($1,boot_t,system_map_t)
 ')
 
 ########################################
@@ -3547,6 +3607,24 @@ interface(`files_dontaudit_write_var_dirs',`
 
 ########################################
 ## <summary>
+##	Allow attempts to write to /var.dirs
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`files_write_var_dirs',`
+	gen_require(`
+		type var_t;
+	')
+
+	allow $1 var_t:dir write;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to search
 ##	the contents of /var.
 ## </summary>
@@ -3579,7 +3657,7 @@ interface(`files_list_var',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir r_dir_perms;
+	allow $1 var_t:dir list_dir_perms;
 ')
 
 ########################################
@@ -3598,7 +3676,7 @@ interface(`files_manage_var_dirs',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir create_dir_perms;
+	allow $1 var_t:dir manage_dir_perms;
 ')
 
 ########################################
@@ -3616,8 +3694,7 @@ interface(`files_read_var_files',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_t:file r_file_perms;
+	read_files_pattern($1,var_t,var_t)
 ')
 
 ########################################
@@ -3635,8 +3712,7 @@ interface(`files_rw_var_files',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir rw_dir_perms;
-	allow $1 var_t:file create_file_perms;
+	rw_files_pattern($1,var_t,var_t)
 ')
 
 ########################################
@@ -3654,8 +3730,7 @@ interface(`files_manage_var_files',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir rw_dir_perms;
-	allow $1 var_t:file create_file_perms;
+	manage_files_pattern($1,var_t,var_t)
 ')
 
 ########################################
@@ -3673,8 +3748,7 @@ interface(`files_read_var_symlinks',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_t:lnk_file { getattr read };
+	read_lnk_files_pattern($1,var_t,var_t)
 ')
 
 ########################################
@@ -3693,8 +3767,7 @@ interface(`files_manage_var_symlinks',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir rw_dir_perms;
-	allow $1 var_t:lnk_file create_lnk_perms;
+	manage_lnk_files_pattern($1,var_t,var_t)
 ')
 
 ########################################
@@ -3722,8 +3795,7 @@ interface(`files_var_filetrans',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir rw_dir_perms;
-	type_transition $1 var_t:$3 $2;
+	filetrans_pattern($1,var_t,$2,$3)
 ')
 
 ########################################
@@ -3741,8 +3813,7 @@ interface(`files_getattr_var_lib_dirs',`
 		type var_t, var_lib_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lib_t:dir getattr;
+	getattr_dirs_pattern($1,var_t,var_lib_t)
 ')
 
 ########################################
@@ -3760,7 +3831,7 @@ interface(`files_search_var_lib',`
 		type var_t, var_lib_t;
 	')
 
-	allow $1 { var_t var_lib_t }:dir search_dir_perms;
+	search_dirs_pattern($1,var_t,var_lib_t)
 ')
 
 ########################################
@@ -3778,8 +3849,7 @@ interface(`files_list_var_lib',`
 		type var_t, var_lib_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lib_t:dir r_dir_perms;
+	list_dirs_pattern($1,var_t,var_lib_t)
 ')
 
 ########################################
@@ -3808,8 +3878,7 @@ interface(`files_var_lib_filetrans',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lib_t:dir rw_dir_perms;
-	type_transition $1 var_lib_t:$3 $2;
+	filetrans_pattern($1,var_lib_t,$2,$3)
 ')
 
 ########################################
@@ -3827,8 +3896,8 @@ interface(`files_read_var_lib_files',`
 		type var_t, var_lib_t;
 	')
 
-	allow $1 { var_t var_lib_t }:dir search_dir_perms;
-	allow $1 var_lib_t:file r_file_perms;
+	allow $1 var_lib_t:dir list_dir_perms;
+	read_files_pattern($1,{ var_t var_lib_t },var_lib_t)
 ')
 
 ########################################
@@ -3846,8 +3915,7 @@ interface(`files_read_var_lib_symlinks',`
 		type var_t, var_lib_t;
 	')
 
-	allow $1 { var_t var_lib_t }:dir search_dir_perms;
-	allow $1 var_lib_t:lnk_file { getattr read };
+	read_lnk_files_pattern($1,{ var_t var_lib_t },var_lib_t)
 ')
 
 # cjp: the next two interfaces really need to be fixed
@@ -3870,8 +3938,7 @@ interface(`files_manage_urandom_seed',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lib_t:dir rw_dir_perms;
-	allow $1 var_lib_t:file manage_file_perms;
+	manage_files_pattern($1,var_lib_t,var_lib_t)
 ')
 
 ########################################
@@ -3891,8 +3958,7 @@ interface(`files_manage_mounttab',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lib_t:dir rw_dir_perms;
-	allow $1 var_lib_t:file manage_file_perms;
+	manage_files_pattern($1,var_lib_t,var_lib_t)
 ')
 
 ########################################
@@ -3910,7 +3976,7 @@ interface(`files_search_locks',`
 		type var_t, var_lock_t;
 	')
 
-	allow $1 { var_t var_lock_t }:dir search_dir_perms;
+	search_dirs_pattern($1,var_t,var_lock_t)
 ')
 
 ########################################
@@ -3948,8 +4014,7 @@ interface(`files_rw_lock_dirs',`
 		type var_t, var_lock_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lock_t:dir rw_dir_perms;
+	rw_dirs_pattern($1,var_t,var_lock_t)
 ')
 
 ########################################
@@ -3968,8 +4033,8 @@ interface(`files_getattr_generic_locks',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_lock_t:dir r_dir_perms;
-	allow $1 var_lock_t:file getattr;
+	allow $1 var_lock_t:dir list_dir_perms;
+	getattr_files_pattern($1,var_lock_t,var_lock_t)
 ')
 
 ########################################
@@ -3988,8 +4053,8 @@ interface(`files_manage_generic_locks',`
 		type var_lock_t;
 	')
 
-	allow $1 var_lock_t:dir rw_dir_perms;
-	allow $1 var_lock_t:file manage_file_perms;
+	allow $1 var_t:dir search_dir_perms;
+	manage_files_pattern($1,var_lock_t,var_lock_t)
 ')
 
 ########################################
@@ -4008,8 +4073,8 @@ interface(`files_delete_all_locks',`
 		attribute lockfile;
 	')
 
-	allow $1 lockfile:dir rw_dir_perms;
-	allow $1 lockfile:file { getattr unlink };
+	allow $1 var_t:dir search_dir_perms;
+	delete_files_pattern($1,lockfile,lockfile)
 ')
 
 ########################################
@@ -4029,9 +4094,9 @@ interface(`files_read_all_locks',`
 	')
 
 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
-	allow $1 lockfile:dir r_dir_perms;
-	allow $1 lockfile:file r_file_perms;
-	allow $1 lockfile:lnk_file { getattr read };
+	allow $1 lockfile:dir list_dir_perms;
+	read_files_pattern($1,lockfile,lockfile)
+	read_lnk_files_pattern($1,lockfile,lockfile)
 ')
 
 ########################################
@@ -4060,9 +4125,8 @@ interface(`files_lock_filetrans',`
 		type var_t, var_lock_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_lock_t:dir rw_dir_perms;
-	type_transition $1 var_lock_t:$3 $2;
+	allow $1 var_t:dir search_dir_perms;
+	filetrans_pattern($1,var_lock_t,$2,$3)
 ')
 
 ########################################
@@ -4100,8 +4164,7 @@ interface(`files_search_pids',`
 		type var_t, var_run_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_run_t:dir search_dir_perms;
+	search_dirs_pattern($1,var_t,var_run_t)
 ')
 
 ########################################
@@ -4139,8 +4202,7 @@ interface(`files_list_pids',`
 		type var_t, var_run_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_run_t:dir r_dir_perms;
+	list_dirs_pattern($1,var_t,var_run_t)
 ')
 
 ########################################
@@ -4170,8 +4232,7 @@ interface(`files_pid_filetrans',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_run_t:dir rw_dir_perms;
-	type_transition $1 var_run_t:$3 $2;
+	filetrans_pattern($1,var_run_t,$2,$3)
 ')
 
 ########################################
@@ -4189,9 +4250,8 @@ interface(`files_rw_generic_pids',`
 		type var_t, var_run_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_run_t:dir r_dir_perms;
-	allow $1 var_run_t:file rw_file_perms;
+	list_dirs_pattern($1,var_t,var_run_t)
+	rw_files_pattern($1,var_run_t,var_run_t)
 ')
 
 ########################################
@@ -4247,9 +4307,8 @@ interface(`files_read_all_pids',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 pidfile:dir r_dir_perms;
-	allow $1 pidfile:file r_file_perms;
+	list_dirs_pattern($1,var_t,pidfile)
+	read_files_pattern($1,pidfile,pidfile)
 ')
 
 ########################################
@@ -4288,13 +4347,12 @@ interface(`files_delete_all_pids',`
 		type var_t, var_run_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_run_t:{ sock_file lnk_file } { getattr unlink };
+	allow $1 var_t:dir search_dir_perms;
 	allow $1 var_run_t:dir rmdir;
-	allow $1 pidfile:dir rw_dir_perms;
-	allow $1 pidfile:file { getattr unlink };
-	allow $1 pidfile:sock_file { getattr unlink };
-	allow $1 pidfile:fifo_file { getattr unlink };
+	allow $1 var_run_t:lnk_file delete_lnk_file_perms;
+	delete_files_pattern($1,pidfile,pidfile)
+	delete_fifo_files_pattern($1,pidfile,pidfile)
+	delete_sock_files_pattern($1,pidfile,{ pidfile var_run_t })
 ')
 
 ########################################
@@ -4313,8 +4371,8 @@ interface(`files_delete_all_pid_dirs',`
 		type var_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 pidfile:dir { rw_dir_perms rmdir };
+	allow $1 var_t:dir search_dir_perms;
+	delete_dirs_pattern($1,pidfile,pidfile)
 ')
 
 ########################################
@@ -4333,8 +4391,7 @@ interface(`files_search_spool',`
 		type var_t, var_spool_t;
 	')
 
-	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_spool_t:dir search_dir_perms;
+	search_dirs_pattern($1,var_t,var_spool_t)
 ')
 
 ########################################
@@ -4372,8 +4429,7 @@ interface(`files_list_spool',`
 		type var_t, var_spool_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_spool_t:dir r_dir_perms;
+	list_dirs_pattern($1,var_t,var_spool_t)
 ')
 
 ########################################
@@ -4392,8 +4448,8 @@ interface(`files_manage_generic_spool_dirs',`
 		type var_t, var_spool_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_spool_t:dir create_dir_perms;
+	allow $1 var_t:dir search_dir_perms;
+	manage_dirs_pattern($1,var_spool_t,var_spool_t)
 ')
 
 ########################################
@@ -4411,9 +4467,8 @@ interface(`files_read_generic_spool',`
 		type var_t, var_spool_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_spool_t:dir r_dir_perms;
-	allow $1 var_spool_t:file r_file_perms;
+	list_dirs_pattern($1,var_t,var_spool_t)
+	read_files_pattern($1,var_spool_t,var_spool_t)
 ')
 
 ########################################
@@ -4432,9 +4487,8 @@ interface(`files_manage_generic_spool',`
 		type var_t, var_spool_t;
 	')
 
-	allow $1 var_t:dir search;
-	allow $1 var_spool_t:dir rw_dir_perms;
-	allow $1 var_spool_t:file create_file_perms;
+	allow $1 var_t:dir search_dir_perms;
+	manage_files_pattern($1,var_spool_t,var_spool_t)
 ')
 
 ########################################
@@ -4454,8 +4508,7 @@ interface(`files_spool_filetrans',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
-	allow $1 var_spool_t:dir rw_dir_perms;
-	type_transition $1 var_spool_t:$3 $2;
+	filetrans_pattern($1,var_spool_t,$2,$3)
 ')
 
 ########################################
@@ -4479,10 +4532,10 @@ interface(`files_polyinstantiate_all',`
 	selinux_compute_member($1)
 
 	# Need sys_admin capability for mounting
-	allow $1 self:capability sys_admin;
+	allow $1 self:capability { chown fsetid sys_admin };
 
 	# Need to give access to the directories to be polyinstantiated
-	allow $1 polydir:dir { create getattr search write add_name setattr mounton };
+	allow $1 polydir:dir { create getattr search write add_name setattr mounton rmdir };
 
 	# Need to give access to the polyinstantiated subdirectories
 	allow $1 polymember:dir search_dir_perms;
@@ -4495,7 +4548,7 @@ interface(`files_polyinstantiate_all',`
 	allow $1 self:process setfscreate;
 	allow $1 polymember: dir { create setattr relabelto };
 	allow $1 polydir: dir { write add_name };
-	allow $1 polyparent:dir { write add_name relabelfrom relabelto };
+	allow $1 polyparent:dir { read write remove_name add_name relabelfrom relabelto };
 
 	# Default type for mountpoints
 	allow $1 poly_t:dir { create mounton };
@@ -4535,31 +4588,5 @@ interface(`files_manage_non_security_dirs',`
 		attribute file_type, security_file_type;
 	')
 
-	allow $1 { file_type -security_file_type }:dir create_dir_perms;
-')
-
-########################################
-## <summary>
-##	Create a aliased type to etc_runtime_t files.
-## </summary>
-## <desc>
-##	<p>
-##	Create a aliased type to etc runtime files.
-##	</p>
-##	<p>
-##	This is added to remove types that should have been etc_runtime_t
-##	</p>
-## </desc>
-## <param name="domain">
-##	<summary>
-##	Alias type for etc_runtime_t.
-##	</summary>
-## </param>
-#
-interface(`corecmd_etc_runtime_alias',`
-	gen_require(`
-		type etc_runtime_t;
-	')
-
-	typealias etc_runtime_t alias $1;
+	allow $1 { file_type -security_file_type }:dir manage_dir_perms;
 ')

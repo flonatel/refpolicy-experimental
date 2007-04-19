@@ -1,0 +1,42 @@
+<module name="mcs" filename="policy/modules/kernel/mcs.if">
+<summary>Multicategory security policy</summary>
+<required val="true">
+Contains attributes used in MCS policy.
+</required>
+<interface name="mcs_killall" lineno="18">
+<summary>
+This domain is allowed to sigkill and sigstop
+all domains regardless of their MCS category set.
+</summary>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="mcs_ptrace_all" lineno="38">
+<summary>
+This domain is allowed to ptrace
+all domains regardless of their MCS
+category set.
+</summary>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+</interface>
+<interface name="mcs_process_set_categories" lineno="58">
+<summary>
+Make specified domain MCS trusted
+for setting any category set for
+the processes it executes.
+</summary>
+<param name="domain">
+<summary>
+Domain target for user exemption.
+</summary>
+</param>
+</interface>
+</module>

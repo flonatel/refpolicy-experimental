@@ -1,0 +1,3 @@
+<module name="monop" filename="policy/modules/services/monop.if">
+<summary>Monopoly daemon</summary>
+</module>

@@ -1,0 +1,45 @@
+<module name="ldap" filename="policy/modules/services/ldap.if">
+<summary>OpenLDAP directory server</summary>
+<interface name="ldap_list_db" lineno="14">
+<summary>
+Read the contents of the OpenLDAP
+database directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ldap_read_config" lineno="33">
+<summary>
+Read the OpenLDAP configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="ldap_use" lineno="52">
+<summary>
+Use LDAP over TCP connection.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ldap_stream_connect" lineno="67">
+<summary>
+Connect to slapd over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

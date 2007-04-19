@@ -1,0 +1,63 @@
+<module name="apm" filename="policy/modules/services/apm.if">
+<summary>Advanced power management daemon</summary>
+<interface name="apm_domtrans_client" lineno="13">
+<summary>
+Execute APM in the apm domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apm_use_fds" lineno="32">
+<summary>
+Use file descriptors for apmd.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apm_write_pipes" lineno="50">
+<summary>
+Write to apmd unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apm_rw_stream_sockets" lineno="68">
+<summary>
+Read and write to an apm unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apm_append_log" lineno="86">
+<summary>
+Append to apm's log file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apm_stream_connect" lineno="105">
+<summary>
+Connect to apmd over an unix stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

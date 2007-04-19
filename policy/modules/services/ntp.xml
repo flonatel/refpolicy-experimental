@@ -1,0 +1,33 @@
+<module name="ntp" filename="policy/modules/services/ntp.if">
+<summary>Network time protocol daemon</summary>
+<interface name="ntp_stub" lineno="13">
+<summary>
+NTP stub interface.  No access allowed.
+</summary>
+<param name="domain" optional="true">
+<summary>
+N/A
+</summary>
+</param>
+</interface>
+<interface name="ntp_domtrans" lineno="29">
+<summary>
+Execute ntp server in the ntpd domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="ntp_domtrans_ntpdate" lineno="48">
+<summary>
+Execute ntp server in the ntpd domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

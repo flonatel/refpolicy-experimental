@@ -1,5 +1,5 @@
 
-policy_module(hal,1.4.0)
+policy_module(hal,1.6.0)
 
 ########################################
 #
@@ -16,31 +16,39 @@ files_tmp_file(hald_tmp_t)
 type hald_var_run_t;
 files_pid_file(hald_var_run_t)
 
+type hald_var_lib_t;
+files_type(hald_var_lib_t)
+
 ########################################
 #
 # Local policy
 #
 
 # execute openvt which needs setuid
-allow hald_t self:capability { audit_write chown setuid setgid kill net_admin sys_admin sys_nice dac_override dac_read_search mknod sys_rawio sys_tty_config };
+allow hald_t self:capability { chown setuid setgid kill net_admin sys_admin sys_nice dac_override dac_read_search mknod sys_rawio sys_tty_config };
 dontaudit hald_t self:capability sys_tty_config;
 allow hald_t self:process signal_perms;
-allow hald_t self:fifo_file rw_file_perms;
+allow hald_t self:fifo_file rw_fifo_file_perms;
 allow hald_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow hald_t self:unix_dgram_socket create_socket_perms;
-allow hald_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
 allow hald_t self:netlink_kobject_uevent_socket create_socket_perms;
 allow hald_t self:tcp_socket create_stream_socket_perms;
 allow hald_t self:udp_socket create_socket_perms;
 # For backwards compatibility with older kernels
 allow hald_t self:netlink_socket create_socket_perms;
 
-allow hald_t hald_tmp_t:dir create_dir_perms;
-allow hald_t hald_tmp_t:file create_file_perms;
+send_audit_msgs_pattern(hald_t)
+
+manage_dirs_pattern(hald_t,hald_tmp_t,hald_tmp_t)
+manage_files_pattern(hald_t,hald_tmp_t,hald_tmp_t)
 files_tmp_filetrans(hald_t, hald_tmp_t, { file dir })
 
-allow hald_t hald_var_run_t:file create_file_perms;
-allow hald_t hald_var_run_t:dir rw_dir_perms;
+# var/lib files for hald
+manage_dirs_pattern(hald_t,hald_var_lib_t,hald_var_lib_t)
+manage_files_pattern(hald_t,hald_var_lib_t,hald_var_lib_t)
+manage_sock_files_pattern(hald_t,hald_var_lib_t,hald_var_lib_t)
+
+manage_files_pattern(hald_t,hald_var_run_t,hald_var_run_t)
 files_pid_filetrans(hald_t,hald_var_run_t,file)
 
 kernel_read_system_state(hald_t)
@@ -74,6 +82,7 @@ dev_manage_generic_chr_files(hald_t)
 dev_rw_generic_usb_dev(hald_t)
 dev_setattr_generic_usb_dev(hald_t)
 dev_setattr_usbfs_files(hald_t)
+dev_rw_power_management(hald_t)
 # hal is now execing pm-suspend
 dev_rw_sysfs(hald_t)
 
@@ -85,6 +94,7 @@ files_read_etc_files(hald_t)
 files_rw_etc_runtime_files(hald_t)
 files_manage_mnt_dirs(hald_t)
 files_manage_mnt_files(hald_t)
+files_manage_mnt_symlinks(hald_t)
 files_search_var_lib(hald_t)
 files_read_usr_files(hald_t)
 # hal is now execing pm-suspend
@@ -117,8 +127,6 @@ term_dontaudit_use_unallocated_ttys(hald_t)
 
 auth_use_nsswitch(hald_t)
 
-init_use_fds(hald_t)
-init_use_script_ptys(hald_t)
 init_domtrans_script(hald_t)
 init_write_initctl(hald_t)
 init_read_utmp(hald_t)
@@ -147,7 +155,6 @@ userdom_dontaudit_use_unpriv_user_fds(hald_t)
 userdom_dontaudit_search_sysadm_home_dirs(hald_t)
 
 ifdef(`targeted_policy',`
-	term_dontaudit_use_console(hald_t)
 	term_dontaudit_use_generic_ptys(hald_t)
 	files_dontaudit_read_root_files(hald_t)
 ')

@@ -1,0 +1,35 @@
+<module name="ddcprobe" filename="policy/modules/admin/ddcprobe.if">
+<summary>ddcprobe retrieves monitor and graphics card information</summary>
+<interface name="ddcprobe_domtrans" lineno="13">
+<summary>
+Execute ddcprobe in the ddcprobe domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="ddcprobe_run" lineno="43">
+<summary>
+Execute ddcprobe in the ddcprobe domain, and
+allow the specified role the ddcprobe domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+Role to be authenticated for ddcprobe domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the clock domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>
