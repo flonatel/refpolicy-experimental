@@ -1,3 +1,0 @@
-<module name="distcc" filename="policy/modules/services/distcc.if">
-<summary>Distributed compiler daemon</summary>
-</module>

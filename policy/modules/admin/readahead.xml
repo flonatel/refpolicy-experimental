@@ -1,3 +1,0 @@
-<module name="readahead" filename="policy/modules/admin/readahead.if">
-<summary>Readahead, read files into page cache for improved performance</summary>
-</module>

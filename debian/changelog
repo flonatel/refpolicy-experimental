@@ -1,3 +1,28 @@
+refpolicy (0.0.20070507-1) unstable; urgency=low
+
+  * New upstream SVN HEAD.
+    - Miscellaneous consolekit fixes from Dan Walsh.
+    - Patch to have avahi use the nsswitch interface rather than individual
+      permissions from Dan Walsh.
+    - Patch to dontaudit logrotate searching avahi pid directory from Dan
+      Walsh. 
+    - Patch to allow insmod to mount kvmfs and dontaudit rw unconfined_t
+      pipes to handle usage from userhelper from Dan Walsh.
+    - Patch to allow amavis to read spamassassin libraries from Dan Walsh.
+    - Patch to allow slocate to getattr other filesystems and directories
+      on those filesystems from Dan Walsh.
+    - Fixes for RHEL4 from the CLIP project.
+    - Replace the old lrrd fc entries with munin ones.
+    - Move program admin template usage out of
+      userdom_admin_user_template() to sysadm policy in userdomain.te to
+      fix usage of the template for third parties.
+    - Fix clockspeed_run_cli() declaration, it was incorrectly defined as a
+      template instead of an interface.
+    - Added modules: rwho (Nalin Dahyabhai)
+  * Updated dependencies, since this refpolicy needs newer toolchain,
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon,  7 May 2007 01:47:44 -0500
+
 refpolicy (0.0.20070417-1) unstable; urgency=low
 
   * New upstream release.

@@ -1,3 +1,0 @@
-<module name="radvd" filename="policy/modules/services/radvd.if">
-<summary>IPv6 router advertisement daemon</summary>
-</module>

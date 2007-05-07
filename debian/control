@@ -6,11 +6,11 @@ Section: admin
 Maintainer: Manoj Srivastava <srivasta@debian.org>
 Uploaders: Erich Schubert <erich@debian.org>
 Standards-Version: 3.7.2.0
-Build-Depends: policycoreutils (>= 1.34.6), checkpolicy (>= 1.34.1), python, m4, bzip2, gawk
+Build-Depends: policycoreutils (>= 2.0.16), checkpolicy (>= 2.0.2), python, m4, bzip2, gawk
 
 Package: selinux-policy-refpolicy-strict
 Architecture: all
-Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 1.32)
+Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.7)
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-default
@@ -38,7 +38,7 @@ Description: Strict variant of the SELinux reference policy
 
 Package: selinux-policy-refpolicy-targeted
 Architecture: all
-Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 1.32)
+Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.7)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-default
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
@@ -68,7 +68,7 @@ Description: Targeted variant of the SELinux reference policy
 
 Package: selinux-policy-refpolicy-src
 Architecture: all
-Depends: python, policycoreutils, checkpolicy (>= 1.32), gawk
+Depends: python, policycoreutils, checkpolicy (>= 2.0.2), gawk
 Conflicts: selinux-policy-default
 Recommends: setools
 Suggests: logcheck, syslog-summary
@@ -96,7 +96,7 @@ Description: Source of the SELinux reference policy for customization
 
 Package: selinux-policy-refpolicy-dev
 Architecture: all
-Depends: python, policycoreutils, checkpolicy (>= 1.32), gawk
+Depends: python, policycoreutils, checkpolicy (>= 2.0.2), gawk
 Recommends: setools
 Description: Headers from the SELinux reference policy for building modules
  The SELinux Reference Policy (refpolicy) is a complete SELinux

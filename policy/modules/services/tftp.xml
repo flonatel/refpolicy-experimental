@@ -1,3 +1,0 @@
-<module name="tftp" filename="policy/modules/services/tftp.if">
-<summary>Trivial file transfer protocol daemon</summary>
-</module>
