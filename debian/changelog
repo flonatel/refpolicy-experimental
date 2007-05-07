@@ -1,3 +1,14 @@
+refpolicy (0.0.20070507-2) unstable; urgency=medium
+
+  * Keep track of modules that are really  built into the base policy in
+    Debian.  We then use this list to remove  the modules .pp files from
+    the policy shipped, since they can not be installed along with the
+    base policy anyway. Make sure we don't add such modules hen
+    considering module dependencies either.
+  * Added Module ricci to modules.conf for both strict and targeted.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon,  7 May 2007 09:07:36 -0500
+
 refpolicy (0.0.20070507-1) unstable; urgency=low
 
   * New upstream SVN HEAD.

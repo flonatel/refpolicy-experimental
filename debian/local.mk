@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Mon Feb 26 23:11:36 2007
+## Last Modified On : Mon May  7 08:55:23 2007
 ## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 104
+## Update Count     : 106
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -193,6 +193,10 @@ install/selinux-policy-refpolicy-strict:
                     DESTDIR=$(TMPTOP) install  install-headers                  \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/local.users              \
           $(TMPTOP)/etc/selinux/refpolicy-strict/users/system.users)
+	for module in $(NON_MODULES); do                                         \
+           test ! -f $(TMPTOP)/usr/share/selinux/refpolicy-strict/$$module.pp || \
+              rm -f $(TMPTOP)/usr/share/selinux/refpolicy-strict/$$module.pp;    \
+        done
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-strict/
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
@@ -217,6 +221,11 @@ install/selinux-policy-refpolicy-targeted:
                     DESTDIR=$(TMPTOP) install  install-headers                      \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/local.users                \
           $(TMPTOP)/etc/selinux/refpolicy-targeted/users/system.users)
+	for module in $(NON_MODULES); do                                           \
+           test ! -f $(TMPTOP)/usr/share/selinux/refpolicy-targeted/$$module.pp || \
+             rm -f $(TMPTOP)/usr/share/selinux/refpolicy-targeted/$$module.pp;     \
+        done
+	rm -f $(TMPTOP)/usr/share/selinux/refpolicy-targeted/unconfined.pp
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-targeted/
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/

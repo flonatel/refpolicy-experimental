@@ -5,9 +5,9 @@
 # Created On       : Mon Aug 21 01:14:21 2006
 # Created On Node  : glaurung.internal.golden-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Tue Oct 24 11:55:51 2006
+# Last Modified On : Mon May  7 11:10:26 2007
 # Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 28
+# Update Count     : 32
 # Status           : Unknown, Use with caution!
 # HISTORY          :
 # Description      :
@@ -79,7 +79,7 @@ my %map = (
            'ftp'           => [ 'ftp', '*ftpd' ],
            'gpg'           => [ 'gnupg' ],
            'hwclock'       => [ 'util-linux' ],
-           'inetd'         => [ '*-inetd', 'rinetd', 'rlinetd', 'xinetd' ],
+           'inetd'         => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd', 'rinetd', 'rlinetd', 'xinetd' ],
            'java'          => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
                                 'java*', 'jvm*', 'jre*', 'jsdk*' ],
            'ldap'          => [ 'slapd' ],
@@ -200,8 +200,15 @@ sub installed_modules {
         if (defined $Deps{$module}) {
           for my $dep (split(' ', $Deps{$module})) {
             next if $Loaded{$dep};
-            push @Load_Order, $dep;
-            $Loaded{$dep}++
+            if (-e "${src_dir}/${dep}.pp") {
+              push @Load_Order, $dep;
+              $Loaded{$dep}++
+            }
+            else {
+              print STDERR "Could not find ${src_dir}/${dep}.pp\n";
+              print STDERR "which is required for module ${module}.pp\n";
+              print STDERR "Assuming ${dep}.pp is built into base.pp\n";
+            }
           }
         }
         push @Load_Order, $module;

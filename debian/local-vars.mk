@@ -48,6 +48,15 @@ MODULES_DIR=$(TMPTOP)/usr/share/python-support/$(package)
 # set this to -mcs, -mls, or -mcs-mls
 MCS_MLS_TYPE=-mcs
 
+# Things we have put into the base for Debian systems.
+# egrep base debian/modules.conf.targeted | grep -v '#' | \
+#     sort | sed -e 's/=.*$//g'
+NON_MODULES=apt authlogin bootloader clock corecommands corenetwork  \
+            cron devices dmesg domain dpkg files filesystem fstools  \
+            getty hostname init iptables kernel libraries locallogin \
+            logging logrotate mcs miscfiles mls modutils mount mta   \
+            selinux selinuxutil storage su sudo sysnetwork terminal  \
+            userdomain userhelper usermanage
 
 define checkdir
 	@test -f debian/rules -a -f policy/modules/kernel/kernel.fc || \

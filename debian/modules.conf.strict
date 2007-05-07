@@ -1,3 +1,6 @@
+# If you edit this file, also edit local-var.mk to define what is or
+# is not a module.
+#
 #
 # This file contains a listing of available modules.
 # To prevent a module from  being used in policy
@@ -1427,6 +1430,13 @@ resmgr = module
 # Red Hat Graphical Boot
 # 
 rhgb = off
+
+# Layer: services
+# Module: ricci
+#
+# Ricci cluster management agent
+# 
+ricci = off
 
 # Layer: services
 # Module: rlogin

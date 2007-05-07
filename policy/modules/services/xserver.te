@@ -34,12 +34,6 @@ corecmd_executable_file(iceauth_exec_t)
 type xauth_exec_t;
 corecmd_executable_file(xauth_exec_t)
 
-# this is not actually a device, its a pipe
-type xconsole_device_t;
-files_type(xconsole_device_t)
-fs_associate_tmpfs(xconsole_device_t)
-files_associate_tmp(xconsole_device_t)
-
 type xdm_t;
 type xdm_exec_t;
 auth_login_pgm_domain(xdm_t)
@@ -111,7 +105,8 @@ allow xdm_t self:socket create_socket_perms;
 allow xdm_t self:appletalk_socket create_socket_perms;
 allow xdm_t self:key { search link write };
 
-allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
+#allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
+logging_r_xconsole(xdm_t)
 
 # Allow gdm to run gdm-binary
 can_exec(xdm_t, xdm_exec_t)
