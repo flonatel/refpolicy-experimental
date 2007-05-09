@@ -186,6 +186,7 @@ genfscon nfs4 / gen_context(system_u:object_r:nfs_t,s0)
 genfscon afs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfsplus / gen_context(system_u:object_r:nfs_t,s0)
+genfscon hostfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon reiserfs / gen_context(system_u:object_r:nfs_t,s0)
 
 ########################################

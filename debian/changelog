@@ -1,3 +1,10 @@
+refpolicy (0.0.20070507-3) unstable; urgency=low
+
+  * Add hostfs as a recognized remote file-system. This should allow a
+    UML virtual machine to function in a fully enforcing mode.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Wed,  9 May 2007 15:48:26 -0500
+
 refpolicy (0.0.20070507-2) unstable; urgency=medium
 
   * Keep track of modules that are really  built into the base policy in
