@@ -1,5 +1,5 @@
 
-policy_module(apt,1.1.0)
+policy_module(apt,1.1.1)
 
 ########################################
 #
@@ -53,6 +53,9 @@ allow apt_t self:shm create_shm_perms;
 allow apt_t self:sem create_sem_perms;
 allow apt_t self:msgq create_msgq_perms;
 allow apt_t self:msg { send receive };
+
+# Run update
+allow apt_t self:netlink_route_socket r_netlink_socket_perms;
 
 # Access /var/cache/apt files
 manage_files_pattern(apt_t,apt_var_cache_t,apt_var_cache_t)

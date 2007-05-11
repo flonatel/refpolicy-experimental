@@ -1,3 +1,24 @@
+refpolicy (0.0.20070507-4) unstable; urgency=low
+
+  * Allow apt to run update by giving r_netlink_socket_perms to
+    self:netlink_route_socket.
+  * Allow apt/aptitude to update, and install files
+    - Added an interface to apt.if allow silently ignoring processes that
+      attempt to use file descriptors from apt. 
+    - Bump the apt policy module version number, since we have added to
+      the interface. 
+    - Added some stuff to dpkg.te to allow debconf .config file
+      interactions back to the user 
+    - Add an optional  dontaudit rule to libraries.te to allow
+      apt-get/aptitude to install packages silently. 
+  * Very early in boot, /lib/init/rw is created as a mandatory tmpfs for
+    state information. Label that directory as initrc_tmp_t to allow
+    mount.te to be permitted to mount a tmpfs there.
+  * In init.te, allow /etc/network/if-up.d/mountnfs to create
+    /var/run/network/mountnfs as a poor mans lock. 
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri, 11 May 2007 00:55:07 -0500
+
 refpolicy (0.0.20070507-3) unstable; urgency=low
 
   * Add hostfs as a recognized remote file-system. This should allow a

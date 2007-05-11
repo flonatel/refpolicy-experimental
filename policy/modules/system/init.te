@@ -175,6 +175,11 @@ ifdef(`distro_redhat',`
 	fs_tmpfs_filetrans(init_t,initctl_t,fifo_file)
 ')
 
+# /lib/init/rw/.ramfs creation and contents
+ifdef(`distro_debian',`
+	fs_manage_tmpfs_files(initrc_t)
+')
+
 ifdef(`targeted_policy',`
 	unconfined_domain(init_t)
 ')
@@ -402,6 +407,13 @@ ifdef(`distro_debian',`
 	storage_tmpfs_filetrans_fixed_disk(initrc_t)
 
 	files_setattr_etc_dirs(initrc_t)
+
+        # /lib/init/rw
+        files_mountpoint(initrc_tmp_t)
+        # /etc/network/if-up.d/mountnfs wants to mkdir
+        # /var/run/network/mountnfs as a poor mans lock
+        allow initrc_t var_run_t:dir create;
+        
 ')
 
 ifdef(`distro_gentoo',`

@@ -67,6 +67,16 @@ allow dpkg_t self:sem create_sem_perms;
 allow dpkg_t self:msgq create_msgq_perms;
 allow dpkg_t self:msg { send receive };
 
+# This is for se_aptitude et al, so that maintainer scripts can talk back.
+apt_use_fds(dpkg_script_t)
+apt_rw_pipes(dpkg_script_t)
+
+# This is for the maintainer scripts
+init_use_script_fds(dpkg_script_t)
+
+# se_apt-get needs this to run dpkg-preconfigure
+init_use_script_ptys(dpkg_t)
+
 allow dpkg_t dpkg_lock_t:file manage_file_perms;
 
 manage_dirs_pattern(dpkg_t,dpkg_tmp_t,dpkg_tmp_t)
@@ -170,6 +180,8 @@ userdom_use_unpriv_users_fds(dpkg_t)
 dpkg_domtrans_script(dpkg_t)
 # since the scripts aren't labeled correctly yet...
 allow dpkg_t dpkg_var_lib_t:file execute;
+# This is used for running config files for debconf interactions
+allow dpkg_t dpkg_tmp_t:file { execute execute_no_trans };
 
 ifdef(`targeted_policy',`
 	unconfined_domain(dpkg_t)

@@ -198,14 +198,15 @@ install/selinux-policy-refpolicy-strict:
               rm -f $(TMPTOP)/usr/share/selinux/refpolicy-strict/$$module.pp;    \
         done
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/refpolicy-strict/
-	$(install_file)      VERSION              $(DOCDIR)/
-	$(install_file)      README               $(DOCDIR)/
-	$(install_file)      debian/README.Debian $(DOCDIR)/
-	$(install_file)      debian/NEWS.Debian   $(DOCDIR)/NEWS.Debian 
-	$(install_file)      Changelog            $(DOCDIR)/changelog
-	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
+	$(install_file)      VERSION               $(DOCDIR)/
+	$(install_file)      README                $(DOCDIR)/
+	$(install_file)      debian/README.Debian  $(DOCDIR)/
+	$(install_file)      debian/localStrict.te $(DOCDIR)/
+	$(install_file)      debian/NEWS.Debian    $(DOCDIR)/NEWS.Debian 
+	$(install_file)      Changelog             $(DOCDIR)/changelog
+	$(install_file)      debian/changelog      $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
-	$(install_file)      debian/copyright     $(DOCDIR)/
+	$(install_file)      debian/copyright      $(DOCDIR)/
 DIRS_TO_CLEAN  += debian/selinux-policy-refpolicy-strict
 
 install/selinux-policy-refpolicy-targeted:

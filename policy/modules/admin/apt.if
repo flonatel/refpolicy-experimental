@@ -73,6 +73,25 @@ interface(`apt_use_fds',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to use file descriptors from apt.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process attempting performing this action
+##      which should not be audited.
+##	</summary>
+## </param>
+#
+interface(`apt_dontaudit_use_fds',`
+	gen_require(`
+		type apt_t;
+	')
+
+	dontaudit $1 apt_t:fd use;
+')
+
+########################################
+## <summary>
 ##	Read from an unnamed apt pipe.
 ## </summary>
 ## <param name="domain">
