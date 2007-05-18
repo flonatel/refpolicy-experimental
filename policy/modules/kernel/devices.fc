@@ -6,6 +6,7 @@ ifdef(`distro_debian',`
 /dev/\.static	-d		gen_context(system_u:object_r:device_t,s0)
 /dev/\.static/dev	-d		gen_context(system_u:object_r:device_t,s0)
 /dev/\.static/dev/(.*)?		<<none>>
+/lib/init/rw           -d      gen_context(system_u:object_r:device_t,s0)
 ')
 /dev/.*				gen_context(system_u:object_r:device_t,s0)
 

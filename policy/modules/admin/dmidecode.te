@@ -38,3 +38,4 @@ ifdef(`targeted_policy',`
 	term_use_generic_ptys(dmidecode_t)
 	term_use_unallocated_ttys(dmidecode_t)
 ')
+dev_search_sysfs(dmidecode_t)

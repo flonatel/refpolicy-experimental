@@ -2777,6 +2777,24 @@ interface(`fs_dontaudit_rw_tmpfs_files',`
 
 ########################################
 ## <summary>
+##     Allow reading tmpfs files
+## </summary>
+## <param name="domain">
+##     <summary>
+##     Domain to read files
+##     </summary>
+## </param>
+#
+interface(`fs_allow_tmpfs_file_read',`
+       gen_require(`
+               type tmpfs_t;
+       ')
+
+       allow $1 tmpfs_t:file read;
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete
 ##	auto moutpoints.
 ## </summary>

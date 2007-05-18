@@ -1,3 +1,18 @@
+refpolicy (0.0.20070507-5) unstable; urgency=low
+
+  * Allow users to read the dpkg database. With this change, every user
+    of the strict policy now has access to dpkg-checkbuildeps, grep-dctrl,
+    etc, which was not the case previously.
+  * Change the example localStrict.te policy file to silently ignore apt
+    searching for something in /var/lib. With this example policy loaded
+    in my strict policy UML virtual machine, I can compile packages in
+    enforcing mode. Based on advice on the mailing list, allow more things
+    to access /selinux
+  * Merge in changes from Russell Coker. These include a better fix for
+    /lib.init/rw.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri, 18 May 2007 00:34:07 -0500
+
 refpolicy (0.0.20070507-4) unstable; urgency=low
 
   * Allow apt to run update by giving r_netlink_socket_perms to

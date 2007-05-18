@@ -23,7 +23,6 @@ ifdef(`distro_redhat',`
 ')
 
 ifdef(`distro_debian', `
-/etc/network/run(/.*)?			gen_context(system_u:object_r:net_conf_t,s0)
 /dev/shm/network(/.*)?			gen_context(system_u:object_r:net_conf_t,s0)
 ')
 #

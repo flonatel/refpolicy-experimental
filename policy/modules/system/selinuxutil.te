@@ -590,6 +590,7 @@ mls_file_write_down(semanage_t)
 mls_rangetrans_target(semanage_t)
 mls_file_read_up(semanage_t)
 
+selinux_get_fs_mount(semanage_t)
 selinux_validate_context(semanage_t)
 selinux_get_enforce_mode(semanage_t)
 # for setsebool:

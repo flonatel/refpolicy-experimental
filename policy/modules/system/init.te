@@ -170,15 +170,9 @@ ifdef(`distro_gentoo',`
 	allow init_t self:process { getcap setcap };
 ')
 
-ifdef(`distro_redhat',`
-	fs_rw_tmpfs_chr_files(init_t)
-	fs_tmpfs_filetrans(init_t,initctl_t,fifo_file)
-')
+fs_rw_tmpfs_chr_files(init_t)
 
-# /lib/init/rw/.ramfs creation and contents
-ifdef(`distro_debian',`
-	fs_manage_tmpfs_files(initrc_t)
-')
+fs_tmpfs_filetrans(init_t,initctl_t,fifo_file)
 
 ifdef(`targeted_policy',`
 	unconfined_domain(init_t)
@@ -391,9 +385,10 @@ userdom_read_all_users_home_content_files(initrc_t)
 # started from init should be placed in their own domain.
 userdom_use_sysadm_terms(initrc_t)
 
+# seed udev /dev
+dev_create_generic_dirs(initrc_t)
+
 ifdef(`distro_debian',`
-        # seed udev /dev
-	dev_create_generic_dirs(initrc_t)
 	# to be able to create /dev/xconsole
 	dev_create_generic_pipes(initrc_t)
 
@@ -408,8 +403,14 @@ ifdef(`distro_debian',`
 
 	files_setattr_etc_dirs(initrc_t)
 
-        # /lib/init/rw
-        files_mountpoint(initrc_tmp_t)
+        selinux_get_fs_mount(init_t)
+
+        # for /lib/init/rw/.ramfs
+        fs_tmpfs_filetrans(initrc_t,initrc_state_t,file)
+
+        # for progress_state which is created by the initramfs
+        fs_allow_tmpfs_file_read(initrc_t)
+
         # /etc/network/if-up.d/mountnfs wants to mkdir
         # /var/run/network/mountnfs as a poor mans lock
         allow initrc_t var_run_t:dir create;
@@ -423,13 +424,11 @@ ifdef(`distro_gentoo',`
 	allow initrc_t self:process setfscreate;
 	dev_create_null_dev(initrc_t)
 	dev_create_zero_dev(initrc_t)
-	dev_create_generic_dirs(initrc_t)
 	term_create_console_dev(initrc_t)
 
 	# unfortunately /sbin/rc does stupid tricks
 	# with /dev/.rcboot to decide if we are in
 	# early init
-	dev_create_generic_dirs(initrc_t)
 	dev_delete_generic_dirs(initrc_t)
 
 	# needed until baselayout is fixed to have the
@@ -453,6 +452,9 @@ ifdef(`distro_gentoo',`
 	')
 ')
 
+selinux_set_enforce_mode(initrc_t)
+fs_rw_tmpfs_chr_files(initrc_t)
+
 ifdef(`distro_redhat',`
 	# this is from kmodule, which should get its own policy:
 	allow initrc_t self:capability sys_admin;
@@ -464,11 +466,8 @@ ifdef(`distro_redhat',`
 	kernel_dontaudit_use_fds(initrc_t)
 	files_dontaudit_read_root_files(initrc_t)
 
-	selinux_set_enforce_mode(initrc_t)
-
 	# These seem to be from the initrd
 	# during device initialization:
-	dev_create_generic_dirs(initrc_t)
 	dev_rwx_zero(initrc_t)
 	dev_rx_raw_memory(initrc_t)
 	dev_wx_raw_memory(initrc_t)
@@ -482,8 +481,6 @@ ifdef(`distro_redhat',`
 	files_mountpoint(initrc_tmp_t)
 	# Needs to cp localtime to /var dirs
 	files_write_var_dirs(initrc_t)
-
-	fs_rw_tmpfs_chr_files(initrc_t)
 
 	storage_manage_fixed_disk(initrc_t)
 	storage_dev_filetrans_fixed_disk(initrc_t)

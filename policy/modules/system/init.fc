@@ -67,9 +67,3 @@ ifdef(`distro_suse', `
 /var/run/sysconfig(/.*)?	gen_context(system_u:object_r:initrc_var_run_t,s0)
 ')
 
-#
-# /lib
-#
-ifdef(`distro_debian',`
-/lib/init/rw            -d     gen_context(system_u:object_r:initrc_tmp_t,s0)
-')

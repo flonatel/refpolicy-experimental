@@ -146,6 +146,13 @@ ifdef(`strict_policy',`
 		userdom_role_change_template(user,sysadm)
 	')
 
+        # Allow users to read the dpkg database (grep-dctrl,
+        # dpkg-buldpackage, et al.
+	optional_policy(`
+            dpkg_read_db(user_t)
+	')
+
+
 	########################################
 	#
 	# Sysadm local policy
