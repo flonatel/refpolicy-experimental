@@ -1,5 +1,5 @@
 
-policy_module(ppp,1.4.0)
+policy_module(ppp,1.6.0)
 
 ########################################
 #
@@ -13,14 +13,12 @@ policy_module(ppp,1.4.0)
 ## </desc>
 gen_tunable(pppd_can_insmod,false)
 
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Allow pppd to be run for a regular user
 ## </p>
 ## </desc>
 gen_tunable(pppd_for_user,false)
-')
 
 # pppd_t is the domain for the pppd program.
 # pppd_exec_t is the type of the pppd executable.
@@ -126,7 +124,8 @@ dev_read_urand(pppd_t)
 dev_search_sysfs(pppd_t)
 dev_read_sysfs(pppd_t)
 
-corenet_non_ipsec_sendrecv(pppd_t)
+corenet_all_recvfrom_unlabeled(pppd_t)
+corenet_all_recvfrom_netlabel(pppd_t)
 corenet_tcp_sendrecv_all_if(pppd_t)
 corenet_raw_sendrecv_all_if(pppd_t)
 corenet_udp_sendrecv_all_if(pppd_t)
@@ -155,7 +154,6 @@ domain_use_interactive_fds(pppd_t)
 
 files_exec_etc_files(pppd_t)
 files_manage_etc_runtime_files(pppd_t)
-files_etc_filetrans_etc_runtime(pppd_t, { dir file })
 files_dontaudit_write_etc_files(pppd_t)
 
 # for scripts
@@ -171,9 +169,9 @@ logging_send_syslog_msg(pppd_t)
 
 miscfiles_read_localization(pppd_t)
 
-sysnet_read_config(pppd_t)
 sysnet_exec_ifconfig(pppd_t)
 sysnet_manage_config(pppd_t)
+sysnet_etc_filetrans_config(pppd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pppd_t)
 userdom_dontaudit_search_sysadm_home_dirs(pppd_t)
@@ -183,12 +181,6 @@ userdom_search_sysadm_home_dirs(pppd_t)
 userdom_search_unpriv_users_home_dirs(pppd_t)
 
 ppp_exec(pppd_t)
-
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(pppd_t)
-	term_dontaudit_use_generic_ptys(pppd_t)
-	files_dontaudit_read_root_files(pppd_t)
-')
 
 optional_policy(`
 	ddclient_domtrans(pppd_t)
@@ -262,7 +254,8 @@ kernel_read_proc_symlinks(pptp_t)
 
 dev_read_sysfs(pptp_t)
 
-corenet_non_ipsec_sendrecv(pptp_t)
+corenet_all_recvfrom_unlabeled(pptp_t)
+corenet_all_recvfrom_netlabel(pptp_t)
 corenet_tcp_sendrecv_all_if(pptp_t)
 corenet_raw_sendrecv_all_if(pptp_t)
 corenet_tcp_sendrecv_all_nodes(pptp_t)
@@ -293,12 +286,6 @@ sysnet_read_config(pptp_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pptp_t)
 userdom_dontaudit_search_sysadm_home_dirs(pptp_t)
-
-ifdef(`targeted_policy',`
-        term_dontaudit_use_unallocated_ttys(pptp_t)
-        term_dontaudit_use_generic_ptys(pptp_t)
-        files_dontaudit_read_root_files(pptp_t)
-')
 
 optional_policy(`
 	consoletype_exec(pppd_t)

@@ -1,3 +1,74 @@
+* Fri Dec 14 2007 Chris PeBenito <selinux@tresys.com> - 20071214
+- Patch for debian logrotate to handle syslogd-listfiles, from Vaclav Ovsik.
+- Improve several tunables descriptions from Dan Walsh.
+- Patch to clean up ns switch usage in the policy from Dan Walsh.
+- More complete labeled networking infrastructure from KaiGai Kohei.
+- Add interface for libselinux constructor, for libselinux-linked
+  SELinux-enabled programs.
+- Patch to restructure user role templates to create restricted user roles
+  from Dan Walsh.
+- Russian man page translations from Andrey Markelov.
+- Remove unused types from dbus.
+- Add infrastructure for managing all user web content.
+- Deprecate some old file and dir permission set macros in favor of the
+  newer, more consistently-named macros.
+- Patch to clean up unescaped periods in several file context entries from
+  Jan-Frode Myklebust.
+- Merge shlib_t into lib_t.
+- Merge strict and targeted policies.  The policy will now behave like the
+  strict policy if the unconfined module is not present.  If it is, it will
+  behave like the targeted policy.  Added an unconfined role to have a mix
+  of confined and unconfined users.
+- Added modules:
+	exim (Dan Walsh)
+	postfixpolicyd (Jan-Frode Myklebust)
+
+* Fri Sep 28 2007 Chris PeBenito <selinux@tresys.com> - 20070928
+- Add support for setting the unknown permissions handling.
+- Fix XML building for external reference builds and headers builds.
+- Patch to add missing requirements in userdomain interfaces from Shintaro
+  Fujiwara.
+- Add tcpd_wrapped_domain() for services that use tcp wrappers.
+- Update MLS constraints from LSPP evaluated policy.
+- Allow initrc_t file descriptors to be inherited regardless of MLS level.
+  Accordingly drop MLS permissions from daemons that inherit from any level.
+- Files and radvd updates from Stefan Schulze Frielinghaus.
+- Deprecate mls_file_write_down() and mls_file_read_up(), replaced with
+  mls_write_all_levels() and mls_read_all_levels(), for consistency.
+- Add make kernel and init ranged interfaces pass the range transition MLS
+  constraints.  Also remove calls to mls_rangetrans_target() in modules that use
+  the kernel and init interfaces, since its redundant.
+- Add interfaces for all MLS attributes except X object classes.
+- Require all sensitivities and categories for MLS and MCS policies, not just
+  the low and high sensitivity and category.
+- Database userspace object manager classes from KaiGai Kohei.
+- Add third-party interface for Apache CGI.
+- Add getserv and shmemserv nscd permissions.
+- Add debian apcupsd binary location, from Stefan Schulze Frielinghaus.
+- Added modules:
+	application
+	awstats (Stefan Schulze Frielinghaus)
+	bitlbee (Devin Carraway)
+	brctl (Dan Walsh)
+
+* Fri Jun 29 2007 Chris PeBenito <selinux@tresys.com> - 20070629
+- Fix incorrectly named files_lib_filetrans_shared_lib() interface in the
+  libraries module.
+- Unified labeled networking policy from Paul Moore.
+- Use netmsg initial SID for MLS-only Netlabel packets, from Paul Moore.
+- Xen updates from Dan Walsh.
+- Filesystem updates from Dan Walsh.
+- Large samba update from Dan Walsh.
+- Drop snmpd_etc_t.
+- Confine sendmail and logrotate on targeted.
+- Tunable connection to postgresql for users from KaiGai Kohei.
+- Memprotect support patch from Stephen Smalley.
+- Add logging_send_audit_msgs() interface and deprecate
+  send_audit_msgs_pattern().
+- Openct updates patch from Dan Walsh.
+- Merge restorecon into setfiles.
+- Patch to begin separating out hald helper programs from Dan Walsh.
+- Fixes for squid, dovecot, and snmp from Dan Walsh.
 - Miscellaneous consolekit fixes from Dan Walsh.
 - Patch to have avahi use the nsswitch interface rather than individual
   permissions from Dan Walsh.
@@ -15,6 +86,9 @@
 - Fix clockspeed_run_cli() declaration, it was incorrectly defined as a
   template instead of an interface.
 - Added modules:
+	amtu (Dan Walsh)
+	apcupsd (Dan Walsh)
+	rpcbind (Dan Walsh)
 	rwho (Nalin Dahyabhai)
 
 * Tue Apr 17 2007 Chris PeBenito <selinux@tresys.com> - 20070417

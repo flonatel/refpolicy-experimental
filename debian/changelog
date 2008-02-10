@@ -1,3 +1,41 @@
+refpolicy (0.0.20071214-1) unstable; urgency=low
+
+  * New upstream release. This has updated policy for ssh, which
+                                                          Closes: #433972
+  * The new policy also permits postfix to read files on anon_inodefs file
+    systems, which then                                   Closes: #435497
+  * Allow use of wildcards when trying to map package names to policy
+    modules. Thanks to Vaclav Ovsik for the heavy lifting. Closes: #427906
+  * Debian puts hpssd.py in /usr/lib -- not /usr/share. Thanks to Frodo
+    Looijaard.                                             Closes: #443177 
+  * Alsa needs changes in file context as well. Thanks to  Martin Orr
+    for pointing this out.                                 Closes: #428464
+  * Allow apache to read munin files. Thanks to Vesa-Pekka Palmu for
+    pointing this out.                                     Closes: #433886
+  * Fix targeted policies priority in control file. Thanks to Stas
+    Myasnikov for pointing this out.                       Closes: #447253
+  * Several files in /usr/lib/cups/backend are hard links to files in
+    /usr/lib/cups/backend-available. In the cups.fc, only the files in
+    backend are tagged with the cupsd_exec_t, so the files in
+    backend-available are tagged with lib_t. This results in somewhat
+    undefined behaviour: depending on the order of directory traversal the
+    files are tagged with either lib_t or cupsd_exec_t. Thanks to Frodo
+    Looijaard.                                             Closes: #442898
+  * selinux-policy-refpolicy-dev now also depends on make and m4, since
+    those are required to actually build policy.  Thanks to Erik
+    Johansson.                                             Closes: #449203
+  * Similarly, the source package recommends make and gcc, since those
+    are needed to build policy.                            Closes: #436211
+  * The bug mentioned in 437139 does not exist in the new policy. A
+    versioned close will allow the bug to remain open for Etch.
+                                                           Closes: #437139
+  * The duplicate declaration of system_chkpwd_t does not appear to be in
+    the sources, based in a find/grep.                     Closes: #463818
+  * There was a spurious + sign in policy/modules/kernel/devices.if.
+    Thanks to Frans Pop for pointing this out.             Closes: #438887
+
+ -- Manoj Srivastava <srivasta@debian.org>  Sat, 09 Feb 2008 20:28:43 -0600
+
 refpolicy (0.0.20070507-5) unstable; urgency=low
 
   * Allow users to read the dpkg database. With this change, every user

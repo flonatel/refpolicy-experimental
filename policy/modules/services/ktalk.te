@@ -1,5 +1,5 @@
 
-policy_module(ktalk,1.4.0)
+policy_module(ktalk,1.6.0)
 
 ########################################
 #
@@ -53,7 +53,8 @@ kernel_read_kernel_sysctls(ktalkd_t)
 kernel_read_system_state(ktalkd_t)
 kernel_read_network_state(ktalkd_t)
 
-corenet_non_ipsec_sendrecv(ktalkd_t)
+corenet_all_recvfrom_unlabeled(ktalkd_t)
+corenet_all_recvfrom_netlabel(ktalkd_t)
 corenet_tcp_sendrecv_all_if(ktalkd_t)
 corenet_udp_sendrecv_all_if(ktalkd_t)
 corenet_tcp_sendrecv_all_nodes(ktalkd_t)
@@ -67,6 +68,10 @@ fs_getattr_xattr_fs(ktalkd_t)
 
 files_read_etc_files(ktalkd_t)
 
+term_search_ptys(ktalkd_t)
+
+auth_use_nsswitch(ktalkd_t)
+
 init_read_utmp(ktalkd_t)
 
 libs_use_ld_so(ktalkd_t)
@@ -74,18 +79,3 @@ libs_use_shared_libs(ktalkd_t)
 logging_send_syslog_msg(ktalkd_t)
 
 miscfiles_read_localization(ktalkd_t)
-
-sysnet_read_config(ktalkd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_generic_ptys(ktalkd_t)
-	term_dontaudit_use_unallocated_ttys(ktalkd_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(ktalkd_t)
-')
-
-optional_policy(`
-	nscd_socket_use(ktalkd_t)
-')

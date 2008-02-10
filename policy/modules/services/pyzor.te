@@ -1,5 +1,5 @@
 
-policy_module(pyzor,1.2.0)
+policy_module(pyzor,1.5.0)
 
 ########################################
 #
@@ -8,8 +8,7 @@ policy_module(pyzor,1.2.0)
 
 type pyzor_t;
 type pyzor_exec_t;
-domain_type(pyzor_t)
-domain_entry_file(pyzor_t,pyzor_exec_t)
+application_domain(pyzor_t,pyzor_exec_t)
 role system_r types pyzor_t;
 
 type pyzord_t;
@@ -50,9 +49,13 @@ kernel_read_system_state(pyzor_t)
 corecmd_list_bin(pyzor_t)
 corecmd_getattr_bin_files(pyzor_t)
 
+corenet_tcp_sendrecv_all_if(pyzor_t)
 corenet_udp_sendrecv_all_if(pyzor_t)
+corenet_tcp_sendrecv_all_nodes(pyzor_t)
 corenet_udp_sendrecv_all_nodes(pyzor_t)
+corenet_tcp_sendrecv_all_ports(pyzor_t)
 corenet_udp_sendrecv_all_ports(pyzor_t)
+corenet_tcp_connect_http_port(pyzor_t)
 
 dev_read_urand(pyzor_t)
 
@@ -67,16 +70,13 @@ miscfiles_read_localization(pyzor_t)
 
 userdom_dontaudit_search_sysadm_home_dirs(pyzor_t)
 
-ifdef(`targeted_policy',`
-	userdom_read_generic_user_home_content_files(pyzor_t)
-')
-
 optional_policy(`
 	amavis_manage_lib_files(pyzor_t)
 	amavis_manage_spool_files(pyzor_t)
 ')
 
 optional_policy(`
+	spamassassin_signal_spamd(pyzor_t)
 	spamassassin_read_spamd_tmp_files(pyzor_t)
 ')
 
@@ -107,7 +107,8 @@ dev_read_urand(pyzord_t)
 
 corecmd_exec_bin(pyzord_t)
 
-corenet_non_ipsec_sendrecv(pyzord_t)
+corenet_all_recvfrom_unlabeled(pyzord_t)
+corenet_all_recvfrom_netlabel(pyzord_t)
 corenet_udp_sendrecv_all_if(pyzord_t)
 corenet_udp_sendrecv_all_nodes(pyzord_t)
 corenet_udp_sendrecv_all_ports(pyzord_t)
@@ -131,13 +132,6 @@ userdom_dontaudit_search_sysadm_home_dirs(pyzord_t)
 userdom_dontaudit_search_staff_home_dirs(pyzord_t)
 
 mta_manage_spool(pyzord_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_generic_ptys(pyzord_t)
-	term_dontaudit_use_unallocated_ttys(pyzord_t)
-
-	userdom_read_generic_user_home_content_files(pyzord_t)
-')
 
 optional_policy(`
 	logging_send_syslog_msg(pyzord_t)

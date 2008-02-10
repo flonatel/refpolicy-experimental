@@ -17,6 +17,7 @@
 
 testdir:
 	$(testdir)
+CONFIG-common:: stamp-conf/selinux-policy-refpolicy-src
 
 BUILD/selinux-policy-refpolicy-strict::    build/selinux-policy-refpolicy-strict
 INST/selinux-policy-refpolicy-strict::     install/selinux-policy-refpolicy-strict
@@ -47,6 +48,13 @@ CLEAN/selinux-policy-refpolicy-strict CLEAN/selinux-policy-refpolicy-targeted CL
 	test ! -d $(TMPTOP) || rm -rf $(TMPTOP)
 	test ! -d $(SRCTOP)/debian/build-$(package) || \
                                       rm -rf $(SRCTOP)/debian/build-$(package)
+
+stamp-conf/selinux-policy-refpolicy-src:
+	$(REASON)
+	test -d $(SRCTOP)/config/appconfig-strict-mcs  || \
+            cp -a $(SRCTOP)/config/appconfig-mcs $(SRCTOP)/config/appconfig-strict-mcs
+	test -d $(SRCTOP)/config/appconfig-targeted-mcs  || \
+            cp -a $(SRCTOP)/config/appconfig-mcs $(SRCTOP)/config/appconfig-targeted-mcs
 
 CONFIG/selinux-policy-refpolicy-strict::
 	$(REASON)

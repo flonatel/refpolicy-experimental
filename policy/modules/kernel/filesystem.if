@@ -271,6 +271,45 @@ interface(`fs_set_xattr_fs_quotas',`
 
 ########################################
 ## <summary>
+##	Read files on anon_inodefs file systems.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_read_anon_inodefs_files',`
+	gen_require(`
+		type anon_inodefs_t;
+
+	')
+
+	read_files_pattern($1,anon_inodefs_t,anon_inodefs_t)
+')
+
+########################################
+## <summary>
+##	Read and write files on anon_inodefs
+##	file systems.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_rw_anon_inodefs_files',`
+	gen_require(`
+		type anon_inodefs_t;
+
+	')
+
+	rw_files_pattern($1,anon_inodefs_t,anon_inodefs_t)
+')
+
+########################################
+## <summary>
 ##	Mount an automount pseudo filesystem.
 ## </summary>
 ## <param name="domain">
@@ -1096,6 +1135,24 @@ interface(`fs_relabelfrom_dos_fs',`
 
 ########################################
 ## <summary>
+##	Search dosfs filesystem. 
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_search_dos',`
+	gen_require(`
+		type dosfs_t;
+	')
+
+	allow $1 dosfs_t:dir search_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Read files on a DOS filesystem.
 ## </summary>
 ## <param name="domain">
@@ -1152,6 +1209,42 @@ interface(`fs_manage_dos_files',`
 #
 interface(`fs_read_eventpollfs',`
 	refpolicywarn(`$0($*) has been deprecated.')
+')
+
+########################################
+## <summary>
+##      Mount a FUSE filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`fs_mount_fusefs',`
+        gen_require(`
+                type fusefs_t;
+        ')
+
+        allow $1 fusefs_t:filesystem mount;
+')
+
+########################################
+## <summary>
+##      Unmount a FUSE filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`fs_unmount_fusefs',`
+        gen_require(`
+                type fusefs_t;
+        ')
+
+        allow $1 fusefs_t:filesystem unmount;
 ')
 
 ########################################
@@ -1266,6 +1359,26 @@ interface(`fs_getattr_iso9660_fs',`
 	')
 
 	allow $1 iso9660_t:filesystem getattr;
+')
+
+########################################
+## <summary>
+##	Read files on an iso9660 filesystem, which
+##	is usually used on CDs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_getattr_iso9660_files',`
+	gen_require(`
+		type iso9660_t;
+	')
+
+	allow $1 iso9660_t:dir list_dir_perms;
+	allow $1 iso9660_t:file getattr;
 ')
 
 ########################################
@@ -2024,6 +2137,24 @@ interface(`fs_rw_nfsd_fs',`
 	')
 
 	rw_files_pattern($1,nfsd_fs_t,nfsd_fs_t)
+')
+
+########################################
+## <summary>
+##	Allow the type to associate to ramfs filesystems.
+## </summary>
+## <param name="type">
+##	<summary>
+##	The type of the object to be associated.
+##	</summary>
+## </param>
+#
+interface(`fs_associate_ramfs',`
+	gen_require(`
+		type ramfs_t;
+	')
+
+	allow $1 ramfs_t:filesystem associate;
 ')
 
 ########################################

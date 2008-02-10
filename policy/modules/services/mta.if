@@ -51,8 +51,7 @@ template(`mta_base_mail_template',`
 	#
 
 	type $1_mail_t, user_mail_domain;
-	domain_type($1_mail_t)
-	domain_entry_file($1_mail_t,sendmail_exec_t)
+	application_domain($1_mail_t,sendmail_exec_t)
 
 	type $1_mail_tmp_t;
 	files_tmp_file($1_mail_tmp_t)
@@ -72,7 +71,8 @@ template(`mta_base_mail_template',`
 
 	kernel_read_kernel_sysctls($1_mail_t)
 
-	corenet_non_ipsec_sendrecv($1_mail_t)
+	corenet_all_recvfrom_unlabeled($1_mail_t)
+	corenet_all_recvfrom_netlabel($1_mail_t)
 	corenet_tcp_sendrecv_all_if($1_mail_t)
 	corenet_tcp_sendrecv_all_nodes($1_mail_t)
 	corenet_tcp_sendrecv_all_ports($1_mail_t)
@@ -87,23 +87,14 @@ template(`mta_base_mail_template',`
 	# It wants to check for nscd
 	files_dontaudit_search_pids($1_mail_t)
 
+	auth_use_nsswitch($1_mail_t)
+
 	libs_use_ld_so($1_mail_t)
 	libs_use_shared_libs($1_mail_t)
 
 	logging_send_syslog_msg($1_mail_t)
 
 	miscfiles_read_localization($1_mail_t)
-
-	sysnet_read_config($1_mail_t)
-	sysnet_dns_name_resolve($1_mail_t)
-
-	optional_policy(`
-		nis_use_ypbind($1_mail_t)
-	')
-
-	optional_policy(`
-		nscd_socket_use($1_mail_t)
-	')
 
 	optional_policy(`
 		postfix_domtrans_user_mail_handler($1_mail_t)
@@ -263,10 +254,8 @@ template(`mta_admin_template',`
 		type $1_mail_t;
 	')
 
-	ifdef(`strict_policy',`
-		# allow the sysadmin to do "mail someone < /home/user/whatever"
-		userdom_read_unpriv_users_home_content_files($1_mail_t)
-	')
+	# allow the sysadmin to do "mail someone < /home/user/whatever"
+	userdom_read_unpriv_users_home_content_files($1_mail_t)
 
 	optional_policy(`
 		gen_require(`
@@ -805,6 +794,25 @@ interface(`mta_manage_spool',`
 	manage_dirs_pattern($1,mail_spool_t,mail_spool_t)
 	manage_files_pattern($1,mail_spool_t,mail_spool_t)
 	manage_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
+')
+
+########################################
+## <summary>
+##	Search mail queue dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mta_search_queue',`
+	gen_require(`
+		type mqueue_spool_t;
+	')
+
+	files_search_spool($1)
+	allow $1 mqueue_spool_t:dir search_dir_perms;
 ')
 
 #######################################

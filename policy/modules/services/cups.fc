@@ -18,6 +18,7 @@
 /usr/bin/cups-config-daemon --	gen_context(system_u:object_r:cupsd_config_exec_t,s0)
 
 /usr/lib(64)?/cups/backend/.* -- gen_context(system_u:object_r:cupsd_exec_t,s0)
+/usr/lib(64)?/cups/backend-available/.* -- gen_context(system_u:object_r:cupsd_exec_t,s0)
 /usr/lib(64)?/cups/daemon/.*	-- gen_context(system_u:object_r:cupsd_exec_t,s0)
 /usr/lib(64)?/cups/daemon/cups-lpd -- gen_context(system_u:object_r:cupsd_lpd_exec_t,s0)
 
@@ -33,7 +34,11 @@
 
 /usr/share/cups(/.*)?		gen_context(system_u:object_r:cupsd_etc_t,s0)
 /usr/share/foomatic/db/oldprinterids --	gen_context(system_u:object_r:cupsd_rw_etc_t,s0)
+ifdef(`distro_debian',`
+/usr/lib/hplip/hpssd\.py --	gen_context(system_u:object_r:hplip_exec_t,s0)
+', `
 /usr/share/hplip/hpssd\.py --	gen_context(system_u:object_r:hplip_exec_t,s0)
+')
 
 /var/cache/alchemist/printconf.* gen_context(system_u:object_r:cupsd_rw_etc_t,s0)
 /var/cache/foomatic(/.*)? 	gen_context(system_u:object_r:cupsd_rw_etc_t,s0)
@@ -50,5 +55,3 @@
 /var/run/hp.*\.port	--	gen_context(system_u:object_r:hplip_var_run_t,s0)
 /var/run/ptal-printd(/.*)?	gen_context(system_u:object_r:ptal_var_run_t,s0)
 /var/run/ptal-mlcd(/.*)?	gen_context(system_u:object_r:ptal_var_run_t,s0)
-
-/var/spool/cups(/.*)?		gen_context(system_u:object_r:print_spool_t,mls_systemhigh)

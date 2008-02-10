@@ -1,5 +1,5 @@
 
-policy_module(rshd,1.2.0)
+policy_module(rshd,1.5.0)
 
 ########################################
 #
@@ -7,7 +7,7 @@ policy_module(rshd,1.2.0)
 #
 type rshd_t;
 type rshd_exec_t;
-inetd_tcp_service_domain(rshd_t,rshd_exec_t)
+inetd_tcp_service_domain(rshd_t, rshd_exec_t)
 domain_subj_id_change_exemption(rshd_t)
 domain_role_change_exemption(rshd_t)
 role system_r types rshd_t;
@@ -23,7 +23,8 @@ allow rshd_t self:tcp_socket create_stream_socket_perms;
 
 kernel_read_kernel_sysctls(rshd_t)
 
-corenet_non_ipsec_sendrecv(rshd_t)
+corenet_all_recvfrom_unlabeled(rshd_t)
+corenet_all_recvfrom_netlabel(rshd_t)
 corenet_tcp_sendrecv_generic_if(rshd_t)
 corenet_udp_sendrecv_generic_if(rshd_t)
 corenet_tcp_sendrecv_all_nodes(rshd_t)
@@ -51,6 +52,8 @@ files_list_home(rshd_t)
 files_read_etc_files(rshd_t)
 files_search_tmp(rshd_t)
 
+auth_use_nsswitch(rshd_t)
+
 libs_use_ld_so(rshd_t)
 libs_use_shared_libs(rshd_t)
 
@@ -61,14 +64,7 @@ miscfiles_read_localization(rshd_t)
 seutil_read_config(rshd_t)
 seutil_read_default_contexts(rshd_t)
 
-sysnet_read_config(rshd_t)
-
 userdom_search_all_users_home_content(rshd_t)
-
-ifdef(`targeted_policy',`
-	unconfined_domain(rshd_t)
-	unconfined_shell_domtrans(rshd_t)
-')
 
 tunable_policy(`use_nfs_home_dirs',`
 	fs_read_nfs_files(rshd_t)
@@ -85,11 +81,9 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nscd_socket_use(rshd_t)
+	tcpd_wrapped_domain(rshd_t,rshd_exec_t)
 ')
 
-ifdef(`TODO',`
 optional_policy(`
-	allow rshd_t rlogind_tmp_t:file rw_file_perms;
-')
+	unconfined_shell_domtrans(rshd_t)
 ')

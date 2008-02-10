@@ -1,5 +1,5 @@
 
-policy_module(domain,1.3.0)
+policy_module(domain,1.5.0)
 
 ########################################
 #
@@ -14,6 +14,10 @@ neverallow domain ~domain:process { transition dyntransition };
 
 # Domains that are unconfined
 attribute unconfined_domain_type;
+
+# Domains that can mmap low memory.
+attribute mmap_low_domain_type;
+neverallow { domain -mmap_low_domain_type } self:memprotect mmap_zero;
 
 # Domains that can set their current context
 # (perform dynamic transitions)
@@ -72,10 +76,15 @@ neverallow ~{ domain unlabeled_t } *:process *;
 #
 
 # read /proc/(pid|self) entries
-allow domain self:dir r_dir_perms;
-allow domain self:lnk_file r_file_perms;
+allow domain self:dir list_dir_perms;
+allow domain self:lnk_file { read_lnk_file_perms lock ioctl };
 allow domain self:file rw_file_perms;
 kernel_read_proc_symlinks(domain)
+# Every domain gets the key ring, so we should default
+# to no one allowed to look at it; afs kernel support creates
+# a keyring
+kernel_dontaudit_search_key(domain)
+kernel_dontaudit_link_key(domain)
 
 # create child processes in the domain
 allow domain self:process { fork sigchld };
@@ -88,20 +97,6 @@ term_use_controlling_term(domain)
 # list the root directory
 files_list_root(domain)
 
-ifdef(`targeted_policy',`
-	# RBAC is disabled in the targeted policy,
-	# as only one role is used, system_r.
-	role system_r types domain;
-
-	# FIXME:
-	# workaround until role dominance is fixed in
-	# the module compiler
-	role secadm_r types domain;
-	role sysadm_r types domain;
-	role user_r types domain;
-	role staff_r types domain;
-')
-
 tunable_policy(`global_ssp',`
 	# enable reading of urandom for all domains:
 	# this should be enabled when all programs
@@ -112,6 +107,12 @@ tunable_policy(`global_ssp',`
 
 optional_policy(`
 	setrans_translate_context(domain)
+')
+
+# xdm passes an open file descriptor to xsession-errors.log which is then audited by all confined domains.
+optional_policy(`
+	xserver_dontaudit_use_xdm_fds(domain)
+	xserver_dontaudit_rw_xdm_pipes(domain)
 ')
 
 ########################################
@@ -138,9 +139,12 @@ allow unconfined_domain_type domain:{ sem msgq shm } *;
 allow unconfined_domain_type domain:msg { send receive };
 
 # For /proc/pid
-allow unconfined_domain_type domain:dir r_dir_perms;
-allow unconfined_domain_type domain:file r_file_perms;
-allow unconfined_domain_type domain:lnk_file r_file_perms;
+allow unconfined_domain_type domain:dir list_dir_perms;
+allow unconfined_domain_type domain:file read_file_perms;
+allow unconfined_domain_type domain:lnk_file { read_lnk_file_perms ioctl lock };
 
 # act on all domains keys
 allow unconfined_domain_type domain:key *;
+
+# receive from all domains over labeled networking
+domain_all_recvfrom_all_domains(unconfined_domain_type)

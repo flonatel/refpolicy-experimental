@@ -114,6 +114,38 @@ interface(`samba_domtrans_smbmount',`
 
 ########################################
 ## <summary>
+##	Execute smbmount interactively and do
+##	a domain transition to the smbmount domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed acces.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed the smbmount domain.
+##	</summary>
+## </param>
+## <param name="terminal">
+##	<summary>
+##	The type of the terminal allow the smbmount domain to use.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`samba_run_smbmount',`
+	gen_require(`
+		type smbmount_t;
+	')
+
+	samba_domtrans_smbmount($1)
+	role $2 types smbmount_t;
+	allow smbmount_t $3:chr_file rw_term_perms;
+')
+
+########################################
+## <summary>
 ##	Allow the specified domain to read
 ##	samba configuration files.
 ## </summary>
@@ -177,6 +209,27 @@ interface(`samba_read_log',`
 
 ########################################
 ## <summary>
+##	Allow the specified domain to append to samba's log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`samba_append_log',`
+	gen_require(`
+		type samba_log_t;
+	')
+
+	logging_search_logs($1)
+	allow $1 samba_log_t:dir list_dir_perms;
+	allow $1 samba_log_t:file append_file_perms;
+')
+
+########################################
+## <summary>
 ##	Execute samba log in the caller domain.
 ## </summary>
 ## <param name="domain">
@@ -230,7 +283,29 @@ interface(`samba_search_var',`
 	')
 
 	files_search_var($1)
+	files_search_var_lib($1)
 	allow $1 samba_var_t:dir search_dir_perms;
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to
+##	read samba /var files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`samba_read_var_files',`
+	gen_require(`
+		type samba_var_t;
+	')
+
+	files_search_var($1)
+	files_search_var_lib($1)
+	read_files_pattern($1,samba_var_t,samba_var_t)
 ')
 
 ########################################
@@ -250,7 +325,47 @@ interface(`samba_rw_var_files',`
 	')
 
 	files_search_var($1)
+	files_search_var_lib($1)
 	rw_files_pattern($1,samba_var_t,samba_var_t)
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to
+##	read and write samba /var files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`samba_manage_var_files',`
+	gen_require(`
+		type samba_var_t;
+	')
+
+	files_search_var($1)
+	files_search_var_lib($1)
+	manage_files_pattern($1,samba_var_t,samba_var_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to use file descriptors from samba.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`samba_dontaudit_use_fds',`
+	gen_require(`
+		type smbd_t;
+	')
+
+	dontaudit $1 smbd_t:fd use; 
 ')
 
 ########################################

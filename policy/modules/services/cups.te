@@ -1,5 +1,5 @@
 
-policy_module(cups,1.6.0)
+policy_module(cups,1.9.0)
 
 ########################################
 #
@@ -86,14 +86,11 @@ allow cupsd_t self:fifo_file rw_file_perms;
 allow cupsd_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow cupsd_t self:unix_dgram_socket create_socket_perms;
 allow cupsd_t self:netlink_selinux_socket create_socket_perms;
-allow cupsd_t self:netlink_route_socket r_netlink_socket_perms;
 allow cupsd_t self:tcp_socket create_stream_socket_perms;
 allow cupsd_t self:udp_socket create_socket_perms;
 allow cupsd_t self:appletalk_socket create_socket_perms;
 # generic socket here until appletalk socket is available in kernels
 allow cupsd_t self:socket create_socket_perms;
-
-send_audit_msgs_pattern(cupsd_t)
 
 allow cupsd_t cupsd_etc_t:{ dir file } setattr;
 read_files_pattern(cupsd_t,cupsd_etc_t,cupsd_etc_t)
@@ -135,7 +132,8 @@ kernel_read_system_state(cupsd_t)
 kernel_read_network_state(cupsd_t)
 kernel_read_all_sysctls(cupsd_t)
 
-corenet_non_ipsec_sendrecv(cupsd_t)
+corenet_all_recvfrom_unlabeled(cupsd_t)
+corenet_all_recvfrom_netlabel(cupsd_t)
 corenet_tcp_sendrecv_all_if(cupsd_t)
 corenet_udp_sendrecv_all_if(cupsd_t)
 corenet_raw_sendrecv_all_if(cupsd_t)
@@ -166,11 +164,9 @@ domain_read_all_domains_state(cupsd_t)
 fs_getattr_all_fs(cupsd_t)
 fs_search_auto_mountpoints(cupsd_t)
 
-mls_fd_use_all_levels(cupsd_t)
 mls_file_downgrade(cupsd_t)
-mls_file_write_down(cupsd_t)
-mls_file_read_up(cupsd_t)
-mls_rangetrans_target(cupsd_t)
+mls_file_write_all_levels(cupsd_t)
+mls_file_read_all_levels(cupsd_t)
 mls_socket_write_all_levels(cupsd_t)
 
 term_use_unallocated_ttys(cupsd_t)
@@ -208,11 +204,14 @@ selinux_compute_access_vector(cupsd_t)
 
 init_exec_script_files(cupsd_t)
 
+auth_use_nsswitch(cupsd_t)
+
 libs_use_ld_so(cupsd_t)
 libs_use_shared_libs(cupsd_t)
 # Read /usr/lib/gconv/gconv-modules.* and /usr/lib/python2.2/.*
 libs_read_lib_files(cupsd_t)
 
+logging_send_audit_msgs(cupsd_t)
 logging_send_syslog_msg(cupsd_t)
 
 miscfiles_read_localization(cupsd_t)
@@ -233,25 +232,6 @@ ifdef(`enable_mls',`
 	lpd_relabel_spool(cupsd_t)
 ')
 
-ifdef(`targeted_policy',`
-	files_dontaudit_read_root_files(cupsd_t)
-
-	term_dontaudit_use_unallocated_ttys(cupsd_t)
-	term_dontaudit_use_generic_ptys(cupsd_t)
-
-	init_stream_connect_script(cupsd_t)
-
-	unconfined_rw_pipes(cupsd_t)
-
-	optional_policy(`
-		init_dbus_chat_script(cupsd_t)
-
-		unconfined_dbus_send(cupsd_t)
-
-		dbus_stub(cupsd_t)
-	')
-')
-
 optional_policy(`
 	apm_domtrans_client(cupsd_t)
 ')
@@ -262,7 +242,6 @@ optional_policy(`
 
 optional_policy(`
 	dbus_system_bus_client_template(cupsd,cupsd_t)
-	dbus_send_system_bus(cupsd_t)
 
 	userdom_dbus_send_all_users(cupsd_t)
 
@@ -281,10 +260,6 @@ optional_policy(`
 
 optional_policy(`
 	logrotate_domtrans(cupsd_t)
-')
-
-optional_policy(`
-	nscd_socket_use(cupsd_t)
 ')
 
 optional_policy(`
@@ -313,7 +288,6 @@ allow cupsd_config_t self:fifo_file rw_fifo_file_perms;
 allow cupsd_config_t self:unix_stream_socket create_socket_perms;
 allow cupsd_config_t self:unix_dgram_socket create_socket_perms;
 allow cupsd_config_t self:tcp_socket create_stream_socket_perms;
-allow cupsd_config_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow cupsd_config_t cupsd_t:process signal;
 ps_process_pattern(cupsd_config_t,cupsd_t)
@@ -341,7 +315,8 @@ files_pid_filetrans(cupsd_config_t,cupsd_config_var_run_t,file)
 kernel_read_system_state(cupsd_config_t)
 kernel_read_kernel_sysctls(cupsd_config_t)
 
-corenet_non_ipsec_sendrecv(cupsd_config_t)
+corenet_all_recvfrom_unlabeled(cupsd_config_t)
+corenet_all_recvfrom_netlabel(cupsd_config_t)
 corenet_tcp_sendrecv_all_if(cupsd_config_t)
 corenet_tcp_sendrecv_all_nodes(cupsd_config_t)
 corenet_tcp_sendrecv_all_ports(cupsd_config_t)
@@ -370,6 +345,8 @@ files_read_var_symlinks(cupsd_config_t)
 # Alternatives asks for this
 init_getattr_script_files(cupsd_config_t)
 
+auth_use_nsswitch(cupsd_config_t)
+
 libs_use_ld_so(cupsd_config_t)
 libs_use_shared_libs(cupsd_config_t)
 
@@ -378,8 +355,6 @@ logging_send_syslog_msg(cupsd_config_t)
 miscfiles_read_localization(cupsd_config_t)
 
 seutil_dontaudit_search_config(cupsd_config_t)
-
-sysnet_read_config(cupsd_config_t)
 
 userdom_dontaudit_use_unpriv_user_fds(cupsd_config_t)
 userdom_dontaudit_search_sysadm_home_dirs(cupsd_config_t)
@@ -396,15 +371,6 @@ ifdef(`distro_redhat',`
 	')
 ')
 
-ifdef(`targeted_policy',`
-	files_dontaudit_read_root_files(cupsd_config_t)
-
-	term_dontaudit_use_unallocated_ttys(cupsd_config_t)
-	term_use_generic_ptys(cupsd_config_t)
-
-	unconfined_rw_pipes(cupsd_config_t)
-')
-
 optional_policy(`
 	cron_system_entry(cupsd_config_t, cupsd_config_exec_t)
 ')
@@ -412,7 +378,6 @@ optional_policy(`
 optional_policy(`
 	dbus_system_bus_client_template(cupsd_config,cupsd_config_t)
 	dbus_connect_system_bus(cupsd_config_t)
-	dbus_send_system_bus(cupsd_config_t)
 
 	optional_policy(`
 		hal_dbus_chat(cupsd_config_t)
@@ -430,14 +395,6 @@ optional_policy(`
 
 optional_policy(`
 	logrotate_use_fds(cupsd_config_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(cupsd_config_t)
-')
-
-optional_policy(`
-	nscd_socket_use(cupsd_config_t)
 ')
 
 optional_policy(`
@@ -461,7 +418,6 @@ allow cupsd_lpd_t self:process signal_perms;
 allow cupsd_lpd_t self:fifo_file rw_fifo_file_perms;
 allow cupsd_lpd_t self:tcp_socket connected_stream_socket_perms;
 allow cupsd_lpd_t self:udp_socket create_socket_perms;
-allow cupsd_lpd_t self:netlink_route_socket r_netlink_socket_perms;
 
 # for identd
 # cjp: this should probably only be inetd_child rules?
@@ -492,7 +448,8 @@ kernel_read_kernel_sysctls(cupsd_lpd_t)
 kernel_read_system_state(cupsd_lpd_t)
 kernel_read_network_state(cupsd_lpd_t)
 
-corenet_non_ipsec_sendrecv(cupsd_lpd_t)
+corenet_all_recvfrom_unlabeled(cupsd_lpd_t)
+corenet_all_recvfrom_netlabel(cupsd_lpd_t)
 corenet_tcp_sendrecv_all_if(cupsd_lpd_t)
 corenet_udp_sendrecv_all_if(cupsd_lpd_t)
 corenet_tcp_sendrecv_all_nodes(cupsd_lpd_t)
@@ -510,6 +467,8 @@ fs_getattr_xattr_fs(cupsd_lpd_t)
 
 files_read_etc_files(cupsd_lpd_t)
 
+auth_use_nsswitch(cupsd_lpd_t)
+
 libs_use_ld_so(cupsd_lpd_t)
 libs_use_shared_libs(cupsd_lpd_t)
 
@@ -517,20 +476,10 @@ logging_send_syslog_msg(cupsd_lpd_t)
 
 miscfiles_read_localization(cupsd_lpd_t)
 
-sysnet_read_config(cupsd_lpd_t)
-
 cups_stream_connect(cupsd_lpd_t)
 
 optional_policy(`
 	inetd_service_domain(cupsd_lpd_t,cupsd_lpd_exec_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(cupsd_lpd_t)
-')
-
-optional_policy(`
-	nscd_socket_use(cupsd_lpd_t)
 ')
 
 ########################################
@@ -550,6 +499,8 @@ allow hplip_t self:tcp_socket create_stream_socket_perms;
 allow hplip_t self:udp_socket create_socket_perms;
 allow hplip_t self:rawip_socket create_socket_perms;
 
+corecmd_read_bin_symlinks(hplip_t)
+
 allow hplip_t cupsd_etc_t:dir search;
 
 cups_stream_connect(hplip_t)
@@ -565,7 +516,8 @@ files_pid_filetrans(hplip_t,hplip_var_run_t,file)
 kernel_read_system_state(hplip_t)
 kernel_read_kernel_sysctls(hplip_t)
 
-corenet_non_ipsec_sendrecv(hplip_t)
+corenet_all_recvfrom_unlabeled(hplip_t)
+corenet_all_recvfrom_netlabel(hplip_t)
 corenet_tcp_sendrecv_all_if(hplip_t)
 corenet_udp_sendrecv_all_if(hplip_t)
 corenet_raw_sendrecv_all_if(hplip_t)
@@ -616,12 +568,6 @@ userdom_dontaudit_search_all_users_home_content(hplip_t)
 
 lpd_read_config(cupsd_t)
 
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(hplip_t)
-	term_dontaudit_use_generic_ptys(hplip_t)
-	files_dontaudit_read_root_files(hplip_t)
-')
-
 optional_policy(`
 	seutil_sigchld_newrole(hplip_t)
 ')
@@ -662,7 +608,8 @@ kernel_read_kernel_sysctls(ptal_t)
 kernel_list_proc(ptal_t)
 kernel_read_proc_symlinks(ptal_t)
 
-corenet_non_ipsec_sendrecv(ptal_t)
+corenet_all_recvfrom_unlabeled(ptal_t)
+corenet_all_recvfrom_netlabel(ptal_t)
 corenet_tcp_sendrecv_all_if(ptal_t)
 corenet_tcp_sendrecv_all_nodes(ptal_t)
 corenet_tcp_sendrecv_all_ports(ptal_t)
@@ -692,12 +639,6 @@ sysnet_read_config(ptal_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ptal_t)
 userdom_dontaudit_search_all_users_home_content(ptal_t)
-
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(ptal_t)
-	term_dontaudit_use_generic_ptys(ptal_t)
-	files_dontaudit_read_root_files(ptal_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(ptal_t)

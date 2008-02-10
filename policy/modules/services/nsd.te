@@ -1,5 +1,5 @@
 
-policy_module(nsd,1.2.0)
+policy_module(nsd,1.4.0)
 
 ########################################
 #
@@ -62,7 +62,8 @@ kernel_read_kernel_sysctls(nsd_t)
 
 corecmd_exec_bin(nsd_t)
 
-corenet_non_ipsec_sendrecv(nsd_t)
+corenet_all_recvfrom_unlabeled(nsd_t)
+corenet_all_recvfrom_netlabel(nsd_t)
 corenet_tcp_sendrecv_generic_if(nsd_t)
 corenet_udp_sendrecv_generic_if(nsd_t)
 corenet_tcp_sendrecv_all_nodes(nsd_t)
@@ -96,12 +97,6 @@ sysnet_read_config(nsd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(nsd_t)
 userdom_dontaudit_search_sysadm_home_dirs(nsd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(nsd_t)
-	term_dontaudit_use_generic_ptys(nsd_t)
-	files_dontaudit_read_root_files(nsd_t)
-')
 
 optional_policy(`
 	nis_use_ypbind(nsd_t)
@@ -148,7 +143,8 @@ kernel_read_system_state(nsd_crond_t)
 corecmd_exec_bin(nsd_crond_t)
 corecmd_exec_shell(nsd_crond_t)
 
-corenet_non_ipsec_sendrecv(nsd_crond_t)
+corenet_all_recvfrom_unlabeled(nsd_crond_t)
+corenet_all_recvfrom_netlabel(nsd_crond_t)
 corenet_tcp_sendrecv_generic_if(nsd_crond_t)
 corenet_udp_sendrecv_generic_if(nsd_crond_t)
 corenet_tcp_sendrecv_all_nodes(nsd_crond_t)

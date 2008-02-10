@@ -1,5 +1,5 @@
 
-policy_module(vpn,1.4.0)
+policy_module(vpn,1.7.0)
 
 ########################################
 #
@@ -7,10 +7,8 @@ policy_module(vpn,1.4.0)
 #
 
 type vpnc_t;
-domain_type(vpnc_t)
-
 type vpnc_exec_t;
-domain_entry_file(vpnc_t,vpnc_exec_t)
+application_domain(vpnc_t,vpnc_exec_t)
 role system_r types vpnc_t;
 
 type vpnc_tmp_t;
@@ -48,7 +46,8 @@ kernel_read_network_state(vpnc_t)
 kernel_read_kernel_sysctls(vpnc_t)
 kernel_rw_net_sysctls(vpnc_t)
 
-corenet_non_ipsec_sendrecv(vpnc_t)
+corenet_all_recvfrom_unlabeled(vpnc_t)
+corenet_all_recvfrom_netlabel(vpnc_t)
 corenet_tcp_sendrecv_all_if(vpnc_t)
 corenet_udp_sendrecv_all_if(vpnc_t)
 corenet_raw_sendrecv_all_if(vpnc_t)
@@ -83,6 +82,8 @@ files_read_etc_runtime_files(vpnc_t)
 files_read_etc_files(vpnc_t)
 files_dontaudit_search_home(vpnc_t)
 
+auth_use_nsswitch(vpnc_t)
+
 libs_exec_ld_so(vpnc_t)
 libs_exec_lib_files(vpnc_t)
 libs_use_ld_so(vpnc_t)
@@ -106,16 +107,8 @@ userdom_dontaudit_search_all_users_home_content(vpnc_t)
 
 optional_policy(`
 	dbus_system_bus_client_template(vpnc,vpnc_t)
-	dbus_send_system_bus(vpnc_t)
+
 	optional_policy(`
 		networkmanager_dbus_chat(vpnc_t)
 	')
-')
-
-optional_policy(`
-        nis_use_ypbind(vpnc_t)
-')
-
-optional_policy(`
-	nscd_socket_use(vpnc_t)
 ')

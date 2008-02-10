@@ -1,5 +1,5 @@
 
-policy_module(pegasus,1.3.0)
+policy_module(pegasus,1.5.0)
 
 ########################################
 #
@@ -38,8 +38,6 @@ allow pegasus_t self:unix_dgram_socket create_socket_perms;
 allow pegasus_t self:unix_stream_socket create_stream_socket_perms;
 allow pegasus_t self:tcp_socket create_stream_socket_perms;
 
-send_audit_msgs_pattern(pegasus_t)
-
 allow pegasus_t pegasus_conf_t:dir rw_dir_perms;
 allow pegasus_t pegasus_conf_t:file { read_file_perms link unlink };
 allow pegasus_t pegasus_conf_t:lnk_file read_lnk_file_perms;
@@ -68,7 +66,8 @@ kernel_read_system_state(pegasus_t)
 kernel_search_vm_sysctl(pegasus_t)
 kernel_read_net_sysctls(pegasus_t)
 
-corenet_non_ipsec_sendrecv(pegasus_t)
+corenet_all_recvfrom_unlabeled(pegasus_t)
+corenet_all_recvfrom_netlabel(pegasus_t)
 corenet_tcp_sendrecv_all_if(pegasus_t)
 corenet_tcp_sendrecv_all_nodes(pegasus_t)
 corenet_tcp_sendrecv_all_ports(pegasus_t)
@@ -113,19 +112,14 @@ init_stream_connect_script(pegasus_t)
 libs_use_ld_so(pegasus_t)
 libs_use_shared_libs(pegasus_t)
 
+logging_send_audit_msgs(pegasus_t)
+
 miscfiles_read_localization(pegasus_t)
 
 sysnet_read_config(pegasus_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pegasus_t)
 userdom_dontaudit_search_sysadm_home_dirs(pegasus_t)
-
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(pegasus_t)
-	term_dontaudit_use_generic_ptys(pegasus_t)
-	files_dontaudit_read_root_files(pegasus_t)
-	unconfined_signull(pegasus_t)
-')
 
 optional_policy(`
 	logging_send_syslog_msg(pegasus_t)
@@ -142,4 +136,8 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(pegasus_t)
+')
+
+optional_policy(`
+	unconfined_signull(pegasus_t)
 ')

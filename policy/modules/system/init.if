@@ -71,6 +71,7 @@ interface(`init_ranged_domain',`
 
 	ifdef(`enable_mls',`
 		range_transition init_t $2:process $3;
+		mls_rangetrans_target($1)
 	')
 ')
 
@@ -171,6 +172,7 @@ interface(`init_ranged_daemon_domain',`
 
 	ifdef(`enable_mls',`
 		range_transition initrc_t $2:process $3;
+		mls_rangetrans_target($1)
 	')
 ')
 
@@ -196,8 +198,7 @@ interface(`init_system_domain',`
 		role system_r;
 	')
 
-	domain_type($1)
-	domain_entry_file($1,$2)
+	application_domain($1,$2)
 
 	role system_r types $1;
 
@@ -241,11 +242,11 @@ interface(`init_ranged_system_domain',`
 	init_system_domain($1,$2)
 
 	ifdef(`enable_mcs',`
-		range_transition initrc_t $2 $3;
+		range_transition initrc_t $2:process $3;
 	')
 
 	ifdef(`enable_mls',`
-		range_transition initrc_t $2 $3;
+		range_transition initrc_t $2:process $3;
 	')
 ')
 
@@ -300,9 +301,6 @@ interface(`init_exec',`
 interface(`init_getpgid',`
 	gen_require(`
 		type init_t;
-
-		# cjp: remove this when init_t decl is moved back to this module
-		attribute direct_run_init;
 	')
 
 	allow $1 init_t:process getpgid;
@@ -321,9 +319,6 @@ interface(`init_getpgid',`
 interface(`init_signull',`
 	gen_require(`
 		type init_t;
-
-		# cjp: remove this when init_t decl is moved back to this module
-		attribute direct_run_init;
 	')
 
 	allow $1 init_t:process signull;
@@ -342,9 +337,6 @@ interface(`init_signull',`
 interface(`init_sigchld',`
 	gen_require(`
 		type init_t;
-
-		# cjp: remove this when init_t decl is moved back to this module
-		attribute direct_run_init;
 	')
 
 	allow $1 init_t:process sigchld;
@@ -363,9 +355,6 @@ interface(`init_sigchld',`
 interface(`init_use_fds',`
 	gen_require(`
 		type init_t;
-
-		# cjp: remove this when init_t decl is moved back to this module
-		attribute direct_run_init;
 	')
 
 	allow $1 init_t:fd use;
@@ -385,9 +374,6 @@ interface(`init_use_fds',`
 interface(`init_dontaudit_use_fds',`
 	gen_require(`
 		type init_t;
-
-		# cjp: remove this when init_t decl is moved back to this module
-		attribute direct_run_init;
 	')
 
 	dontaudit $1 init_t:fd use;
@@ -944,6 +930,24 @@ interface(`init_dontaudit_stream_connect_script',`
 	')
 
 	dontaudit $1 initrc_t:unix_stream_socket connectto;
+')
+########################################
+## <summary>
+##	Send messages to init scripts over dbus.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_dbus_send_script',`
+	gen_require(`
+		type initrc_t;
+		class dbus send_msg;
+	')
+
+	allow $1 initrc_t:dbus send_msg;
 ')
 
 ########################################

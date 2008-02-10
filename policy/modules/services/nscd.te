@@ -1,5 +1,5 @@
 
-policy_module(nscd,1.4.0)
+policy_module(nscd,1.6.0)
 
 gen_require(`
 	class nscd all_nscd_perms;
@@ -65,7 +65,8 @@ fs_search_auto_mountpoints(nscd_t)
 auth_getattr_shadow(nscd_t)
 auth_use_nsswitch(nscd_t)
 
-corenet_non_ipsec_sendrecv(nscd_t)
+corenet_all_recvfrom_unlabeled(nscd_t)
+corenet_all_recvfrom_netlabel(nscd_t)
 corenet_tcp_sendrecv_all_if(nscd_t)
 corenet_udp_sendrecv_all_if(nscd_t)
 corenet_tcp_sendrecv_all_nodes(nscd_t)
@@ -104,12 +105,6 @@ sysnet_read_config(nscd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(nscd_t)
 userdom_dontaudit_search_sysadm_home_dirs(nscd_t)
-
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(nscd_t)
-	term_use_generic_ptys(nscd_t)
-	files_dontaudit_read_root_files(nscd_t)
-')
 
 optional_policy(`
 	udev_read_db(nscd_t)

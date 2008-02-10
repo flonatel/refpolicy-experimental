@@ -1,5 +1,5 @@
 
-policy_module(filesystem,1.6.0)
+policy_module(filesystem,1.9.0)
 
 ########################################
 #
@@ -21,6 +21,7 @@ sid fs gen_context(system_u:object_r:fs_t,s0)
 
 # Use xattrs for the following filesystem types.
 # Requires that a security xattr handler exist for the filesystem.
+fs_use_xattr ecryptfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr encfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr ext2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr ext3 gen_context(system_u:object_r:fs_t,s0);
@@ -28,6 +29,7 @@ fs_use_xattr gfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr gfs2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jffs2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jfs gen_context(system_u:object_r:fs_t,s0);
+fs_use_xattr lustre gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr xfs gen_context(system_u:object_r:fs_t,s0);
 
 # Use the allocating task SID to label inodes in the following filesystem
@@ -43,6 +45,12 @@ fs_use_task sockfs gen_context(system_u:object_r:fs_t,s0);
 #
 # Non-persistent/pseudo filesystems
 #
+
+type anon_inodefs_t;
+fs_type(anon_inodefs_t)
+files_mountpoint(anon_inodefs_t)
+genfscon anon_inodefs / gen_context(system_u:object_r:anon_inodefs_t,s0)
+
 type bdev_t;
 fs_type(bdev_t)
 genfscon bdev / gen_context(system_u:object_r:bdev_t,s0)
@@ -54,11 +62,17 @@ genfscon binfmt_misc / gen_context(system_u:object_r:binfmt_misc_fs_t,s0)
 
 type capifs_t;
 fs_type(capifs_t)
+files_mountpoint(capifs_t)
 genfscon capifs / gen_context(system_u:object_r:capifs_t,s0)
 
 type configfs_t;
 fs_type(configfs_t)
 genfscon configfs / gen_context(system_u:object_r:configfs_t,s0)
+
+type cpusetfs_t;
+fs_type(cpusetfs_t)
+allow cpusetfs_t self:filesystem associate;
+genfscon cpuset / gen_context(system_u:object_r:cpusetfs_t,s0)
 
 type eventpollfs_t;
 fs_type(eventpollfs_t)
@@ -83,6 +97,11 @@ type inotifyfs_t;
 fs_type(inotifyfs_t)
 genfscon inotifyfs / gen_context(system_u:object_r:inotifyfs_t,s0)
 
+type mvfs_t;
+fs_noxattr_type(mvfs_t)
+allow mvfs_t self:filesystem associate;
+genfscon mvfs / gen_context(system_u:object_r:mvfs_t,s0)
+
 type nfsd_fs_t;
 fs_type(nfsd_fs_t)
 genfscon nfsd / gen_context(system_u:object_r:nfsd_fs_t,s0)
@@ -93,6 +112,7 @@ genfscon oprofilefs / gen_context(system_u:object_r:oprofilefs_t,s0)
 
 type ramfs_t;
 fs_type(ramfs_t)
+files_mountpoint(ramfs_t)
 genfscon ramfs / gen_context(system_u:object_r:ramfs_t,s0)
 
 type romfs_t;
@@ -105,6 +125,21 @@ fs_type(rpc_pipefs_t)
 genfscon rpc_pipefs / gen_context(system_u:object_r:rpc_pipefs_t,s0)
 files_mountpoint(rpc_pipefs_t)
 
+type spufs_t;
+fs_type(spufs_t)
+genfscon spufs / gen_context(system_u:object_r:spufs_t,s0)
+files_mountpoint(spufs_t)
+
+type squash_t;
+fs_type(squash_t)
+genfscon squash / gen_context(system_u:object_r:squash_t,s0)
+files_mountpoint(squash_t)
+
+type vxfs_t;
+fs_noxattr_type(vxfs_t)
+files_mountpoint(vxfs_t)
+genfscon vxfs / gen_context(system_u:object_r:vxfs_t,s0)
+
 #
 # tmpfs_t is the type for tmpfs filesystems
 #
@@ -112,6 +147,7 @@ type tmpfs_t;
 fs_type(tmpfs_t)
 files_type(tmpfs_t)
 files_mountpoint(tmpfs_t)
+files_poly_parent(tmpfs_t)
 
 # Use a transition SID based on the allocating task SID and the
 # filesystem SID to label inodes in the following filesystem types,
@@ -157,6 +193,13 @@ genfscon ntfs-3g / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon ntfs / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon vfat / gen_context(system_u:object_r:dosfs_t,s0)
 
+type fusefs_t;
+fs_noxattr_type(fusefs_t)
+allow fusefs_t self:filesystem associate;
+allow fusefs_t fs_t:filesystem associate;
+genfscon fuse / gen_context(system_u:object_r:fusefs_t,s0)
+genfscon fuseblk / gen_context(system_u:object_r:fusefs_t,s0)
+
 #
 # iso9660_t is the type for CD filesystems
 # and their files.
@@ -184,6 +227,7 @@ files_mountpoint(nfs_t)
 genfscon nfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon nfs4 / gen_context(system_u:object_r:nfs_t,s0)
 genfscon afs / gen_context(system_u:object_r:nfs_t,s0)
+genfscon coda / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hfsplus / gen_context(system_u:object_r:nfs_t,s0)
 genfscon hostfs / gen_context(system_u:object_r:nfs_t,s0)

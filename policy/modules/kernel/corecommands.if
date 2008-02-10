@@ -32,11 +32,11 @@ interface(`corecmd_executable_file',`
 
 ########################################
 ## <summary>
-##	Create a aliased type to generic bin files.
+##	Create a aliased type to generic bin files.  (Deprecated)
 ## </summary>
 ## <desc>
 ##	<p>
-##	Create a aliased type to generic bin files.
+##	Create a aliased type to generic bin files.  (Deprecated)
 ##	</p>
 ##	<p>
 ##	This is added to support targeted policy.  Its
@@ -51,15 +51,7 @@ interface(`corecmd_executable_file',`
 ## </param>
 #
 interface(`corecmd_bin_alias',`
-	ifdef(`targeted_policy',`
-		gen_require(`
-			type bin_t;
-		')
-
-		typealias bin_t alias $1;
-	',`
-		refpolicywarn(`$0($*) has no effect in strict policy.')
-	')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -883,7 +875,6 @@ interface(`corecmd_exec_chroot',`
 
 	read_lnk_files_pattern($1,bin_t,bin_t)
 	can_exec($1,chroot_exec_t)
-	allow $1 self:capability sys_chroot;
 ')
 
 ########################################
@@ -927,6 +918,24 @@ interface(`corecmd_exec_all_executables',`
 	can_exec($1,exec_type)
 	list_dirs_pattern($1,bin_t,bin_t)
 	read_lnk_files_pattern($1,bin_t,exec_type)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to execute all executables.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`corecmd_dontaudit_exec_all_executables',`
+	gen_require(`
+		attribute exec_type;
+	')
+
+	dontaudit $1 exec_type:file { execute execute_no_trans };
 ')
 
 ########################################

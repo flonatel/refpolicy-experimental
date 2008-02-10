@@ -107,6 +107,12 @@ my %map = (
            'xserver'       => [ 'gdm', 'kdm', 'xdm', 'xserver*' ]
           );
 
+# Converts wildcard (glob) pattern into regex pattern (only `*' is wild).
+sub wild2re {
+  my ($pat) = @_;
+  return join('.*', map(quotemeta, split('\*', $pat, -1)));
+}
+
 #  List all th modules, except the base module, in the policy
 #  directory. This sets @all_modules and %Module_Path
 sub list_modules {
@@ -196,7 +202,10 @@ sub installed_modules {
 
   PACKAGE:
     for my $pkg (@{ $map{$module} }) {
-      if ($Installed{$pkg}) {
+      my $is_installed = index($pkg, '*') < 0 ?
+        $Installed{$pkg} # exact name
+          : grep(m/^@{[wild2re($pkg)]}$/, keys %Installed); # wildcard
+      if ($is_installed) {
         if (defined $Deps{$module}) {
           for my $dep (split(' ', $Deps{$module})) {
             next if $Loaded{$dep};

@@ -1,5 +1,5 @@
 
-policy_module(vbetool,1.1.0)
+policy_module(vbetool,1.3.0)
 
 ########################################
 #
@@ -32,4 +32,6 @@ miscfiles_read_localization(vbetool_t)
 
 optional_policy(`
 	hal_rw_pid_files(vbetool_t)
+	hal_write_log(vbetool_t)
+	hal_dontaudit_append_lib_files(vbetool_t)
 ')

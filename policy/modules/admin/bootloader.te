@@ -1,5 +1,5 @@
 
-policy_module(bootloader,1.5.0)
+policy_module(bootloader,1.7.0)
 
 ########################################
 #
@@ -15,11 +15,9 @@ type boot_runtime_t;
 files_type(boot_runtime_t)
 
 type bootloader_t;
-domain_type(bootloader_t)
-role system_r types bootloader_t;
-
 type bootloader_exec_t;
-domain_entry_file(bootloader_t,bootloader_exec_t)
+application_domain(bootloader_t,bootloader_exec_t)
+role system_r types bootloader_t;
 
 #
 # bootloader_etc_t is the configuration file,
@@ -92,8 +90,8 @@ fs_read_tmpfs_symlinks(bootloader_t)
 #Needed for ia64
 fs_manage_dos_files(bootloader_t)
 
-mls_file_read_up(bootloader_t)
-mls_file_write_down(bootloader_t)
+mls_file_read_all_levels(bootloader_t)
+mls_file_write_all_levels(bootloader_t)
 
 
 term_getattr_all_user_ttys(bootloader_t)
@@ -176,17 +174,13 @@ ifdef(`distro_redhat',`
 	mount_domtrans(bootloader_t)
 ')
 
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(bootloader_t)
-	term_use_generic_ptys(bootloader_t)
-')
-
 optional_policy(`
 	fstools_exec(bootloader_t)
 ')
 
 optional_policy(`
 	hal_dontaudit_append_lib_files(bootloader_t)
+	hal_write_log(bootloader_t)
 ')
 
 optional_policy(`

@@ -24,7 +24,7 @@ interface(`portage_domtrans',`
 	# constraining domain
 	domain_trans($1,portage_exec_t,portage_t)
 	allow portage_t $1:fd use;
-	allow portage_t $1:fifo_file rw_file_perms;
+	allow portage_t $1:fifo_file rw_fifo_file_perms;
 	allow portage_t $1:process sigchld;
 
 	# transition to portage
@@ -152,7 +152,8 @@ interface(`portage_compile_domain',`
 	# really shouldnt need this but some packages test
 	# network access, such as during configure
 	# also distcc--need to reinvestigate confining distcc client
-	corenet_non_ipsec_sendrecv($1)
+	corenet_all_recvfrom_unlabeled($1)
+	corenet_all_recvfrom_netlabel($1)
 	corenet_tcp_sendrecv_generic_if($1)
 	corenet_udp_sendrecv_generic_if($1)
 	corenet_raw_sendrecv_generic_if($1)
@@ -242,7 +243,8 @@ interface(`portage_fetch_domain',`
 
 	corecmd_exec_bin($1)
 
-	corenet_non_ipsec_sendrecv($1)
+	corenet_all_recvfrom_unlabeled($1)
+	corenet_all_recvfrom_netlabel($1)
 	corenet_tcp_sendrecv_generic_if($1)
 	corenet_tcp_sendrecv_all_nodes($1)
 	corenet_tcp_sendrecv_all_ports($1)
@@ -344,7 +346,8 @@ interface(`portage_main_domain',`
 	# seems to work ok without these
 	dontaudit portage_t device_t:{ blk_file chr_file } getattr;
 	dontaudit portage_t proc_t:dir setattr;
-	dontaudit portage_t device_type:{ chr_file blk_file } r_file_perms;
+	dontaudit portage_t device_type:chr_file read_chr_file_perms;
+	dontaudit portage_t device_type:blk_file read_blk_file_perms;
 	')
 ')
 

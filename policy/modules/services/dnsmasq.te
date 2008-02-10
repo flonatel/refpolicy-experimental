@@ -1,5 +1,5 @@
 
-policy_module(dnsmasq,1.3.0)
+policy_module(dnsmasq,1.5.0)
 
 ########################################
 #
@@ -42,7 +42,8 @@ kernel_read_kernel_sysctls(dnsmasq_t)
 kernel_list_proc(dnsmasq_t)
 kernel_read_proc_symlinks(dnsmasq_t)
 
-corenet_non_ipsec_sendrecv(dnsmasq_t)
+corenet_all_recvfrom_unlabeled(dnsmasq_t)
+corenet_all_recvfrom_netlabel(dnsmasq_t)
 corenet_tcp_sendrecv_generic_if(dnsmasq_t)
 corenet_udp_sendrecv_generic_if(dnsmasq_t)
 corenet_raw_sendrecv_generic_if(dnsmasq_t)
@@ -81,12 +82,6 @@ sysnet_read_config(dnsmasq_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dnsmasq_t)
 userdom_dontaudit_search_sysadm_home_dirs(dnsmasq_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(dnsmasq_t)
-	term_dontaudit_use_generic_ptys(dnsmasq_t)
-	files_dontaudit_read_root_files(dnsmasq_t)
-')
 
 optional_policy(`
 	nis_use_ypbind(dnsmasq_t)

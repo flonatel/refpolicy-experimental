@@ -63,6 +63,9 @@ resetlabels:  $(fcpath)
 #
 # Build a binary policy locally
 #
+ifneq "$(UNK_PERMS)" ""
+$(polver): CHECKPOLICY += -U $(UNK_PERMS)
+endif
 $(polver): $(policy_conf)
 	@echo "Compiling $(NAME) $(polver)"
 ifneq ($(pv),$(kv))
@@ -76,6 +79,9 @@ endif
 #
 # Install a binary policy
 #
+ifneq "$(UNK_PERMS)" ""
+$(loadpath): CHECKPOLICY += -U $(UNK_PERMS)
+endif
 $(loadpath): $(policy_conf)
 	@mkdir -p $(policypath)
 	@echo "Compiling and installing $(NAME) $(loadpath)"
@@ -90,7 +96,7 @@ endif
 #
 # Load the binary policy
 #
-reload $(tmpdir)/load: $(loadpath) $(fcpath) $(ncpath) $(appfiles)
+reload $(tmpdir)/load: $(loadpath) $(fcpath) $(appfiles)
 	@echo "Loading $(NAME) $(loadpath)"
 	$(verbose) $(LOADPOLICY) -q $(loadpath)
 	@touch $(tmpdir)/load
@@ -127,6 +133,7 @@ $(tmpdir)/all_interfaces.conf: $(m4support) $(all_interfaces)
 	@echo "divert" >> $@
 
 $(tmpdir)/rolemap.conf: $(rolemap)
+	$(verbose) echo "" > $@
 	$(call parse-rolemap,base,$@)
 
 $(tmpdir)/all_te_files.conf: $(m4support) $(tmpdir)/generated_definitions.conf $(tmpdir)/all_interfaces.conf $(all_te_files) $(tmpdir)/rolemap.conf

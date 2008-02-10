@@ -1,5 +1,5 @@
 
-policy_module(devices,1.4.0)
+policy_module(devices,1.7.0)
 
 ########################################
 #
@@ -135,6 +135,12 @@ dev_node(random_device_t)
 
 type scanner_device_t;
 dev_node(scanner_device_t)
+
+#
+# Type for smartcards
+#
+type smartcard_device_t;
+dev_node(smartcard_device_t)
 
 #
 # Type for sound devices and mixers

@@ -1,5 +1,5 @@
 
-policy_module(qmail,1.1.0)
+policy_module(qmail,1.3.0)
 
 ########################################
 #
@@ -56,8 +56,7 @@ init_daemon_domain(qmail_start_t,qmail_start_exec_t)
 
 type qmail_tcp_env_t;
 type qmail_tcp_env_exec_t;
-domain_type(qmail_tcp_env_t)
-domain_entry_file(qmail_tcp_env_t,qmail_tcp_env_exec_t)
+application_domain(qmail_tcp_env_t,qmail_tcp_env_exec_t)
 
 ########################################
 #
@@ -171,7 +170,8 @@ allow qmail_remote_t self:udp_socket create_socket_perms;
 
 rw_files_pattern(qmail_remote_t,qmail_spool_t,qmail_spool_t)
 
-corenet_non_ipsec_sendrecv(qmail_remote_t)
+corenet_all_recvfrom_unlabeled(qmail_remote_t)
+corenet_all_recvfrom_netlabel(qmail_remote_t)
 corenet_tcp_sendrecv_generic_if(qmail_remote_t)
 corenet_udp_sendrecv_generic_if(qmail_remote_t)
 corenet_tcp_sendrecv_generic_node(qmail_remote_t)

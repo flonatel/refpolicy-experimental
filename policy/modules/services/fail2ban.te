@@ -1,5 +1,5 @@
 
-policy_module(fail2ban,1.0.0)
+policy_module(fail2ban,1.1.0)
 
 ########################################
 #
@@ -54,11 +54,6 @@ libs_use_shared_libs(fail2ban_t)
 logging_read_generic_logs(fail2ban_t)
 
 miscfiles_read_localization(fail2ban_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(fail2ban_t)
-	term_dontaudit_use_generic_ptys(fail2ban_t)
-')
 
 optional_policy(`
 	apache_read_log(fail2ban_t)

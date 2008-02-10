@@ -4,9 +4,9 @@
 ## Created On       : Thu May 10 23:57:50 2007
 ## Created On Node  : glaurung.internal.golden-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Fri May 11 00:58:55 2007
-## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 4
+## Last Modified On : Mon Oct 29 11:57:13 2007
+## Last Machine Used: anzu.internal.golden-gryphon.com
+## Update Count     : 5
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -30,16 +30,16 @@
 module localStrict 1.0;
 
 require {
+        type apt_t;
+        type auditd_t;
+        type crond_t;
+        type fsadm_log_t;
+        type fsadm_t;
+        type initrc_t;
+        type mount_t;
+        type security_t;
         type system_chkpwd_t;
         type var_run_t;
-        type fsadm_log_t;
-        type mount_t;
-        type auditd_t;
-        type apt_t;
-        type fsadm_t;
-        type crond_t;
-        type initrc_t;
-        type security_t;
         class unix_stream_socket listen;
         class file write;
         class fd use;
@@ -57,6 +57,13 @@ allow apt_t var_run_t:dir search;
 # src="auditd_t" tgt="auditd_t" class="unix_stream_socket", perms="listen"
 # comm="audispd" exe="" path=""
 allow auditd_t self:unix_stream_socket listen;
+
+#============= crond_t ==============
+# Since cron policy explicitly did not give permission for this, 
+# we should silence the audit messages.
+# src="crond_t" tgt="crond_t" class="process", perms="setrlimit"
+# comm="cron" exe="" path=""
+allow crond_t self:process setrlimit;
 
 ##============= fsadm_t ==============
 # src="fsadm_t" tgt="security_t" class="filesystem", perms="getattr"
@@ -89,10 +96,3 @@ allow system_chkpwd_t security_t:filesystem getattr;
 # src="system_chkpwd_t" tgt="var_run_t" class="dir", perms="search"
 # comm="unix_chkpwd" exe="" path=""
 allow system_chkpwd_t var_run_t:dir search;
-
-#============= crond_t ==============
-# Since cron policy explicitly did not give permission for this, 
-# we should silence the audit messages.
-# src="crond_t" tgt="crond_t" class="process", perms="setrlimit"
-# comm="cron" exe="" path=""
-allow crond_t self:process setrlimit;

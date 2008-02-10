@@ -1,5 +1,5 @@
 
-policy_module(lvm,1.6.0)
+policy_module(lvm,1.8.0)
 
 ########################################
 #
@@ -69,7 +69,8 @@ kernel_dontaudit_getattr_core_if(clvmd_t)
 corecmd_exec_shell(clvmd_t)
 corecmd_getattr_bin_files(clvmd_t)
 
-corenet_non_ipsec_sendrecv(clvmd_t)
+corenet_all_recvfrom_unlabeled(clvmd_t)
+corenet_all_recvfrom_netlabel(clvmd_t)
 corenet_tcp_sendrecv_all_if(clvmd_t)
 corenet_udp_sendrecv_all_if(clvmd_t)
 corenet_raw_sendrecv_all_if(clvmd_t)
@@ -103,6 +104,8 @@ domain_use_interactive_fds(clvmd_t)
 
 storage_raw_read_fixed_disk(clvmd_t)
 
+auth_use_nsswitch(clvmd_t)
+
 libs_use_ld_so(clvmd_t)
 libs_use_shared_libs(clvmd_t)
 
@@ -113,19 +116,11 @@ miscfiles_read_localization(clvmd_t)
 seutil_dontaudit_search_config(clvmd_t)
 seutil_sigchld_newrole(clvmd_t)
 
-sysnet_read_config(clvmd_t)
-
 userdom_dontaudit_use_unpriv_user_fds(clvmd_t)
 userdom_dontaudit_search_sysadm_home_dirs(clvmd_t)
 
 lvm_domtrans(clvmd_t)
 lvm_read_config(clvmd_t)
-
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(clvmd_t)
-	term_dontaudit_use_generic_ptys(clvmd_t)
-	files_dontaudit_read_root_files(clvmd_t)
-')
 
 optional_policy(`
 	ccs_stream_connect(clvmd_t)
@@ -133,10 +128,6 @@ optional_policy(`
 
 optional_policy(`
 	gpm_dontaudit_getattr_gpmctl(clvmd_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(clvmd_t)
 ')
 
 optional_policy(`
@@ -283,13 +274,6 @@ seutil_sigchld_newrole(lvm_t)
 ifdef(`distro_redhat',`
 	# this is from the initrd:
 	files_rw_isid_type_dirs(lvm_t)
-')
-
-ifdef(`targeted_policy', `
-	term_use_unallocated_ttys(lvm_t)
-	term_use_generic_ptys(lvm_t)
-
-	files_dontaudit_read_root_files(lvm_t)
 ')
 
 optional_policy(`

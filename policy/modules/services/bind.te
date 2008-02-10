@@ -1,5 +1,5 @@
 
-policy_module(bind,1.4.0)
+policy_module(bind,1.6.0)
 
 ########################################
 #
@@ -9,7 +9,7 @@ policy_module(bind,1.4.0)
 ## <desc>
 ## <p>
 ## Allow BIND to write the master zone files.
-## Generally this is used for dynamic DNS.
+## Generally this is used for dynamic DNS or zone transfers.
 ## </p>
 ## </desc>
 gen_tunable(named_write_master_zones,false)
@@ -66,7 +66,6 @@ allow named_t self:unix_stream_socket create_stream_socket_perms;
 allow named_t self:unix_dgram_socket create_socket_perms;
 allow named_t self:tcp_socket create_stream_socket_perms;
 allow named_t self:udp_socket create_socket_perms;
-allow named_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow named_t dnssec_t:file { getattr read };
 
@@ -101,7 +100,10 @@ kernel_read_kernel_sysctls(named_t)
 kernel_read_system_state(named_t)
 kernel_read_network_state(named_t)
 
-corenet_non_ipsec_sendrecv(named_t)
+corecmd_search_bin(named_t)
+
+corenet_all_recvfrom_unlabeled(named_t)
+corenet_all_recvfrom_netlabel(named_t)
 corenet_tcp_sendrecv_all_if(named_t)
 corenet_udp_sendrecv_all_if(named_t)
 corenet_tcp_sendrecv_all_nodes(named_t)
@@ -118,21 +120,21 @@ corenet_sendrecv_dns_server_packets(named_t)
 corenet_sendrecv_dns_client_packets(named_t)
 corenet_sendrecv_rndc_server_packets(named_t)
 corenet_sendrecv_rndc_client_packets(named_t)
+corenet_udp_bind_all_unreserved_ports(named_t)
 
 dev_read_sysfs(named_t)
 dev_read_rand(named_t)
-
-fs_getattr_all_fs(named_t)
-fs_search_auto_mountpoints(named_t)
-
-corecmd_search_bin(named_t)
-
 dev_read_urand(named_t)
 
 domain_use_interactive_fds(named_t)
 
 files_read_etc_files(named_t)
 files_read_etc_runtime_files(named_t)
+
+fs_getattr_all_fs(named_t)
+fs_search_auto_mountpoints(named_t)
+
+auth_use_nsswitch(named_t)
 
 libs_use_ld_so(named_t)
 libs_use_shared_libs(named_t)
@@ -147,12 +149,6 @@ sysnet_read_config(named_t)
 userdom_dontaudit_use_unpriv_user_fds(named_t)
 userdom_dontaudit_search_sysadm_home_dirs(named_t)
 
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(named_t)
-	term_dontaudit_use_generic_ptys(named_t)
-	files_dontaudit_read_root_files(named_t)
-')
-
 tunable_policy(`named_write_master_zones',`
 	manage_dirs_pattern(named_t,named_zone_t,named_zone_t)
 	manage_files_pattern(named_t,named_zone_t,named_zone_t)
@@ -160,23 +156,20 @@ tunable_policy(`named_write_master_zones',`
 ')
 
 optional_policy(`
-	gen_require(`
-		class dbus send_msg;
-	')
-
-	allow named_t self:dbus send_msg;
-
 	init_dbus_chat_script(named_t)
 
 	sysnet_dbus_chat_dhcpc(named_t)
 
 	dbus_system_bus_client_template(named,named_t)
 	dbus_connect_system_bus(named_t)
-	dbus_send_system_bus(named_t)
 
 	optional_policy(`
 		networkmanager_dbus_chat(named_t)
 	')
+')
+
+optional_policy(`
+	kerberos_use(named_t)
 ')
 
 optional_policy(`
@@ -186,14 +179,6 @@ optional_policy(`
 	networkmanager_rw_udp_sockets(named_t)
 	networkmanager_rw_packet_sockets(named_t)
 	networkmanager_rw_routing_sockets(named_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(named_t)
-')
-
-optional_policy(`
-	nscd_socket_use(named_t)
 ')
 
 optional_policy(`
@@ -231,19 +216,20 @@ allow ndc_t named_zone_t:dir search;
 
 kernel_read_kernel_sysctls(ndc_t)
 
-corenet_non_ipsec_sendrecv(ndc_t)
+corenet_all_recvfrom_unlabeled(ndc_t)
+corenet_all_recvfrom_netlabel(ndc_t)
 corenet_tcp_sendrecv_all_if(ndc_t)
 corenet_tcp_sendrecv_all_nodes(ndc_t)
 corenet_tcp_sendrecv_all_ports(ndc_t)
 corenet_tcp_connect_rndc_port(ndc_t)
 corenet_sendrecv_rndc_client_packets(ndc_t)
 
-fs_getattr_xattr_fs(ndc_t)
-
 domain_use_interactive_fds(ndc_t)
 
 files_read_etc_files(ndc_t)
 files_search_pids(ndc_t)
+
+fs_getattr_xattr_fs(ndc_t)
 
 init_use_fds(ndc_t)
 init_use_script_ptys(ndc_t)
@@ -261,13 +247,6 @@ sysnet_dns_name_resolve(ndc_t)
 # for /etc/rndc.key
 ifdef(`distro_redhat',`
 	allow ndc_t named_conf_t:dir search;
-')
-
-ifdef(`targeted_policy',`
-	kernel_dontaudit_read_unlabeled_files(ndc_t)
-
-	term_use_unallocated_ttys(ndc_t)
-	term_use_generic_ptys(ndc_t)
 ')
 
 optional_policy(`

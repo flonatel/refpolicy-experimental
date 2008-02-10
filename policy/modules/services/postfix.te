@@ -1,5 +1,5 @@
 
-policy_module(postfix,1.5.0)
+policy_module(postfix,1.8.0)
 
 ########################################
 #
@@ -22,7 +22,7 @@ type postfix_etc_t;
 files_type(postfix_etc_t)
 
 type postfix_exec_t;
-corecmd_executable_file(postfix_exec_t)
+application_executable_file(postfix_exec_t)
 
 postfix_server_domain_template(local)
 mta_mailserver_delivery(postfix_local_t)
@@ -33,8 +33,7 @@ files_tmp_file(postfix_local_tmp_t)
 # Program for creating database files
 type postfix_map_t;
 type postfix_map_exec_t;
-domain_type(postfix_map_t)
-domain_entry_file(postfix_map_t,postfix_map_exec_t)
+application_domain(postfix_map_t,postfix_map_exec_t)
 
 type postfix_map_tmp_t;
 files_tmp_file(postfix_map_tmp_t)
@@ -84,6 +83,12 @@ files_type(postfix_public_t)
 type postfix_var_run_t;
 files_pid_file(postfix_var_run_t)
 
+postfix_server_domain_template(virtual)
+mta_mailserver_delivery(postfix_virtual_t)
+
+type postfix_virtual_tmp_t;
+files_tmp_file(postfix_virtual_tmp_t)
+
 ########################################
 #
 # Postfix master process local policy
@@ -99,7 +104,7 @@ allow postfix_master_t postfix_etc_t:file rw_file_perms;
 
 can_exec(postfix_master_t,postfix_exec_t)
 
-allow postfix_master_t postfix_map_exec_t:file rx_file_perms;
+allow postfix_master_t postfix_map_exec_t:file { mmap_file_perms ioctl lock };
 
 allow postfix_master_t postfix_postdrop_exec_t:file getattr;
 
@@ -133,7 +138,8 @@ rename_files_pattern(postfix_master_t,postfix_spool_maildrop_t,postfix_spool_mai
 
 kernel_read_all_sysctls(postfix_master_t)
 
-corenet_non_ipsec_sendrecv(postfix_master_t)
+corenet_all_recvfrom_unlabeled(postfix_master_t)
+corenet_all_recvfrom_netlabel(postfix_master_t)
 corenet_tcp_sendrecv_all_if(postfix_master_t)
 corenet_udp_sendrecv_all_if(postfix_master_t)
 corenet_tcp_sendrecv_all_nodes(postfix_master_t)
@@ -158,21 +164,16 @@ domain_use_interactive_fds(postfix_master_t)
 
 files_read_usr_files(postfix_master_t)
 
+term_dontaudit_search_ptys(postfix_master_t)
+
 miscfiles_read_man_pages(postfix_master_t)
 
 seutil_sigchld_newrole(postfix_master_t)
 # postfix does a "find" on startup for some reason - keep it quiet
 seutil_dontaudit_search_config(postfix_master_t)
 
-sysnet_read_config(postfix_master_t)
-
 mta_rw_aliases(postfix_master_t)
 mta_read_sendmail_bin(postfix_master_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(postfix_master_t)
-	term_dontaudit_use_generic_ptys(postfix_master_t)
-')
 
 optional_policy(`
 	cyrus_stream_connect(postfix_master_t)
@@ -184,7 +185,11 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nis_use_ypbind(postfix_master_t)
+	mysql_stream_connect(postfix_master_t)
+')
+
+optional_policy(`
+	sendmail_signal(postfix_master_t)
 ')
 
 ###########################################################
@@ -309,7 +314,8 @@ kernel_read_kernel_sysctls(postfix_map_t)
 kernel_dontaudit_list_proc(postfix_map_t)
 kernel_dontaudit_read_system_state(postfix_map_t)
 
-corenet_non_ipsec_sendrecv(postfix_map_t)
+corenet_all_recvfrom_unlabeled(postfix_map_t)
+corenet_all_recvfrom_netlabel(postfix_map_t)
 corenet_tcp_sendrecv_all_if(postfix_map_t)
 corenet_udp_sendrecv_all_if(postfix_map_t)
 corenet_tcp_sendrecv_all_nodes(postfix_map_t)
@@ -331,6 +337,8 @@ files_read_etc_files(postfix_map_t)
 files_read_etc_runtime_files(postfix_map_t)
 files_dontaudit_search_var(postfix_map_t)
 
+auth_use_nsswitch(postfix_map_t)
+
 libs_use_ld_so(postfix_map_t)
 libs_use_shared_libs(postfix_map_t)
 
@@ -339,13 +347,6 @@ logging_send_syslog_msg(postfix_map_t)
 miscfiles_read_localization(postfix_map_t)
 
 seutil_read_config(postfix_map_t)
-
-sysnet_read_config(postfix_map_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(postfix_map_t)
-	term_dontaudit_use_generic_ptys(postfix_map_t)
-')
 
 tunable_policy(`read_default_t',`
 	files_list_default(postfix_map_t)
@@ -357,10 +358,6 @@ tunable_policy(`read_default_t',`
 
 optional_policy(`
 	locallogin_dontaudit_use_fds(postfix_map_t)
-')
-
-optional_policy(`
-	nscd_socket_use(postfix_map_t)
 ')
 
 ########################################
@@ -386,7 +383,7 @@ delete_files_pattern(postfix_pickup_t,postfix_spool_maildrop_t,postfix_spool_mai
 # Postfix pipe local policy
 #
 
-allow postfix_pipe_t self:fifo_file { read write };
+allow postfix_pipe_t self:fifo_file rw_fifo_file_perms;
 
 write_sock_files_pattern(postfix_pipe_t,postfix_private_t,postfix_private_t)
 
@@ -427,17 +424,15 @@ corenet_udp_sendrecv_all_nodes(postfix_postdrop_t)
 term_dontaudit_use_all_user_ptys(postfix_postdrop_t)
 term_dontaudit_use_all_user_ttys(postfix_postdrop_t)
 
-sysnet_dns_name_resolve(postfix_postdrop_t)
-
 mta_rw_user_mail_stream_sockets(postfix_postdrop_t)
-
-ifdef(`targeted_policy', `
-	term_use_unallocated_ttys(postfix_postdrop_t)
-	term_use_generic_ptys(postfix_postdrop_t)
-')
 
 optional_policy(`
 	cron_system_entry(postfix_postdrop_t, postfix_postdrop_exec_t)
+')
+
+# https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239951
+optional_policy(`
+	fstools_read_pipes(postfix_postdrop_t)
 ')
 
 optional_policy(`
@@ -467,8 +462,6 @@ term_use_all_user_ttys(postfix_postqueue_t)
 
 init_sigchld_script(postfix_postqueue_t)
 init_use_script_fds(postfix_postqueue_t)
-
-sysnet_dontaudit_read_config(postfix_postqueue_t)
 
 ########################################
 #
@@ -512,14 +505,10 @@ allow postfix_showq_t postfix_spool_maildrop_t:lnk_file { getattr read };
 term_use_all_user_ptys(postfix_showq_t)
 term_use_all_user_ttys(postfix_showq_t)
 
-sysnet_dns_name_resolve(postfix_showq_t)
-
 ########################################
 #
 # Postfix smtp delivery local policy
 #
-
-allow postfix_smtp_t self:netlink_route_socket r_netlink_socket_perms;
 
 # connect to master process
 stream_connect_pattern(postfix_smtp_t,{ postfix_private_t postfix_public_t },{ postfix_private_t postfix_public_t },postfix_master_t)
@@ -527,6 +516,8 @@ stream_connect_pattern(postfix_smtp_t,{ postfix_private_t postfix_public_t },{ p
 allow postfix_smtp_t postfix_prng_t:file rw_file_perms;
 
 allow postfix_smtp_t postfix_spool_t:file rw_file_perms;
+
+files_dontaudit_getattr_home_dir(postfix_smtp_t)
 
 optional_policy(`
 	cyrus_stream_connect(postfix_smtp_t)
@@ -541,6 +532,9 @@ allow postfix_smtpd_t postfix_master_t:tcp_socket rw_stream_socket_perms;
 # connect to master process
 stream_connect_pattern(postfix_smtpd_t,{ postfix_private_t postfix_public_t },{ postfix_private_t postfix_public_t },postfix_master_t)
 
+# Connect to policy server
+corenet_tcp_connect_postfix_policyd_port(postfix_smtpd_t)
+
 # for prng_exch
 allow postfix_smtpd_t postfix_spool_t:file rw_file_perms;
 allow postfix_smtpd_t postfix_prng_t:file rw_file_perms;
@@ -552,9 +546,41 @@ files_read_usr_files(postfix_smtpd_t)
 mta_read_aliases(postfix_smtpd_t)
 
 optional_policy(`
+	mailman_read_data_files(postfix_smtpd_t)
+')
+
+optional_policy(`
 	postgrey_stream_connect(postfix_smtpd_t)
 ')
 
 optional_policy(`
 	sasl_connect(postfix_smtpd_t)
 ')
+
+########################################
+#
+# Postfix virtual local policy
+#
+
+allow postfix_virtual_t self:fifo_file rw_fifo_file_perms;
+allow postfix_virtual_t self:process { setsched setrlimit };
+
+allow postfix_virtual_t postfix_spool_t:file rw_file_perms;
+
+manage_dirs_pattern(postfix_virtual_t,postfix_virtual_tmp_t,postfix_virtual_tmp_t)
+manage_files_pattern(postfix_virtual_t,postfix_virtual_tmp_t,postfix_virtual_tmp_t)
+files_tmp_filetrans(postfix_virtual_t, postfix_virtual_tmp_t, { file dir })
+
+# connect to master process
+stream_connect_pattern(postfix_virtual_t,postfix_public_t,postfix_public_t,postfix_master_t)
+
+corecmd_exec_shell(postfix_virtual_t)
+corecmd_exec_bin(postfix_virtual_t)
+
+files_read_etc_files(postfix_virtual_t)
+
+mta_read_aliases(postfix_virtual_t)
+mta_delete_spool(postfix_virtual_t)
+# For reading spamassasin
+mta_read_config(postfix_virtual_t)
+mta_manage_spool(postfix_virtual_t)

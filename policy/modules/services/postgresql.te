@@ -1,5 +1,5 @@
 
-policy_module(postgresql,1.3.0)
+policy_module(postgresql,1.5.0)
 
 #################################
 #
@@ -42,7 +42,6 @@ allow postgresql_t self:tcp_socket create_stream_socket_perms;
 allow postgresql_t self:udp_socket create_stream_socket_perms;
 allow postgresql_t self:unix_dgram_socket create_socket_perms;
 allow postgresql_t self:unix_stream_socket create_stream_socket_perms;
-allow postgresql_t self:netlink_route_socket r_netlink_socket_perms;
 
 manage_dirs_pattern(postgresql_t,postgresql_db_t,postgresql_db_t)
 manage_files_pattern(postgresql_t,postgresql_db_t,postgresql_db_t)
@@ -82,7 +81,8 @@ kernel_list_proc(postgresql_t)
 kernel_read_all_sysctls(postgresql_t)
 kernel_read_proc_symlinks(postgresql_t)
 
-corenet_non_ipsec_sendrecv(postgresql_t)
+corenet_all_recvfrom_unlabeled(postgresql_t)
+corenet_all_recvfrom_netlabel(postgresql_t)
 corenet_tcp_sendrecv_all_if(postgresql_t)
 corenet_udp_sendrecv_all_if(postgresql_t)
 corenet_tcp_sendrecv_all_nodes(postgresql_t)
@@ -115,6 +115,8 @@ files_search_etc(postgresql_t)
 files_read_etc_runtime_files(postgresql_t)
 files_read_usr_files(postgresql_t)
 
+auth_use_nsswitch(postgresql_t)
+
 init_read_utmp(postgresql_t)
 
 libs_use_ld_so(postgresql_t)
@@ -126,20 +128,11 @@ miscfiles_read_localization(postgresql_t)
 
 seutil_dontaudit_search_config(postgresql_t)
 
-sysnet_read_config(postgresql_t)
-sysnet_use_ldap(postgresql_t)
-
 userdom_dontaudit_search_sysadm_home_dirs(postgresql_t)
 userdom_dontaudit_use_sysadm_ttys(postgresql_t)
 userdom_dontaudit_use_unpriv_user_fds(postgresql_t)
 
 mta_getattr_spool(postgresql_t)
-
-ifdef(`targeted_policy', `
-	files_dontaudit_read_root_files(postgresql_t)
-	term_dontaudit_use_generic_ptys(postgresql_t)
-	term_dontaudit_use_unallocated_ttys(postgresql_t)
-')
 
 tunable_policy(`allow_execmem',`
 	allow postgresql_t self:process execmem;
@@ -159,11 +152,11 @@ optional_policy(`
 ')
 
 optional_policy(`
-	kerberos_use(postgresql_t)
+	ipsec_match_default_spd(postgresql_t)
 ')
 
 optional_policy(`
-	nis_use_ypbind(postgresql_t)
+	kerberos_use(postgresql_t)
 ')
 
 optional_policy(`
@@ -172,30 +165,4 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(postgresql_t)
-')
-
-ifdef(`TODO',`
-ifdef(`targeted_policy', `', `
-bool allow_user_postgresql_connect false;
-
-if (allow_user_postgresql_connect) {
-# allow any user domain to connect to the database server
-allow userdomain postgresql_t:unix_stream_socket connectto;
-allow userdomain postgresql_var_run_t:sock_file write;
-allow userdomain postgresql_tmp_t:sock_file write;
-}
-')
-ifdef(`distro_debian', `
-	init_exec_script_files(postgresql_t)
-	# gross hack
-	postgresql_domtrans(dpkg_t)
-	can_exec(postgresql_t, dpkg_exec_t)
-')
-
-ifdef(`distro_gentoo', `
-	allow postgresql_t initrc_su_t:process { sigchld };
-	# "su - postgres ..." is called from initrc_t
-	postgresql_search_db(initrc_su_t)
-	dontaudit initrc_su_t sysadm_devpts_t:chr_file rw_file_perms;
-')
 ')

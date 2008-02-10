@@ -42,8 +42,7 @@ template(`mozilla_per_role_template',`
 	# Declarations
 	#
 	type $1_mozilla_t;
-	domain_type($1_mozilla_t)
-	domain_entry_file($1_mozilla_t,mozilla_exec_t)
+	application_domain($1_mozilla_t,mozilla_exec_t)
 	role $3 types $1_mozilla_t;
 
 	type $1_mozilla_home_t alias $1_mozilla_rw_t;
@@ -126,7 +125,8 @@ template(`mozilla_per_role_template',`
 	corecmd_exec_bin($1_mozilla_t)
 
 	# Browse the web, connect to printer
-	corenet_non_ipsec_sendrecv($1_mozilla_t)
+	corenet_all_recvfrom_unlabeled($1_mozilla_t)
+	corenet_all_recvfrom_netlabel($1_mozilla_t)
 	corenet_tcp_sendrecv_generic_if($1_mozilla_t)
 	corenet_raw_sendrecv_generic_if($1_mozilla_t)
 	corenet_tcp_sendrecv_all_nodes($1_mozilla_t)
@@ -150,6 +150,7 @@ template(`mozilla_per_role_template',`
 	corenet_dontaudit_tcp_bind_generic_port($1_mozilla_t)
 
 	dev_read_urand($1_mozilla_t)
+	dev_read_rand($1_mozilla_t)
 	dev_write_sound($1_mozilla_t)
 	dev_read_sound($1_mozilla_t)
 	dev_dontaudit_rw_dri($1_mozilla_t)
@@ -172,7 +173,6 @@ template(`mozilla_per_role_template',`
 	term_dontaudit_getattr_pty_dirs($1_mozilla_t)
 	
 	libs_use_ld_so($1_mozilla_t)
-	libs_use_lib_files($1_mozilla_t)
 	libs_use_shared_libs($1_mozilla_t)
 
 	logging_send_syslog_msg($1_mozilla_t)
@@ -354,9 +354,7 @@ template(`mozilla_per_role_template',`
 
 	optional_policy(`
 		dbus_system_bus_client_template($1_mozilla,$1_mozilla_t)
-		dbus_send_system_bus($1_mozilla_t)
 		dbus_user_bus_client_template($1,$1_mozilla,$1_mozilla_t)
-		dbus_send_user_bus($1,$1_mozilla_t)
 	')
 
 	optional_policy(`

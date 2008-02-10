@@ -1,19 +1,17 @@
 
-policy_module(mount,1.6.0)
+policy_module(mount,1.9.0)
 
 ########################################
 #
 # Declarations
 #
 
-ifdef(`targeted_policy',`
 ## <desc>
 ## <p>
-## Allow mount to mount any file
+## Allow the mount command to mount any directory or file.
 ## </p>
 ## </desc>
 gen_tunable(allow_mount_anyfile,false)
-')
 
 type mount_t;
 type mount_exec_t;
@@ -26,11 +24,11 @@ files_type(mount_loopback_t)
 type mount_tmp_t;
 files_tmp_file(mount_tmp_t)
 
-ifdef(`targeted_policy',`
-	type unconfined_mount_t;
-	domain_type(unconfined_mount_t)
-	domain_entry_file(unconfined_mount_t,mount_exec_t)
-')
+# causes problems with interfaces when
+# this is optionally declared in monolithic
+# policy--duplicate type declaration
+type unconfined_mount_t;
+application_domain(unconfined_mount_t,mount_exec_t)
 
 ########################################
 #
@@ -41,7 +39,6 @@ ifdef(`targeted_policy',`
 allow mount_t self:capability { ipc_lock sys_rawio sys_admin dac_override chown sys_tty_config setuid setgid };
 
 allow mount_t mount_loopback_t:file read_file_perms;
-allow mount_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow mount_t mount_tmp_t:file manage_file_perms;
 allow mount_t mount_tmp_t:dir manage_dir_perms;
@@ -104,6 +101,8 @@ init_use_fds(mount_t)
 init_use_script_ptys(mount_t)
 init_dontaudit_getattr_initctl(mount_t)
 
+auth_use_nsswitch(mount_t)
+
 libs_use_ld_so(mount_t)
 libs_use_shared_libs(mount_t)
 
@@ -111,8 +110,8 @@ logging_send_syslog_msg(mount_t)
 
 miscfiles_read_localization(mount_t)
 
-mls_file_read_up(mount_t)
-mls_file_write_down(mount_t)
+mls_file_read_all_levels(mount_t)
+mls_file_write_all_levels(mount_t)
 
 sysnet_use_portmap(mount_t)
 
@@ -129,17 +128,16 @@ ifdef(`distro_redhat',`
 	')
 ')
 
-ifdef(`targeted_policy',`
-	tunable_policy(`allow_mount_anyfile',`
-		auth_read_all_dirs_except_shadow(mount_t)
-		auth_read_all_files_except_shadow(mount_t)
-		files_mounton_non_security(mount_t)
-	')
+tunable_policy(`allow_mount_anyfile',`
+	auth_read_all_dirs_except_shadow(mount_t)
+	auth_read_all_files_except_shadow(mount_t)
+	files_mounton_non_security(mount_t)
 ')
 
 optional_policy(`
 	# for nfs
-	corenet_non_ipsec_sendrecv(mount_t)
+	corenet_all_recvfrom_unlabeled(mount_t)
+	corenet_all_recvfrom_netlabel(mount_t)
 	corenet_tcp_sendrecv_all_if(mount_t)
 	corenet_raw_sendrecv_all_if(mount_t)
 	corenet_udp_sendrecv_all_if(mount_t)
@@ -162,13 +160,7 @@ optional_policy(`
 
 	fs_search_rpc(mount_t)
 
-	sysnet_dns_name_resolve(mount_t)
-
 	rpc_stub(mount_t)
-
-	optional_policy(`
-		nis_use_ypbind(mount_t)
-	')
 ')
 
 optional_policy(`
@@ -192,16 +184,12 @@ optional_policy(`
 	samba_domtrans_smbmount(mount_t)
 ')
 
-optional_policy(`
-	nscd_socket_use(mount_t)
-')
-
 ########################################
 #
 # Unconfined mount local policy
 #
 
-ifdef(`targeted_policy',`
+optional_policy(`
 	files_etc_filetrans_etc_runtime(unconfined_mount_t,file)
 	unconfined_domain(unconfined_mount_t)
 ')

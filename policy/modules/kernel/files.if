@@ -468,8 +468,7 @@ interface(`files_read_all_files',`
 ##	Allow shared library text relocations in all files.
 ##	</p>
 ##	<p>
-##	This is added to support WINE in the targeted
-##	policy.  It has no effect on the strict policy.
+##	This is added to support WINE policy.
 ##	</p>
 ## </desc>
 ## <param name="domain">
@@ -479,15 +478,11 @@ interface(`files_read_all_files',`
 ## </param>
 #
 interface(`files_execmod_all_files',`
-	ifdef(`targeted_policy',`
-		gen_require(`
-			attribute file_type;
-		')
-
-		allow $1 file_type:file execmod;
-	',`
-		refpolicywarn(`$0($1) has no effect in strict policy.')
+	gen_require(`
+		attribute file_type;
 	')
+
+	allow $1 file_type:file execmod;
 ')
 
 ########################################
@@ -992,7 +987,7 @@ interface(`files_dontaudit_search_all_dirs',`
 		attribute file_type;
 	')
 
-	dontaudit $1 file_type:dir search;
+	dontaudit $1 file_type:dir search_dir_perms;
 ')
 
 ########################################
@@ -1111,6 +1106,24 @@ interface(`files_getattr_all_mountpoints',`
 
 ########################################
 ## <summary>
+##	Search all mount points.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_search_all_mountpoints',`
+	gen_require(`
+		attribute mountpoint;
+	')
+
+	allow $1 mountpoint:dir search_dir_perms;
+')
+
+########################################
+## <summary>
 ##	List the contents of the root directory.
 ## </summary>
 ## <param name="domain">
@@ -1125,7 +1138,26 @@ interface(`files_list_root',`
 	')
 
 	allow $1 root_t:dir list_dir_perms;
-	allow $1 root_t:lnk_file r_file_perms;
+	allow $1 root_t:lnk_file { read_lnk_file_perms ioctl lock };
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to write
+##	files in the root directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_rw_root_dir',`
+	gen_require(`
+		type root_t;
+	')
+
+	dontaudit $1 root_t:dir rw_dir_perms;
 ')
 
 ########################################
@@ -1320,7 +1352,7 @@ interface(`files_dontaudit_search_boot',`
 		type boot_t;
 	')
 
-	dontaudit $1 boot_t:dir search;
+	dontaudit $1 boot_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -3114,6 +3146,24 @@ interface(`files_read_generic_tmp_files',`
 
 ########################################
 ## <summary>
+##	Manage temporary directories in /tmp.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`files_manage_generic_tmp_dirs',`
+	gen_require(`
+		type tmp_t;
+	')
+
+	manage_dirs_pattern($1,tmp_t,tmp_t)
+')
+
+########################################
+## <summary>
 ##	Manage temporary files and directories in /tmp.
 ## </summary>
 ## <param name="domain">
@@ -3201,6 +3251,44 @@ interface(`files_dontaudit_getattr_all_tmp_files',`
 	')
 
 	dontaudit $1 tmpfile:file getattr;
+')
+
+########################################
+## <summary>
+##	Allow attempts to get the attributes
+##	of all tmp files. 
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain not to audit.
+##	</summary>
+## </param>
+#
+interface(`files_getattr_all_tmp_files',`
+	gen_require(`
+		attribute tmpfile;
+	')
+
+	allow $1 tmpfile:file getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes
+##	of all tmp sock_file. 
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain not to audit.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_getattr_all_tmp_sockets',`
+	gen_require(`
+		attribute tmpfile;
+	')
+
+	dontaudit $1 tmpfile:sock_file getattr;
 ')
 
 ########################################
@@ -3312,6 +3400,42 @@ interface(`files_list_usr',`
 
 ########################################
 ## <summary>
+##	Add and remove entries from /usr directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_rw_usr_dirs',`
+	gen_require(`
+		type usr_t;
+	')
+
+	allow $1 usr_t:dir rw_dir_perms;
+')
+
+########################################
+## <summary>
+##	dontaudit Add and remove entries from /usr directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_rw_usr_dirs',`
+	gen_require(`
+		type usr_t;
+	')
+
+	dontaudit $1 usr_t:dir rw_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of files in /usr.
 ## </summary>
 ## <param name="domain">
@@ -3370,6 +3494,24 @@ interface(`files_exec_usr_files',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete files in the /usr directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_manage_usr_files',`
+	gen_require(`
+		type usr_t;
+	')
+
+	manage_files_pattern($1, usr_t, usr_t)
+')
+
+########################################
+## <summary>
 ##	Relabel a file to the type used in /usr.
 ## </summary>
 ## <param name="domain">
@@ -3384,6 +3526,24 @@ interface(`files_relabelto_usr_files',`
 	')
 
 	relabelto_files_pattern($1,usr_t,usr_t)
+')
+
+########################################
+## <summary>
+##	Relabel a file from the type used in /usr.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_relabelfrom_usr_files',`
+	gen_require(`
+		type usr_t;
+	')
+
+	relabelfrom_files_pattern($1,usr_t,usr_t)
 ')
 
 ########################################
@@ -3527,7 +3687,7 @@ interface(`files_create_kernel_symbol_table',`
 		type boot_t, system_map_t;
 	')
 
-	allow $1 boot_t:dir ra_dir_perms;
+	allow $1 boot_t:dir { list_dir_perms add_entry_dir_perms };
 	allow $1 system_map_t:file { rw_file_perms create };
 ')
 
@@ -3639,7 +3799,7 @@ interface(`files_dontaudit_search_var',`
 		type var_t;
 	')
 
-	dontaudit $1 var_t:dir search;
+	dontaudit $1 var_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -3995,7 +4155,7 @@ interface(`files_dontaudit_search_locks',`
 		type var_lock_t;
 	')
 
-	dontaudit $1 var_lock_t:dir search;
+	dontaudit $1 var_lock_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -4183,7 +4343,7 @@ interface(`files_dontaudit_search_pids',`
 		type var_run_t;
 	')
 
-	dontaudit $1 var_run_t:dir search;
+	dontaudit $1 var_run_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -4553,6 +4713,14 @@ interface(`files_polyinstantiate_all',`
 	# Default type for mountpoints
 	allow $1 poly_t:dir { create mounton };
 	fs_unmount_xattr_fs($1)
+
+	ifdef(`distro_redhat',`
+		# namespace.init
+		files_search_home($1)
+		corecmd_exec_bin($1)
+		seutil_domtrans_setfiles($1)
+		mount_domtrans($1)
+	')
 ')
 
 ########################################

@@ -1,32 +1,28 @@
 
-policy_module(spamassassin,1.6.0)
+policy_module(spamassassin,1.9.0)
 
 ########################################
 #
 # Declarations
 #
 
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Allow user spamassassin clients to use the network.
 ## </p>
 ## </desc>
 gen_tunable(spamassassin_can_network,false)
-')
 
-ifdef(`targeted_policy',`
 ## <desc>
 ## <p>
 ## Allow spamd to read/write user home directories.
 ## </p>
 ## </desc>
 gen_tunable(spamd_enable_home_dirs,true)
-')
 
 # spamassassin client executable
 type spamc_exec_t;
-corecmd_executable_file(spamc_exec_t)
+application_executable_file(spamc_exec_t)
 
 type spamd_t;
 type spamd_exec_t;
@@ -46,7 +42,7 @@ type spamd_var_run_t;
 files_pid_file(spamd_var_run_t)
 
 type spamassassin_exec_t;
-corecmd_executable_file(spamassassin_exec_t)
+application_executable_file(spamassassin_exec_t)
 
 ########################################
 #
@@ -87,13 +83,15 @@ files_tmp_filetrans(spamd_t, spamd_tmp_t, { file dir })
 allow spamd_t spamd_var_lib_t:dir list_dir_perms;
 read_files_pattern(spamd_t,spamd_var_lib_t,spamd_var_lib_t)
 
-manage_files_pattern(spamd_t,spamd_var_run_t,spamd_var_run_t)
-files_pid_filetrans(spamd_t,spamd_var_run_t,file)
+manage_dirs_pattern(spamd_t, spamd_var_run_t, spamd_var_run_t)
+manage_files_pattern(spamd_t, spamd_var_run_t, spamd_var_run_t)
+files_pid_filetrans(spamd_t, spamd_var_run_t, { dir file })
 
 kernel_read_all_sysctls(spamd_t)
 kernel_read_system_state(spamd_t)
 
-corenet_non_ipsec_sendrecv(spamd_t)
+corenet_all_recvfrom_unlabeled(spamd_t)
+corenet_all_recvfrom_netlabel(spamd_t)
 corenet_tcp_sendrecv_all_if(spamd_t)
 corenet_udp_sendrecv_all_if(spamd_t)
 corenet_tcp_sendrecv_all_nodes(spamd_t)
@@ -103,6 +101,7 @@ corenet_udp_sendrecv_all_ports(spamd_t)
 corenet_tcp_bind_all_nodes(spamd_t)
 corenet_tcp_bind_spamd_port(spamd_t)
 corenet_tcp_connect_razor_port(spamd_t)
+corenet_tcp_connect_smtp_port(spamd_t)
 corenet_sendrecv_razor_client_packets(spamd_t)
 corenet_sendrecv_spamd_server_packets(spamd_t)
 # spamassassin 3.1 needs this for its
@@ -137,8 +136,6 @@ init_dontaudit_rw_utmp(spamd_t)
 
 libs_use_ld_so(spamd_t)
 libs_use_shared_libs(spamd_t)
-# Various Perl bits
-libs_use_lib_files(spamd_t)
 
 logging_send_syslog_msg(spamd_t)
 
@@ -151,20 +148,6 @@ sysnet_dns_name_resolve(spamd_t)
 userdom_use_unpriv_users_fds(spamd_t)
 userdom_search_unpriv_users_home_dirs(spamd_t)
 userdom_dontaudit_search_sysadm_home_dirs(spamd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(spamd_t)
-	term_dontaudit_use_generic_ptys(spamd_t)
-
-	files_dontaudit_read_root_files(spamd_t)
-
-	tunable_policy(`spamd_enable_home_dirs',`
-		userdom_manage_generic_user_home_content_dirs(spamd_t)
-		userdom_manage_generic_user_home_content_files(spamd_t)
-		userdom_manage_generic_user_home_content_symlinks(spamd_t)
-		userdom_generic_user_home_dir_filetrans_generic_user_home_content(spamd_t,dir)
-	')
-')
 
 tunable_policy(`use_nfs_home_dirs',`
 	fs_manage_nfs_files(spamd_t)
@@ -189,6 +172,11 @@ optional_policy(`
 optional_policy(`
 	dcc_domtrans_client(spamd_t)
 	dcc_stream_connect_dccifd(spamd_t)
+')
+
+optional_policy(`
+	mysql_search_db(spamd_t)
+	mysql_stream_connect(spamd_t)
 ')
 
 optional_policy(`

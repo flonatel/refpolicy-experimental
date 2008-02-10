@@ -1,5 +1,5 @@
 
-policy_module(tmpreaper,1.2.0)
+policy_module(tmpreaper,1.3.0)
 
 ########################################
 #
@@ -7,11 +7,9 @@ policy_module(tmpreaper,1.2.0)
 #
 
 type tmpreaper_t;
-role system_r types tmpreaper_t;
-domain_type(tmpreaper_t)
-
 type tmpreaper_exec_t;
-domain_entry_file(tmpreaper_t,tmpreaper_exec_t)
+application_domain(tmpreaper_t,tmpreaper_exec_t)
+role system_r types tmpreaper_t;
 
 ########################################
 #
@@ -31,8 +29,8 @@ files_purge_tmp(tmpreaper_t)
 # why does it need setattr?
 files_setattr_all_tmp_dirs(tmpreaper_t)
 
-mls_file_read_up(tmpreaper_t)
-mls_file_write_down(tmpreaper_t)
+mls_file_read_all_levels(tmpreaper_t)
+mls_file_write_all_levels(tmpreaper_t)
 
 libs_use_ld_so(tmpreaper_t)
 libs_use_shared_libs(tmpreaper_t)

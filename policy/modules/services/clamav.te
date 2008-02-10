@@ -1,5 +1,5 @@
 
-policy_module(clamav,1.3.0)
+policy_module(clamav,1.6.0)
 
 ########################################
 #
@@ -74,19 +74,22 @@ manage_dirs_pattern(clamd_t,clamd_var_lib_t,clamd_var_lib_t)
 manage_files_pattern(clamd_t,clamd_var_lib_t,clamd_var_lib_t)
 
 # log files
-allow clamd_t clamd_var_log_t:dir setattr;
+manage_dirs_pattern(clamd_t,clamd_var_log_t,clamd_var_log_t)
 manage_files_pattern(clamd_t,clamd_var_log_t,clamd_var_log_t)
-logging_log_filetrans(clamd_t,clamd_var_log_t,file)
+logging_log_filetrans(clamd_t,clamd_var_log_t,{ dir file })
 
 # pid file
+manage_dirs_pattern(clamd_t,clamd_var_log_t,clamd_var_log_t)
 manage_files_pattern(clamd_t,clamd_var_run_t,clamd_var_run_t)
 manage_sock_files_pattern(clamd_t,clamd_var_run_t,clamd_var_run_t)
-files_pid_filetrans(clamd_t,clamd_var_run_t,file)
+files_pid_filetrans(clamd_t,clamd_var_run_t,{ file dir })
 
 kernel_dontaudit_list_proc(clamd_t)
 kernel_read_sysctl(clamd_t)
+kernel_read_kernel_sysctls(clamd_t)
 
-corenet_non_ipsec_sendrecv(clamd_t)
+corenet_all_recvfrom_unlabeled(clamd_t)
+corenet_all_recvfrom_netlabel(clamd_t)
 corenet_tcp_sendrecv_all_if(clamd_t)
 corenet_tcp_sendrecv_all_nodes(clamd_t)
 corenet_tcp_sendrecv_all_ports(clamd_t)
@@ -118,15 +121,11 @@ cron_use_fds(clamd_t)
 cron_use_system_job_fds(clamd_t)
 cron_rw_pipes(clamd_t)
 
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(clamd_t)
-	term_dontaudit_use_generic_ptys(clamd_t)
-')
-
 optional_policy(`
 	amavis_read_lib_files(clamd_t)
 	amavis_read_spool_files(clamd_t)
 	amavis_spool_filetrans(clamd_t,clamd_var_run_t,sock_file)
+	amavis_create_pid_files(clamd_t)
 ')
 
 ########################################
@@ -160,7 +159,8 @@ allow freshclam_t freshclam_var_log_t:dir setattr;
 allow freshclam_t clamd_var_log_t:dir search_dir_perms;
 logging_log_filetrans(freshclam_t,freshclam_var_log_t,file)
 
-corenet_non_ipsec_sendrecv(freshclam_t)
+corenet_all_recvfrom_unlabeled(freshclam_t)
+corenet_all_recvfrom_netlabel(freshclam_t)
 corenet_tcp_sendrecv_all_if(freshclam_t)
 corenet_tcp_sendrecv_all_nodes(freshclam_t)
 corenet_tcp_sendrecv_all_ports(freshclam_t)
@@ -211,7 +211,7 @@ manage_files_pattern(clamscan_t,clamscan_tmp_t,clamscan_tmp_t)
 files_tmp_filetrans(clamscan_t,clamscan_tmp_t,{ file dir })
 
 # var/lib files together with clamd
-read_files_pattern(clamscan_t,clamd_var_lib_t,clamd_var_lib_t)
+manage_files_pattern(clamscan_t,clamd_var_lib_t,clamd_var_lib_t)
 allow clamscan_t clamd_var_lib_t:dir list_dir_perms;
 
 kernel_read_kernel_sysctls(clamscan_t)
@@ -219,6 +219,9 @@ kernel_read_kernel_sysctls(clamscan_t)
 files_read_etc_files(clamscan_t)
 files_read_etc_runtime_files(clamscan_t)
 files_search_var_lib(clamscan_t)
+
+init_read_utmp(clamscan_t)
+init_dontaudit_write_utmp(clamscan_t)
 
 libs_use_ld_so(clamscan_t)
 libs_use_shared_libs(clamscan_t)

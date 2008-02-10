@@ -1,5 +1,5 @@
 
-policy_module(rlogin,1.3.0)
+policy_module(rlogin,1.6.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(rlogin,1.3.0)
 
 type rlogind_t;
 type rlogind_exec_t;
-inetd_service_domain(rlogind_t,rlogind_exec_t)
+inetd_service_domain(rlogind_t, rlogind_exec_t)
 role system_r types rlogind_t;
 
 type rlogind_devpts_t; #, userpty_type;
@@ -39,18 +39,19 @@ term_create_pty(rlogind_t,rlogind_devpts_t)
 # for /usr/lib/telnetlogin
 can_exec(rlogind_t, rlogind_exec_t)
 
-manage_dirs_pattern(rlogind_t,rlogind_tmp_t,rlogind_tmp_t)
-manage_files_pattern(rlogind_t,rlogind_tmp_t,rlogind_tmp_t)
+manage_dirs_pattern(rlogind_t, rlogind_tmp_t, rlogind_tmp_t)
+manage_files_pattern(rlogind_t, rlogind_tmp_t, rlogind_tmp_t)
 files_tmp_filetrans(rlogind_t, rlogind_tmp_t, { file dir })
 
-manage_files_pattern(rlogind_t,rlogind_var_run_t,rlogind_var_run_t)
-files_pid_filetrans(rlogind_t,rlogind_var_run_t,file)
+manage_files_pattern(rlogind_t, rlogind_var_run_t, rlogind_var_run_t)
+files_pid_filetrans(rlogind_t, rlogind_var_run_t, file)
 
 kernel_read_kernel_sysctls(rlogind_t)
 kernel_read_system_state(rlogind_t)
 kernel_read_network_state(rlogind_t)
 
-corenet_non_ipsec_sendrecv(rlogind_t)
+corenet_all_recvfrom_unlabeled(rlogind_t)
+corenet_all_recvfrom_netlabel(rlogind_t)
 corenet_tcp_sendrecv_all_if(rlogind_t)
 corenet_udp_sendrecv_all_if(rlogind_t)
 corenet_tcp_sendrecv_all_nodes(rlogind_t)
@@ -83,8 +84,6 @@ miscfiles_read_localization(rlogind_t)
 
 seutil_dontaudit_search_config(rlogind_t)
 
-sysnet_read_config(rlogind_t)
-
 userdom_setattr_unpriv_users_ptys(rlogind_t)
 # cjp: this is egregious
 userdom_read_all_users_home_content_files(rlogind_t)
@@ -93,6 +92,10 @@ remotelogin_domtrans(rlogind_t)
 
 optional_policy(`
 	kerberos_read_keytab(rlogind_t)
+')
+
+optional_policy(`
+	tcpd_wrapped_domain(rlogind_t, rlogind_exec_t)
 ')
 
 ifdef(`TODO',`

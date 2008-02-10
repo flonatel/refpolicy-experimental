@@ -1,5 +1,5 @@
 
-policy_module(lpd,1.5.0)
+policy_module(lpd,1.8.0)
 
 ########################################
 #
@@ -32,7 +32,7 @@ type lpd_var_run_t;
 files_pid_file(lpd_var_run_t)
 
 type lpr_exec_t;
-corecmd_executable_file(lpr_exec_t)
+application_executable_file(lpr_exec_t)
 
 type print_spool_t;
 files_tmp_file(print_spool_t)
@@ -72,7 +72,8 @@ allow checkpc_t printconf_t:dir { getattr search read };
 
 kernel_read_system_state(checkpc_t)
 
-corenet_non_ipsec_sendrecv(checkpc_t)
+corenet_all_recvfrom_unlabeled(checkpc_t)
+corenet_all_recvfrom_netlabel(checkpc_t)
 corenet_tcp_sendrecv_all_if(checkpc_t)
 corenet_udp_sendrecv_all_if(checkpc_t)
 corenet_tcp_sendrecv_all_nodes(checkpc_t)
@@ -101,11 +102,6 @@ libs_use_ld_so(checkpc_t)
 libs_use_shared_libs(checkpc_t)
 
 sysnet_read_config(checkpc_t)
-
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(checkpc_t)
-	term_use_unallocated_ttys(checkpc_t)
-')
 
 optional_policy(`
 	cron_system_entry(checkpc_t,checkpc_exec_t)
@@ -157,7 +153,8 @@ kernel_read_kernel_sysctls(lpd_t)
 # bash wants access to /proc/meminfo
 kernel_read_system_state(lpd_t)
 
-corenet_non_ipsec_sendrecv(lpd_t)
+corenet_all_recvfrom_unlabeled(lpd_t)
+corenet_all_recvfrom_netlabel(lpd_t)
 corenet_tcp_sendrecv_all_if(lpd_t)
 corenet_udp_sendrecv_all_if(lpd_t)
 corenet_tcp_sendrecv_all_nodes(lpd_t)
@@ -204,12 +201,6 @@ sysnet_read_config(lpd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(lpd_t)
 userdom_dontaudit_search_sysadm_home_dirs(lpd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(lpd_t)
-	term_dontaudit_use_generic_ptys(lpd_t)
-	files_dontaudit_read_root_files(lpd_t)
-')
 
 optional_policy(`
 	nis_use_ypbind(lpd_t)

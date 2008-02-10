@@ -1,5 +1,5 @@
 
-policy_module(locallogin,1.4.0)
+policy_module(locallogin,1.6.0)
 
 ########################################
 #
@@ -37,8 +37,8 @@ allow local_login_t self:capability { dac_override chown fowner fsetid kill setg
 allow local_login_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow local_login_t self:process { setrlimit setexec };
 allow local_login_t self:fd use;
-allow local_login_t self:fifo_file rw_file_perms;
-allow local_login_t self:sock_file r_file_perms;
+allow local_login_t self:fifo_file rw_fifo_file_perms;
+allow local_login_t self:sock_file read_sock_file_perms;
 allow local_login_t self:unix_dgram_socket create_socket_perms;
 allow local_login_t self:unix_stream_socket create_stream_socket_perms;
 allow local_login_t self:unix_dgram_socket sendto;
@@ -138,11 +138,6 @@ userdom_use_unpriv_users_fds(local_login_t)
 userdom_sigchld_all_users(local_login_t)
 userdom_create_all_users_keys(local_login_t)
 
-ifdef(`targeted_policy',`
-	unconfined_domain(local_login_t)
-	unconfined_shell_domtrans(local_login_t)
-')
-
 tunable_policy(`read_default_t',`
 	files_list_default(local_login_t)
 	files_read_default_files(local_login_t)
@@ -159,6 +154,16 @@ tunable_policy(`use_nfs_home_dirs',`
 tunable_policy(`use_samba_home_dirs',`
 	fs_read_cifs_files(local_login_t)
 	fs_read_cifs_symlinks(local_login_t)
+')
+
+optional_policy(`
+	alsa_domtrans(local_login_t)
+')
+
+optional_policy(`
+	dbus_system_bus_client_template(local_login, local_login_t)
+
+	consolekit_dbus_chat(local_login_t)
 ')
 
 optional_policy(`
@@ -180,11 +185,16 @@ optional_policy(`
 ')
 
 optional_policy(`
+	unconfined_domain(local_login_t)
+')
+
+optional_policy(`
 	usermanage_read_crack_db(local_login_t)
 ')
 
 optional_policy(`
-	alsa_domtrans(local_login_t)
+	xserver_read_xdm_tmp_files(local_login_t)
+	xserver_rw_xdm_tmp_files(local_login_t)
 ')
 
 #################################

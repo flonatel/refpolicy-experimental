@@ -1,5 +1,5 @@
 
-policy_module(ipsec,1.3.0)
+policy_module(ipsec,1.5.0)
 
 ########################################
 #
@@ -95,7 +95,7 @@ kernel_getattr_core_if(ipsec_t)
 kernel_getattr_message_if(ipsec_t)
 
 # Pluto needs network access
-corenet_non_ipsec_sendrecv(ipsec_t)
+corenet_all_recvfrom_unlabeled(ipsec_t)
 corenet_tcp_sendrecv_all_if(ipsec_t)
 corenet_raw_sendrecv_all_if(ipsec_t)
 corenet_tcp_sendrecv_all_nodes(ipsec_t)
@@ -138,12 +138,6 @@ sysnet_read_config(ipsec_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ipsec_t)
 userdom_dontaudit_search_sysadm_home_dirs(ipsec_t)
-
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(ipsec_t)
-	term_dontaudit_use_generic_ptys(ipsec_t)
-	files_dontaudit_read_root_files(ipsec_t)
-')
 
 optional_policy(`
 	nis_use_ypbind(ipsec_t)
@@ -303,11 +297,9 @@ allow racoon_t ipsec_key_file_t:dir list_dir_perms;
 read_files_pattern(racoon_t,ipsec_key_file_t,ipsec_key_file_t)
 read_lnk_files_pattern(racoon_t,ipsec_key_file_t,ipsec_key_file_t)
 
-allow racoon_t ipsec_spd_t:association setcontext;
-
 kernel_read_network_state(racoon_t)
 
-corenet_non_ipsec_sendrecv(racoon_t)
+corenet_all_recvfrom_unlabeled(racoon_t)
 corenet_tcp_bind_all_nodes(racoon_t)
 corenet_udp_bind_isakmp_port(racoon_t)
 
@@ -321,12 +313,15 @@ files_read_etc_files(racoon_t)
 # allow racoon to use avc_has_perm to check context on proposed SA
 selinux_compute_access_vector(racoon_t)
 
+ipsec_setcontext_default_spd(racoon_t)
+
 libs_use_ld_so(racoon_t)
 libs_use_shared_libs(racoon_t)
 
 locallogin_use_fds(racoon_t)
 
 logging_send_syslog_msg(racoon_t)
+logging_send_audit_msgs(racoon_t)
 
 miscfiles_read_localization(racoon_t)
 
@@ -343,15 +338,15 @@ allow setkey_t ipsec_conf_file_t:dir list_dir_perms;
 read_files_pattern(setkey_t,ipsec_conf_file_t,ipsec_conf_file_t)
 read_lnk_files_pattern(setkey_t,ipsec_conf_file_t,ipsec_conf_file_t)
 
-# allow setkey to set the context for ipsec SAs and policy.
-allow setkey_t ipsec_spd_t:association setcontext;
-
 # allow setkey utility to set contexts on SA's and policy
 domain_ipsec_setcontext_all_domains(setkey_t)
 
 files_read_etc_files(setkey_t)
 
 init_dontaudit_use_fds(setkey_t)
+
+# allow setkey to set the context for ipsec SAs and policy.
+ipsec_setcontext_default_spd(setkey_t)
 
 locallogin_use_fds(setkey_t)
 

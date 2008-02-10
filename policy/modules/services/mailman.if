@@ -48,7 +48,8 @@ template(`mailman_domain_template', `
 	kernel_read_kernel_sysctls(mailman_$1_t)
 	kernel_read_system_state(mailman_$1_t)
 
-	corenet_non_ipsec_sendrecv(mailman_$1_t)
+	corenet_all_recvfrom_unlabeled(mailman_$1_t)
+	corenet_all_recvfrom_netlabel(mailman_$1_t)
 	corenet_tcp_sendrecv_all_if(mailman_$1_t)
 	corenet_udp_sendrecv_all_if(mailman_$1_t)
 	corenet_raw_sendrecv_all_if(mailman_$1_t)
@@ -73,6 +74,8 @@ template(`mailman_domain_template', `
 	files_read_var_lib_symlinks(mailman_$1_t)
 	files_read_etc_runtime_files(mailman_$1_t)
 
+	auth_use_nsswitch(mailman_$1_t)
+
 	libs_use_ld_so(mailman_$1_t)
 	libs_use_shared_libs(mailman_$1_t)
 	libs_exec_ld_so(mailman_$1_t)
@@ -81,12 +84,6 @@ template(`mailman_domain_template', `
 	logging_send_syslog_msg(mailman_$1_t)
 
 	miscfiles_read_localization(mailman_$1_t)
-
-	sysnet_read_config(mailman_$1_t)
-
-	optional_policy(`
-		nis_use_ypbind(mailman_$1_t)
-	')
 ')
 
 #######################################
@@ -251,6 +248,24 @@ interface(`mailman_read_data_symlinks',`
 	')
 
 	read_lnk_files_pattern($1,mailman_data_t,mailman_data_t)
+')
+
+#######################################
+## <summary>
+##	Append to mailman logs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mailman_append_log',`
+	gen_require(`
+		type mailman_log_t;
+	')
+
+	append_files_pattern($1,mailman_log_t,mailman_log_t)
 ')
 
 #######################################

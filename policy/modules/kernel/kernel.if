@@ -66,6 +66,7 @@ interface(`kernel_ranged_domtrans_to',`
 
 	ifdef(`enable_mls',`
 		range_transition kernel_t $2:process $3;
+		mls_rangetrans_target($1)
 	')
 ')
 
@@ -104,6 +105,24 @@ interface(`kernel_setpgid',`
 	')
 
 	allow $1 kernel_t:process setpgid;
+')
+
+########################################
+## <summary>
+##	Set the priority of kernel threads.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_setsched',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	allow $1 kernel_t:process setsched;
 ')
 
 ########################################
@@ -333,6 +352,24 @@ interface(`kernel_search_key',`
 
 ########################################
 ## <summary>
+##	dontaudit search the kernel key ring.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_search_key',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	dontaudit $1 kernel_t:key search;
+')
+
+########################################
+## <summary>
 ##	Allow link to the kernel key ring.
 ## </summary>
 ## <param name="domain">
@@ -347,6 +384,24 @@ interface(`kernel_link_key',`
 	')
 
 	allow $1 kernel_t:key link;
+')
+
+########################################
+## <summary>
+##	dontaudit link to the kernel key ring.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_link_key',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	dontaudit $1 kernel_t:key link;
 ')
 
 ########################################
@@ -778,6 +833,27 @@ interface(`kernel_dontaudit_read_proc_symlinks',`
 	')
 
 	dontaudit $1 proc_t:lnk_file read;
+')
+
+#######################################
+## <summary>
+##	Allow caller to read and write state information for AFS.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`kernel_rw_afs_state',`
+	gen_require(`
+		type proc_t, proc_afs_t;
+	')
+
+	read_files_pattern($1,proc_t,proc_afs_t)
+
+	list_dirs_pattern($1,proc_t,proc_t)
 ')
 
 #######################################
@@ -1848,6 +1924,27 @@ interface(`kernel_list_unlabeled',`
 
 ########################################
 ## <summary>
+##	Read the process state (/proc/pid) of all unlabeled_t.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_read_unlabeled_state',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:dir list_dir_perms;
+	read_files_pattern($1,unlabeled_t,unlabeled_t)
+	read_lnk_files_pattern($1,unlabeled_t,unlabeled_t)
+')
+
+
+########################################
+## <summary>
 ##	Do not audit attempts to list unlabeled directories.
 ## </summary>
 ## <param name="domain">
@@ -2198,17 +2295,14 @@ interface(`kernel_dontaudit_sendrecv_unlabeled_association',`
 
 ########################################
 ## <summary>
-##      Receive TCP packets from a NetLabel connection.
+##      Receive TCP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive TCP packets from a NetLabel connection, NetLabel is an
-##      explicit packet labeling framework which implements CIPSO and
-##      similar protocols.
+##      Receive TCP packets from an unlabeled connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_tcp_recv_netlabel() should
+##	The corenetwork interface corenet_tcp_recv_unlabeled() should
 ##	be used instead of this one.
 ##	</p>
 ## </desc>
@@ -2228,19 +2322,17 @@ interface(`kernel_tcp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive TCP packets from a NetLabel
-##      connection.
+##      Do not audit attempts to receive TCP packets from an unlabeled
+##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive TCP packets from a NetLabel
-##      connection.  NetLabel is an explicit packet labeling framework
-##      which implements CIPSO and similar protocols.
+##      Do not audit attempts to receive TCP packets from an unlabeled
+##	connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_dontaudit_tcp_recv_netlabel() should
-##	be used instead of this one.
+##	The corenetwork interface corenet_dontaudit_tcp_recv_unlabeled()
+##	should be used instead of this one.
 ##	</p>
 ## </desc>
 ## <param name="domain">
@@ -2259,17 +2351,14 @@ interface(`kernel_dontaudit_tcp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Receive UDP packets from a NetLabel connection.
+##      Receive UDP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive UDP packets from a NetLabel connection, NetLabel is an
-##      explicit packet labeling framework which implements CIPSO and
-##      similar protocols.
+##      Receive UDP packets from an unlabeled connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_udp_recv_netlabel() should
+##	The corenetwork interface corenet_udp_recv_unlabeled() should
 ##	be used instead of this one.
 ##	</p>
 ## </desc>
@@ -2289,19 +2378,17 @@ interface(`kernel_udp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive UDP packets from a NetLabel
-##      connection.
+##      Do not audit attempts to receive UDP packets from an unlabeled
+##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive UDP packets from a NetLabel
-##      connection.  NetLabel is an explicit packet labeling framework
-##      which implements CIPSO and similar protocols.
+##      Do not audit attempts to receive UDP packets from an unlabeled
+##	connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_dontaudit_udp_recv_netlabel() should
-##	be used instead of this one.
+##	The corenetwork interface corenet_dontaudit_udp_recv_unlabeled()
+##	should be used instead of this one.
 ##	</p>
 ## </desc>
 ## <param name="domain">
@@ -2320,17 +2407,14 @@ interface(`kernel_dontaudit_udp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Receive Raw IP packets from a NetLabel connection.
+##      Receive Raw IP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive Raw IP packets from a NetLabel connection, NetLabel is an
-##      explicit packet labeling framework which implements CIPSO and
-##      similar protocols.
+##      Receive Raw IP packets from an unlabeled connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_raw_recv_netlabel() should
+##	The corenetwork interface corenet_raw_recv_unlabeled() should
 ##	be used instead of this one.
 ##	</p>
 ## </desc>
@@ -2350,19 +2434,17 @@ interface(`kernel_raw_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive Raw IP packets from a NetLabel
-##      connection.
+##      Do not audit attempts to receive Raw IP packets from an unlabeled
+##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive Raw IP packets from a NetLabel
-##      connection.  NetLabel is an explicit packet labeling framework
-##      which implements CIPSO and similar protocols.
+##      Do not audit attempts to receive Raw IP packets from an unlabeled
+##	connection.
 ##      </p>
 ##	<p>
-##	The corenetwork interface
-##	corenet_dontaudit_raw_recv_netlabel() should
-##	be used instead of this one.
+##	The corenetwork interface corenet_dontaudit_raw_recv_unlabeled()
+##	should be used instead of this one.
 ##	</p>
 ## </desc>
 ## <param name="domain">
