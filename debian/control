@@ -3,6 +3,7 @@ VCS-Arch: http://arch.debian.org/arch/private/srivasta/grab/refpolicy
 VCS-Browser: http://arch.debian.org/cgi-bin/archzoom.cgi/srivasta@debian.org--lenny/refpolicy?expand
 Priority: optional
 Section: admin
+Homepage: http://serefpolicy.sourceforge.net/
 Maintainer: Manoj Srivastava <srivasta@debian.org>
 Uploaders: Erich Schubert <erich@debian.org>
 Standards-Version: 3.7.3.0
@@ -10,7 +11,7 @@ Build-Depends: policycoreutils (>= 2.0.27), checkpolicy (>= 2.0.4), python, m4, 
 
 Package: selinux-policy-refpolicy-strict
 Architecture: all
-Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
+Depends: policycoreutils (>= 2.0.42), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-default
@@ -32,14 +33,14 @@ Description: Strict variant of the SELinux reference policy
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-  .
+ .
  This is the strict variant of the reference policy. This provides 
  the highest level of security, but may not be complete yet.
 
 Package: selinux-policy-refpolicy-targeted
 Architecture: all
 Priority: standard
-Depends: policycoreutils, libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
+Depends: policycoreutils (>= 2.0.42), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-default
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
@@ -61,7 +62,7 @@ Description: Targeted variant of the SELinux reference policy
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-  .
+ .
  This is the targeted variant of the reference policy.  In this
  variation, most of the system remain untouched, apart from a few
  targeted inter-net facing daemons, which are tightly sand boxed.
@@ -69,7 +70,7 @@ Description: Targeted variant of the SELinux reference policy
 
 Package: selinux-policy-refpolicy-src
 Architecture: all
-Depends: python, policycoreutils, checkpolicy (>= 2.0.4), gawk
+Depends: python, policycoreutils (>= 2.0.42), checkpolicy (>= 2.0.4), gawk
 Conflicts: selinux-policy-default
 Recommends: setools
 Suggests: logcheck, syslog-summary
@@ -91,13 +92,13 @@ Description: Source of the SELinux reference policy for customization
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-  .
+ .
  This is the source of the policy, provided so that local variations of
  SELinux policy may be created.
 
 Package: selinux-policy-refpolicy-dev
 Architecture: all
-Depends: python, policycoreutils, checkpolicy (>= 2.0.4), gawk, make, m4
+Depends: python, policycoreutils (>= 2.0.42), checkpolicy (>= 2.0.4), gawk, make, m4
 Recommends: setools
 Homepage: http://serefpolicy.sourceforge.net/
 Description: Headers from the SELinux reference policy for building modules
@@ -117,7 +118,7 @@ Description: Headers from the SELinux reference policy for building modules
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-  .
+ .
  This package provides header files for building your own SELinux
  policy packages compatible with official policy packages.
 
@@ -143,7 +144,7 @@ Description: Documentation for the SELinux reference policy
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-  .
+ .
  This package contains the documentation for the reference policy.
 
 

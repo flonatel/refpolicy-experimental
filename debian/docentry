@@ -17,7 +17,7 @@ Abstract: The SELinux Reference Policy (refpolicy) is a complete SELinux
   + Flexible Base Policy
   + Application Policy Variations
   + Multi-Level Security
-Section: Apps/Admin
+Section: System/Administration
 
 Format: HTML
 Index: /usr/share/doc/selinux-policy-refpolicy-doc/html/index.html

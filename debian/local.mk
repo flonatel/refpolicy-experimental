@@ -363,6 +363,7 @@ binary/selinux-policy-refpolicy-strict:
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
+	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
 	sed -e 's/=T/strict/g' debian/postinst.policy  > $(TMPTOP)/DEBIAN/postinst
 	chmod 755                                      $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/strict.postrm      $(TMPTOP)/DEBIAN/postrm
@@ -378,6 +379,7 @@ binary/selinux-policy-refpolicy-targeted:
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,'  > DEBIAN/conffiles)
+	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
 	sed -e 's/=T/targeted/g' debian/postinst.policy >$(TMPTOP)/DEBIAN/postinst
 	chmod 755                                       $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/targeted.postrm     $(TMPTOP)/DEBIAN/postrm
@@ -415,6 +417,7 @@ binary/selinux-policy-refpolicy-doc:
 	$(checkdir)
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
+	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
 	$(install_program)   debian/doc.postinst      $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/doc.prerm         $(TMPTOP)/DEBIAN/prerm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \

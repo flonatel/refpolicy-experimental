@@ -1,3 +1,13 @@
+2008-03-20  Manoj Srivastava  <srivasta@debian.org>
+
+	* postinst.policy:
+		  srivasta@debian.org--lenny/debian-dir--refpolicy--1.0--patch-13
+		  refpolicy  includes an Exim policy, but doesn't install
+		  it on a fresh refpolicy installation, because the module
+		  package is exim.pp, while Debian calls its exim package
+		  'exim4'.  Thanks to Devin Carraway for the heavy
+		  lifting. 
+
 2007-05-07  Manoj Srivastava  <srivasta@debian.org>
 
 	* modules.conf.targeted (ricci):

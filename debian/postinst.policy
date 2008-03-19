@@ -75,6 +75,7 @@ my %map = (
            'cups'          => [ 'cupsys*' ],
            'cyrus'         => [ 'cyrus*' ],
            'dhcp'          => [ 'dhcp*', 'dhclient*', 'pump' ],
+           'exim'          => [ 'exim4' ],
            'finger'        => [ 'finger', '*fingerd' ],
            'ftp'           => [ 'ftp', '*ftpd' ],
            'gpg'           => [ 'gnupg' ],

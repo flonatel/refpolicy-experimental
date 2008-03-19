@@ -125,6 +125,7 @@ inherits file
 	reparent
 	search
 	rmdir
+	open
 }
 
 class file
@@ -133,6 +134,7 @@ inherits file
 	execute_no_trans
 	entrypoint
 	execmod
+	open
 }
 
 class lnk_file
@@ -144,16 +146,23 @@ inherits file
 	execute_no_trans
 	entrypoint
 	execmod
+	open
 }
 
 class blk_file
 inherits file
+{
+	open
+}
 
 class sock_file
 inherits file
 
 class fifo_file
 inherits file
+{
+	open
+}
 
 class fd
 {
@@ -201,6 +210,8 @@ class node
 	enforce_dest
 	dccp_recv
 	dccp_send
+	recvfrom
+	sendto
 }
 
 class netif
@@ -213,6 +224,8 @@ class netif
 	rawip_send
 	dccp_recv
 	dccp_send
+	ingress
+	egress
 }
 
 class netlink_socket
@@ -343,6 +356,7 @@ class system
 class capability
 {
 	# The capabilities are defined in include/linux/capability.h
+	# Capabilities >= 32 are defined in the capability2 class.
 	# Care should be taken to ensure that these are consistent with
 	# those definitions. (Order matters)
 
@@ -377,8 +391,14 @@ class capability
 	lease
 	audit_write
 	audit_control
+	setfcap
 }
 
+class capability2 
+{
+	mac_override	# unused by SELinux
+	mac_admin	# unused by SELinux
+}
 
 #
 # Define the access vector interpretation for controlling
@@ -639,6 +659,10 @@ class packet
 	send
 	recv
 	relabelto
+	flow_in		# not currently in use
+	flow_out	# not currently in use
+	forward_in
+	forward_out
 }
 
 class key
@@ -725,4 +749,10 @@ inherits database
 	write
 	import
 	export
+}
+
+# network peer labels
+class peer
+{
+	recv
 }

@@ -14,7 +14,7 @@
 # strict, targeted,
 # strict-mls, targeted-mls,
 # strict-mcs, targeted-mcs
-TYPE = mcs
+TYPE ?= mcs
 
 # Policy Name
 # If set, this will be used as the policy

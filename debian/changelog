@@ -1,3 +1,38 @@
+refpolicy (0.0.20080314-1) unstable; urgency=low
+
+  * New upstream SVN HEAD
+    - Add wireshark module based on ethereal module.
+    - Revise upstart support in init module to use a tunable, as upstart is now
+      used in Fedora too.
+    - Add iferror.m4 rather generate it out of the Makefiles.
+    - Definitions for open permisson on file and similar objects from Eric
+      Paris.
+    - Apt updates for ptys and logs, from Martin Orr.
+    - RPC update from Vaclav Ovsik.
+    - Exim updates on Debian from Devin Carrawy.
+    - Pam and samba updates from Stefan Schulze Frielinghaus.
+    - Backup update on Debian from Vaclav Ovsik.
+    - Cracklib update on Debian from Vaclav Ovsik.
+    - Label /proc/kallsyms with system_map_t.
+    - 64-bit capabilities from Stephen Smalley.
+    - Labeled networking peer object class updates.
+  * refpolicy  includes an Exim policy, but did not install it on a fresh
+    refpolicy installation, because the module package is exim.pp, while
+    Debian calls its exim package 'exim4'.  Thanks to Devin Carraway for
+    the heavy lifting.                                 Closes: #465208
+  * Bug fix: "selinux-policy-refpolicy-dev: Installed build.conf specifies
+    MCS build type", thanks to Devin Carraway.         Closes: #465215
+  * Bug fix: "newer policycoreutils required", thanks to Max Kellermann
+                                                       Closes: #469123
+  * The latest set of packages also seem to resolve the consolekit
+    issues. Bug fix: "consolekit gives error messages when running with SELinux
+    enabled", thanks to Ritesh Raj Sarraf.             Closes: #463995
+  * Bug fix: "selinux-policy-refpolicy-targeted: descriptions seems to
+    misplace &#39;.&#39; to split paragraphs (debian/control)", thanks to
+    Felipe Augusto van de Wiel (faw).                  Closes: #466638,#466978
+
+ -- Manoj Srivastava <srivasta@debian.org>  Wed, 19 Mar 2008 18:27:23 -0500
+
 refpolicy (0.0.20071214-1) unstable; urgency=low
 
   * New upstream release. This has updated policy for ssh, which

@@ -1,5 +1,5 @@
 
-policy_module(libraries,2.0.0)
+policy_module(libraries,2.0.1)
 
 ########################################
 #
@@ -85,6 +85,12 @@ optional_policy(`
         apt_dontaudit_use_fds(ldconfig_t)   
 ')
 
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(ldconfig_t)
+	')
+')
+
 ifdef(`hide_broken_symptoms',`
 	optional_policy(`
 		unconfined_dontaudit_rw_tcp_sockets(ldconfig_t)
@@ -94,6 +100,12 @@ ifdef(`hide_broken_symptoms',`
 optional_policy(`
 	# dontaudit access to /usr/lib/apache, normal programs cannot read these libs anyway
 	apache_dontaudit_search_modules(ldconfig_t)
+')
+
+optional_policy(`
+	apt_rw_pipes(ldconfig_t)
+	apt_use_fds(ldconfig_t)
+	apt_use_ptys(ldconfig_t)
 ')
 
 optional_policy(`

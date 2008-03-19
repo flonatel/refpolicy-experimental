@@ -1,5 +1,5 @@
 
-policy_module(selinuxutil,1.8.0)
+policy_module(selinuxutil,1.8.1)
 
 gen_require(`
 	bool secure_mode;
@@ -145,6 +145,12 @@ libs_use_shared_libs(checkpolicy_t)
 
 userdom_use_all_users_fds(checkpolicy_t)
 
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(checkpolicy_t)
+	')
+')
+
 ########################################
 #
 # Load_policy local policy
@@ -182,6 +188,12 @@ miscfiles_read_localization(load_policy_t)
 seutil_libselinux_linked(load_policy_t)
 
 userdom_use_all_users_fds(load_policy_t)
+
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(load_policy_t)
+	')
+')
 
 ifdef(`hide_broken_symptoms',`
 	# cjp: cover up stray file descriptors.
@@ -276,6 +288,12 @@ userdom_use_unpriv_users_fds(newrole_t)
 userdom_dontaudit_search_all_users_home_content(newrole_t)
 userdom_search_all_users_home_dirs(newrole_t)
 
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(newrole_t)
+	')
+')
+
 # if secure mode is enabled, then newrole
 # can only transition to unprivileged users
 if(secure_mode) {
@@ -329,6 +347,12 @@ miscfiles_read_localization(restorecond_t)
 
 seutil_libselinux_linked(restorecond_t)
 
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(restorecond_t)
+	')
+')
+
 optional_policy(`
 	rpm_use_script_fds(restorecond_t)
 ')
@@ -372,6 +396,7 @@ term_dontaudit_list_ptys(run_init_t)
 
 auth_use_nsswitch(run_init_t)
 auth_domtrans_chk_passwd(run_init_t)
+auth_domtrans_upd_passwd(run_init_t)
 auth_dontaudit_read_shadow(run_init_t)
 
 init_spec_domtrans_script(run_init_t)
@@ -392,6 +417,12 @@ ifndef(`direct_sysadm_daemon',`
 	ifdef(`distro_gentoo',`
 		# Gentoo integrated run_init:
 		init_script_file_entry_type(run_init_t)
+	')
+')
+
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(run_init_t)
 	')
 ')
 
@@ -473,6 +504,12 @@ seutil_manage_default_contexts(semanage_t)
 ifdef(`distro_debian',`
 	files_read_var_lib_files(semanage_t)
 	files_read_var_lib_symlinks(semanage_t)
+')
+
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(semanage_t)
+	')
 ')
 
 # cjp: need a more general way to handle this:
@@ -581,6 +618,12 @@ ifdef(`distro_redhat', `
 	fs_rw_tmpfs_blk_files(setfiles_t)
 	fs_relabel_tmpfs_blk_file(setfiles_t)
 	fs_relabel_tmpfs_chr_file(setfiles_t)
+')
+
+ifdef(`distro_ubuntu',`
+	optional_policy(`
+		unconfined_domain(setfiles_t)
+	')
 ')
 
 ifdef(`hide_broken_symptoms',`
