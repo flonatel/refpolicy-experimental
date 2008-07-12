@@ -1,3 +1,17 @@
+refpolicy (0.0.20061018-5.1+etch1) stable-security; urgency=high
+
+  * Non-maintainer upload by the security team.
+  * Allow named_t to bind to all UDP ports, not just the DNS port;
+    this enables DNS port randomization, introduced by bind9
+    1:9.3.4-2etch3 in response to DSA-1603-1 / CVE-2008-1447.  The
+    change does not represent a vulnerability in refpolicy, rather
+    a compatibility fix for an urgent and widely-deployed package.
+    (Closes: #490271).
+  * Upgrade the bind policy module at upgrade, if and only if the
+    previously-installed refpolicy package was <= 0.0.20061018-5
+
+ -- Devin Carraway <devin@debian.org>  Sat, 12 Jul 2008 09:33:09 +0000
+
 refpolicy (0.0.20061018-5) unstable; urgency=high
 
   * Add policy for log and lock files for aptitude. This is needed for

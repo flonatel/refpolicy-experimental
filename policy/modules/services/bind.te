@@ -1,5 +1,5 @@
 
-policy_module(bind,1.2.0)
+policy_module(bind,1.2.1)
 
 ########################################
 #
@@ -106,7 +106,7 @@ corenet_udp_sendrecv_all_ports(named_t)
 corenet_tcp_bind_all_nodes(named_t)
 corenet_udp_bind_all_nodes(named_t)
 corenet_tcp_bind_dns_port(named_t)
-corenet_udp_bind_dns_port(named_t)
+corenet_udp_bind_all_ports(named_t)
 corenet_tcp_bind_rndc_port(named_t)
 corenet_tcp_connect_all_ports(named_t)
 corenet_sendrecv_dns_server_packets(named_t)
