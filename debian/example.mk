@@ -19,8 +19,8 @@ endif
 
 TYPE ?= $(NAME)${MCSFLAG}
 
-# This can also be changed to /usr/share/selinux/refpolicy-strict/include
-HEADERDIR := /usr/share/selinux/refpolicy-targeted/include
+# This can also be changed to /usr/share/selinux/mls/include
+HEADERDIR := /usr/share/selinux/default/include
 include $(HEADERDIR)/Makefile
 
 # arch-tag: 56a0db1b-e624-4696-9882-9b7147b719f9

@@ -1,5 +1,5 @@
 
-policy_module(logrotate,1.7.1)
+policy_module(logrotate, 1.9.0)
 
 ########################################
 #
@@ -115,7 +115,6 @@ miscfiles_read_localization(logrotate_t)
 
 seutil_dontaudit_read_config(logrotate_t)
 
-userdom_dontaudit_search_sysadm_home_dirs(logrotate_t)
 userdom_use_unpriv_users_fds(logrotate_t)
 
 cron_system_entry(logrotate_t, logrotate_exec_t)
@@ -125,6 +124,8 @@ cron_search_spool(logrotate_t)
 allow crond_t logrotate_var_lib_t:dir search;
  
 mta_send_mail(logrotate_t)
+
+sysadm_dontaudit_search_home_dirs(logrotate_t)
 
 ifdef(`distro_debian', `
 	allow logrotate_t logrotate_tmp_t:file { relabelfrom relabelto };

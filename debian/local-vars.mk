@@ -51,11 +51,11 @@ MCS_MLS_TYPE=-mcs
 # Things we have put into the base for Debian systems.
 # egrep base debian/modules.conf.targeted | grep -v '#' | \
 #     sort | sed -e 's/=.*$//g'
-NON_MODULES=application apt authlogin bootloader clock corecommands \
+NON_MODULES=application apt authlogin clock corecommands \
             corenetwork  cron devices dmesg domain dpkg files filesystem \
-            fstools getty hostname init ipsec iptables kernel libraries \
+            fstools getty hostname init iptables kernel libraries \
             locallogin logging logrotate mcs miscfiles mls modutils mount \
-            mta selinux selinuxutil storage su sudo sysnetwork terminal  \
+            mta selinux selinuxutil storage su sysnetwork terminal  \
             userdomain userhelper usermanage
 
 define checkdir

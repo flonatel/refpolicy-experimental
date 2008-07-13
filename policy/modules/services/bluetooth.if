@@ -36,6 +36,7 @@ template(`bluetooth_per_role_template',`
 	gen_require(`
 		attribute bluetooth_helper_domain;
 		type bluetooth_helper_exec_t;
+		type bluetooth_t;
 	')
 
 	type $1_bluetooth_t, bluetooth_helper_domain;
@@ -107,7 +108,7 @@ template(`bluetooth_per_role_template',`
 	')
 
 	optional_policy(`
-		xserver_user_client_template($1, $1_bluetooth_t, $1_bluetooth_tmpfs_t)
+		xserver_user_x_domain_template($1, $1_bluetooth, $1_bluetooth_t, $1_bluetooth_tmpfs_t)
 	')
 ')
 

@@ -130,6 +130,7 @@ globaltun = $(poldir)/global_tunables
 globalbool = $(poldir)/global_booleans
 rolemap = $(poldir)/rolemap
 user_files := $(poldir)/users
+policycaps := $(poldir)/policy_capabilities
 
 # local config file paths
 ifndef LOCAL_ROOT
@@ -236,7 +237,7 @@ seusers := $(appconf)/seusers
 appdir := $(contextpath)
 user_default_contexts := $(wildcard config/appconfig-$(TYPE)/*_default_contexts)
 user_default_contexts_names := $(addprefix $(contextpath)/users/,$(subst _default_contexts,,$(notdir $(user_default_contexts))))
-appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts customizable_types securetty_types) $(contextpath)/files/media $(user_default_contexts_names)
+appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts x_contexts customizable_types securetty_types) $(contextpath)/files/media $(user_default_contexts_names)
 net_contexts := $(builddir)net_contexts
 
 all_layers := $(shell find $(wildcard $(moddir)/*) -maxdepth 0 -type d)

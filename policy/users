@@ -1,4 +1,3 @@
-
 ##################################
 #
 # Core User configuration.
@@ -26,7 +25,6 @@ gen_user(system_u,, system_r, s0, s0 - mls_systemhigh, mcs_allcats)
 # permit any access to such users, then remove this entry.
 #
 gen_user(user_u, user, user_r, s0, s0)
-gen_user(netuser_u, netuser, netuser_r, s0, s0)
 gen_user(staff_u, staff, staff_r sysadm_r ifdef(`enable_mls',`secadm_r auditadm_r'), s0, s0 - mls_systemhigh, mcs_allcats)
 gen_user(sysadm_u, sysadm, sysadm_r, s0, s0 - mls_systemhigh, mcs_allcats)
 

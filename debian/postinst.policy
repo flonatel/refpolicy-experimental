@@ -40,8 +40,8 @@ exit 0 if $ARGV[0] =~ /abort-deconfigure/;
 exit 0 unless $ARGV[0] =~ /configure/;
 
 my $type        = '=T';
-my $package_name= "selinux-policy-refpolicy-$type";
-my $policy_name = "refpolicy-$type";
+my $package_name= "selinux-policy-$type";
+my $policy_name = "$type";
 my $basedir     = "/etc/selinux/$policy_name";
 my $src_dir     = "/usr/share/selinux/$policy_name";
 
@@ -242,15 +242,24 @@ sub main {
     &get_dependencies("$src_dir");
     &get_ordering();
     &installed_modules();
-    if (system("semodule -b $src_dir/base.pp -s $policy_name -n ") == 0) {
+    chdir "$src_dir" or die "Can't access $src_dir";
+    if (system("semodule -b base.pp -s $policy_name -n ") == 0) {
       print STDERR "Loaded base policy\n";
+      my $semod = "semodule";
+      if("$type" eq "default") {
+        $semod .= " -i unconfined.pp";
+      }
+      my $mod_list;
       for my $mod (@Load_Order) {
-        if (system("semodule -i $src_dir/${mod}.pp -s $policy_name -n ") == 0) {
-          print STDERR "Loaded module ${mod}.pp\n";
-        }
-        else {
-          print STDERR "Failed to load module ${mod}.pp\n";
-        }
+        $semod .= " -i ${mod}.pp";
+        $mod_list .= " $mod";
+      }
+      $semod .= " -s $policy_name -n";
+      if (system($semod) == 0) {
+        print STDERR "Loaded modules $mod_list\n";
+      }
+      else {
+        print STDERR "Error running \"$semod\", please fix manually and report a bug.\n";
       }
     }
     else {

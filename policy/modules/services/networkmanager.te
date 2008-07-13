@@ -1,5 +1,5 @@
 
-policy_module(networkmanager,1.9.0)
+policy_module(networkmanager, 1.10.0)
 
 ########################################
 #
@@ -20,7 +20,7 @@ files_pid_file(NetworkManager_var_run_t)
 
 # networkmanager will ptrace itself if gdb is installed
 # and it receives a unexpected signal (rh bug #204161) 
-allow NetworkManager_t self:capability { kill setgid setuid sys_nice dac_override net_admin net_raw net_bind_service ipc_lock };
+allow NetworkManager_t self:capability { kill setgid setuid dac_override net_admin net_raw net_bind_service ipc_lock };
 dontaudit NetworkManager_t self:capability { sys_tty_config sys_ptrace };
 allow NetworkManager_t self:process { ptrace setcap setpgid getsched signal_perms };
 allow NetworkManager_t self:fifo_file rw_fifo_file_perms;
@@ -109,10 +109,11 @@ sysnet_manage_config(NetworkManager_t)
 sysnet_etc_filetrans_config(NetworkManager_t)
 
 userdom_dontaudit_use_unpriv_user_fds(NetworkManager_t)
-userdom_dontaudit_search_sysadm_home_dirs(NetworkManager_t)
 userdom_dontaudit_use_unpriv_users_ttys(NetworkManager_t)
 # Read gnome-keyring
 userdom_read_unpriv_users_home_content_files(NetworkManager_t)
+
+sysadm_dontaudit_search_home_dirs(NetworkManager_t)
 
 optional_policy(`
 	bind_domtrans(NetworkManager_t)

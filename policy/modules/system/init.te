@@ -1,5 +1,5 @@
 
-policy_module(init,1.9.2)
+policy_module(init, 1.11.0)
 
 gen_require(`
 	class passwd rootok;
@@ -173,12 +173,14 @@ fs_rw_tmpfs_chr_files(init_t)
 
 fs_tmpfs_filetrans(init_t,initctl_t,fifo_file)
 
+optional_policy(`
 tunable_policy(`init_upstart',`
 	corecmd_shell_domtrans(init_t,initrc_t)
 ',`
 	# Run the shell in the sysadm role for single-user mode.
 	# causes problems with upstart
-	userdom_shell_domtrans_sysadm(init_t)
+	sysadm_shell_domtrans(init_t)
+')
 ')
 
 optional_policy(`
@@ -381,10 +383,11 @@ modutils_domtrans_insmod(initrc_t)
 seutil_read_config(initrc_t)
 
 userdom_read_all_users_home_content_files(initrc_t)
+
 # Allow access to the sysadm TTYs. Note that this will give access to the 
 # TTYs to any process in the initrc_t domain. Therefore, daemons and such
 # started from init should be placed in their own domain.
-userdom_use_sysadm_terms(initrc_t)
+sysadm_use_terms(initrc_t)
 
 # seed udev /dev
 dev_create_generic_dirs(initrc_t)
@@ -443,6 +446,11 @@ ifdef(`distro_gentoo',`
 	# for integrated run_init to read run_init_type.
 	# happens during boot (/sbin/rc execs init scripts)
 	seutil_read_default_contexts(initrc_t)
+
+	# /lib/rcscripts/net/system.sh rewrites resolv.conf :(
+	sysnet_create_config(initrc_t)
+	sysnet_write_config(initrc_t)
+	sysnet_setattr_config(initrc_t)	
 
 	optional_policy(`
 		arpwatch_manage_data_files(initrc_t)

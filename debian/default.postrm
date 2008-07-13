@@ -33,9 +33,9 @@
 # Abort if any command returns an error value
 set -e
 
-TYPE=targeted
-package_name=selinux-policy-refpolicy-$TYPE
-POLICYNAME=refpolicy-$TYPE
+NAME=default
+package_name=selinux-policy-$NAME
+POLICYNAME=$NAME
 BASEDIR=/etc/selinux/$POLICYNAME
 
 
