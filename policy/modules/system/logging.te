@@ -44,6 +44,11 @@ files_pid_file(klogd_var_run_t)
 type syslog_conf_t;
 files_type(syslog_conf_t)
 
+ifdef(`distro_debian', `
+# for xconsole detection
+    allow initrc_t syslog_conf_t:file r_file_perms;
+')
+
 type syslogd_t;
 type syslogd_exec_t;
 init_daemon_domain(syslogd_t,syslogd_exec_t)

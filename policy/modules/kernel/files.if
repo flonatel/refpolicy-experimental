@@ -2612,6 +2612,7 @@ interface(`files_search_mnt',`
 	')
         
         allow $1 mnt_t:dir search_dir_perms;
+        allow $1 mnt_t:lnk_file r_file_perms;
 ')
 
 ########################################
@@ -4413,6 +4414,25 @@ interface(`files_rw_generic_pids',`
 
 	list_dirs_pattern($1,var_t,var_run_t)
 	rw_files_pattern($1,var_run_t,var_run_t)
+')
+
+########################################
+## <summary>
+##      Create directories under /var/run
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`files_manage_pid_dirs',`
+	gen_require(`
+		type var_t, var_run_t;
+	')
+
+	allow $1 var_t:dir search;
+	allow $1 var_run_t:dir manage_dir_perms;
 ')
 
 ########################################

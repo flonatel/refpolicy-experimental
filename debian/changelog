@@ -1,3 +1,11 @@
+refpolicy (2:0.0.20080702-2) unstable; urgency=low
+
+  * Made the mls package extra and made some other packages optional.
+    Closes: #490760
+  * Merged some patches from older policy packages.
+
+ -- Russell Coker <russell@coker.com.au>  Sun, 20 Jul 2008 16:48:19 +1000
+
 refpolicy (2:0.0.20080702-1) unstable; urgency=low
 
   * Update to latest upstream and take over the package as Manoj seems busy

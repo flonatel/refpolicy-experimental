@@ -1,5 +1,5 @@
 
-policy_module(dpkg,1.5.0)
+policy_module(dpkg,1.5.1)
 
 ########################################
 #
@@ -160,7 +160,6 @@ auth_dontaudit_read_shadow(dpkg_t)
 files_exec_etc_files(dpkg_t)
 
 init_domtrans_script(dpkg_t)
-init_use_script_ptys(dpkg_t)
 
 libs_use_ld_so(dpkg_t)
 libs_use_shared_libs(dpkg_t)
@@ -177,10 +176,12 @@ seutil_manage_bin_policy(dpkg_t)
 sysnet_read_config(dpkg_t)
 
 userdom_use_unpriv_users_fds(dpkg_t)
+allow userdomain dpkg_var_lib_t:dir r_dir_perms;
+allow userdomain dpkg_var_lib_t:file r_file_perms;
 
 # transition to dpkg script:
 dpkg_domtrans_script(dpkg_t)
-# since the scripts aren't labeled correctly yet...
+# since the scripts are not labeled correctly yet...
 allow dpkg_t dpkg_var_lib_t:file execute;
 # This is used for running config files for debconf interactions
 allow dpkg_t dpkg_tmp_t:file { execute execute_no_trans };
@@ -307,7 +308,6 @@ auth_dontaudit_getattr_shadow(dpkg_script_t)
 auth_manage_all_files_except_shadow(dpkg_script_t)
 
 init_domtrans_script(dpkg_script_t)
-init_use_script_fds(dpkg_script_t)
 
 libs_use_ld_so(dpkg_script_t)
 libs_use_shared_libs(dpkg_script_t)

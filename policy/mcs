@@ -66,8 +66,11 @@ gen_levels(1,mcs_num_cats)
 #
 # Note that getattr on files is always permitted.
 #
-mlsconstrain file { write setattr append unlink link rename ioctl lock execute relabelfrom }
+mlsconstrain file { ioctl lock execute relabelfrom }
 	( h1 dom h2 );
+
+mlsconstrain file { write setattr append unlink link rename }
+	(( h1 dom h2 ) and ((l1 domby l2) or (t2 == mcstrustedobject)));
 
 mlsconstrain dir { create getattr setattr read write link unlink rename search add_name remove_name reparent rmdir lock ioctl }
 	(( h1 dom h2 ) or ( t2 == domain ) or ( t1 == mlsfileread ));
@@ -75,7 +78,8 @@ mlsconstrain dir { create getattr setattr read write link unlink rename search a
 # New filesystem object labels must be dominated by the relabeling subject
 # clearance, also the objects are single-level.
 mlsconstrain file { create relabelto }
-	(( h1 dom h2 ) and ( l2 eq h2 ));
+	(( l2 eq h2 ) and ( h1 dom h2 ) and
+	((l1 domby l2) or (t2 == mcstrustedobject)));
 
 # At this time we do not restrict "ps" type operations via MCS.  This
 # will probably change in future.
@@ -86,14 +90,16 @@ mlsconstrain file { read }
 mlsconstrain { dir lnk_file chr_file blk_file sock_file fifo_file } { relabelfrom }
 	( h1 dom h2 );
 
+# not mandatory at this time - can write down
 mlsconstrain { dir lnk_file chr_file blk_file sock_file fifo_file } { create relabelto }
 	(( h1 dom h2 ) and ( l2 eq h2 ));
 
 mlsconstrain process { transition dyntransition }
-	(( h1 dom h2 ) or ( t1 == mcssetcats ));
+	(( ( h1 dom h2 ) and ((l1 domby l2) or (t1 == mcssetlow)) ) or ( t1 == mcssetcats ));
+
 
 mlsconstrain process { ptrace }
-	(( h1 dom h2) or ( t1 == mcsptraceall ));
+	(( (h1 dom h2) and (l1 domby l2)) or ( t1 == mcsptraceall ));
 
 mlsconstrain process { sigkill sigstop }
 	(( h1 dom h2 ) or ( t1 == mcskillall ));

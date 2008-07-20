@@ -198,6 +198,24 @@ interface(`ppp_read_config',`
 
 ########################################
 ## <summary>
+##	 Execute domain in the ppp caller.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	 Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`ppp_script_exec',`
+	gen_require(`
+		type pppd_script_exec_t;
+	')
+
+	can_exec($1, pppd_script_exec_t)
+')
+
+########################################
+## <summary>
 ##	Read PPP-writable configuration files.
 ## </summary>
 ## <param name="domain">

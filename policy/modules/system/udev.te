@@ -1,5 +1,5 @@
 
-policy_module(udev,1.9.0)
+policy_module(udev,1.9.1)
 
 ########################################
 #
@@ -172,6 +172,11 @@ ifdef(`distro_gentoo',`
 	# during boot, init scripts use /dev/.rcsysinit
 	# existance to determine if we are in early booting
 	init_getattr_script_status_files(udev_t)
+')
+
+ifdef(`distro_debian',`
+	fs_manage_tmpfs_dirs(udev_t)
+	fs_manage_tmpfs_chr_files(udev_t)
 ')
 
 ifdef(`distro_redhat',`

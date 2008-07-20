@@ -34,6 +34,9 @@
 /sbin/swapon.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 /sbin/tune2fs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 
+# this is not ideal, but the best way to minimise privs for initrc_t
+/sbin/logsave		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+
 /usr/bin/partition_uuid	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 /usr/bin/raw		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
 /usr/bin/scsi_unique_id	--	gen_context(system_u:object_r:fsadm_exec_t,s0)

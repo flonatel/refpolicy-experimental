@@ -268,6 +268,7 @@ dev_rw_sysfs(initrc_t)
 dev_list_usbfs(initrc_t)
 dev_read_framebuffer(initrc_t)
 dev_read_realtime_clock(initrc_t)
+clock_rw_adjtime(initrc_t)
 dev_read_sound_mixer(initrc_t)
 dev_write_sound_mixer(initrc_t)
 dev_setattr_all_chr_files(initrc_t)
@@ -399,6 +400,8 @@ ifdef(`distro_debian',`
 	# for /etc/network/run/ifstate
 	sysnet_manage_config(initrc_t)
 	fs_tmpfs_filetrans(initrc_t,initrc_var_run_t,dir)
+	allow initrc_t initrc_var_run_t:dir manage_dir_perms;
+	allow initrc_t initrc_var_run_t:lnk_file manage_lnk_file_perms;
 
 	# for storing state under /dev/shm
 	fs_setattr_tmpfs_dirs(initrc_t)
@@ -418,7 +421,9 @@ ifdef(`distro_debian',`
         # /etc/network/if-up.d/mountnfs wants to mkdir
         # /var/run/network/mountnfs as a poor mans lock
         allow initrc_t var_run_t:dir create;
-        
+
+	# for lsb_release which calls apt-cache
+	apt_read_cache(initrc_t)
 ')
 
 ifdef(`distro_gentoo',`
