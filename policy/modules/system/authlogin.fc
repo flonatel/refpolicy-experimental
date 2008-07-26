@@ -1,11 +1,12 @@
 
 /bin/login		--	gen_context(system_u:object_r:login_exec_t,s0)
 
-/etc/\.pwd\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
-/etc/group\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
 /etc/gshadow.*		--	gen_context(system_u:object_r:shadow_t,s0)
-/etc/passwd\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
+/etc/\.group\.edit\.swp	--	gen_context(system_u:object_r:shadow_t,s0)
+/etc/\.gshadow\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
 /etc/shadow.*		--	gen_context(system_u:object_r:shadow_t,s0)
+/etc/\.passwd\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
+/etc/\.shadow\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
 
 /lib/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:pam_exec_t,s0)
 /lib64/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:pam_exec_t,s0)

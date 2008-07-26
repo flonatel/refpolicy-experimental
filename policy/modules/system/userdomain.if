@@ -116,6 +116,14 @@ template(`userdom_base_user_template',`
 		# Allow making the stack executable via mprotect.
 		allow $1_t self:process execstack;
 	')
+
+	ifdef(`distro_debian', `
+		# allow reading /var/lib/apt/lists
+		apt_read_db($1_t)
+		# allow reading /var/cache/apt - should not be needed but
+		# does not really matter
+		apt_read_cache($1_t)
+	')
 ')
 
 #######################################

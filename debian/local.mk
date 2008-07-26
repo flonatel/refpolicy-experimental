@@ -196,6 +196,10 @@ install/selinux-policy-mls:
 	$(make_directory)    $(TMPTOP)/etc/selinux/mls/policy
 	test -f $(TMPTOP)/etc/selinux/mls/modules/active/file_contexts.local || \
 	touch $(TMPTOP)/etc/selinux/mls/modules/active/file_contexts.local
+	touch $(TMPTOP)/etc/selinux/mls/modules/semanage.read.LOCK
+	chmod 600 $(TMPTOP)/etc/selinux/mls/modules/semanage.read.LOCK
+	touch $(TMPTOP)/etc/selinux/mls/modules/semanage.trans.LOCK
+	chmod 600 $(TMPTOP)/etc/selinux/mls/modules/semanage.trans.LOCK
 	(cd $(SRCTOP)/debian/build-$(package);                                  \
             $(MAKE) NAME=mls TYPE=mls $(OPTIONS) \
                     DESTDIR=$(TMPTOP) install  install-headers                  \
@@ -225,6 +229,10 @@ install/selinux-policy-default:
 	$(make_directory)    $(TMPTOP)/etc/selinux/default/policy
 	test -f $(TMPTOP)/etc/selinux/default/modules/active/file_contexts.local || \
 	touch $(TMPTOP)/etc/selinux/default/modules/active/file_contexts.local
+	touch $(TMPTOP)/etc/selinux/default/modules/semanage.read.LOCK
+	chmod 600 $(TMPTOP)/etc/selinux/default/modules/semanage.read.LOCK
+	touch $(TMPTOP)/etc/selinux/default/modules/semanage.trans.LOCK
+	chmod 600 $(TMPTOP)/etc/selinux/default/modules/semanage.trans.LOCK
 	(cd $(SRCTOP)/debian/build-$(package);                                      \
             $(MAKE) NAME=default TYPE=mcs $(OPTIONS) \
                     DESTDIR=$(TMPTOP) install  install-headers                      \

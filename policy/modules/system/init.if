@@ -204,6 +204,8 @@ interface(`init_system_domain',`
 
 	domtrans_pattern(initrc_t,$2,$1)
 
+	init_use_fds($1)
+
 	ifdef(`hide_broken_symptoms',`
 		# RHEL4 systems seem to have a stray
 		# fds open from the initrd
