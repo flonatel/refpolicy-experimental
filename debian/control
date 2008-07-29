@@ -11,7 +11,7 @@ Build-Depends: policycoreutils (>= 2.0.27), checkpolicy (>= 2.0.4), python, m4, 
 
 Package: selinux-policy-default
 Architecture: all
-Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
+Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.30-2)
 Recommends: checkpolicy, setools
 Priority: standard
 Suggests: logcheck, syslog-summary
@@ -28,7 +28,7 @@ Description: Strict and Targeted variants of the SELinux policy
 Package: selinux-policy-mls
 Architecture: all
 Priority: extra
-Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35)
+Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.30-2)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1), selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1), selinux-policy-refpolicy-strict, selinux-policy-refpolicy-targeted
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary

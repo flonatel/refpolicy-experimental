@@ -304,6 +304,9 @@ HOME_DIR/.*/plugins/nprhapengine\.so.* --	gen_context(system_u:object_r:textrel_
 ifdef(`distro_suse',`
 /var/lib/samba/bin/.+\.so(\.[^/]*)*	-l	gen_context(system_u:object_r:lib_t,s0)
 ')
+ifdef(`distro_debian', `
+/var/cache/ldconfig/aux-cache		--	gen_context(system_u:object_r:ld_so_cache_t,s0)
+')
 
 /var/spool/postfix/lib(64)?(/.*)? 		gen_context(system_u:object_r:lib_t,s0)
 /var/spool/postfix/usr(/.*)?			gen_context(system_u:object_r:lib_t,s0)

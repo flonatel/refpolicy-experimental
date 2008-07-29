@@ -1,7 +1,14 @@
+refpolicy (2:0.0.20080702-4) unstable; urgency=low
+
+  * Policy updates.
+  * Depend on libsepol1 version 2.0.30-2.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 29 Jul 2008 15:16:46 +1000
+
 refpolicy (2:0.0.20080702-3) unstable; urgency=low
 
   * More policy fixes.
-  * Made it build-depend on libsepol1 (>=2.0.30-2)
+  * Made it build-depend and depend on libsepol1 (>=2.0.30-2)
     Closes: #492318
   * Made it automatically change the SELINUXTYPE if the old value is obsolete
     and the policy was linked successfully.
