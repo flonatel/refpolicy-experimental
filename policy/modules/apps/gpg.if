@@ -92,6 +92,8 @@ template(`gpg_per_role_template',`
 	userdom_user_home_dir_filetrans_user_home_content($1, $1_gpg_t, file)
 	userdom_manage_user_home_content_files($1, $1_gpg_t)
 
+	userdom_tmp_filetrans_user_tmp($1, $1_gpg_t, file)
+
 	# transition from the userdomain to the derived domain
 	domtrans_pattern($2,gpg_exec_t,$1_gpg_t)
 

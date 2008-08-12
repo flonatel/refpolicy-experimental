@@ -105,7 +105,7 @@ my %map = (
            'uptime'        => [ 'uptimed' ],
            'usbmodules'    => [ 'usbutils' ],
 #           'usermanage'    => [ 'passwd' ],
-           'xserver'       => [ 'gdm', 'kdm', 'xdm', 'xserver*' ]
+           'xserver'       => [ 'gdm', 'kdm', 'xdm', 'xserver*', 'xbase-clients' ]
           );
 
 # Converts wildcard (glob) pattern into regex pattern (only `*' is wild).

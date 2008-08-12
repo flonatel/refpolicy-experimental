@@ -7,7 +7,7 @@ Homepage: http://serefpolicy.sourceforge.net/
 Maintainer: Russell Coker <russell@coker.com.au>
 Uploaders: Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
 Standards-Version: 3.7.3.0
-Build-Depends: policycoreutils (>= 2.0.27), checkpolicy (>= 2.0.4), python, m4, bzip2, gawk, libsepol1 (>=2.0.30-2)
+Build-Depends: policycoreutils (>= 2.0.49), checkpolicy (>= 2.0.16), python, m4, bzip2, gawk, libsepol1 (>=2.0.30-2)
 
 Package: selinux-policy-default
 Architecture: all

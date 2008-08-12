@@ -15,6 +15,8 @@ domain_entry_file(udev_t,udev_helper_exec_t)
 domain_interactive_fd(udev_t)
 init_daemon_domain(udev_t,udev_exec_t)
 
+init_domtrans_script(udev_t)
+
 type udev_etc_t alias etc_udev_t;
 files_config_file(udev_etc_t)
 
@@ -59,7 +61,7 @@ allow udev_t self:rawip_socket create_socket_perms;
 allow udev_t udev_helper_exec_t:dir list_dir_perms;
 can_exec(udev_t, udev_exec_t)
 
-allow udev_t udev_helper_exec_t:dir r_dir_perms;
+allow udev_t udev_helper_exec_t:dir list_dir_perms;
 
 # read udev config
 allow udev_t udev_etc_t:file read_file_perms;

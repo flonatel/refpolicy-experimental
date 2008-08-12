@@ -164,7 +164,7 @@ interface(`apt_read_cache',`
 	files_search_var($1)
 	allow $1 apt_var_cache_t:dir list_dir_perms;
 	dontaudit $1 apt_var_cache_t:dir write;
-	allow $1 apt_var_cache_t:file r_file_perms;
+	allow $1 apt_var_cache_t:file read_file_perms;
 ')
 
 ########################################

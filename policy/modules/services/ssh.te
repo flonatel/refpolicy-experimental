@@ -59,7 +59,7 @@ ifdef(`enable_mcs',`
 
 ifdef(`distro_debian', `
 # for key blacklist related to openssl bug
-	allow sshd_t usr_t:file r_file_perms;
+	allow sshd_t usr_t:file read_file_perms;
 ')
 
 #################################

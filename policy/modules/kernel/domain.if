@@ -743,7 +743,7 @@ interface(`domain_dontaudit_read_all_domains_state',`
 	')
 
 	dontaudit $1 domain:dir list_dir_perms;
-	dontaudit $1 domain:lnk_file read_file_perms;
+	dontaudit $1 domain:lnk_file read_lnk_file_perms;
 	dontaudit $1 domain:file read_file_perms;
 
 	# cjp: these should be removed:

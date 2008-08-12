@@ -100,8 +100,11 @@ files_read_all_pids(logrotate_t)
 files_manage_generic_spool(logrotate_t)
 files_manage_generic_spool_dirs(logrotate_t)
 
-# cjp: why is this needed?
+# logrotate has to restart some daemons
 init_domtrans_script(logrotate_t)
+
+# for runlevel
+init_dontaudit_write_utmp(logrotate_t)
 
 logging_manage_all_logs(logrotate_t)
 logging_send_syslog_msg(logrotate_t)

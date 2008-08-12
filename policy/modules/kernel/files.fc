@@ -252,4 +252,7 @@ HOME_ROOT/lost\+found/.*		<<none>>
 
 ifdef(`distro_debian',`
 /var/run/motd		--	gen_context(system_u:object_r:etc_runtime_t,s0)
+# on Debian /lib/init/rw is a tmpfs used like /var/run but
+# before /var is mounted
+/lib/init/rw		-d	gen_context(system_u:object_r:var_run_t,s0-mls_systemhigh)
 ')

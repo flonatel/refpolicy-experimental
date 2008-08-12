@@ -49,7 +49,7 @@ interface(`pythonsupport_compiled_read',`
 	')
 
 	files_search_var_lib($1)
-	allow $1 python_compiled_t:dir r_dir_perms;
-	allow $1 python_compiled_t:file r_file_perms;
-	allow $1 python_compiled_t:lnk_file r_file_perms;
+	allow $1 python_compiled_t:dir list_dir_perms;
+	allow $1 python_compiled_t:file read_file_perms;
+	allow $1 python_compiled_t:lnk_file read_lnk_file_perms;
 ')

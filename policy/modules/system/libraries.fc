@@ -306,6 +306,7 @@ ifdef(`distro_suse',`
 ')
 ifdef(`distro_debian', `
 /var/cache/ldconfig/aux-cache		--	gen_context(system_u:object_r:ld_so_cache_t,s0)
+/var/cache/ldconfig			-d	gen_context(system_u:object_r:etc_t,s0)
 ')
 
 /var/spool/postfix/lib(64)?(/.*)? 		gen_context(system_u:object_r:lib_t,s0)

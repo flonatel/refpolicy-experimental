@@ -59,9 +59,6 @@ ifdef(`distro_redhat',`
 /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)
 /usr/bin/xauth    	--      gen_context(system_u:object_r:xauth_exec_t,s0)
 /usr/bin/Xorg		--	gen_context(system_u:object_r:xserver_exec_t,s0)
-ifdef(`distro_debian', `
-/usr/sbin/gdm		--	gen_context(system_u:object_r:xdm_exec_t,s0)
-')
 
 /usr/lib(64)?/qt-.*/etc/settings(/.*)?	gen_context(system_u:object_r:xdm_var_run_t,s0)
 
@@ -82,9 +79,7 @@ ifdef(`distro_debian', `
 # /var
 #
 
-/var/[xgk]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
-
-/var/lib/[xkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
+/var/lib/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
 /var/lib/xkb(/.*)?		gen_context(system_u:object_r:xkb_var_lib_t,s0)
 
 /var/log/[kw]dm\.log	--	gen_context(system_u:object_r:xserver_log_t,s0)

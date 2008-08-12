@@ -176,8 +176,8 @@ seutil_manage_bin_policy(dpkg_t)
 sysnet_read_config(dpkg_t)
 
 userdom_use_unpriv_users_fds(dpkg_t)
-allow userdomain dpkg_var_lib_t:dir r_dir_perms;
-allow userdomain dpkg_var_lib_t:file r_file_perms;
+allow userdomain dpkg_var_lib_t:dir list_dir_perms;
+allow userdomain dpkg_var_lib_t:file read_file_perms;
 
 # transition to dpkg script:
 dpkg_domtrans_script(dpkg_t)

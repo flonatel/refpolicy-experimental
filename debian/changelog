@@ -1,3 +1,30 @@
+refpolicy (2:0.0.20080702-6) unstable; urgency=low
+
+  * Made it build-depend on policycoreutils 2.0.49 and checkpolicy 2.0.16.
+    Closes: #494234
+  * Made xserver.pp be loaded whenevedr xbase-clients is installed so that
+    /tmp/.ICE-unix gets the right context.
+  * Policy updates, allowed rsyslogd to work correctly
+    Allow gpg to read/write user files under /tmp
+    Set the context of /var/run/portmap_mapping and /var/cache/ldconfig
+    Allow users to read symlinks under /var/lib (for python)
+    Make udev_t transition when running initrc_exec_t.
+    Changed the type of /var/init/rw to var_run_t
+    Changed r_dir_perms to list_dir_perms and r_file_perms to read_file_perms
+    to avoid warnings.
+    Changed read_file_perms to read_lnk_file_perms for lnk_file class.
+    Set the contexts for /var/run/hotkey-setup, /var/run/motd, /var/run/kdm/*,
+    and /var/lib/gdm/*
+    Dontaudit logrotate_t trying to write initrc_var_run_t.
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 13 Aug 2008 08:20:08 +1000
+
+refpolicy (2:0.0.20080702-5) unstable; urgency=low
+
+  * Allow unconfined_r to transition to system_r.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 29 Jul 2008 18:02:33 +1000
+
 refpolicy (2:0.0.20080702-4) unstable; urgency=low
 
   * Policy updates.
