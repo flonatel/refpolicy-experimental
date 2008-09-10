@@ -26,8 +26,15 @@ files_pid_file(courier_var_run_t)
 type courier_exec_t;
 files_type(courier_exec_t)
 
+type courier_sqwebmail_cache_t;
+files_type(courier_sqwebmail_cache_t)
+
 courier_domain_template(sqwebmail)
 typealias courier_sqwebmail_exec_t alias sqwebmail_cron_exec_t;
+
+manage_files_pattern(courier_sqwebmail_t, courier_sqwebmail_cache_t, courier_sqwebmail_cache_t)
+
+dev_read_urand(courier_sqwebmail_t)
 
 ########################################
 #
@@ -105,6 +112,15 @@ userdom_manage_unpriv_users_home_content_files(courier_pop_t)
 # the regular home dir
 userdom_manage_unpriv_users_home_content_dirs(courier_pop_t)
 userdom_read_user_home_content_symlinks(user,courier_pop_t)
+
+optional_policy(`
+	gen_require(`
+		bool daemon_access_unconfined_home;
+	')
+	if(daemon_access_unconfined_home) {
+		unconfined_write_home_content_files(courier_pop_t)
+	}
+')
 
 ########################################
 #

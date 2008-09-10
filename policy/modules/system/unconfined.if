@@ -618,6 +618,26 @@ interface(`unconfined_read_home_content_files',`
 
 ########################################
 ## <summary>
+##	Read/write/create files in unconfined users home directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`unconfined_write_home_content_files',`
+	gen_require(`
+		type unconfined_home_dir_t, unconfined_home_t;
+	')
+
+	files_search_home($1)
+	userdom_user_home_dir_filetrans_user_home_content(unconfined, $1, { dir file })
+	userdom_manage_user_home_content_files(unconfined, $1)
+')
+
+########################################
+## <summary>
 ##	Read unconfined users temporary files.
 ## </summary>
 ## <param name="domain">

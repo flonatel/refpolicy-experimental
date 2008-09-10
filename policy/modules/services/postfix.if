@@ -186,9 +186,11 @@ template(`postfix_per_role_template',`
 	gen_require(`
 		attribute postfix_user_domains;
 		type postfix_postdrop_t;
+		type postfix_postqueue_t;
 	')
 
 	role $3 types postfix_postdrop_t;
+	role $3 types postfix_postqueue_t;
 
 	allow postfix_user_domains $2:process sigchld;
 	allow postfix_user_domains $2:fifo_file { write getattr };
@@ -524,3 +526,4 @@ interface(`postfix_domtrans_user_mail_handler',`
 
 	typeattribute $1 postfix_user_domtrans;
 ')
+

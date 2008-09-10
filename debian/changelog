@@ -1,3 +1,18 @@
+refpolicy (2:0.0.20080702-7) unstable; urgency=low
+
+  * Polish updates, added labelling for /lib/udev/create_static_nodes,
+    /var/log/prelink.log, and corrected labelling for /var/run/kdm
+  * Made Postfix work with unconfined_t.
+  * Made spamass-milter run in the spamd_t domain, and allow postfix_smtpd_t
+    to talk to it.
+  * Labelled /var/cache/sqwebmail and allowed courier_sqwebmail_t to access it.
+    Also allowed courier_sqwebmail_t to access /dev/urandom.
+  * Allowed courier-pop and apache to access unconfined home directories.
+  * Changed the policy for /var/cache/ldconfig to match upstream.
+  * Allowed unconfined_t to run run_init.
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 10 Sep 2008 11:10:00 +1000
+
 refpolicy (2:0.0.20080702-6) unstable; urgency=low
 
   * Made it build-depend on policycoreutils 2.0.49 and checkpolicy 2.0.16.

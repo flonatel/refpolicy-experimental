@@ -6,6 +6,7 @@ HOME_DIR/\.spamassassin(/.*)?	gen_context(system_u:object_r:ROLE_spamassassin_ho
 /usr/bin/spamd		--	gen_context(system_u:object_r:spamd_exec_t,s0)
 
 /usr/sbin/spamd		--	gen_context(system_u:object_r:spamd_exec_t,s0)
+/usr/sbin/spamass-milter --	gen_context(system_u:object_r:spamd_exec_t,s0)
 
 /var/lib/spamassassin(/.*)?	gen_context(system_u:object_r:spamd_var_lib_t,s0)
 
@@ -14,3 +15,4 @@ HOME_DIR/\.spamassassin(/.*)?	gen_context(system_u:object_r:ROLE_spamassassin_ho
 
 /var/spool/spamassassin(/.*)?	gen_context(system_u:object_r:spamd_spool_t,s0)
 /var/spool/spamd(/.*)?		gen_context(system_u:object_r:spamd_spool_t,s0)
+/var/spool/postfix/spamass(/.*)? gen_context(system_u:object_r:spamd_var_run_t,s0)

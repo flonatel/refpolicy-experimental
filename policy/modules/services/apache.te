@@ -398,6 +398,14 @@ tunable_policy(`httpd_enable_ftp_server',`
 tunable_policy(`httpd_enable_homedirs',`
 	userdom_read_unpriv_users_home_content_files(httpd_t)
 ')
+optional_policy(`
+	gen_require(`
+		bool daemon_access_unconfined_home;
+	')
+	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
+			unconfined_read_home_content_files(httpd_t)
+	')
+')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
 	fs_read_nfs_files(httpd_t)
@@ -647,6 +655,14 @@ tunable_policy(`httpd_enable_cgi && httpd_unified',`
 tunable_policy(`httpd_enable_homedirs',`
 	userdom_read_unpriv_users_home_content_files(httpd_suexec_t)
 ')
+optional_policy(`
+	gen_require(`
+		bool daemon_access_unconfined_home;
+	')
+	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
+			unconfined_read_home_content_files(httpd_suexec_t)
+	')
+')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
 	fs_read_nfs_files(httpd_suexec_t)
@@ -704,6 +720,14 @@ ifdef(`distro_redhat',`
 
 tunable_policy(`httpd_enable_homedirs',`
 	userdom_read_unpriv_users_home_content_files(httpd_sys_script_t)
+')
+optional_policy(`
+	gen_require(`
+		bool daemon_access_unconfined_home;
+	')
+	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
+			unconfined_read_home_content_files(httpd_sys_script_t)
+	')
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`

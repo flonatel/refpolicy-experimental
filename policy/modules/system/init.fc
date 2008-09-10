@@ -16,8 +16,8 @@ ifdef(`distro_gentoo',`
 /etc/x11/startDM\.sh	--	gen_context(system_u:object_r:initrc_exec_t,s0)
 ')
 ifdef(`distro_debian',`
-/var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_exec_t,s0)
-/var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_exec_t,s0)
+/var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+/var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
 ')
 
 #

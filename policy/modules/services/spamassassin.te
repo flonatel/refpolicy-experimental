@@ -27,6 +27,7 @@ application_executable_file(spamc_exec_t)
 type spamd_t;
 type spamd_exec_t;
 init_daemon_domain(spamd_t,spamd_exec_t)
+can_exec(spamd_t, spamc_exec_t)
 
 type spamd_spool_t;
 files_type(spamd_spool_t)
@@ -100,6 +101,7 @@ corenet_tcp_sendrecv_all_ports(spamd_t)
 corenet_udp_sendrecv_all_ports(spamd_t)
 corenet_tcp_bind_all_nodes(spamd_t)
 corenet_tcp_bind_spamd_port(spamd_t)
+corenet_tcp_connect_spamd_port(spamd_t)
 corenet_tcp_connect_razor_port(spamd_t)
 corenet_tcp_connect_smtp_port(spamd_t)
 corenet_sendrecv_razor_client_packets(spamd_t)
@@ -186,6 +188,7 @@ optional_policy(`
 
 optional_policy(`
 	postfix_read_config(spamd_t)
+	postfix_search_spool(spamd_t)
 ')
 
 optional_policy(`

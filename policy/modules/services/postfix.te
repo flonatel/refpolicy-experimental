@@ -255,6 +255,10 @@ allow postfix_cleanup_t postfix_spool_bounce_t:dir list_dir_perms;
 
 corecmd_exec_bin(postfix_cleanup_t)
 
+# for milters - may be a bug in postfix
+allow postfix_cleanup_t postfix_smtpd_t:fd use;
+allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write };
+
 ########################################
 #
 # Postfix local local policy
@@ -591,3 +595,8 @@ mta_delete_spool(postfix_virtual_t)
 # For reading spamassasin
 mta_read_config(postfix_virtual_t)
 mta_manage_spool(postfix_virtual_t)
+
+# for talking to spamass-milter
+optional_policy(`
+	spamassassin_connect_unix_sock(postfix_smtpd_t)
+')

@@ -22,6 +22,15 @@ type unconfined_execmem_exec_t;
 init_system_domain(unconfined_execmem_t, unconfined_execmem_exec_t)
 role unconfined_r types unconfined_execmem_t;
 
+## <desc>
+## <p>
+## Enabling this allows some daemons to access unconfined_home_dir_t and
+## unconfined_home_t as if they were regular home directories.  This does
+## reduce the protection...
+## </p>
+## </desc>
+gen_bool(daemon_access_unconfined_home,true)
+
 ########################################
 #
 # Local policy
@@ -52,6 +61,10 @@ unconfined_domain(unconfined_t)
 
 userdom_priveleged_home_dir_manager(unconfined_t)
 
+ifdef(`distro_debian',`
+	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
+	seutil_init_script_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
+')
 ifdef(`distro_gentoo',`
 	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
 	seutil_init_script_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
@@ -164,6 +177,8 @@ optional_policy(`
 	postfix_run_map(unconfined_t, unconfined_r, { unconfined_devpts_t unconfined_tty_device_t })
 	# cjp: this should probably be removed:
 	postfix_domtrans_master(unconfined_t)
+
+	postfix_per_role_template(unconfined, unconfined_t, unconfined_r)
 ')
 
 
