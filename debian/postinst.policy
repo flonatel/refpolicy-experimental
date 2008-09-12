@@ -265,29 +265,21 @@ sub main {
     &get_ordering();
     &installed_modules();
     chdir "$src_dir" or die "Can't access $src_dir";
-    if (system("semodule -b base.pp -s $policy_name -n ") == 0) {
-      print STDERR "Loaded base policy\n";
-      my $semod = "semodule";
-      if("$type" eq "default") {
-        $semod .= " -i unconfined.pp";
-      }
-      my $mod_list;
-      for my $mod (@Load_Order) {
-        $semod .= " -i ${mod}.pp";
-        $mod_list .= " $mod";
-      }
-      $semod .= " -s $policy_name -n";
-      if (system($semod) == 0) {
-        print STDERR "Loaded modules $mod_list\n";
-        change_policy_type();
-      }
-      else {
-        print STDERR "Error running \"$semod\", please fix manually and report a bug.\n";
-      }
+    my $semod = "semodule -b base.pp -s $policy_name -n ";
+    if("$type" eq "default") {
+      $semod .= " -i unconfined.pp";
+    }
+    my $mod_list;
+    for my $mod (@Load_Order) {
+      $semod .= " -i ${mod}.pp";
+      $mod_list .= " $mod";
+    }
+    if (system($semod) == 0) {
+      print STDERR "Loaded modules $mod_list\n";
+      change_policy_type();
     }
     else {
-      print STDERR "Could not load $src_dir/base.pp for $policy_name.\n";
-      print STDERR "Failed to load base policy, please load policy manually.\n";
+      print STDERR "Error running \"$semod\", please load policy manually and report a bug.\n";
     }
   }
   else {

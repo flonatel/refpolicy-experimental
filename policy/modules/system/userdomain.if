@@ -1433,6 +1433,12 @@ template(`userdom_admin_user_template',`
 	optional_policy(`
 		userhelper_exec($1_t)
 	')
+	optional_policy(`
+		gen_require(`
+			type $1_mail_t;
+		')
+		postfix_domtrans_master($1_mail_t)
+	')
 ')
 
 ########################################

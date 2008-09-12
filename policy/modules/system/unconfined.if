@@ -103,6 +103,7 @@ interface(`unconfined_domain_noaudit',`
 	optional_policy(`
 		xserver_unconfined($1)
 	')
+
 ')
 
 ########################################

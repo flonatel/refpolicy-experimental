@@ -1,3 +1,19 @@
+refpolicy (2:0.0.20080702-8) unstable; urgency=low
+
+  * Made the postinst faster on machines with small amounts of memory.  5%
+    improvement on AMD64 with 64M of RAM.  Not sure how much benefit it might
+    give for a NSLUG.
+  * Allowed dictd to create pid file.
+  * Allowed mcstransd to getcap.
+  * Revert part of the change from 2:0.0.20080702-7, we don't want /etc/init.d
+    scripts running as run_init_t.
+    Closes: #498965
+  * Makes Postfix work correctly.
+    Closes: #473043
+  * Allow $1_mail_t to read proc_t:file (for Postfix).
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 12 Sep 2008 10:51:01 +1000
+
 refpolicy (2:0.0.20080702-7) unstable; urgency=low
 
   * Polish updates, added labelling for /lib/udev/create_static_nodes,

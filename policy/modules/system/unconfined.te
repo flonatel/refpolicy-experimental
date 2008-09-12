@@ -63,7 +63,6 @@ userdom_priveleged_home_dir_manager(unconfined_t)
 
 ifdef(`distro_debian',`
 	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
-	seutil_init_script_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
 ')
 ifdef(`distro_gentoo',`
 	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
@@ -158,7 +157,14 @@ optional_policy(`
 ')
 
 optional_policy(`
+	gen_require(`
+		attribute can_system_change;
+	')
 	mta_per_role_template(unconfined, unconfined_t, unconfined_r)
+	postfix_domtrans_master(unconfined_mail_t)
+# this is not ideal.  It would probably be best if we could avoid the sysadm_r
+# transition.
+	typeattribute unconfined_mail_t can_system_change;
 ')
 
 optional_policy(`

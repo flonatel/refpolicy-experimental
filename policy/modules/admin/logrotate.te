@@ -122,9 +122,6 @@ userdom_use_unpriv_users_fds(logrotate_t)
 
 cron_system_entry(logrotate_t, logrotate_exec_t)
 cron_search_spool(logrotate_t)
-# for logcheck: (Note that this is a design-rule violation for refpolicy,
-# using crond_t in this file directly, should be via an interface!)
-allow crond_t logrotate_var_lib_t:dir search;
  
 mta_send_mail(logrotate_t)
 

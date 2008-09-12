@@ -96,6 +96,8 @@ template(`mta_base_mail_template',`
 
 	miscfiles_read_localization($1_mail_t)
 
+	kernel_read_system_state($1_mail_t)
+
 	optional_policy(`
 		postfix_domtrans_user_mail_handler($1_mail_t)
 	')
