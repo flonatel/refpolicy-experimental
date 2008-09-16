@@ -204,12 +204,13 @@ optional_policy(`
 # Partially converted rules.  THESE ARE ONLY TEMPORARY
 #
 
+mta_etc_filetrans_aliases(postfix_master_t)
+allow postfix_master_t etc_aliases_t:file manage_file_perms;
+
 ifdef(`distro_redhat',`
 	# for newer main.cf that uses /etc/aliases
 	allow postfix_master_t etc_aliases_t:dir manage_dir_perms;
-	allow postfix_master_t etc_aliases_t:file manage_file_perms;
 	allow postfix_master_t etc_aliases_t:lnk_file manage_lnk_file_perms;
-	mta_etc_filetrans_aliases(postfix_master_t)
 	filetrans_pattern(postfix_master_t,postfix_etc_t,etc_aliases_t,{ dir file lnk_file })
 ')
 

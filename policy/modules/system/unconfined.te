@@ -157,14 +157,17 @@ optional_policy(`
 ')
 
 optional_policy(`
-	gen_require(`
-		attribute can_system_change;
-	')
 	mta_per_role_template(unconfined, unconfined_t, unconfined_r)
-	postfix_domtrans_master(unconfined_mail_t)
+
+	optional_policy(`
+		gen_require(`
+			attribute can_system_change;
+		')
+		postfix_domtrans_master(unconfined_mail_t)
 # this is not ideal.  It would probably be best if we could avoid the sysadm_r
 # transition.
-	typeattribute unconfined_mail_t can_system_change;
+		typeattribute unconfined_mail_t can_system_change;
+	')
 ')
 
 optional_policy(`

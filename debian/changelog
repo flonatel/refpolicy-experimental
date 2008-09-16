@@ -1,3 +1,15 @@
+refpolicy (2:0.0.20080702-9) unstable; urgency=low
+
+  * Allow the Postfix newaliases to create new /etc/aliases.db file so that
+    the postinst for Postfix can work.
+  * The last update broke unconfined_mail_t for systems not running postfix,
+    fixing that (thanks Martin Orr).
+    Closes: #499064
+  * Fix a check for syslogd being executable by logrotate (thanks Václav Ovsk).
+    Closes: #496809
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 16 Sep 2008 20:42:00 +1000
+
 refpolicy (2:0.0.20080702-8) unstable; urgency=low
 
   * Made the postinst faster on machines with small amounts of memory.  5%
