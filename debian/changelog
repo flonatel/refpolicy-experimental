@@ -1,3 +1,22 @@
+refpolicy (2:0.0.20080702-10) unstable; urgency=low
+
+  * Allow mailserver local delivery agent to manage_file_perm access to
+    mail_spool_t
+    Closes: #499218
+  * Build a module for xen, and make lvm support optional in it.
+  * Make the postinst link the xen, lvm, and pcmcia modules if appropriate.
+  * Added the clamav module to the policy.
+  * Wrote a new DKIM module.
+  * Allowed crontab to create directories under /tmp.
+  * Made unconfined_crond_t an alias for unconfined_t and made unconfined cron
+    jobs work.
+  * Built the NAGIOS module and include the suggested change from #493979.
+    NB I won't have time to do any testing of this so someone else will need
+    to deploy it on a fully functional NAGIOS system.
+    Closes: #493979
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 19 Sep 2008 22:25:00 +1000
+
 refpolicy (2:0.0.20080702-9) unstable; urgency=low
 
   * Allow the Postfix newaliases to create new /etc/aliases.db file so that

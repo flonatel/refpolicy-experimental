@@ -27,6 +27,10 @@ logging_log_file(clamd_var_log_t)
 type clamd_var_lib_t;
 files_type(clamd_var_lib_t)
 
+# spool files
+type clamd_spool_t;
+files_type(clamd_spool_t)
+
 # pid files
 type clamd_var_run_t;
 files_pid_file(clamd_var_run_t)
@@ -73,6 +77,10 @@ files_tmp_filetrans(clamd_t,clamd_tmp_t,{ file dir })
 manage_dirs_pattern(clamd_t,clamd_var_lib_t,clamd_var_lib_t)
 manage_files_pattern(clamd_t,clamd_var_lib_t,clamd_var_lib_t)
 
+# spool files
+manage_dirs_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
+manage_files_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
+
 # log files
 manage_dirs_pattern(clamd_t,clamd_var_log_t,clamd_var_log_t)
 manage_files_pattern(clamd_t,clamd_var_log_t,clamd_var_log_t)
@@ -87,6 +95,9 @@ files_pid_filetrans(clamd_t,clamd_var_run_t,{ file dir })
 kernel_dontaudit_list_proc(clamd_t)
 kernel_read_sysctl(clamd_t)
 kernel_read_kernel_sysctls(clamd_t)
+
+# for /proc/meminfo
+allow clamd_t proc_t:file { getattr read };
 
 corenet_all_recvfrom_unlabeled(clamd_t)
 corenet_all_recvfrom_netlabel(clamd_t)
@@ -132,6 +143,8 @@ optional_policy(`
 #
 # Freshclam local policy
 #
+
+files_search_var_lib(freshclam_t)
 
 allow freshclam_t self:capability { setgid setuid dac_override };
 allow freshclam_t self:fifo_file rw_fifo_file_perms;

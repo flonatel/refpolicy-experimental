@@ -298,6 +298,27 @@ bootloader = module
 storage = base
 
 # Layer: services
+# Module: nagios
+#
+# Policy for NAGIOS network monitor
+#
+nagios = module
+
+# Layer: services
+# Module: dkim
+#
+# Policy for DKIM mail signing milter
+# 
+dkim = module
+
+# Layer: services
+# Module: clamav
+#
+# Policy for Clam Anti Virus
+#
+clamav = module
+
+# Layer: services
 # Module: nis
 #
 # Policy for NIS (YP) servers and clients
@@ -881,6 +902,13 @@ selinuxutil = base
 # Policy for udev.
 # 
 udev = base
+
+# Layer: system
+# Module: xen
+#
+# Xen virtualisation management
+#
+xen = module
 
 # Layer: system
 # Module: pcmcia

@@ -193,7 +193,9 @@ locallogin_dontaudit_use_fds(xend_t)
 
 logging_send_syslog_msg(xend_t)
 
-lvm_domtrans(xend_t)
+optional_policy(`
+	lvm_domtrans(xend_t)
+')
 
 miscfiles_read_localization(xend_t)
 

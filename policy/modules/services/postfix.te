@@ -566,6 +566,14 @@ optional_policy(`
 ')
 
 optional_policy(`
+	clamav_stream_connect(postfix_smtpd_t)
+')
+
+optional_policy(`
+	dkim_stream_connect(postfix_smtpd_t)
+')
+
+optional_policy(`
 	sasl_connect(postfix_smtpd_t)
 ')
 

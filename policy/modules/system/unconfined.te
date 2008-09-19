@@ -89,9 +89,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	cron_per_role_template(unconfined, unconfined_t, unconfined_r)
-	# this is disallowed usage:
-	unconfined_domain(unconfined_crond_t)
+	cron_existing_domain_per_role_template(unconfined, unconfined_t, unconfined_r)
 ')
 
 optional_policy(`
