@@ -66,6 +66,7 @@ my %map = (
            'amavis'        => [ 'amavisd-new' ],
            'apache'        => [ 'apache*' ],
            'apm'           => [ 'acpid' ],
+           'asterisk'      => [ 'asterisk' ],
            'automount'     => [ 'autofs*' ],
            'avahi'         => [ 'avahi-*' ],
            'bind'          => [ 'bind9' ],

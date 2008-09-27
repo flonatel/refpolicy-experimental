@@ -48,6 +48,8 @@ type freshclam_t;
 type freshclam_exec_t;
 init_daemon_domain(freshclam_t, freshclam_exec_t)
 
+allow freshclam_t self:netlink_route_socket r_netlink_socket_perms;
+
 # log files
 type freshclam_var_log_t;
 logging_log_file(freshclam_var_log_t)
@@ -62,6 +64,12 @@ allow clamd_t self:fifo_file rw_fifo_file_perms;
 allow clamd_t self:unix_stream_socket create_stream_socket_perms;
 allow clamd_t self:unix_dgram_socket create_socket_perms;
 allow clamd_t self:tcp_socket { listen accept };
+corecmd_search_bin(clamd_t)
+corecmd_read_bin_symlinks(clamd_t)
+optional_policy(`
+# to allow creating the unix domain socket
+	postfix_search_spool(clamd_t)
+')
 
 # configuration files
 allow clamd_t clamd_etc_t:dir list_dir_perms;
@@ -131,6 +139,7 @@ sysnet_dns_name_resolve(clamd_t)
 cron_use_fds(clamd_t)
 cron_use_system_job_fds(clamd_t)
 cron_rw_pipes(clamd_t)
+crond_search_dir(clamd_var_lib_t)
 
 optional_policy(`
 	amavis_read_lib_files(clamd_t)
@@ -179,6 +188,7 @@ corenet_tcp_sendrecv_all_nodes(freshclam_t)
 corenet_tcp_sendrecv_all_ports(freshclam_t)
 corenet_tcp_sendrecv_clamd_port(freshclam_t)
 corenet_tcp_connect_http_port(freshclam_t)
+corenet_tcp_connect_http_cache_port(freshclam_t)
 corenet_sendrecv_http_client_packets(freshclam_t)
 
 dev_read_rand(freshclam_t)

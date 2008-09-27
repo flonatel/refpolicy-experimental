@@ -1,3 +1,21 @@
+refpolicy (2:0.0.20080702-11) unstable; urgency=high
+
+  * Create new interface crond_search_dir() and use it to allow crond_t to
+    search clamd_var_lib_t for amavis cron jobs.
+  * Allow postfix_cleanup_t to talk to dkim for signing local messages.
+  * Allow freshclam_t to read the routing table and talk to http_cache_port_t.
+  * Allow clamd_t to search bin_t and read bin_t links.
+  * Allow clamd_t to search postfix_spool_t for creation of Unix domain socket
+    in the sub-directory, this is ugly and a little bit wrong but makes it
+    easier to configure Postfix.
+  * Allow semanage_t (for setsebool and semodule) to call statfs().
+  * Add Asterisk policy module, and grant setcap access.
+  * Copy the Fedora 10 cron changes to reduce the policy size.
+    Allow user_t to send sigchld to user_crontab_t and to write to
+    user_crontab_tmp_t files.  Necessary for full functionality!
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 27 Sep 2008 18:52:00 +1000
+
 refpolicy (2:0.0.20080702-10) unstable; urgency=low
 
   * Allow mailserver local delivery agent to manage_file_perm access to

@@ -439,6 +439,7 @@ allow semanage_t self:capability { dac_override audit_write };
 allow semanage_t self:unix_stream_socket create_stream_socket_perms;
 allow semanage_t self:unix_dgram_socket create_socket_perms;
 allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
+fs_getattr_xattr_fs(semanage_t)
 
 allow semanage_t policy_config_t:file { read write };
 

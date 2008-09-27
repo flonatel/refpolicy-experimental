@@ -319,6 +319,13 @@ dkim = module
 clamav = module
 
 # Layer: services
+# Module: asterisk
+#
+# Policy for Asterisk VOIP server
+# 
+asterisk = module
+
+# Layer: services
 # Module: nis
 #
 # Policy for NIS (YP) servers and clients

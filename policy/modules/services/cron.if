@@ -39,14 +39,13 @@ template(`cron_per_role_template',`
 		type crond_t, cron_spool_t, crontab_exec_t;
 		class dbus send_msg;
 	')
+	typealias $1_t alias $1_crond_t;
 
 	# Type of user crontabs once moved to cron spool.
 	type $1_cron_spool_t, cron_spool_type;
 	files_type($1_cron_spool_t)
 
-	type $1_crond_t;
-	domain_type($1_crond_t)
-	domain_cron_exemption_target($1_crond_t)
+	domain_cron_exemption_target($1_t)
 	corecmd_shell_entry_type($1_crond_t)
 	role $3 types $1_crond_t;
 
@@ -62,12 +61,6 @@ template(`cron_per_role_template',`
 	# $1_crond_t local policy
 	#
 
-	allow $1_crond_t self:capability dac_override;
-	allow $1_crond_t self:process { signal_perms setsched };
-	allow $1_crond_t self:fifo_file rw_fifo_file_perms;
-	allow $1_crond_t self:unix_stream_socket create_stream_socket_perms;
-	allow $1_crond_t self:unix_dgram_socket create_socket_perms;
-
 	# The entrypoint interface is not used as this is not
 	# a regular entrypoint.  Since crontab files are
 	# not directly executed, crond must ensure that
@@ -81,109 +74,16 @@ template(`cron_per_role_template',`
 	# The transition is requested explicitly by the modified crond 
 	# via setexeccon.  There is no way to set up an automatic
 	# transition, since crontabs are configuration files, not executables.
-	allow crond_t $1_crond_t:process transition;
-	dontaudit crond_t $1_crond_t:process { noatsecure siginh rlimitinh };
-	allow crond_t $1_crond_t:fd use;
-	allow $1_crond_t crond_t:fd use;
-	allow $1_crond_t crond_t:fifo_file rw_file_perms;
-	allow $1_crond_t crond_t:process sigchld;
-
-	kernel_read_system_state($1_crond_t)
-	kernel_read_kernel_sysctls($1_crond_t)
-
-	# ps does not need to access /boot when run from cron
-	files_dontaudit_search_boot($1_crond_t)
-
-	corenet_all_recvfrom_unlabeled($1_crond_t)
-	corenet_all_recvfrom_netlabel($1_crond_t)
-	corenet_tcp_sendrecv_all_if($1_crond_t)
-	corenet_udp_sendrecv_all_if($1_crond_t)
-	corenet_tcp_sendrecv_all_nodes($1_crond_t)
-	corenet_udp_sendrecv_all_nodes($1_crond_t)
-	corenet_tcp_sendrecv_all_ports($1_crond_t)
-	corenet_udp_sendrecv_all_ports($1_crond_t)
-	corenet_tcp_connect_all_ports($1_crond_t)
-	corenet_sendrecv_all_client_packets($1_crond_t)
-
-	dev_read_urand($1_crond_t)
-
-	fs_getattr_all_fs($1_crond_t)
-
-	corecmd_exec_all_executables($1_crond_t)
-
-	# quiet other ps operations
-	domain_dontaudit_read_all_domains_state($1_crond_t)
-	domain_dontaudit_getattr_all_domains($1_crond_t)
-
-	files_read_usr_files($1_crond_t)
-	files_exec_etc_files($1_crond_t)
-	# for nscd:
-	files_dontaudit_search_pids($1_crond_t)
-
-	libs_use_ld_so($1_crond_t)
-	libs_use_shared_libs($1_crond_t)
-	libs_exec_lib_files($1_crond_t)
-	libs_exec_ld_so($1_crond_t)
-
-	files_read_etc_runtime_files($1_crond_t)
-	files_read_var_files($1_crond_t)
-	files_search_spool($1_crond_t)
-
-	logging_search_logs($1_crond_t)
-
-	seutil_read_config($1_crond_t)
-
-	miscfiles_read_localization($1_crond_t)
-
-	userdom_manage_user_tmp_files($1,$1_crond_t)
-	userdom_manage_user_tmp_symlinks($1,$1_crond_t)
-	userdom_manage_user_tmp_pipes($1,$1_crond_t)
-	userdom_manage_user_tmp_sockets($1,$1_crond_t)
-	# Run scripts in user home directory and access shared libs.
-	userdom_exec_user_home_content_files($1,$1_crond_t)
-	# Access user files and dirs.
-#	userdom_manage_user_home_subdir_dirs($1,$1_crond_t)
-	userdom_manage_user_home_content_files($1,$1_crond_t)
-	userdom_manage_user_home_content_symlinks($1,$1_crond_t)
-	userdom_manage_user_home_content_pipes($1,$1_crond_t)
-	userdom_manage_user_home_content_sockets($1,$1_crond_t)
-#	userdom_user_home_dir_filetrans_user_home_content($1,$1_crond_t,notdevfile_class_set)
+	allow crond_t $1_t:process transition;
+	dontaudit crond_t $1_t:process { noatsecure siginh rlimitinh };
+	allow crond_t $1_t:fd use;
+	allow $1_t crond_t:fd use;
+	allow $1_t crond_t:fifo_file rw_file_perms;
+	allow $1_t crond_t:process sigchld;
 
 	tunable_policy(`fcron_crond', `
 		allow crond_t $1_cron_spool_t:file manage_file_perms;
 	')
-
-	# need a per-role version of this:
-	#optional_policy(`
-	#	mono_domtrans($1_crond_t)
-	#')
-
-	optional_policy(`
-		dbus_stub($1_crond_t)
-
-		allow $1_crond_t $2:dbus send_msg;
-	')		
-
-	optional_policy(`
-		nis_use_ypbind($1_crond_t)
-	')
-
-	ifdef(`TODO',`
-	optional_policy(`
-		create_dir_file($1_crond_t, httpd_$1_content_t)
-	')
-	allow $1_crond_t tmp_t:dir rw_dir_perms;
-	type_transition $1_crond_t $1_tmp_t:{ file lnk_file sock_file fifo_file } $1_tmp_t;
-
-	ifdef(`mta.te', `
-		domain_auto_trans($1_crond_t, sendmail_exec_t, $1_mail_t)
-		allow $1_crond_t sendmail_exec_t:lnk_file read_lnk_file_perms;
-
-		# $1_mail_t should only be reading from the cron fifo not needing to write
-		dontaudit $1_mail_t crond_t:fifo_file write;
-		allow mta_user_agent $1_crond_t:fd use;
-	')
-	') dnl endif TODO
 
 	##############################
 	#
@@ -209,6 +109,8 @@ template(`cron_per_role_template',`
 	allow $1_crontab_t $1_crontab_tmp_t:file manage_file_perms;
 	allow $1_crontab_t $1_crontab_tmp_t:dir manage_dir_perms;
 	files_tmp_filetrans($1_crontab_t,$1_crontab_tmp_t,{ file dir })
+	allow $2 $1_crontab_tmp_t:dir rw_dir_perms;
+	allow $2 $1_crontab_tmp_t:file manage_file_perms;
 
 	# create files in /var/spool/cron
 	manage_files_pattern($1_crontab_t,cron_spool_t,$1_cron_spool_t)
@@ -228,6 +130,7 @@ template(`cron_per_role_template',`
 	# Run helper programs as the user domain
 	corecmd_bin_domtrans($1_crontab_t,$2)
 	corecmd_shell_domtrans($1_crontab_t,$2)
+	allow $2 $1_crontab_t:process sigchld;
 
 	domain_use_interactive_fds($1_crontab_t)
 
@@ -443,13 +346,11 @@ template(`cron_existing_domain_per_role_template', `
 template(`cron_admin_template',`
 	gen_require(`
 		attribute cron_spool_type;
-		type $1_crontab_t, $1_crond_t;
+		type $1_crontab_t;
 	')
 
 	# Allow our crontab domain to unlink a user cron spool file.
 	allow $1_crontab_t cron_spool_type:file { getattr read unlink };
-
-	logging_read_generic_logs($1_crond_t)
 
 	# Manipulate other users crontab.
 	selinux_get_fs_mount($1_crontab_t)
@@ -740,4 +641,23 @@ interface(`cron_dontaudit_append_system_job_tmp_files',`
 	')
 
 	dontaudit $1 system_crond_tmp_t:file append;
+')
+
+########################################
+## <summary>
+##	Allow crond to search directories that are home directories for
+##	accounts used or parent directories of home directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Type of directory that crond_t may search.
+##	</summary>
+## </param>
+#
+interface(`crond_search_dir',`
+	gen_require(`
+		type crond_t;
+	')
+
+	allow crond_t $1:dir search;
 ')

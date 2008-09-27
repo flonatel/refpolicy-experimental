@@ -571,6 +571,7 @@ optional_policy(`
 
 optional_policy(`
 	dkim_stream_connect(postfix_smtpd_t)
+	dkim_stream_connect(postfix_cleanup_t)
 ')
 
 optional_policy(`
