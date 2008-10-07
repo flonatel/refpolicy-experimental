@@ -298,6 +298,13 @@ bootloader = module
 storage = base
 
 # Layer: services
+# Module: audioentropy
+#
+# Policy for daemons that use a microphone input as a source of entropy
+# 
+audioentropy = module
+
+# Layer: services
 # Module: nagios
 #
 # Policy for NAGIOS network monitor

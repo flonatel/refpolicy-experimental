@@ -1,3 +1,15 @@
+refpolicy (2:0.0.20080702-12) unstable; urgency=low
+
+  * Allow procmail to deliver mail to the unconfined home directories if
+    daemon_access_unconfined_home is set.
+  * Add the audioentropy module for use with the randomsound package.
+  * Allow spamd_t the kill capability.
+  * Make the default range for MCS __default__ users be s0-s0:c0.c1023,
+    this fixes a problem with restarting daemons after logging in as non-root
+    and running "su -".
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 07 Oct 2008 13:17:01 +1100
+
 refpolicy (2:0.0.20080702-11) unstable; urgency=high
 
   * Create new interface crond_search_dir() and use it to allow crond_t to

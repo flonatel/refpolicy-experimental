@@ -1,5 +1,5 @@
 
-policy_module(apt,1.4.0)
+policy_module(apt, 1.4.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(apt,1.4.0)
 
 type apt_t;
 type apt_exec_t;
-init_system_domain(apt_t,apt_exec_t)
+init_system_domain(apt_t, apt_exec_t)
 domain_system_change_exemption(apt_t)
 role system_r types apt_t;
 
@@ -62,28 +62,28 @@ allow apt_t self:msg { send receive };
 allow apt_t self:netlink_route_socket r_netlink_socket_perms;
 
 # Access /var/cache/apt files
-manage_files_pattern(apt_t,apt_var_cache_t,apt_var_cache_t)
-files_var_filetrans(apt_t,apt_var_cache_t,dir)
+manage_files_pattern(apt_t, apt_var_cache_t, apt_var_cache_t)
+files_var_filetrans(apt_t, apt_var_cache_t, dir)
 
-manage_dirs_pattern(apt_t,apt_tmp_t,apt_tmp_t)
-manage_files_pattern(apt_t,apt_tmp_t,apt_tmp_t)
+manage_dirs_pattern(apt_t, apt_tmp_t, apt_tmp_t)
+manage_files_pattern(apt_t, apt_tmp_t, apt_tmp_t)
 files_tmp_filetrans(apt_t, apt_tmp_t, { file dir })
 
-manage_dirs_pattern(apt_t,apt_tmpfs_t,apt_tmpfs_t)
-manage_files_pattern(apt_t,apt_tmpfs_t,apt_tmpfs_t)
-manage_lnk_files_pattern(apt_t,apt_tmpfs_t,apt_tmpfs_t)
-manage_fifo_files_pattern(apt_t,apt_tmpfs_t,apt_tmpfs_t)
-manage_sock_files_pattern(apt_t,apt_tmpfs_t,apt_tmpfs_t)
-fs_tmpfs_filetrans(apt_t,apt_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
+manage_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
+manage_lnk_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
+manage_fifo_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
+manage_sock_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
+fs_tmpfs_filetrans(apt_t, apt_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
 # Access /var/lib/apt files
-manage_files_pattern(apt_t,apt_var_lib_t,apt_var_lib_t)
-files_var_lib_filetrans(apt_t,apt_var_lib_t,dir)
+manage_files_pattern(apt_t, apt_var_lib_t, apt_var_lib_t)
+files_var_lib_filetrans(apt_t, apt_var_lib_t, dir)
 
 # lock files
 allow apt_t apt_lock_t:dir manage_dir_perms;
 allow apt_t apt_lock_t:file manage_file_perms;
-files_lock_filetrans(apt_t,apt_lock_t,{dir file})
+files_lock_filetrans(apt_t, apt_lock_t, {dir file})
 
 # log files
 allow apt_t apt_var_log_t:file manage_file_perms;
@@ -145,7 +145,7 @@ sysnet_read_config(apt_t)
 
 # with boolean, for cron-apt and such?
 #optional_policy(`
-#	cron_system_entry(apt_t,apt_exec_t)
+#	cron_system_entry(apt_t, apt_exec_t)
 #')
 
 optional_policy(`

@@ -75,6 +75,15 @@ miscfiles_read_localization(procmail_t)
 # only works until we define a different type for maildir
 userdom_priveleged_home_dir_manager(procmail_t)
 
+optional_policy(`
+	gen_require(`
+		bool daemon_access_unconfined_home;
+	')
+	tunable_policy(`daemon_access_unconfined_home', `
+		unconfined_read_home_content_files(procmail_t)
+	')
+')
+
 # Do not audit attempts to access /root.
 staff_dontaudit_search_home_dirs(procmail_t)
 sysadm_dontaudit_search_home_dirs(procmail_t)
