@@ -227,6 +227,7 @@ manage_fifo_files_pattern(initrc_t,initrc_state_t,initrc_state_t)
 
 allow initrc_t initrc_var_run_t:file manage_file_perms;
 files_pid_filetrans(initrc_t,initrc_var_run_t,file)
+storage_var_run_filetrans_fixed_disk(initrc_t)
 
 can_exec(initrc_t,initrc_tmp_t)
 allow initrc_t initrc_tmp_t:file manage_file_perms;

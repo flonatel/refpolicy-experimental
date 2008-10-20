@@ -1,3 +1,18 @@
+refpolicy (2:0.0.20080702-13) unstable; urgency=high
+
+  * Allow spamd_t to create a Unix domain socket.
+  * Allow clamd_t to read files under /usr (for Perl).
+    Allow it to connect to amavisd_send_port_t.
+    Allow it to talk to itself by unix stream sockets and bind to UDP nodes.
+    Closes: #502274
+  * Allow logrotate_t to transition to webalizer_t for web log processing.
+  * Allow initrc_t to create fixed_disk_device_t nodes under var_run_t,
+    for the case where /etc/fstab has an error regarding the root fs.
+  * Use the Lenny paths for xm, xend, xenstored, and xenconsoled.
+    Add some extra permissions that Xen needs.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 21 Oct 2008 00:36:00 +1100
+
 refpolicy (2:0.0.20080702-12) unstable; urgency=low
 
   * Allow procmail to deliver mail to the unconfined home directories if

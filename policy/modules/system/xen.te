@@ -34,6 +34,9 @@ type xend_var_lib_t;
 files_type(xend_var_lib_t)
 # for mounting an NFS store
 files_mountpoint(xend_var_lib_t)
+fs_getattr_xattr_fs(xend_t)
+# for /var/lib/python-support/python2.5/.path
+files_read_var_lib_files(xend_t)
 
 # log files
 type xend_var_log_t;
@@ -123,10 +126,7 @@ manage_fifo_files_pattern(xend_t,xend_var_lib_t,xend_var_lib_t)
 files_var_lib_filetrans(xend_t,xend_var_lib_t,{ file dir })
 
 # transition to store
-domain_auto_trans(xend_t, xenstored_exec_t, xenstored_t)
-allow xenstored_t xend_t:fd use;
-allow xenstored_t xend_t:process sigchld;
-allow xenstored_t xend_t:fifo_file write;
+domtrans_pattern(xend_t, xenstored_exec_t, xenstored_t)
 
 # transition to console
 domain_auto_trans(xend_t, xenconsoled_exec_t, xenconsoled_t)
@@ -167,7 +167,6 @@ dev_rw_sysfs(xend_t)
 dev_rw_xen(xend_t)
 
 domain_read_all_domains_state(xend_t)
-domain_dontaudit_read_all_domains_state(xend_t)
 domain_dontaudit_ptrace_all_domains(xend_t)
 
 files_read_etc_files(xend_t)
@@ -226,7 +225,7 @@ optional_policy(`
 
 allow xenconsoled_t self:capability { dac_override fsetid ipc_lock };
 allow xenconsoled_t self:unix_stream_socket create_stream_socket_perms;
-allow xenconsoled_t self:fifo_file { read write };
+allow xenconsoled_t self:fifo_file rw_fifo_file_perms;
 
 allow xenconsoled_t xen_devpts_t:chr_file rw_term_perms;
 
@@ -245,6 +244,7 @@ dev_rw_sysfs(xenconsoled_t)
 
 domain_dontaudit_ptrace_all_domains(xenconsoled_t)
 
+corecmd_search_bin(xenconsoled_t)
 files_read_usr_files(xenconsoled_t)
 
 term_create_pty(xenconsoled_t,xen_devpts_t);
@@ -281,6 +281,9 @@ manage_dirs_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
 manage_files_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
 manage_sock_files_pattern(xenstored_t,xenstored_var_lib_t,xenstored_var_lib_t)
 files_var_lib_filetrans(xenstored_t,xenstored_var_lib_t,{ file dir sock_file })
+allow xend_t xenstored_var_lib_t:dir rw_dir_perms;
+allow xend_t xenstored_var_lib_t:file unlink;
+corecmd_search_bin(xenstored_t)
 
 kernel_write_xen_state(xenstored_t)
 kernel_read_xen_state(xenstored_t)
@@ -320,7 +323,7 @@ xen_append_log(xenstored_t)
 allow xm_t self:capability { dac_override ipc_lock sys_tty_config };
 
 # internal communication is often done using fifo and unix sockets.
-allow xm_t self:fifo_file { read write };
+allow xm_t self:fifo_file rw_fifo_file_perms;
 allow xm_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow xm_t self:tcp_socket create_stream_socket_perms;
 

@@ -59,13 +59,17 @@ logging_log_file(freshclam_var_log_t)
 # clamd local policy
 #
 
+allow clamd_t self:process signull;
+allow clamd_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow clamd_t self:capability { kill setgid setuid dac_override };
 allow clamd_t self:fifo_file rw_fifo_file_perms;
 allow clamd_t self:unix_stream_socket create_stream_socket_perms;
 allow clamd_t self:unix_dgram_socket create_socket_perms;
 allow clamd_t self:tcp_socket { listen accept };
-corecmd_search_bin(clamd_t)
+corecmd_exec_bin(clamd_t)
 corecmd_read_bin_symlinks(clamd_t)
+files_read_usr_files(clamd_t)
+
 optional_policy(`
 # to allow creating the unix domain socket
 	postfix_search_spool(clamd_t)
@@ -113,9 +117,11 @@ corenet_tcp_sendrecv_all_if(clamd_t)
 corenet_tcp_sendrecv_all_nodes(clamd_t)
 corenet_tcp_sendrecv_all_ports(clamd_t)
 corenet_tcp_sendrecv_clamd_port(clamd_t)
+corenet_tcp_sendrecv_amavisd_send_port(clamd_t)
 corenet_tcp_bind_all_nodes(clamd_t)
 corenet_tcp_bind_clamd_port(clamd_t)
 corenet_sendrecv_clamd_server_packets(clamd_t)
+corenet_udp_bind_all_nodes(clamd_t)
 
 dev_read_rand(clamd_t)
 dev_read_urand(clamd_t)

@@ -249,6 +249,24 @@ interface(`storage_tmpfs_filetrans_fixed_disk',`
 
 ########################################
 ## <summary>
+##	Create block devices in a directory labelled as var_run_t
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`storage_var_run_filetrans_fixed_disk',`
+	gen_require(`
+		type fixed_disk_device_t;
+	')
+
+	files_pid_filetrans($1,fixed_disk_device_t,blk_file)
+')
+
+########################################
+## <summary>
 ##	Relabel fixed disk device nodes.
 ## </summary>
 ## <param name="domain">

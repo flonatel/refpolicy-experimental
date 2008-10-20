@@ -41,6 +41,7 @@ files_type(spamd_var_lib_t)
 
 type spamd_var_run_t;
 files_pid_file(spamd_var_run_t)
+manage_sock_files_pattern(spamd_t,spamd_var_run_t,spamd_var_run_t)
 
 type spamassassin_exec_t;
 application_executable_file(spamassassin_exec_t)
