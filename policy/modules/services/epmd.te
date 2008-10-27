@@ -1,0 +1,52 @@
+
+policy_module(epmd, 1.7.1)
+
+########################################
+#
+# Declarations
+#
+
+## <desc>
+## <p>
+## Allow the Erlang Port mapper to coordinate all nodes in distributed
+## computing.  It also wants to run on single nodes so any daemon written in
+## Erlang will need it.
+## </p>
+## </desc>
+
+type epmd_t;
+type epmd_exec_t;
+init_daemon_domain(epmd_t,epmd_exec_t)
+role system_r types epmd_t;
+
+########################################
+#
+# epmd local policy
+#
+
+allow epmd_t self:tcp_socket create_stream_socket_perms;
+#allow epmd_t self:udp_socket create_socket_perms;
+
+corenet_all_recvfrom_unlabeled(epmd_t)
+corenet_all_recvfrom_netlabel(epmd_t)
+corenet_tcp_bind_epmd_port(epmd_t)
+corenet_tcp_sendrecv_all_if(epmd_t)
+#corenet_udp_sendrecv_all_if(epmd_t)
+corenet_tcp_sendrecv_all_nodes(epmd_t)
+#corenet_udp_sendrecv_all_nodes(epmd_t)
+corenet_tcp_sendrecv_all_ports(epmd_t)
+#corenet_udp_sendrecv_all_ports(epmd_t)
+corenet_tcp_bind_all_nodes(epmd_t)
+#corenet_udp_bind_all_nodes(epmd_t)
+#corenet_tcp_connect_all_ports(epmd_t)
+#corenet_udp_bind_all_unreserved_ports(epmd_t)
+
+files_read_etc_files(epmd_t)
+
+libs_use_ld_so(epmd_t)
+libs_use_shared_libs(epmd_t)
+
+logging_send_syslog_msg(epmd_t)
+
+miscfiles_read_localization(epmd_t)
+

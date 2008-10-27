@@ -170,6 +170,8 @@ sysnet_etc_filetrans_config(udev_t)
 
 userdom_dontaudit_search_all_users_home_content(udev_t)
 
+fstools_getattr_swap_files(udev_t)
+
 ifdef(`distro_gentoo',`
 	# during boot, init scripts use /dev/.rcsysinit
 	# existance to determine if we are in early booting

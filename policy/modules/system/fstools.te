@@ -184,4 +184,5 @@ optional_policy(`
 
 optional_policy(`
 	xen_append_log(fsadm_t)
+	xen_rw_image_files(fsadm_t)
 ')

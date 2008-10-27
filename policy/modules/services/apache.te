@@ -442,7 +442,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+# for cron jobs to restart Apache
 	cron_system_entry(httpd_t, httpd_exec_t)
+# For cron jobs to run from accounts with home directories in the web store
+	crond_search_dir(httpd_sys_content_t)
 ')
 
 optional_policy(`

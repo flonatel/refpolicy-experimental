@@ -27,7 +27,7 @@ files_pid_file(jabberd_var_run_t)
 allow jabberd_t self:capability dac_override;
 dontaudit jabberd_t self:capability sys_tty_config;
 allow jabberd_t self:process signal_perms;
-allow jabberd_t self:fifo_file { read write getattr };
+allow jabberd_t self:fifo_file rw_file_perms;
 allow jabberd_t self:tcp_socket create_stream_socket_perms;
 allow jabberd_t self:udp_socket create_socket_perms;
 
@@ -42,7 +42,7 @@ files_pid_filetrans(jabberd_t,jabberd_var_run_t,file)
 
 kernel_read_kernel_sysctls(jabberd_t)
 kernel_list_proc(jabberd_t)
-kernel_read_proc_symlinks(jabberd_t)
+kernel_read_system_state(jabberd_t)
 
 corenet_all_recvfrom_unlabeled(jabberd_t)
 corenet_all_recvfrom_netlabel(jabberd_t)
@@ -52,15 +52,20 @@ corenet_tcp_sendrecv_all_nodes(jabberd_t)
 corenet_udp_sendrecv_all_nodes(jabberd_t)
 corenet_tcp_sendrecv_all_ports(jabberd_t)
 corenet_udp_sendrecv_all_ports(jabberd_t)
+corenet_udp_bind_all_nodes(jabberd_t)
 corenet_tcp_bind_all_nodes(jabberd_t)
 corenet_tcp_bind_jabber_client_port(jabberd_t)
 corenet_tcp_bind_jabber_interserver_port(jabberd_t)
 corenet_sendrecv_jabber_client_server_packets(jabberd_t)
 corenet_sendrecv_jabber_interserver_server_packets(jabberd_t)
 
+corecmd_exec_bin(jabberd_t)
+corecmd_exec_shell(jabberd_t)
+
 dev_read_sysfs(jabberd_t)
 # For SSL
 dev_read_rand(jabberd_t)
+dev_read_urand(jabberd_t)
 
 domain_use_interactive_fds(jabberd_t)
 
@@ -82,6 +87,10 @@ sysnet_read_config(jabberd_t)
 userdom_dontaudit_use_unpriv_user_fds(jabberd_t)
 
 sysadm_dontaudit_search_home_dirs(jabberd_t)
+
+optional_policy(`
+	run_epmd(jabberd_t, system_r)
+')
 
 optional_policy(`
 	nis_use_ypbind(jabberd_t)

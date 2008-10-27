@@ -1,3 +1,22 @@
+refpolicy (2:0.0.20080702-14) unstable; urgency=high
+
+  * Allow noatsecure for Xen domains so that LD_PRELOAD will work across
+    a domain transition.  Also dontaudit searching of the sysadm home dir
+    and allow xend_t to manage xenstored_var_run_t.
+    Allow losetup (fsadm_t) and udev access to Xen image files
+  * Add support for Exim.
+  * Add support for Jabber, including adding the epmd_t domain for the Erlang
+    Port Mapper Daemon (used by ejabberd).  Label port 5280 as being for Jabber
+    (the ejabberd web administration service) and port 7777 (SOCKS5
+    Bytestreams (XEP-0065) for proxy file transfer).
+  * Allow cron to search httpd_sys_content_t
+  * Dontaudit logrotate search access to unconfined_home_dir_t.
+  * Fixed labelling of /var/lock/mailman
+  * Allow courier_pop_t to read /dev/urandom and to do ioctl on it's fifos.
+    Also allow it to talk to portmap so the IMAP server can do FAM.
+
+ -- Russell Coker <russell@coker.com.au>  Mon, 27 Oct 2008 23:01:33 +1100
+
 refpolicy (2:0.0.20080702-13) unstable; urgency=high
 
   * Allow spamd_t to create a Unix domain socket.

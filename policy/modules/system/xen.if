@@ -76,6 +76,25 @@ interface(`xen_read_image_files',`
 
 ########################################
 ## <summary>
+##	Read and write xen image files.
+## </summary>
+## <param name="domain">
+## 	<summary>
+##	Domain allowed access.
+## 	</summary>
+## </param>
+#
+interface(`xen_rw_image_files',`
+	gen_require(`
+		type xen_image_t, xend_var_lib_t;
+	')
+
+	files_list_var_lib($1)
+	rw_files_pattern($1,{ xend_var_lib_t xen_image_t },xen_image_t)
+')
+
+########################################
+## <summary>
 ##	Allow the specified domain to append
 ##	xend log files.
 ## </summary>

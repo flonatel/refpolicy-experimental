@@ -80,7 +80,7 @@ optional_policy(`
 		bool daemon_access_unconfined_home;
 	')
 	tunable_policy(`daemon_access_unconfined_home', `
-		unconfined_read_home_content_files(procmail_t)
+		unconfined_write_home_content_files(procmail_t)
 	')
 ')
 

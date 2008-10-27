@@ -212,7 +212,13 @@ xen_stream_connect_xenstore(xend_t)
 
 netutils_domtrans(xend_t)
 
-sysadm_dontaudit_search_home_dirs(xend_t)
+sysadm_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
+unconfined_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
+ifdef(`distro_debian', `
+# xend uses LD_PRELOAD or similar for libxenctrl.so
+allow xend_t { xenconsoled_t xenstored_t }:process noatsecure;
+')
+allow xend_t xenstored_var_run_t:file manage_file_perms;
 
 optional_policy(`
 	consoletype_exec(xend_t)
