@@ -1,3 +1,12 @@
+refpolicy (2:0.0.20080702-14.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Only record changes to original modules selections. (closes: #524516)
+  * Again disable unbuildable portslave policy.
+  * Fix pythonsupport policy.
+
+ -- Bastian Blank <waldi@debian.org>  Wed, 20 May 2009 22:49:16 +0000
+
 refpolicy (2:0.0.20080702-14) unstable; urgency=high
 
   * Allow noatsecure for Xen domains so that LD_PRELOAD will work across

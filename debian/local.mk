@@ -73,10 +73,10 @@ CONFIG/selinux-policy-mls::
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                    NAME=mls TYPE=mls $(OPTIONS) bare
 	test -e debian/stamp-config-mls  ||                             \
+	  cp debian/modules.conf.mls.update debian/build-$(package)/policy/modules.conf
+	test -e debian/stamp-config-mls  ||                             \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=mls TYPE=mls $(OPTIONS) conf)
-	cp debian/modules.conf.mls                                      \
-                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	echo done > debian/stamp-config-mls
 STAMPS_TO_CLEAN += debian/stamp-config-mls
 DIRS_TO_CLEAN  += debian/build-selinux-policy-mls
@@ -98,10 +98,10 @@ CONFIG/selinux-policy-default::
 	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                  NAME=default TYPE=mcs $(OPTIONS) bare
 	test -e debian/stamp-config-default  ||                           \
+	  cp debian/modules.conf.default.update debian/build-$(package)/policy/modules.conf
+	test -e debian/stamp-config-default  ||                           \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=default TYPE=mcs $(OPTIONS) conf)
-	cp debian/modules.conf.default                                    \
-                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
 	echo done > debian/stamp-config-default
 STAMPS_TO_CLEAN += debian/stamp-config-default
 DIRS_TO_CLEAN  += debian/build-selinux-policy-default
