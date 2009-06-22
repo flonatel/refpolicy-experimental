@@ -34,7 +34,7 @@ interface(`nscd_domtrans',`
 	')
 
 	corecmd_search_bin($1)
-	domtrans_pattern($1,nscd_exec_t,nscd_t)
+	domtrans_pattern($1, nscd_exec_t, nscd_t)
 ')
 
 ########################################
@@ -53,7 +53,7 @@ interface(`nscd_exec',`
 		type nscd_exec_t;
 	')
 
-	can_exec($1,nscd_exec_t)
+	can_exec($1, nscd_exec_t)
 ')
 
 ########################################
@@ -80,7 +80,7 @@ interface(`nscd_socket_use',`
 	dontaudit $1 nscd_t:nscd { shmempwd shmemgrp shmemhost };
 
 	files_search_pids($1)
-	stream_connect_pattern($1,nscd_var_run_t,nscd_var_run_t,nscd_t)
+	stream_connect_pattern($1, nscd_var_run_t, nscd_var_run_t, nscd_t)
 	dontaudit $1 nscd_var_run_t:file { getattr read };
 ')
 
@@ -108,7 +108,7 @@ interface(`nscd_shm_use',`
 	allow $1 nscd_t:fd use;
 
 	# cjp: these were originally inherited from the
-	# nscd_socket_domain macro.  need to investigate
+	# nscd_socket_domain macro. need to investigate
 	# if they are all actually required
 	allow $1 self:unix_stream_socket create_stream_socket_perms;
 	allow $1 nscd_t:unix_stream_socket connectto;
@@ -152,7 +152,7 @@ interface(`nscd_read_pid',`
 	')
 
 	files_search_pids($1)
-	read_files_pattern($1,nscd_var_run_t,nscd_var_run_t)
+	read_files_pattern($1, nscd_var_run_t, nscd_var_run_t)
 ')
 
 ########################################
@@ -189,11 +189,6 @@ interface(`nscd_unconfined',`
 ##	The role to be allowed the nscd domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the role's terminal.
-##	</summary>
-## </param>
 #
 interface(`nscd_run',`
 	gen_require(`
@@ -202,5 +197,4 @@ interface(`nscd_run',`
 
 	nscd_domtrans($1)
 	role $2 types nscd_t;
-	dontaudit nscd_t $3:chr_file rw_term_perms;
 ')

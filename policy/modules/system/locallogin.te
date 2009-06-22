@@ -1,5 +1,5 @@
 
-policy_module(locallogin, 1.7.0)
+policy_module(locallogin, 1.9.0)
 
 ########################################
 #
@@ -100,6 +100,7 @@ term_setattr_unallocated_ttys(local_login_t)
 
 auth_rw_login_records(local_login_t)
 auth_rw_faillog(local_login_t)
+auth_manage_pam_pid(local_login_t)
 auth_manage_pam_console_data(local_login_t)
 auth_domtrans_pam_console(local_login_t)
 
@@ -126,14 +127,11 @@ files_read_var_symlinks(local_login_t)
 
 init_dontaudit_use_fds(local_login_t)
 
-libs_use_ld_so(local_login_t)
-libs_use_shared_libs(local_login_t)
-
 miscfiles_read_localization(local_login_t)
 
 userdom_spec_domtrans_all_users(local_login_t)
 userdom_signal_all_users(local_login_t)
-userdom_search_all_users_home_content(local_login_t)
+userdom_search_user_home_content(local_login_t)
 userdom_use_unpriv_users_fds(local_login_t)
 userdom_sigchld_all_users(local_login_t)
 userdom_create_all_users_keys(local_login_t)
@@ -167,7 +165,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	dbus_system_bus_client_template(local_login, local_login_t)
+	dbus_system_bus_client(local_login_t)
 
 	consolekit_dbus_chat(local_login_t)
 ')
@@ -231,9 +229,6 @@ files_dontaudit_search_isid_type_dirs(sulogin_t)
 
 init_getpgid_script(sulogin_t)
 
-libs_use_ld_so(sulogin_t)
-libs_use_shared_libs(sulogin_t)
-
 logging_send_syslog_msg(sulogin_t)
 
 seutil_read_config(sulogin_t)
@@ -243,11 +238,10 @@ auth_read_shadow(sulogin_t)
 
 userdom_use_unpriv_users_fds(sulogin_t)
 
-staff_search_home_dirs(sulogin_t)
+userdom_search_user_home_dirs(sulogin_t)
+userdom_use_user_ptys(sulogin_t)
 
 sysadm_shell_domtrans(sulogin_t)
-sysadm_use_ptys(sulogin_t)
-sysadm_search_home_dirs(sulogin_t)
 
 # suse and debian do not use pam with sulogin...
 ifdef(`distro_suse', `define(`sulogin_no_pam')')

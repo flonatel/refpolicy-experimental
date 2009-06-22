@@ -1,5 +1,5 @@
 
-policy_module(nsd, 1.5.0)
+policy_module(nsd, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(nsd, 1.5.0)
 
 type nsd_t;
 type nsd_exec_t;
-init_daemon_domain(nsd_t,nsd_exec_t)
+init_daemon_domain(nsd_t, nsd_exec_t)
 
 # A type for configuration files of nsd
 type nsd_conf_t;
@@ -16,7 +16,7 @@ files_type(nsd_conf_t)
 
 type nsd_crond_t;
 domain_type(nsd_crond_t)
-domain_entry_file(nsd_crond_t,nsd_exec_t)
+domain_entry_file(nsd_crond_t, nsd_exec_t)
 role system_r types nsd_crond_t;
 
 # a type for nsd.db
@@ -42,20 +42,20 @@ allow nsd_t self:tcp_socket create_stream_socket_perms;
 allow nsd_t self:udp_socket create_socket_perms;
 
 allow nsd_t nsd_conf_t:dir list_dir_perms;
-read_files_pattern(nsd_t,nsd_conf_t,nsd_conf_t)
-read_lnk_files_pattern(nsd_t,nsd_conf_t,nsd_conf_t)
+read_files_pattern(nsd_t, nsd_conf_t, nsd_conf_t)
+read_lnk_files_pattern(nsd_t, nsd_conf_t, nsd_conf_t)
 
 allow nsd_t nsd_db_t:file manage_file_perms;
-filetrans_pattern(nsd_t,nsd_zone_t,nsd_db_t,file)
+filetrans_pattern(nsd_t, nsd_zone_t, nsd_db_t, file)
 
-manage_files_pattern(nsd_t,nsd_var_run_t,nsd_var_run_t)
-files_pid_filetrans(nsd_t,nsd_var_run_t,file)
+manage_files_pattern(nsd_t, nsd_var_run_t, nsd_var_run_t)
+files_pid_filetrans(nsd_t, nsd_var_run_t, file)
 
 allow nsd_t nsd_zone_t:dir list_dir_perms;
-read_files_pattern(nsd_t,nsd_zone_t,nsd_zone_t)
-read_lnk_files_pattern(nsd_t,nsd_zone_t,nsd_zone_t)
+read_files_pattern(nsd_t, nsd_zone_t, nsd_zone_t)
+read_lnk_files_pattern(nsd_t, nsd_zone_t, nsd_zone_t)
 
-can_exec(nsd_t,nsd_exec_t)
+can_exec(nsd_t, nsd_exec_t)
 
 kernel_read_system_state(nsd_t)
 kernel_read_kernel_sysctls(nsd_t)
@@ -66,12 +66,12 @@ corenet_all_recvfrom_unlabeled(nsd_t)
 corenet_all_recvfrom_netlabel(nsd_t)
 corenet_tcp_sendrecv_generic_if(nsd_t)
 corenet_udp_sendrecv_generic_if(nsd_t)
-corenet_tcp_sendrecv_all_nodes(nsd_t)
-corenet_udp_sendrecv_all_nodes(nsd_t)
+corenet_tcp_sendrecv_generic_node(nsd_t)
+corenet_udp_sendrecv_generic_node(nsd_t)
 corenet_tcp_sendrecv_all_ports(nsd_t)
 corenet_udp_sendrecv_all_ports(nsd_t)
-corenet_tcp_bind_all_nodes(nsd_t)
-corenet_udp_bind_all_nodes(nsd_t)
+corenet_tcp_bind_generic_node(nsd_t)
+corenet_udp_bind_generic_node(nsd_t)
 corenet_tcp_bind_dns_port(nsd_t)
 corenet_udp_bind_dns_port(nsd_t)
 corenet_sendrecv_dns_server_packets(nsd_t)
@@ -86,9 +86,6 @@ files_read_etc_runtime_files(nsd_t)
 fs_getattr_all_fs(nsd_t)
 fs_search_auto_mountpoints(nsd_t)
 
-libs_use_ld_so(nsd_t)
-libs_use_shared_libs(nsd_t)
-
 logging_send_syslog_msg(nsd_t)
 
 miscfiles_read_localization(nsd_t)
@@ -96,8 +93,7 @@ miscfiles_read_localization(nsd_t)
 sysnet_read_config(nsd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(nsd_t)
-
-sysadm_dontaudit_search_home_dirs(nsd_t)
+userdom_dontaudit_search_user_home_dirs(nsd_t)
 
 optional_policy(`
 	nis_use_ypbind(nsd_t)
@@ -124,20 +120,20 @@ allow nsd_crond_t self:fifo_file rw_fifo_file_perms;
 allow nsd_crond_t self:tcp_socket create_socket_perms;
 allow nsd_crond_t self:udp_socket create_socket_perms;
 
-allow nsd_crond_t nsd_conf_t:file { getattr read ioctl };
+allow nsd_crond_t nsd_conf_t:file read_file_perms;
 
 allow nsd_crond_t nsd_db_t:file manage_file_perms;
-filetrans_pattern(nsd_crond_t,nsd_zone_t,nsd_db_t,file)
+filetrans_pattern(nsd_crond_t, nsd_zone_t, nsd_db_t, file)
 files_search_var_lib(nsd_crond_t)
 
 allow nsd_crond_t nsd_t:process signal;
 
-ps_process_pattern(nsd_crond_t,nsd_t)
+ps_process_pattern(nsd_crond_t, nsd_t)
 
-manage_files_pattern(nsd_crond_t,nsd_zone_t,nsd_zone_t)
-filetrans_pattern(nsd_crond_t,nsd_conf_t,nsd_zone_t,file)
+manage_files_pattern(nsd_crond_t, nsd_zone_t, nsd_zone_t)
+filetrans_pattern(nsd_crond_t, nsd_conf_t, nsd_zone_t, file)
 
-can_exec(nsd_crond_t,nsd_exec_t)
+can_exec(nsd_crond_t, nsd_exec_t)
 
 kernel_read_system_state(nsd_crond_t)
 
@@ -148,8 +144,8 @@ corenet_all_recvfrom_unlabeled(nsd_crond_t)
 corenet_all_recvfrom_netlabel(nsd_crond_t)
 corenet_tcp_sendrecv_generic_if(nsd_crond_t)
 corenet_udp_sendrecv_generic_if(nsd_crond_t)
-corenet_tcp_sendrecv_all_nodes(nsd_crond_t)
-corenet_udp_sendrecv_all_nodes(nsd_crond_t)
+corenet_tcp_sendrecv_generic_node(nsd_crond_t)
+corenet_udp_sendrecv_generic_node(nsd_crond_t)
 corenet_tcp_sendrecv_all_ports(nsd_crond_t)
 corenet_udp_sendrecv_all_ports(nsd_crond_t)
 corenet_tcp_connect_all_ports(nsd_crond_t)
@@ -164,19 +160,16 @@ files_read_etc_files(nsd_crond_t)
 files_read_etc_runtime_files(nsd_crond_t)
 files_search_var_lib(nsd_t)
 
-libs_use_ld_so(nsd_crond_t)
-libs_use_shared_libs(nsd_crond_t)
-
 logging_send_syslog_msg(nsd_crond_t)
 
 miscfiles_read_localization(nsd_crond_t)
 
 sysnet_read_config(nsd_crond_t)
 
-sysadm_dontaudit_search_home_dirs(nsd_crond_t)
+userdom_dontaudit_search_user_home_dirs(nsd_crond_t)
 
 optional_policy(`
-	cron_system_entry(nsd_crond_t,nsd_exec_t)
+	cron_system_entry(nsd_crond_t, nsd_exec_t)
 ')
 
 optional_policy(`

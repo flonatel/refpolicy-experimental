@@ -1,5 +1,5 @@
 
-policy_module(monop, 1.5.0)
+policy_module(monop, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(monop, 1.5.0)
 
 type monopd_t;
 type monopd_exec_t;
-init_daemon_domain(monopd_t,monopd_exec_t)
+init_daemon_domain(monopd_t, monopd_exec_t)
 
 type monopd_etc_t;
 files_config_file(monopd_etc_t)
@@ -29,15 +29,15 @@ allow monopd_t self:process signal_perms;
 allow monopd_t self:tcp_socket create_stream_socket_perms;
 allow monopd_t self:udp_socket create_socket_perms;
 
-allow monopd_t monopd_etc_t:file { getattr read };
+allow monopd_t monopd_etc_t:file read_file_perms;
 files_search_etc(monopd_t)
 
 allow monopd_t monopd_share_t:dir list_dir_perms;
-read_files_pattern(monopd_t,monopd_share_t,monopd_share_t)
-read_lnk_files_pattern(monopd_t,monopd_share_t,monopd_share_t)
+read_files_pattern(monopd_t, monopd_share_t, monopd_share_t)
+read_lnk_files_pattern(monopd_t, monopd_share_t, monopd_share_t)
 
-manage_files_pattern(monopd_t,monopd_var_run_t,monopd_var_run_t)
-files_pid_filetrans(monopd_t,monopd_var_run_t,file)
+manage_files_pattern(monopd_t, monopd_var_run_t, monopd_var_run_t)
+files_pid_filetrans(monopd_t, monopd_var_run_t, file)
 
 kernel_read_kernel_sysctls(monopd_t)
 kernel_list_proc(monopd_t)
@@ -47,11 +47,11 @@ corenet_all_recvfrom_unlabeled(monopd_t)
 corenet_all_recvfrom_netlabel(monopd_t)
 corenet_tcp_sendrecv_generic_if(monopd_t)
 corenet_udp_sendrecv_generic_if(monopd_t)
-corenet_tcp_sendrecv_all_nodes(monopd_t)
-corenet_udp_sendrecv_all_nodes(monopd_t)
+corenet_tcp_sendrecv_generic_node(monopd_t)
+corenet_udp_sendrecv_generic_node(monopd_t)
 corenet_tcp_sendrecv_all_ports(monopd_t)
 corenet_udp_sendrecv_all_ports(monopd_t)
-corenet_tcp_bind_all_nodes(monopd_t)
+corenet_tcp_bind_generic_node(monopd_t)
 corenet_tcp_bind_monopd_port(monopd_t)
 corenet_sendrecv_monopd_server_packets(monopd_t)
 
@@ -64,9 +64,6 @@ files_read_etc_files(monopd_t)
 fs_getattr_all_fs(monopd_t)
 fs_search_auto_mountpoints(monopd_t)
 
-libs_use_ld_so(monopd_t)
-libs_use_shared_libs(monopd_t)
-
 logging_send_syslog_msg(monopd_t)
 
 miscfiles_read_localization(monopd_t)
@@ -74,8 +71,7 @@ miscfiles_read_localization(monopd_t)
 sysnet_read_config(monopd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(monopd_t)
-
-sysadm_dontaudit_search_home_dirs(monopd_t)
+userdom_dontaudit_search_user_home_dirs(monopd_t)
 
 optional_policy(`
 	nis_use_ypbind(monopd_t)

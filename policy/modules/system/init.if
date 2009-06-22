@@ -2,6 +2,73 @@
 
 ########################################
 ## <summary>
+##	Create a file type used for init scripts.
+## </summary>
+## <desc>
+##	<p>
+##	Create a file type used for init scripts.
+##	Can not be used in conjunction with
+##	init_script_domain().
+##	</p>
+## </desc>
+## <param name="script_file">
+##	<summary>
+##	Type of the script file used as an entry point to this domain.
+##	</summary>
+## </param>
+#
+interface(`init_script_file',`
+	gen_require(`
+		type initrc_t;
+		attribute init_script_file_type, init_run_all_scripts_domain;
+	')
+
+	typeattribute $1 init_script_file_type;
+
+	domain_entry_file(initrc_t, $1)
+
+	domtrans_pattern(init_run_all_scripts_domain, $1, initrc_t)
+')
+
+########################################
+## <summary>
+##	Create a domain used for init scripts.
+## </summary>
+## <desc>
+##	<p>
+##	Create a domain used for init scripts.
+##	Can not be used in conjunction with
+##	init_script_file().
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used as an init script domain.
+##	</summary>
+## </param>
+## <param name="script_file">
+##	<summary>
+##	Type of the script file used as an entry point to this domain.
+##	</summary>
+## </param>
+#
+interface(`init_script_domain',`
+	gen_require(`
+		attribute init_script_domain_type, init_script_file_type;
+		attribute init_run_all_scripts_domain;
+	')
+
+	typeattribute $1 init_script_domain_type;
+	typeattribute $2 init_script_file_type;
+
+	domain_type($1)
+	domain_entry_file($1, $2)
+
+	domtrans_pattern(init_run_all_scripts_domain, $2, $1)
+')
+
+########################################
+## <summary>
 ##	Create a domain which can be started by init.
 ## </summary>
 ## <param name="domain">
@@ -123,6 +190,8 @@ interface(`init_daemon_domain',`
 
 		typeattribute $1 direct_init;
 		typeattribute $2 direct_init_entry;
+
+		userdom_dontaudit_use_user_terminals($1)
 	')
 
 	ifdef(`hide_broken_symptoms',`
@@ -471,6 +540,16 @@ interface(`init_telinit',`
 	allow $1 initctl_t:fifo_file rw_fifo_file_perms;
 
 	init_exec($1)
+
+	tunable_policy(`init_upstart',`
+		gen_require(`
+			type init_t;
+		')
+
+		# upstart uses a datagram socket instead of initctl pipe
+		allow $1 self:unix_dgram_socket create_socket_perms;
+		allow $1 init_t:unix_dgram_socket sendto;
+	')
 ')
 
 ########################################
@@ -589,14 +668,14 @@ interface(`init_domtrans_script',`
 ##	Execute a init script in a specified domain.
 ## </summary>
 ## <desc>
-##      <p>
+##	<p>
 ##	Execute a init script in a specified domain.
-##      </p>
-##      <p>
-##      No interprocess communication (signals, pipes,
-##      etc.) is provided by this interface since
-##      the domains are not owned by this module.
-##      </p>
+##	</p>
+##	<p>
+##	No interprocess communication (signals, pipes,
+##	etc.) is provided by this interface since
+##	the domains are not owned by this module.
+##	</p>
 ## </desc>
 ## <param name="source_domain">
 ##	<summary>
@@ -620,6 +699,31 @@ interface(`init_script_file_domtrans',`
 
 ########################################
 ## <summary>
+##	Transition to the init script domain
+##	on a specified labeled init script.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="init_script_file">
+##	<summary>
+##	Labeled init script file.
+##	</summary>
+## </param>
+#
+interface(`init_labeled_script_domtrans',`
+	gen_require(`
+		type initrc_t;
+	')
+
+	domtrans_pattern($1, $2, initrc_t)
+	files_search_etc($1)
+')
+
+########################################
+## <summary>
 ##	Start and stop daemon programs directly.
 ## </summary>
 ## <desc>
@@ -639,11 +743,6 @@ interface(`init_script_file_domtrans',`
 ##	The role to be performing this action.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal of the user.
-##	</summary>
-## </param>
 #
 interface(`init_run_daemon',`
 	gen_require(`
@@ -653,7 +752,45 @@ interface(`init_run_daemon',`
 
 	typeattribute $1 direct_run_init;
 	role_transition $2 direct_init_entry system_r;
-	dontaudit direct_init $3:chr_file rw_file_perms;
+')
+
+########################################
+## <summary>
+##	Read the process state (/proc/pid) of init.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_read_state',`
+	gen_require(`
+		attribute init_t;
+	')
+
+	allow $1 init_t:dir search_dir_perms;
+	allow $1 init_t:file read_file_perms;
+	allow $1 init_t:lnk_file read_lnk_file_perms;
+')
+
+########################################
+## <summary>
+##	Ptrace init
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`init_ptrace',`
+	gen_require(`
+		attribute init_t;
+	')
+
+	allow $1 init_t:process ptrace;
 ')
 
 ########################################
@@ -695,6 +832,25 @@ interface(`init_getattr_script_files',`
 
 ########################################
 ## <summary>
+##	Read init scripts.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_read_script_files',`
+	gen_require(`
+		type initrc_exec_t;
+	')
+
+	files_search_etc($1)
+	allow $1 initrc_exec_t:file read_file_perms;
+')
+
+########################################
+## <summary>
 ##	Execute init scripts in the caller domain.
 ## </summary>
 ## <param name="domain">
@@ -710,6 +866,63 @@ interface(`init_exec_script_files',`
 
 	files_list_etc($1)
 	can_exec($1,initrc_exec_t)
+')
+
+########################################
+## <summary>
+##	Get the attribute of all init script entrypoint files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_getattr_all_script_files',`
+	gen_require(`
+		attribute init_script_file_type;
+	')
+
+	files_list_etc($1)
+	allow $1 init_script_file_type:file getattr;
+')
+
+########################################
+## <summary>
+##	Read all init script files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_read_all_script_files',`
+	gen_require(`
+		attribute init_script_file_type;
+	')
+
+	files_search_etc($1)
+	allow $1 init_script_file_type:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Execute all init scripts in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_exec_all_script_files',`
+	gen_require(`
+		attribute init_script_file_type;
+	')
+
+	files_list_etc($1)
+	can_exec($1, init_script_file_type)
 ')
 
 ########################################
@@ -922,7 +1135,7 @@ interface(`init_rw_script_stream_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1018,25 +1231,6 @@ interface(`init_dontaudit_use_script_ptys',`
 	')
 
 	dontaudit $1 initrc_devpts_t:chr_file { rw_term_perms lock append };
-')
-
-########################################
-## <summary>
-##	Read init scripts.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`init_read_script_files',`
-	gen_require(`
-		type initrc_exec_t;
-	')
-
-	files_search_etc($1)
-	allow $1 initrc_exec_t:file read_file_perms;
 ')
 
 ########################################
@@ -1198,7 +1392,7 @@ interface(`init_write_utmp',`
 	')
 
 	files_list_pids($1)
-	allow $1 initrc_var_run_t:file { getattr write };
+	allow $1 initrc_var_run_t:file { getattr open write };
 ')
 
 ########################################
@@ -1259,11 +1453,11 @@ interface(`init_dontaudit_rw_utmp',`
 
 ########################################
 ## <summary>
-##      Create, read, write, and delete utmp.
+##	Create, read, write, and delete utmp.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain access allowed.
+##	Domain access allowed.
 ##	</summary>
 ## </param>
 #
@@ -1274,4 +1468,58 @@ interface(`init_manage_utmp',`
 
 	files_search_pids($1)
 	allow $1 initrc_var_run_t:file manage_file_perms;
+')
+
+########################################
+## <summary>
+##	Create files in /var/run with the
+##	utmp file type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain access allowed.
+##	</summary>
+## </param>
+#
+interface(`init_pid_filetrans_utmp',`
+	gen_require(`
+		type initrc_var_run_t;
+	')
+
+	files_pid_filetrans($1, initrc_var_run_t, file)
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to connect to daemon with a tcp socket
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_tcp_recvfrom_all_daemons',`
+	gen_require(`
+		attribute daemon;
+	')
+
+	corenet_tcp_recvfrom_labeled($1, daemon)
+')
+
+########################################
+## <summary>
+##	Allow the specified domain to connect to daemon with a udp socket
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_udp_recvfrom_all_daemons',`
+	gen_require(`
+		attribute daemon;
+	')
+	corenet_udp_recvfrom_labeled($1, daemon)
 ')

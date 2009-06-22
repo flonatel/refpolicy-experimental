@@ -1,5 +1,5 @@
 
-policy_module(ada,1.2.0)
+policy_module(ada, 1.3.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(ada,1.2.0)
 
 type ada_t;
 type ada_exec_t;
-application_domain(ada_t,ada_exec_t)
+application_domain(ada_t, ada_exec_t)
 role system_r types ada_t;
 
 ########################################
@@ -18,6 +18,8 @@ role system_r types ada_t;
 
 allow ada_t self:process { execstack execmem };
 
+userdom_use_user_terminals(ada_t)
+
 optional_policy(`
-	unconfined_domain_noaudit(ada_t)
+	unconfined_domain(ada_t)
 ')

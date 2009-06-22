@@ -76,6 +76,24 @@ interface(`ppp_signal',`
 
 ########################################
 ## <summary>
+##	Send a generic signull to PPP.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`ppp_signull',`
+	gen_require(`
+		type pppd_t;
+	')
+
+	allow $1 pppd_t:process signull;
+')
+
+########################################
+## <summary>
 ##	 Execute domain in the ppp domain.
 ## </summary>
 ## <param name="domain">
@@ -107,11 +125,6 @@ interface(`ppp_domtrans',`
 ##	The role to allow the ppp domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the ppp domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`ppp_run_cond',`
@@ -123,7 +136,6 @@ interface(`ppp_run_cond',`
 
 	tunable_policy(`pppd_for_user',`
 		ppp_domtrans($1)
-		allow pppd_t $3:chr_file rw_term_perms;
 	')
 ')
 
@@ -141,11 +153,6 @@ interface(`ppp_run_cond',`
 ##	The role to allow the ppp domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the ppp domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`ppp_run',`
@@ -155,7 +162,6 @@ interface(`ppp_run',`
 
 	ppp_domtrans($1)
 	role $2 types pppd_t;
-	allow pppd_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -230,7 +236,7 @@ interface(`ppp_read_rw_config',`
 	')
 
 	allow $1 pppd_etc_t:dir list_dir_perms;
-	allow $1 pppd_etc_rw_t:file { getattr read };
+	allow $1 pppd_etc_rw_t:file read_file_perms;
 	files_search_etc($1)
 ')
 
@@ -250,7 +256,7 @@ interface(`ppp_read_secrets',`
 	')
 
 	allow $1 pppd_etc_t:dir list_dir_perms;
-	allow $1 pppd_secret_t:file { getattr read };
+	allow $1 pppd_secret_t:file read_file_perms;
 	files_search_etc($1)
 ')
 
@@ -305,7 +311,7 @@ interface(`ppp_pid_filetrans',`
 		type pppd_var_run_t;
 	')
 
-	files_pid_filetrans($1,pppd_var_run_t,file)
+	files_pid_filetrans($1, pppd_var_run_t, file)
 ')
 
 ########################################
@@ -331,7 +337,7 @@ interface(`ppp_admin',`
 
 	allow $1 pppd_t:process { ptrace signal_perms getattr };
 	ps_process_pattern($1, pppd_t)
-	        
+
 	files_list_tmp($1)
 	manage_files_pattern($1, pppd_tmp_t, pppd_tmp_t)
 

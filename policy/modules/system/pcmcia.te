@@ -1,5 +1,5 @@
 
-policy_module(pcmcia, 1.5.0)
+policy_module(pcmcia, 1.6.0)
 
 ########################################
 #
@@ -93,8 +93,6 @@ files_dontaudit_getattr_all_symlinks(cardmgr_t)
 files_dontaudit_getattr_all_pipes(cardmgr_t)
 files_dontaudit_getattr_all_sockets(cardmgr_t)
 
-libs_use_ld_so(cardmgr_t)
-libs_use_shared_libs(cardmgr_t)
 libs_exec_ld_so(cardmgr_t)
 libs_exec_lib_files(cardmgr_t)
 
@@ -109,9 +107,9 @@ sysnet_domtrans_ifconfig(cardmgr_t)
 sysnet_etc_filetrans_config(cardmgr_t)
 sysnet_manage_config(cardmgr_t)
 
+userdom_use_user_terminals(cardmgr_t)
 userdom_dontaudit_use_unpriv_user_fds(cardmgr_t)
-
-sysadm_dontaudit_search_home_dirs(cardmgr_t)
+userdom_dontaudit_search_user_home_dirs(cardmgr_t)
 
 optional_policy(`
 	seutil_dontaudit_read_config(cardmgr_t)
@@ -136,5 +134,6 @@ optional_policy(`
 
 # Create device files in /tmp.
 # cjp: why is this created all over the place?
-allow cardmgr_t { var_run_t cardmgr_var_run_t tmp_t }:dir rw_dir_perms;
-type_transition cardmgr_t { var_run_t cardmgr_var_run_t tmp_t }:{ chr_file blk_file } cardmgr_dev_t;
+files_pid_filetrans(cardmgr_t, cardmgr_dev_t, { chr_file blk_file })
+files_tmp_filetrans(cardmgr_t, cardmgr_dev_t, { chr_file blk_file })
+filetrans_pattern(cardmgr_t, cardmgr_var_run_t, cardmgr_dev_t, { chr_file blk_file })

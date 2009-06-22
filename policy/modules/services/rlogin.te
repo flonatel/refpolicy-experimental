@@ -1,5 +1,5 @@
 
-policy_module(rlogin, 1.7.0)
+policy_module(rlogin, 1.8.4)
 
 ########################################
 #
@@ -13,6 +13,9 @@ role system_r types rlogind_t;
 
 type rlogind_devpts_t; #, userpty_type;
 term_login_pty(rlogind_devpts_t)
+
+type rlogind_home_t;
+userdom_user_home_content(rlogind_home_t)
 
 type rlogind_tmp_t;
 files_tmp_file(rlogind_tmp_t)
@@ -34,7 +37,7 @@ allow rlogind_t self:netlink_tcpdiag_socket r_netlink_socket_perms;
 allow rlogind_t self:capability { setuid setgid };
 
 allow rlogind_t rlogind_devpts_t:chr_file { rw_chr_file_perms setattr };
-term_create_pty(rlogind_t,rlogind_devpts_t)
+term_create_pty(rlogind_t, rlogind_devpts_t)
 
 # for /usr/lib/telnetlogin
 can_exec(rlogind_t, rlogind_exec_t)
@@ -52,10 +55,10 @@ kernel_read_network_state(rlogind_t)
 
 corenet_all_recvfrom_unlabeled(rlogind_t)
 corenet_all_recvfrom_netlabel(rlogind_t)
-corenet_tcp_sendrecv_all_if(rlogind_t)
-corenet_udp_sendrecv_all_if(rlogind_t)
-corenet_tcp_sendrecv_all_nodes(rlogind_t)
-corenet_udp_sendrecv_all_nodes(rlogind_t)
+corenet_tcp_sendrecv_generic_if(rlogind_t)
+corenet_udp_sendrecv_generic_if(rlogind_t)
+corenet_tcp_sendrecv_generic_node(rlogind_t)
+corenet_udp_sendrecv_generic_node(rlogind_t)
 corenet_tcp_sendrecv_all_ports(rlogind_t)
 corenet_udp_sendrecv_all_ports(rlogind_t)
 
@@ -77,25 +80,36 @@ files_search_default(rlogind_t)
 
 init_rw_utmp(rlogind_t)
 
-libs_use_ld_so(rlogind_t)
-libs_use_shared_libs(rlogind_t)
-
 logging_send_syslog_msg(rlogind_t)
 
 miscfiles_read_localization(rlogind_t)
 
 seutil_read_config(rlogind_t)
 
-userdom_setattr_unpriv_users_ptys(rlogind_t)
+userdom_setattr_user_ptys(rlogind_t)
 # cjp: this is egregious
-userdom_read_all_users_home_content_files(rlogind_t)
+userdom_read_user_home_content_files(rlogind_t)
 
 remotelogin_domtrans(rlogind_t)
 remotelogin_signal(rlogind_t)
 
+rlogin_read_home_content(rlogind_t)
+
+tunable_policy(`use_nfs_home_dirs',`
+	fs_list_nfs(rlogind_t)
+	fs_read_nfs_files(rlogind_t)
+	fs_read_nfs_symlinks(rlogind_t)
+')
+
+tunable_policy(`use_samba_home_dirs',`
+	fs_list_cifs(rlogind_t)
+	fs_read_cifs_files(rlogind_t)
+	fs_read_cifs_symlinks(rlogind_t)
+')
+
 optional_policy(`
-	kerberos_use(rlogind_t)
-	kerberos_read_keytab(rlogind_t)
+	kerberos_keytab_template(rlogind, rlogind_t)
+	kerberos_manage_host_rcache(rlogind_t)
 ')
 
 optional_policy(`

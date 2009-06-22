@@ -62,7 +62,6 @@ interface(`unconfined_domain_noaudit',`
 #		auditallow $1 self:process execstack;
 	')
 
-
 	optional_policy(`
 		auth_unconfined($1)
 	')
@@ -75,12 +74,6 @@ interface(`unconfined_domain_noaudit',`
 	optional_policy(`
 		ipsec_setcontext_default_spd($1)
 		ipsec_match_default_spd($1)
-	')
-
-	optional_policy(`
-		# this is to handle execmod on shared
-		# libs with text relocations
-		libs_use_shared_libs($1)
 	')
 
 	optional_policy(`
@@ -213,11 +206,6 @@ interface(`unconfined_domtrans',`
 ##	The role to allow the unconfined domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the unconfined domain to use.
-##	</summary>
-## </param>
 #
 interface(`unconfined_run',`
 	gen_require(`
@@ -226,7 +214,6 @@ interface(`unconfined_run',`
 
 	unconfined_domtrans($1)
 	role $2 types unconfined_t;
-	allow unconfined_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -316,13 +303,13 @@ interface(`unconfined_domtrans_to',`
 #
 interface(`unconfined_run_to',`
 	gen_require(`
-		type unconfined_t, unconfined_devpts_t, unconfined_tty_device_t;
+		type unconfined_t;
 		role unconfined_r;
 	')
 
 	domtrans_pattern(unconfined_t,$2,$1)
 	role unconfined_r types $1;
-	allow $1 { unconfined_devpts_t unconfined_tty_device_t }:chr_file rw_term_perms;
+	userdom_use_user_terminals($1)
 ')
 
 ########################################
@@ -615,26 +602,6 @@ interface(`unconfined_read_home_content_files',`
 	allow $1 { unconfined_home_dir_t unconfined_home_t }:dir list_dir_perms;
 	read_files_pattern($1, { unconfined_home_dir_t unconfined_home_t }, unconfined_home_t)
 	read_lnk_files_pattern($1, { unconfined_home_dir_t unconfined_home_t }, unconfined_home_t)
-')
-
-########################################
-## <summary>
-##	Read/write/create files in unconfined users home directories.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`unconfined_write_home_content_files',`
-	gen_require(`
-		type unconfined_home_dir_t, unconfined_home_t;
-	')
-
-	files_search_home($1)
-	userdom_user_home_dir_filetrans_user_home_content(unconfined, $1, { dir file })
-	userdom_manage_user_home_content_files(unconfined, $1)
 ')
 
 ########################################

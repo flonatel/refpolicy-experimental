@@ -1,5 +1,5 @@
 
-policy_module(uwimap, 1.6.0)
+policy_module(uwimap, 1.7.1)
 
 ########################################
 #
@@ -42,9 +42,9 @@ kernel_read_proc_symlinks(imapd_t)
 corenet_all_recvfrom_unlabeled(imapd_t)
 corenet_all_recvfrom_netlabel(imapd_t)
 corenet_tcp_sendrecv_generic_if(imapd_t)
-corenet_tcp_sendrecv_all_nodes(imapd_t)
+corenet_tcp_sendrecv_generic_node(imapd_t)
 corenet_tcp_sendrecv_all_ports(imapd_t)
-corenet_tcp_bind_all_nodes(imapd_t)
+corenet_tcp_bind_generic_node(imapd_t)
 corenet_tcp_bind_pop_port(imapd_t)
 corenet_tcp_connect_all_ports(imapd_t)
 corenet_sendrecv_pop_server_packets(imapd_t)
@@ -65,9 +65,6 @@ fs_search_auto_mountpoints(imapd_t)
 
 auth_domtrans_chk_passwd(imapd_t)
 
-libs_use_ld_so(imapd_t)
-libs_use_shared_libs(imapd_t)
-
 logging_send_syslog_msg(imapd_t)
 
 miscfiles_read_localization(imapd_t)
@@ -77,9 +74,12 @@ sysnet_read_config(imapd_t)
 userdom_dontaudit_use_unpriv_user_fds(imapd_t)
 # cjp: this is excessive, should be limited to the
 # mail directories
-userdom_priveleged_home_dir_manager(imapd_t)
-
-sysadm_dontaudit_search_home_dirs(imapd_t)
+userdom_manage_user_home_content_dirs(imapd_t)
+userdom_manage_user_home_content_files(imapd_t)
+userdom_manage_user_home_content_symlinks(imapd_t)
+userdom_manage_user_home_content_pipes(imapd_t)
+userdom_manage_user_home_content_sockets(imapd_t)
+userdom_user_home_dir_filetrans_user_home_content(imapd_t, { dir file lnk_file fifo_file sock_file })
 
 mta_rw_spool(imapd_t)
 

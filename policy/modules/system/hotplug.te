@@ -1,5 +1,5 @@
 
-policy_module(hotplug, 1.9.0)
+policy_module(hotplug, 1.11.2)
 
 ########################################
 #
@@ -53,10 +53,10 @@ files_read_kernel_modules(hotplug_t)
 
 corenet_all_recvfrom_unlabeled(hotplug_t)
 corenet_all_recvfrom_netlabel(hotplug_t)
-corenet_tcp_sendrecv_all_if(hotplug_t)
-corenet_udp_sendrecv_all_if(hotplug_t)
-corenet_tcp_sendrecv_all_nodes(hotplug_t)
-corenet_udp_sendrecv_all_nodes(hotplug_t)
+corenet_tcp_sendrecv_generic_if(hotplug_t)
+corenet_udp_sendrecv_generic_if(hotplug_t)
+corenet_tcp_sendrecv_generic_node(hotplug_t)
+corenet_udp_sendrecv_generic_node(hotplug_t)
 corenet_tcp_sendrecv_all_ports(hotplug_t)
 corenet_udp_sendrecv_all_ports(hotplug_t)
 
@@ -98,8 +98,6 @@ init_dontaudit_rw_initctl(hotplug_t)
 logging_send_syslog_msg(hotplug_t)
 logging_search_logs(hotplug_t)
 
-libs_use_ld_so(hotplug_t)
-libs_use_shared_libs(hotplug_t)
 # Read /usr/lib/gconv/.*
 libs_read_lib_files(hotplug_t)
 
@@ -114,13 +112,13 @@ seutil_dontaudit_search_config(hotplug_t)
 sysnet_read_config(hotplug_t)
 
 userdom_dontaudit_use_unpriv_user_fds(hotplug_t)
-
-sysadm_dontaudit_search_home_dirs(hotplug_t)
+userdom_dontaudit_search_user_home_dirs(hotplug_t)
 
 ifdef(`distro_redhat', `
 	optional_policy(`
 		# for arping used for static IP addresses on PCMCIA ethernet
 		netutils_domtrans(hotplug_t)
+		netutils_signal(hotplug_t)
 		fs_rw_tmpfs_chr_files(hotplug_t)
 	')
 	files_getattr_generic_locks(hotplug_t)
@@ -131,7 +129,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	dbus_system_bus_client_template(hotplug,hotplug_t)
+	dbus_system_bus_client(hotplug_t)
 ')
 
 optional_policy(`

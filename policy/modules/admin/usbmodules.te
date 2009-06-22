@@ -1,5 +1,5 @@
 
-policy_module(usbmodules,1.1.0)
+policy_module(usbmodules, 1.2.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(usbmodules,1.1.0)
 
 type usbmodules_t;
 type usbmodules_exec_t;
-init_system_domain(usbmodules_t,usbmodules_exec_t)
+init_system_domain(usbmodules_t, usbmodules_exec_t)
 role system_r types usbmodules_t;
 
 ########################################
@@ -33,12 +33,11 @@ term_write_console(usbmodules_t)
 
 init_use_fds(usbmodules_t)
 
-libs_use_ld_so(usbmodules_t)
-libs_use_shared_libs(usbmodules_t)
-
 miscfiles_read_hwdata(usbmodules_t)
 
 modutils_read_module_deps(usbmodules_t)
+
+userdom_use_user_terminals(usbmodules_t)
 
 optional_policy(`
 	hotplug_read_config(usbmodules_t)

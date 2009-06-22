@@ -1,5 +1,5 @@
 
-policy_module(loadkeys,1.4.0)
+policy_module(loadkeys, 1.5.1)
 
 ########################################
 #
@@ -11,7 +11,7 @@ policy_module(loadkeys,1.4.0)
 # all user domain ttys
 type loadkeys_t;
 type loadkeys_exec_t;
-init_system_domain(loadkeys_t,loadkeys_exec_t)
+init_system_domain(loadkeys_t, loadkeys_exec_t)
 
 ########################################
 #
@@ -35,12 +35,12 @@ term_use_unallocated_ttys(loadkeys_t)
 init_dontaudit_use_fds(loadkeys_t)
 init_dontaudit_use_script_ptys(loadkeys_t)
 
-libs_use_ld_so(loadkeys_t)
-libs_use_shared_libs(loadkeys_t)
-
 locallogin_use_fds(loadkeys_t)
 
 miscfiles_read_localization(loadkeys_t)
+
+userdom_use_user_ttys(loadkeys_t)
+userdom_list_user_home_dirs(loadkeys_t)
 
 optional_policy(`
 	nscd_dontaudit_search_pid(loadkeys_t)

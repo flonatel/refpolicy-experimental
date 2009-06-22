@@ -1,5 +1,5 @@
 
-policy_module(xen, 1.7.0)
+policy_module(xen, 1.8.2)
 
 ########################################
 #
@@ -8,8 +8,8 @@ policy_module(xen, 1.7.0)
 
 # console ptys
 type xen_devpts_t;
-term_pty(xen_devpts_t);
-files_type(xen_devpts_t);
+term_pty(xen_devpts_t)
+files_type(xen_devpts_t)
 
 # Xen Image files
 type xen_image_t; # customizable
@@ -144,10 +144,10 @@ corecmd_exec_shell(xend_t)
 
 corenet_all_recvfrom_unlabeled(xend_t)
 corenet_all_recvfrom_netlabel(xend_t)
-corenet_tcp_sendrecv_all_if(xend_t)
-corenet_tcp_sendrecv_all_nodes(xend_t)
+corenet_tcp_sendrecv_generic_if(xend_t)
+corenet_tcp_sendrecv_generic_node(xend_t)
 corenet_tcp_sendrecv_all_ports(xend_t)
-corenet_tcp_bind_all_nodes(xend_t)
+corenet_tcp_bind_generic_node(xend_t)
 corenet_tcp_bind_xen_port(xend_t)
 corenet_tcp_bind_soundd_port(xend_t)
 corenet_tcp_bind_generic_port(xend_t)
@@ -185,9 +185,6 @@ term_use_generic_ptys(xend_t)
 term_use_ptmx(xend_t)
 term_getattr_pty_fs(xend_t)
 
-libs_use_ld_so(xend_t)
-libs_use_shared_libs(xend_t)
-
 locallogin_dontaudit_use_fds(xend_t)
 
 logging_send_syslog_msg(xend_t)
@@ -208,11 +205,12 @@ sysnet_delete_dhcpc_pid(xend_t)
 sysnet_read_dhcpc_pid(xend_t)
 sysnet_rw_dhcp_config(xend_t)
 
+userdom_dontaudit_search_user_home_dirs(xend_t)
+
 xen_stream_connect_xenstore(xend_t)
 
 netutils_domtrans(xend_t)
 
-sysadm_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
 unconfined_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
 ifdef(`distro_debian', `
 # xend uses LD_PRELOAD or similar for libxenctrl.so
@@ -253,15 +251,12 @@ domain_dontaudit_ptrace_all_domains(xenconsoled_t)
 corecmd_search_bin(xenconsoled_t)
 files_read_usr_files(xenconsoled_t)
 
-term_create_pty(xenconsoled_t,xen_devpts_t);
+term_create_pty(xenconsoled_t,xen_devpts_t)
 term_use_generic_ptys(xenconsoled_t)
 term_use_console(xenconsoled_t)
 
 init_use_fds(xenconsoled_t)
 init_use_script_ptys(xenconsoled_t)
-
-libs_use_ld_so(xenconsoled_t)
-libs_use_shared_libs(xenconsoled_t)
 
 miscfiles_read_localization(xenconsoled_t)
 
@@ -312,9 +307,6 @@ term_use_console(xenconsoled_t)
 init_use_fds(xenstored_t)
 init_use_script_ptys(xenstored_t)
 
-libs_use_ld_so(xenstored_t)
-libs_use_shared_libs(xenstored_t)
-
 logging_send_syslog_msg(xenstored_t)
 
 miscfiles_read_localization(xenstored_t)
@@ -349,7 +341,7 @@ kernel_write_xen_state(xm_t)
 corecmd_exec_bin(xm_t)
 
 corenet_tcp_sendrecv_generic_if(xm_t)
-corenet_tcp_sendrecv_all_nodes(xm_t)
+corenet_tcp_sendrecv_generic_node(xm_t)
 corenet_tcp_connect_soundd_port(xm_t)
 
 dev_read_urand(xm_t)
@@ -366,9 +358,6 @@ term_use_all_terms(xm_t)
 
 init_rw_script_stream_sockets(xm_t)
 init_use_fds(xm_t)
-
-libs_use_ld_so(xm_t)
-libs_use_shared_libs(xm_t)
 
 miscfiles_read_localization(xm_t)
 

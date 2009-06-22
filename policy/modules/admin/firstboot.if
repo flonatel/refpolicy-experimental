@@ -18,7 +18,7 @@ interface(`firstboot_domtrans',`
 		type firstboot_t, firstboot_exec_t;
 	')
 
-	domtrans_pattern($1,firstboot_exec_t,firstboot_t)
+	domtrans_pattern($1, firstboot_exec_t, firstboot_t)
 ')
 
 ########################################
@@ -36,11 +36,6 @@ interface(`firstboot_domtrans',`
 ##	The role to be allowed the firstboot domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the firstboot domain to use.
-##	</summary>
-## </param>
 #
 interface(`firstboot_run',`
 	gen_require(`
@@ -49,7 +44,6 @@ interface(`firstboot_run',`
 
 	firstboot_domtrans($1)
 	role $2 types firstboot_t;
-	allow firstboot_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -141,4 +135,23 @@ interface(`firstboot_dontaudit_rw_pipes',`
 	')
 
 	dontaudit $1 firstboot_t:fifo_file { read write };
+')
+
+########################################
+## <summary>
+## 	Do not audit attemps to read and write to a firstboot
+##	unix domain stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`firstboot_dontaudit_rw_stream_sockets',`
+	gen_require(`
+		type firstboot_t;
+	')
+
+	dontaudit $1 firstboot_t:unix_stream_socket { read write };
 ')

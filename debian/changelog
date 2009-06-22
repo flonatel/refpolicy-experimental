@@ -1,11 +1,164 @@
+refpolicy (2:0.0.20090621-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - Greylist milter from Paul Howarth.
+    - Crack db access for su to handle password expiration, from Brandon Whalen.
+    - Misc fixes for unix_update from Brandon Whalen.
+    - Add x_device permissions for XI2 functions, from Eamon Walsh.
+    - MLS constraints for the x_selection class, from Eamon Walsh.
+    - Postgresql updates from KaiGai Kohei.
+    - Milter state directory patch from Paul Howarth.
+    - Add MLS constrains for ingress/egress and secmark from Paul Moore.
+    - Drop write permission from fs_read_rpc_sockets().
+    - Remove unused udev_runtime_t type.
+    - Patch for RadSec port from Glen Turner.
+    - Enable network_peer_controls policy capability from Paul Moore.
+    - Btrfs xattr support from Paul Moore.
+    - Add db_procedure install permission from KaiGai Kohei.
+    - Add support for network interfaces with access controlled by a Boolean
+      from the CLIP project.
+    - Several fixes from the CLIP project.
+    - Add support for labeled Booleans.
+    - Remove node definitions and change node usage to generic nodes.
+    - Add kernel_service access vectors, from Stephen Smalley.
+    - Added modules:
+            certmaster (Dan Walsh)
+            git (Dan Walsh)
+            gpsd (Miroslav Grepl)
+            guest (Dan Walsh)
+            ifplugd (Dan Walsh)
+            lircd (Miroslav Grepl)
+            logadm (Dan Walsh)
+            pingd (Dan Walsh)
+            psad (Dan Walsh)
+            portreserve (Dan Walsh)
+            ulogd (Dan Walsh)
+            webadm (Dan Walsh)
+            xguest (Dan Walsh)
+            zosremote (Dan Walsh)
+
+     - Fix consistency of audioentropy and iscsi module naming.
+     - Debian file context fix for xen from Russell Coker.
+     - Xserver MLS fix from Eamon Walsh.
+     - Add omapi port for dhcpcd.
+     - Deprecate per-role templates and rolemap support.
+     - Implement user-based access control for use as role separations.
+     - Move shared library calls from individual modules to the domain module.
+     - Enable open permission checks policy capability.
+     - Remove hierarchy from portage module as it is not a good example of
+       hieararchy.
+     - Remove enableaudit target from modular build as semodule -DB supplants it.
+     - Added modules:
+             milter (Paul Howarth)
+  * Sync'd with Russell Coker
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 22 Jun 2009 02:42:42 -0500
+
+refpolicy (2:0.0.20081014-1) unstable; urgency=low
+
+  * New upstream release
+    - Fix httpd_enable_homedirs to actually provide the access it is
+      supposed to provide.
+    - Add unused interface/template parameter metadata in XML.
+    - Patch to handle postfix data_directory from Vaclav Ovsik.
+    - SE-Postgresql policy from KaiGai Kohei.
+    - Patch for X.org dbus support from Martin Orr.
+    - Patch for labeled networking controls in 2.6.25 from Paul Moore.
+    - Module loading now requires setsched on kernel threads.
+    - Patch to allow gpg agent --write-env-file option from Vaclav Ovsik.
+    - X application data class from Eamon Walsh and Ted Toth.
+    - Move user roles into individual modules.
+    - Make hald_log_t a log file.
+    - Cryptsetup runs shell scripts.  Patch from Martin Orr.
+    - Add file for enabling policy capabilities.
+    - Patch to fix leaky interface/template call depth calculator from
+      Vaclav Ovsik.
+    - Added modules:
+            kerneloops (Dan Walsh)
+            kismet (Dan Walsh)
+            podsleuth (Dan Walsh)
+            prelude (Dan Walsh)
+            qemu (Dan Walsh)
+            virt (Dan Walsh)
+  * Updated the link to the shared copyright file.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Sat, 14 Feb 2009 15:42:48 -0600
+
+refpolicy (2:0.0.20080702-16) unstable; urgency=low
+
+  * Allow system_dbusd_t to read /proc/X/cmdline so it knows the client name
+  * Label /usr/lib/gnome-vfs-2.0/gnome-vfs-daemon as bin_t
+  * Allow $1_gpg_t to read inotifyfs_t directories
+  * Allow user_t signull access to xdm_t for gdmflexiserver
+  * Fix the path for deliver in lda.fc
+  * Load lda.pp when dovecot-common is installed and dovecot.pp when other
+    dovecot packages are installed.  Allow lda_t to use dovecot auth socket
+  * Allow dovecot_auth_t to create sockets labeled as dovecot_var_run_t,
+    also allow chown capability to apply correct ownership
+  * Label /usr/sbin/nrpe and allow it to search nagios_etc_t:dir, read etc_t
+    files, do setgid() and setuid(), create a pidfile, bind to port 5666, stat
+    filesystems, get a list of processes, and check mysql and postgresql
+    databases.
+  * Make mail_spool_t a filesystem_type.
+  * Allow snmpd_t capabilities setuid and chown
+  * Allow xdm_xserver_t to send dbus messages to unconfined_t
+  * Allow postfix_cleanup_t shutdown access to a postfix_smtpd_t
+    unix_stream_socket
+  * Allow clamd_t access to inherit it's own fds.
+  * Enable the watchdog policy in the build.
+  * Grant capability ipc_lock to dpkg_t
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 13 May 2009 09:13:38 +1000
+
+refpolicy (2:0.0.20080702-15) unstable; urgency=low
+
+  * Gave every domain that has process:setcap access also have process:getcap.
+  * Set the type of /etc/network/run/ifstate to etc_runtime_t and allow
+    udev_t to write to it.
+  * allow apt_t to manage directories of type apt_var_log_t
+  * allow initrc_t postfix_etc_t:file ioctl;
+  * allow postfix_showq_t to be used from user roles.
+  * allow postfix_virtual_t to connect to postfix_private_t sockets
+  * allow postfix_pipe_t to execute bin_t
+  * allow initrc_t udev_tbl_t:file unlink and device_t:dir rmdir
+  * allow the Courier POP server fill rw_file_perms access to courier_var_lib_t.
+  * allow jabberd_t to connect to jabber_interserver_port_t.
+  * allow fcrond to do all the funky things it desires.
+  * allow cupsd_t to read/write generic USB devices.
+  * allow webalizer to read /usr files (for GeoIP).
+  * Enable dovecot_t for daemon_access_unconfined_home
+  * dontaudit logrotate stating terminal devices.
+  * allow dpkg_t to set rlimit
+  * Label /var/lib/squirrelmail/data(/.*)? as httpd_squirrelmail_t.
+  * allow apmd_t to talk to hald_t via dbus.
+  * allow dovecot to connect to Mysql and PostgreSQL
+  * label most /usr/lib/dovecot/* files as bin_t
+  * Added new "lda" module for email local delivery agents such as maildrop
+    and procmail and don't build procmail.pp any more.
+  * Label /var/run/xauth/* as xdm_var_run_t.
+  * Label /var/run/openvpn.client* as openvpn_var_run_t.
+  * Make /var/log/?dm.log.* files get the type xserver_log_t
+  * Make /var/log/aptitude* files get the type apt_var_log_t
+  * Make /var/run/gdm_socket get the type xdm_var_run_t
+  * Labelled the entrypoint scripts under /etc/gdm as xsession_exec_t
+  * Fixed Debian labelling for atspool
+  * allow openvpn_t to access var_lib_t and usr_t files for vulnkey.
+  * allow user domains to access the xdm socket of type xdm_var_run_t for
+    switch user.
+  * allow unconfined_t to transition to system_dbusd_t.
+    Closes: #498965
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 04 Mar 2009 23:10:14 +1100
+
 refpolicy (2:0.0.20080702-14.1) unstable; urgency=low
 
-  * Non-maintainer upload.
-  * Only record changes to original modules selections. (closes: #524516)
-  * Again disable unbuildable portslave policy.
-  * Fix pythonsupport policy.
+  * Fix FTBS problems when building in parallel, by moving to the new,
+    make -j friendly targets in debian/rules. These rules have been tested
+    in several packages, and have been tested often with
+    "fakeroot make -j4 -f ./debian/rules binary".
+  * Updated the VCS-* variables in control to point to the git repo.
 
- -- Bastian Blank <waldi@debian.org>  Wed, 20 May 2009 22:49:16 +0000
+ -- Manoj Srivastava <srivasta@debian.org>  Wed, 07 Jan 2009 11:58:44 -0600
 
 refpolicy (2:0.0.20080702-14) unstable; urgency=high
 

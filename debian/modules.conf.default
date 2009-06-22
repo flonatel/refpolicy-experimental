@@ -101,6 +101,14 @@ selinux = base
 # 
 terminal = base
 
+# Layer: kernel
+# Module: ubac
+# Required in base
+#
+# User-based access control policy
+# 
+ubac = base
+
 # Layer: admin
 # Module: acct
 #
@@ -127,21 +135,21 @@ amanda = module
 #
 # Abstract Machine Test Utility
 # 
-amtu = module
+amtu = off
 
 # Layer: admin
 # Module: anaconda
 #
 # Policy for the Anaconda installer.
 # 
-anaconda = module
+anaconda = off
 
 # Layer: admin
 # Module: apt
 #
 # APT advanced package toll.
 # 
-apt = module
+apt = base
 
 # Layer: admin
 # Module: backup
@@ -176,7 +184,7 @@ certwatch = module
 #
 # Determine of the console connected to the controlling terminal.
 # 
-consoletype = module
+consoletype = off
 
 # Layer: admin
 # Module: ddcprobe
@@ -190,7 +198,7 @@ ddcprobe = module
 #
 # Policy for dmesg.
 # 
-dmesg = module
+dmesg = base
 
 # Layer: admin
 # Module: dmidecode
@@ -204,7 +212,7 @@ dmidecode = module
 #
 # Policy for the Debian package manager.
 # 
-dpkg = module
+dpkg = base
 
 # Layer: admin
 # Module: firstboot
@@ -212,7 +220,7 @@ dpkg = module
 # Final system configuration run during the first boot
 # after installation of Red Hat/Fedora systems.
 # 
-firstboot = module
+firstboot = off
 
 # Layer: admin
 # Module: kismet
@@ -226,14 +234,14 @@ kismet = module
 #
 # Hardware detection and configuration tools
 # 
-kudzu = module
+kudzu = off
 
 # Layer: admin
 # Module: logrotate
 #
 # Rotate and archive system logs
 # 
-logrotate = module
+logrotate = base
 
 # Layer: admin
 # Module: logwatch
@@ -290,14 +298,14 @@ readahead = module
 #
 # Policy for the RPM package manager.
 # 
-rpm = module
+rpm = off
 
 # Layer: admin
 # Module: su
 #
 # Run shells with substitute user and group
 # 
-su = module
+su = base
 
 # Layer: admin
 # Module: sudo
@@ -339,7 +347,7 @@ tzdata = module
 #
 # Red Hat utility to change /etc/fstab.
 # 
-updfstab = module
+updfstab = off
 
 # Layer: admin
 # Module: usbmodules
@@ -353,7 +361,7 @@ usbmodules = module
 #
 # Policy for managing user accounts.
 # 
-usermanage = module
+usermanage = base
 
 # Layer: admin
 # Module: vbetool
@@ -606,7 +614,7 @@ yam = module
 #
 # Policy controlling access to storage devices
 # 
-storage = module
+storage = base
 
 # Layer: roles
 # Module: auditadm
@@ -616,32 +624,60 @@ storage = module
 auditadm = module
 
 # Layer: roles
+# Module: guest
+#
+# Least privledge terminal user role
+# 
+guest = module
+
+# Layer: roles
+# Module: logadm
+#
+# Log administrator role
+# 
+logadm = module
+
+# Layer: roles
 # Module: secadm
 #
 # Security administrator role
 # 
-secadm = module
+secadm = off
 
 # Layer: roles
 # Module: staff
 #
 # Administrator's unprivileged user role
 # 
-staff = module
+staff = base
 
 # Layer: roles
 # Module: sysadm
 #
 # General system administration role
 # 
-sysadm = module
+sysadm = base
 
 # Layer: roles
 # Module: unprivuser
 #
 # Generic unprivileged user role
 # 
-unprivuser = module
+unprivuser = base
+
+# Layer: roles
+# Module: webadm
+#
+# Web administrator role
+# 
+webadm = module
+
+# Layer: roles
+# Module: xguest
+#
+# Least privledge xwindows user role
+# 
+xguest = module
 
 # Layer: services
 # Module: afs
@@ -757,6 +793,13 @@ canna = module
 ccs = module
 
 # Layer: services
+# Module: certmaster
+#
+# Certmaster SSL certificate distribution service
+# 
+certmaster = module
+
+# Layer: services
 # Module: cipe
 #
 # Encrypted tunnel daemon
@@ -810,7 +853,7 @@ cpucontrol = module
 #
 # Periodic execution of scheduled commands.
 # 
-cron = module
+cron = base
 
 # Layer: services
 # Module: cups
@@ -825,6 +868,13 @@ cups = module
 # Concurrent versions system
 # 
 cvs = module
+
+# Layer: services
+# Module: cyphesis
+#
+# Cyphesis WorldForge game server
+# 
+cyphesis = module
 
 # Layer: services
 # Module: cyrus
@@ -897,6 +947,13 @@ distcc = module
 djbdns = module
 
 # Layer: services
+# Module: dkim
+#
+# DKIM Milter - add and validate public key signatures on email
+# 
+dkim = module
+
+# Layer: services
 # Module: dnsmasq
 #
 # dnsmasq DNS forwarder and DHCP server
@@ -909,6 +966,13 @@ dnsmasq = module
 # Dovecot POP and IMAP mail server
 # 
 dovecot = module
+
+# Layer: services
+# Module: epmd
+#
+# Erlang Port Mapper Daemon (epmd).
+# 
+epmd = module
 
 # Layer: services
 # Module: exim
@@ -953,6 +1017,13 @@ ftp = module
 gatekeeper = module
 
 # Layer: services
+# Module: git
+#
+# GIT revision control system
+# 
+git = module
+
+# Layer: services
 # Module: gpm
 #
 # General Purpose Mouse driver
@@ -960,11 +1031,18 @@ gatekeeper = module
 gpm = module
 
 # Layer: services
+# Module: gpsd
+#
+# gpsd monitor daemon
+# 
+gpsd = module
+
+# Layer: services
 # Module: hal
 #
 # Hardware abstraction layer
 # 
-hal = module
+hal = base
 
 # Layer: services
 # Module: howl
@@ -981,6 +1059,13 @@ howl = module
 i18n_input = module
 
 # Layer: services
+# Module: ifplugd
+#
+# Bring up/down ethernet interfaces based on cable detection.
+# 
+ifplugd = module
+
+# Layer: services
 # Module: imaze
 #
 # iMaze game server
@@ -992,7 +1077,7 @@ imaze = module
 #
 # Internet services daemon.
 # 
-inetd = module
+inetd = base
 
 # Layer: services
 # Module: inn
@@ -1044,11 +1129,25 @@ kerneloops = module
 ktalk = module
 
 # Layer: services
+# Module: lda
+#
+# mail delivery agent
+# 
+lda = module
+
+# Layer: services
 # Module: ldap
 #
 # OpenLDAP directory server
 # 
 ldap = module
+
+# Layer: services
+# Module: lircd
+#
+# Linux infared remote control daemon
+# 
+lircd = module
 
 # Layer: services
 # Module: lpd
@@ -1065,6 +1164,20 @@ lpd = module
 mailman = module
 
 # Layer: services
+# Module: memcached
+#
+# high-performance memory object caching system
+# 
+memcached = module
+
+# Layer: services
+# Module: milter
+#
+# Milter mail filters
+# 
+milter = module
+
+# Layer: services
 # Module: monop
 #
 # Monopoly daemon
@@ -1076,7 +1189,7 @@ monop = module
 #
 # Policy common to all email tranfer agents.
 # 
-mta = module
+mta = base
 
 # Layer: services
 # Module: munin
@@ -1172,6 +1285,13 @@ oav = module
 oddjob = module
 
 # Layer: services
+# Module: oident
+#
+# SELinux policy for Oident daemon.
+# 
+oident = module
+
+# Layer: services
 # Module: openca
 #
 # OpenCA - Open Certificate Authority
@@ -1214,11 +1334,25 @@ pegasus = module
 perdition = module
 
 # Layer: services
+# Module: pingd
+#
+# Pingd of the Whatsup cluster node up/down detection utility
+# 
+pingd = module
+
+# Layer: services
 # Module: portmap
 #
 # RPC port mapping service.
 # 
 portmap = module
+
+# Layer: services
+# Module: portreserve
+#
+# Reserve well-known ports in the RPC port range.
+# 
+portreserve = module
 
 # Layer: services
 # Module: portslave
@@ -1282,6 +1416,13 @@ privoxy = module
 # Procmail mail delivery agent
 # 
 procmail = module
+
+# Layer: services
+# Module: psad
+#
+# Intrusion Detection and Log Analysis with iptables
+# 
+psad = module
 
 # Layer: services
 # Module: publicfile
@@ -1573,6 +1714,13 @@ transproxy = module
 ucspitcp = module
 
 # Layer: services
+# Module: ulogd
+#
+# Iptables/netfilter userspace logging daemon.
+# 
+ulogd = module
+
+# Layer: services
 # Module: uptime
 #
 # Uptime daemon
@@ -1599,6 +1747,13 @@ uwimap = module
 # Libvirt virtualization API
 # 
 virt = module
+
+# Layer: services
+# Module: w3c
+#
+# W3C Markup Validator
+# 
+w3c = module
 
 # Layer: services
 # Module: watchdog
@@ -1642,26 +1797,33 @@ zabbix = module
 # 
 zebra = module
 
+# Layer: services
+# Module: zosremote
+#
+# policy for z/OS Remote-services Audit dispatcher plugin
+# 
+zosremote = module
+
 # Layer: system
 # Module: application
 #
 # Policy for user executable applications.
 # 
-application = module
+application = base
 
 # Layer: system
 # Module: authlogin
 #
 # Common policy for authentication and user login.
 # 
-authlogin = module
+authlogin = base
 
 # Layer: system
 # Module: clock
 #
 # Policy for reading and setting the hardware clock.
 # 
-clock = module
+clock = base
 
 # Layer: system
 # Module: daemontools
@@ -1675,21 +1837,21 @@ daemontools = module
 #
 # Tools for filesystem management, such as mkfs and fsck.
 # 
-fstools = module
+fstools = base
 
 # Layer: system
 # Module: getty
 #
 # Policy for getty.
 # 
-getty = module
+getty = base
 
 # Layer: system
 # Module: hostname
 #
 # Policy for changing the system host name.
 # 
-hostname = module
+hostname = base
 
 # Layer: system
 # Module: hotplug
@@ -1704,7 +1866,7 @@ hotplug = module
 #
 # System initialization programs (init and init scripts).
 # 
-init = module
+init = base
 
 # Layer: system
 # Module: ipsec
@@ -1718,7 +1880,7 @@ ipsec = module
 #
 # Policy for iptables.
 # 
-iptables = module
+iptables = base
 
 # Layer: system
 # Module: iscsi
@@ -1732,21 +1894,21 @@ iscsi = module
 #
 # Policy for system libraries.
 # 
-libraries = module
+libraries = base
 
 # Layer: system
 # Module: locallogin
 #
 # Policy for local logins.
 # 
-locallogin = module
+locallogin = base
 
 # Layer: system
 # Module: logging
 #
 # Policy for the kernel message logger and system logging daemon.
 # 
-logging = module
+logging = base
 
 # Layer: system
 # Module: lvm
@@ -1760,28 +1922,28 @@ lvm = module
 #
 # Miscelaneous files.
 # 
-miscfiles = module
+miscfiles = base
 
 # Layer: system
 # Module: modutils
 #
 # Policy for kernel module utilities
 # 
-modutils = module
+modutils = base
 
 # Layer: system
 # Module: mount
 #
 # Policy for mount.
 # 
-mount = module
+mount = base
 
 # Layer: system
 # Module: netlabel
 #
 # NetLabel/CIPSO labeled networking management
 # 
-netlabel = module
+netlabel = base
 
 # Layer: system
 # Module: pcmcia
@@ -1789,6 +1951,13 @@ netlabel = module
 # PCMCIA card management services
 # 
 pcmcia = module
+
+# Layer: system
+# Module: pythonsupport
+#
+# Support for precompiling python modules
+# 
+pythonsupport = module
 
 # Layer: system
 # Module: raid
@@ -1802,28 +1971,28 @@ raid = module
 #
 # Policy for SELinux policy and userland applications.
 # 
-selinuxutil = module
+selinuxutil = base
 
 # Layer: system
 # Module: setrans
 #
 # SELinux MLS/MCS label translation service.
 # 
-setrans = module
+setrans = base
 
 # Layer: system
 # Module: sysnetwork
 #
 # Policy for network configuration: ifconfig and dhcp client.
 # 
-sysnetwork = module
+sysnetwork = base
 
 # Layer: system
 # Module: udev
 #
 # Policy for udev.
 # 
-udev = module
+udev = base
 
 # Layer: system
 # Module: unconfined
@@ -1837,7 +2006,7 @@ unconfined = module
 #
 # Policy for user domains
 # 
-userdomain = module
+userdomain = base
 
 # Layer: system
 # Module: xen

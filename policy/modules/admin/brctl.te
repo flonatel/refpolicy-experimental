@@ -1,4 +1,4 @@
-policy_module(brctl,1.2.0)
+policy_module(brctl, 1.3.1)
 
 ########################################
 #
@@ -25,6 +25,8 @@ kernel_load_module(brctl_t)
 kernel_read_network_state(brctl_t)
 kernel_read_sysctl(brctl_t)
 
+corenet_rw_tun_tap_dev(brctl_t)
+
 dev_rw_sysfs(brctl_t)
 dev_write_sysfs_dirs(brctl_t)
 
@@ -33,8 +35,7 @@ domain_use_interactive_fds(brctl_t)
 
 files_read_etc_files(brctl_t)
 
-libs_use_ld_so(brctl_t)
-libs_use_shared_libs(brctl_t)
+term_dontaudit_use_console(brctl_t)
 
 miscfiles_read_localization(brctl_t)
 

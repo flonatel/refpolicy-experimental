@@ -4,6 +4,7 @@
 
 /usr/bin/at			--	gen_context(system_u:object_r:crontab_exec_t,s0)
 /usr/bin/(f)?crontab		--	gen_context(system_u:object_r:crontab_exec_t,s0)
+/usr/sbin/fcronsighup           --      gen_context(system_u:object_r:crontab_exec_t,s0)
 
 /usr/sbin/anacron		--	gen_context(system_u:object_r:anacron_exec_t,s0)
 /usr/sbin/atd			--	gen_context(system_u:object_r:crond_exec_t,s0)
@@ -17,9 +18,15 @@
 /var/run/fcron\.fifo		-s	gen_context(system_u:object_r:crond_var_run_t,s0)
 /var/run/fcron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
 
+ifdef(`distro_debian', `
+/var/spool/cron/atspool        -d      gen_context(system_u:object_r:cron_spool_t,s0)
+/var/spool/cron/atjobs         -d      gen_context(system_u:object_r:cron_spool_t,s0)
+/var/spool/cron/atjobs/[^/]*   --      <<none>>
+', `
 /var/spool/at			-d	gen_context(system_u:object_r:cron_spool_t,s0)
 /var/spool/at/spool		-d	gen_context(system_u:object_r:cron_spool_t,s0)
 /var/spool/at/[^/]*		--	<<none>>
+')
 
 /var/spool/cron			-d	gen_context(system_u:object_r:cron_spool_t,s0)
 #/var/spool/cron/root		--	gen_context(system_u:object_r:sysadm_cron_spool_t,s0)
@@ -41,7 +48,7 @@ ifdef(`distro_suse', `
 #/var/spool/cron/crontabs/root	--	gen_context(system_u:object_r:sysadm_cron_spool_t,s0)
 
 /var/spool/fcron		-d	gen_context(system_u:object_r:cron_spool_t,s0)
-/var/spool/fcron/.*			<<none>>
+/var/spool/fcron/[^/]*			<<none>>
 /var/spool/fcron/systab\.orig	--	gen_context(system_u:object_r:system_cron_spool_t,s0)
 /var/spool/fcron/systab		--	gen_context(system_u:object_r:system_cron_spool_t,s0)
 /var/spool/fcron/new\.systab	--	gen_context(system_u:object_r:system_cron_spool_t,s0)

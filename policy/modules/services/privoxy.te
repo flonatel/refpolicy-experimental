@@ -1,5 +1,5 @@
 
-policy_module(privoxy, 1.7.0)
+policy_module(privoxy, 1.8.2)
 
 ########################################
 #
@@ -8,7 +8,10 @@ policy_module(privoxy, 1.7.0)
 
 type privoxy_t; # web_client_domain
 type privoxy_exec_t;
-init_daemon_domain(privoxy_t,privoxy_exec_t)
+init_daemon_domain(privoxy_t, privoxy_exec_t)
+
+type privoxy_initrc_exec_t;
+init_script_file(privoxy_initrc_exec_t)
 
 type privoxy_etc_rw_t;
 files_type(privoxy_etc_rw_t)
@@ -30,11 +33,11 @@ allow privoxy_t self:tcp_socket create_stream_socket_perms;
 
 allow privoxy_t privoxy_etc_rw_t:file rw_file_perms;
 
-manage_files_pattern(privoxy_t,privoxy_log_t,privoxy_log_t)
-logging_log_filetrans(privoxy_t,privoxy_log_t,file)
+manage_files_pattern(privoxy_t, privoxy_log_t, privoxy_log_t)
+logging_log_filetrans(privoxy_t, privoxy_log_t, file)
 
-manage_files_pattern(privoxy_t,privoxy_var_run_t,privoxy_var_run_t)
-files_pid_filetrans(privoxy_t,privoxy_var_run_t,file)
+manage_files_pattern(privoxy_t, privoxy_var_run_t, privoxy_var_run_t)
+files_pid_filetrans(privoxy_t, privoxy_var_run_t, file)
 
 kernel_read_kernel_sysctls(privoxy_t)
 kernel_list_proc(privoxy_t)
@@ -42,14 +45,15 @@ kernel_read_proc_symlinks(privoxy_t)
 
 corenet_all_recvfrom_unlabeled(privoxy_t)
 corenet_all_recvfrom_netlabel(privoxy_t)
-corenet_tcp_sendrecv_all_if(privoxy_t)
-corenet_tcp_sendrecv_all_nodes(privoxy_t)
+corenet_tcp_sendrecv_generic_if(privoxy_t)
+corenet_tcp_sendrecv_generic_node(privoxy_t)
 corenet_tcp_sendrecv_all_ports(privoxy_t)
-corenet_tcp_bind_all_nodes(privoxy_t)
+corenet_tcp_bind_generic_node(privoxy_t)
 corenet_tcp_bind_http_cache_port(privoxy_t)
 corenet_tcp_connect_http_port(privoxy_t)
 corenet_tcp_connect_http_cache_port(privoxy_t)
 corenet_tcp_connect_ftp_port(privoxy_t)
+corenet_tcp_connect_pgpkeyserver_port(privoxy_t)
 corenet_tcp_connect_tor_port(privoxy_t)
 corenet_sendrecv_http_cache_client_packets(privoxy_t)
 corenet_sendrecv_http_cache_server_packets(privoxy_t)
@@ -66,9 +70,6 @@ domain_use_interactive_fds(privoxy_t)
 
 files_read_etc_files(privoxy_t)
 
-libs_use_ld_so(privoxy_t)
-libs_use_shared_libs(privoxy_t)
-
 logging_send_syslog_msg(privoxy_t)
 
 miscfiles_read_localization(privoxy_t)
@@ -76,10 +77,9 @@ miscfiles_read_localization(privoxy_t)
 sysnet_dns_name_resolve(privoxy_t)
 
 userdom_dontaudit_use_unpriv_user_fds(privoxy_t)
-
-sysadm_dontaudit_search_home_dirs(privoxy_t)
+userdom_dontaudit_search_user_home_dirs(privoxy_t)
 # cjp: this should really not be needed
-sysadm_use_terms(privoxy_t)
+userdom_use_user_terminals(privoxy_t)
 
 optional_policy(`
 	nis_use_ypbind(privoxy_t)

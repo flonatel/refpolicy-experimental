@@ -1,5 +1,5 @@
 
-policy_module(rpm,1.8.0)
+policy_module(rpm, 1.9.2)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(rpm,1.8.0)
 
 type rpm_t;
 type rpm_exec_t;
-init_system_domain(rpm_t,rpm_exec_t)
+init_system_domain(rpm_t, rpm_exec_t)
 domain_obj_id_change_exemption(rpm_t)
 domain_role_change_exemption(rpm_t)
 domain_system_change_exemption(rpm_t)
@@ -37,7 +37,7 @@ domain_obj_id_change_exemption(rpm_script_t)
 domain_system_change_exemption(rpm_script_t)
 corecmd_shell_entry_type(rpm_script_t)
 domain_type(rpm_script_t)
-domain_entry_file(rpm_t,rpm_script_exec_t)
+domain_entry_file(rpm_t, rpm_script_exec_t)
 domain_interactive_fd(rpm_script_t)
 role system_r types rpm_script_t;
 
@@ -68,26 +68,24 @@ allow rpm_t self:shm create_shm_perms;
 allow rpm_t self:sem create_sem_perms;
 allow rpm_t self:msgq create_msgq_perms;
 allow rpm_t self:msg { send receive };
-allow rpm_t self:dir search;
-allow rpm_t self:file rw_file_perms;;
 
 allow rpm_t rpm_log_t:file manage_file_perms;
-logging_log_filetrans(rpm_t,rpm_log_t,file)
+logging_log_filetrans(rpm_t, rpm_log_t, file)
 
-manage_dirs_pattern(rpm_t,rpm_tmp_t,rpm_tmp_t)
-manage_files_pattern(rpm_t,rpm_tmp_t,rpm_tmp_t)
+manage_dirs_pattern(rpm_t, rpm_tmp_t, rpm_tmp_t)
+manage_files_pattern(rpm_t, rpm_tmp_t, rpm_tmp_t)
 files_tmp_filetrans(rpm_t, rpm_tmp_t, { file dir })
 
-manage_dirs_pattern(rpm_t,rpm_tmpfs_t,rpm_tmpfs_t)
-manage_files_pattern(rpm_t,rpm_tmpfs_t,rpm_tmpfs_t)
-manage_lnk_files_pattern(rpm_t,rpm_tmpfs_t,rpm_tmpfs_t)
-manage_fifo_files_pattern(rpm_t,rpm_tmpfs_t,rpm_tmpfs_t)
-manage_sock_files_pattern(rpm_t,rpm_tmpfs_t,rpm_tmpfs_t)
-fs_tmpfs_filetrans(rpm_t,rpm_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(rpm_t, rpm_tmpfs_t, rpm_tmpfs_t)
+manage_files_pattern(rpm_t, rpm_tmpfs_t, rpm_tmpfs_t)
+manage_lnk_files_pattern(rpm_t, rpm_tmpfs_t, rpm_tmpfs_t)
+manage_fifo_files_pattern(rpm_t, rpm_tmpfs_t, rpm_tmpfs_t)
+manage_sock_files_pattern(rpm_t, rpm_tmpfs_t, rpm_tmpfs_t)
+fs_tmpfs_filetrans(rpm_t, rpm_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
 # Access /var/lib/rpm files
-manage_files_pattern(rpm_t,rpm_var_lib_t,rpm_var_lib_t)
-files_var_lib_filetrans(rpm_t,rpm_var_lib_t,dir)
+manage_files_pattern(rpm_t, rpm_var_lib_t, rpm_var_lib_t)
+files_var_lib_filetrans(rpm_t, rpm_var_lib_t, dir)
 
 kernel_read_system_state(rpm_t)
 kernel_read_kernel_sysctls(rpm_t)
@@ -96,12 +94,12 @@ corecmd_exec_all_executables(rpm_t)
 
 corenet_all_recvfrom_unlabeled(rpm_t)
 corenet_all_recvfrom_netlabel(rpm_t)
-corenet_tcp_sendrecv_all_if(rpm_t)
-corenet_raw_sendrecv_all_if(rpm_t)
-corenet_udp_sendrecv_all_if(rpm_t)
-corenet_tcp_sendrecv_all_nodes(rpm_t)
-corenet_raw_sendrecv_all_nodes(rpm_t)
-corenet_udp_sendrecv_all_nodes(rpm_t)
+corenet_tcp_sendrecv_generic_if(rpm_t)
+corenet_raw_sendrecv_generic_if(rpm_t)
+corenet_udp_sendrecv_generic_if(rpm_t)
+corenet_tcp_sendrecv_generic_node(rpm_t)
+corenet_raw_sendrecv_generic_node(rpm_t)
+corenet_udp_sendrecv_generic_node(rpm_t)
 corenet_tcp_sendrecv_all_ports(rpm_t)
 corenet_udp_sendrecv_all_ports(rpm_t)
 corenet_tcp_connect_all_ports(rpm_t)
@@ -134,8 +132,6 @@ storage_raw_write_fixed_disk(rpm_t)
 # for installing kernel packages
 storage_raw_read_fixed_disk(rpm_t)
 
-term_list_ptys(rpm_t)
-
 auth_relabel_all_files_except_shadow(rpm_t)
 auth_manage_all_files_except_shadow(rpm_t)
 auth_dontaudit_read_shadow(rpm_t)
@@ -160,8 +156,6 @@ files_exec_etc_files(rpm_t)
 
 init_domtrans_script(rpm_t)
 
-libs_use_ld_so(rpm_t)
-libs_use_shared_libs(rpm_t)
 libs_exec_ld_so(rpm_t)
 libs_exec_lib_files(rpm_t)
 libs_domtrans_ldconfig(rpm_t)
@@ -172,10 +166,11 @@ logging_send_syslog_msg(rpm_t)
 seutil_manage_src_policy(rpm_t)
 seutil_manage_bin_policy(rpm_t)
 
+userdom_use_user_terminals(rpm_t)
 userdom_use_unpriv_users_fds(rpm_t)
 
 optional_policy(`
-	cron_system_entry(rpm_t,rpm_exec_t)
+	cron_system_entry(rpm_t, rpm_exec_t)
 ')
 
 optional_policy(`
@@ -231,16 +226,16 @@ allow rpm_script_t self:msg { send receive };
 allow rpm_script_t rpm_tmp_t:file read_file_perms;
 
 allow rpm_script_t rpm_script_tmp_t:dir mounton;
-manage_dirs_pattern(rpm_script_t,rpm_script_tmp_t,rpm_script_tmp_t)
-manage_files_pattern(rpm_script_t,rpm_script_tmp_t,rpm_script_tmp_t)
+manage_dirs_pattern(rpm_script_t, rpm_script_tmp_t, rpm_script_tmp_t)
+manage_files_pattern(rpm_script_t, rpm_script_tmp_t, rpm_script_tmp_t)
 files_tmp_filetrans(rpm_script_t, rpm_script_tmp_t, { file dir })
 
-manage_dirs_pattern(rpm_script_t,rpm_script_tmpfs_t,rpm_script_tmpfs_t)
-manage_files_pattern(rpm_script_t,rpm_script_tmpfs_t,rpm_script_tmpfs_t)
-manage_lnk_files_pattern(rpm_script_t,rpm_script_tmpfs_t,rpm_script_tmpfs_t)
-manage_fifo_files_pattern(rpm_script_t,rpm_script_tmpfs_t,rpm_script_tmpfs_t)
-manage_sock_files_pattern(rpm_script_t,rpm_script_tmpfs_t,rpm_script_tmpfs_t)
-fs_tmpfs_filetrans(rpm_script_t,rpm_script_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(rpm_script_t, rpm_script_tmpfs_t, rpm_script_tmpfs_t)
+manage_files_pattern(rpm_script_t, rpm_script_tmpfs_t, rpm_script_tmpfs_t)
+manage_lnk_files_pattern(rpm_script_t, rpm_script_tmpfs_t, rpm_script_tmpfs_t)
+manage_fifo_files_pattern(rpm_script_t, rpm_script_tmpfs_t, rpm_script_tmpfs_t)
+manage_sock_files_pattern(rpm_script_t, rpm_script_tmpfs_t, rpm_script_tmpfs_t)
+fs_tmpfs_filetrans(rpm_script_t, rpm_script_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
 kernel_read_kernel_sysctls(rpm_script_t)
 kernel_read_system_state(rpm_script_t)
@@ -277,8 +272,6 @@ selinux_compute_user_contexts(rpm_script_t)
 storage_raw_read_fixed_disk(rpm_script_t)
 storage_raw_write_fixed_disk(rpm_script_t)
 
-term_getattr_unallocated_ttys(rpm_script_t)
-term_list_ptys(rpm_script_t)
 term_use_all_terms(rpm_script_t)
 
 auth_dontaudit_getattr_shadow(rpm_script_t)
@@ -301,8 +294,6 @@ files_exec_usr_files(rpm_script_t)
 
 init_domtrans_script(rpm_script_t)
 
-libs_use_ld_so(rpm_script_t)
-libs_use_shared_libs(rpm_script_t)
 libs_exec_ld_so(rpm_script_t)
 libs_exec_lib_files(rpm_script_t)
 libs_domtrans_ldconfig(rpm_script_t)
@@ -344,7 +335,7 @@ optional_policy(`
 	unconfined_domtrans(rpm_script_t)
 
 	optional_policy(`
-		java_domtrans(rpm_script_t)
+		java_domtrans_unconfined(rpm_script_t)
 	')
 
 	optional_policy(`

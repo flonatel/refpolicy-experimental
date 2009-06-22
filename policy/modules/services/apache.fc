@@ -1,4 +1,4 @@
-HOME_DIR/((www)|(web)|(public_html))(/.+)? gen_context(system_u:object_r:httpd_ROLE_content_t,s0)
+HOME_DIR/((www)|(web)|(public_html))(/.+)? gen_context(system_u:object_r:httpd_user_content_t,s0)
 
 /etc/apache(2)?(/.*)?			gen_context(system_u:object_r:httpd_config_t,s0)
 /etc/apache-ssl(2)?(/.*)?		gen_context(system_u:object_r:httpd_config_t,s0)
@@ -16,7 +16,6 @@ HOME_DIR/((www)|(web)|(public_html))(/.+)? gen_context(system_u:object_r:httpd_R
 
 /usr/lib/apache-ssl/.+		--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/lib/cgi-bin(/.*)?			gen_context(system_u:object_r:httpd_sys_script_exec_t,s0)
-/usr/lib/squid/cachemgr\.cgi	--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/lib(64)?/apache(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
 /usr/lib(64)?/apache2/modules(/.*)?	gen_context(system_u:object_r:httpd_modules_t,s0)
 /usr/lib(64)?/apache(2)?/suexec(2)? --	gen_context(system_u:object_r:httpd_suexec_exec_t,s0)
@@ -52,7 +51,8 @@ ifdef(`distro_suse', `
 /var/lib/httpd(/.*)?			gen_context(system_u:object_r:httpd_var_lib_t,s0)
 /var/lib/php/session(/.*)?		gen_context(system_u:object_r:httpd_var_run_t,s0)
 /var/lib/squirrelmail/prefs(/.*)?	gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
-
+/var/lib/squirrelmail/data(/.*)?        gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
+ 
 /var/log/apache(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
 /var/log/apache-ssl(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
 /var/log/cacti(/.*)?			gen_context(system_u:object_r:httpd_log_t,s0)

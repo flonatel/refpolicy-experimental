@@ -1,5 +1,5 @@
 
-policy_module(alsa, 1.5.0)
+policy_module(alsa, 1.7.1)
 
 ########################################
 #
@@ -43,16 +43,17 @@ kernel_read_system_state(alsa_t)
 
 dev_read_sound(alsa_t)
 dev_write_sound(alsa_t)
+dev_read_sysfs(alsa_t)
 
 corecmd_exec_bin(alsa_t)
 
 files_search_home(alsa_t)
 files_read_etc_files(alsa_t)
+files_read_usr_files(alsa_t)
 
 auth_use_nsswitch(alsa_t)
 
-libs_use_ld_so(alsa_t)
-libs_use_shared_libs(alsa_t)
+init_use_fds(alsa_t)
 
 logging_send_syslog_msg(alsa_t)
 
@@ -60,10 +61,7 @@ miscfiles_read_localization(alsa_t)
 
 userdom_manage_unpriv_user_semaphores(alsa_t)
 userdom_manage_unpriv_user_shared_mem(alsa_t)
-
-sysadm_dontaudit_search_home_dirs(alsa_t)
-
-unprivuser_search_home_dirs(alsa_t)
+userdom_search_user_home_dirs(alsa_t)
 
 optional_policy(`
 	hal_use_fds(alsa_t)

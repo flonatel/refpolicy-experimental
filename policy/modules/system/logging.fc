@@ -4,7 +4,11 @@
 /etc/rsyslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
 /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
 /etc/audit(/.*)?		gen_context(system_u:object_r:auditd_etc_t,mls_systemhigh)
+/etc/rc\.d/init\.d/auditd --	gen_context(system_u:object_r:auditd_initrc_exec_t,s0)
+/etc/rc\.d/init\.d/rsyslog --	gen_context(system_u:object_r:syslogd_initrc_exec_t,s0)
 
+/sbin/audispd		--	gen_context(system_u:object_r:audisp_exec_t,s0)
+/sbin/audisp-remote	--	gen_context(system_u:object_r:audisp_remote_exec_t,s0)
 /sbin/auditctl		--	gen_context(system_u:object_r:auditctl_exec_t,s0)
 /sbin/auditd		--	gen_context(system_u:object_r:auditd_exec_t,s0)
 /sbin/klogd		--	gen_context(system_u:object_r:klogd_exec_t,s0)
@@ -21,6 +25,7 @@
 /usr/sbin/syslog-ng	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
 /usr/sbin/syslogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
 
+/var/lib/syslog-ng(/.*)? 	gen_context(system_u:object_r:syslogd_var_lib_t,s0)
 /var/lib/syslog-ng.persist --	gen_context(system_u:object_r:syslogd_var_lib_t,s0)
 
 ifdef(`distro_suse', `
@@ -29,6 +34,7 @@ ifdef(`distro_suse', `
 
 /var/axfrdns/log/main(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
 /var/dnscache/log/main(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
+/var/cfengine/outputs(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
 
 /var/log		-d	gen_context(system_u:object_r:var_log_t,s0-mls_systemhigh)
 /var/log/.*			gen_context(system_u:object_r:var_log_t,s0)
@@ -38,7 +44,7 @@ ifdef(`distro_suse', `
 /var/log/maillog[^/]*		gen_context(system_u:object_r:var_log_t,mls_systemhigh)
 /var/log/spooler[^/]*		gen_context(system_u:object_r:var_log_t,mls_systemhigh)
 /var/log/audit(/.*)?		gen_context(system_u:object_r:auditd_log_t,mls_systemhigh)
-/var/log/syslog-ng(/.*)? --	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+/var/log/syslog-ng(/.*)? 	gen_context(system_u:object_r:syslogd_var_run_t,s0)
 
 ifndef(`distro_gentoo',`
 /var/log/audit\.log	--	gen_context(system_u:object_r:auditd_log_t,mls_systemhigh)
@@ -49,7 +55,7 @@ ifdef(`distro_redhat',`
 ')
 
 /var/run/audit_events	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
-/var/run/audispd_events	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+/var/run/audispd_events	-s	gen_context(system_u:object_r:audisp_var_run_t,s0)
 /var/run/auditd\.pid	--	gen_context(system_u:object_r:auditd_var_run_t,s0)
 /var/run/auditd_sock	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
 /var/run/klogd\.pid	--	gen_context(system_u:object_r:klogd_var_run_t,s0)

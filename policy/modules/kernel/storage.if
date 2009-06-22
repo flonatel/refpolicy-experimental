@@ -118,10 +118,11 @@ interface(`storage_raw_read_fixed_disk',`
 interface(`storage_dontaudit_read_fixed_disk',`
 	gen_require(`
 		type fixed_disk_device_t;
-		
+
 	')
 
-	dontaudit $1 fixed_disk_device_t:blk_file { getattr ioctl read };
+	dontaudit $1 fixed_disk_device_t:blk_file read_blk_file_perms;
+	dontaudit $1 fixed_disk_device_t:chr_file read_chr_file_perms;
 ')
 
 ########################################
@@ -163,7 +164,7 @@ interface(`storage_raw_write_fixed_disk',`
 interface(`storage_dontaudit_write_fixed_disk',`
 	gen_require(`
 		type fixed_disk_device_t;
-		
+
 	')
 
 	dontaudit $1 fixed_disk_device_t:blk_file write_blk_file_perms;
@@ -171,15 +172,15 @@ interface(`storage_dontaudit_write_fixed_disk',`
 
 ########################################
 ## <summary>
-##      Allow the caller to directly read and write to a fixed disk.
-##      This is extremly dangerous as it can bypass the
-##      SELinux protections for filesystem objects, and
-##      should only be used by trusted domains.
+##	Allow the caller to directly read and write to a fixed disk.
+##	This is extremly dangerous as it can bypass the
+##	SELinux protections for filesystem objects, and
+##	should only be used by trusted domains.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`storage_raw_rw_fixed_disk',`
@@ -206,6 +207,7 @@ interface(`storage_manage_fixed_disk',`
 	dev_list_all_dev_nodes($1)
 	allow $1 self:capability mknod;
 	allow $1 fixed_disk_device_t:blk_file manage_blk_file_perms;
+	allow $1 fixed_disk_device_t:chr_file manage_chr_file_perms;
 	typeattribute $1 fixed_disk_raw_read, fixed_disk_raw_write;
 ')
 
@@ -225,7 +227,7 @@ interface(`storage_dev_filetrans_fixed_disk',`
 		type fixed_disk_device_t;
 	')
 
-	dev_filetrans($1,fixed_disk_device_t,blk_file)
+	dev_filetrans($1, fixed_disk_device_t, blk_file)
 ')
 
 ########################################
@@ -244,7 +246,7 @@ interface(`storage_tmpfs_filetrans_fixed_disk',`
 		type fixed_disk_device_t;
 	')
 
-	fs_tmpfs_filetrans($1,fixed_disk_device_t,blk_file)
+	fs_tmpfs_filetrans($1, fixed_disk_device_t, blk_file)
 ')
 
 ########################################
@@ -542,7 +544,7 @@ interface(`storage_dontaudit_getattr_removable_dev',`
 interface(`storage_dontaudit_read_removable_device',`
 	gen_require(`
 		type removable_device_t;
-		
+
 	')
 
 	dontaudit $1 removable_device_t:blk_file { getattr ioctl read };

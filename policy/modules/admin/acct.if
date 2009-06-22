@@ -16,7 +16,7 @@ interface(`acct_domtrans',`
 	')
 
 	corecmd_search_bin($1)
-	domtrans_pattern($1, acct_exec_t,acct_t)
+	domtrans_pattern($1, acct_exec_t, acct_t)
 ')
 
 ########################################

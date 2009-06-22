@@ -1,5 +1,5 @@
 
-policy_module(rdisc,1.5.0)
+policy_module(rdisc, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(rdisc,1.5.0)
 
 type rdisc_t;
 type rdisc_exec_t;
-init_daemon_domain(rdisc_t,rdisc_exec_t)
+init_daemon_domain(rdisc_t, rdisc_exec_t)
 
 ########################################
 #
@@ -30,8 +30,8 @@ corenet_all_recvfrom_unlabeled(rdisc_t)
 corenet_all_recvfrom_netlabel(rdisc_t)
 corenet_udp_sendrecv_generic_if(rdisc_t)
 corenet_raw_sendrecv_generic_if(rdisc_t)
-corenet_udp_sendrecv_all_nodes(rdisc_t)
-corenet_raw_sendrecv_all_nodes(rdisc_t)
+corenet_udp_sendrecv_generic_node(rdisc_t)
+corenet_raw_sendrecv_generic_node(rdisc_t)
 corenet_udp_sendrecv_all_ports(rdisc_t)
 
 dev_read_sysfs(rdisc_t)
@@ -42,10 +42,9 @@ domain_use_interactive_fds(rdisc_t)
 
 files_read_etc_files(rdisc_t)
 
-libs_use_ld_so(rdisc_t)
-libs_use_shared_libs(rdisc_t)
-
 logging_send_syslog_msg(rdisc_t)
+
+miscfiles_read_localization(rdisc_t)
 
 sysnet_read_config(rdisc_t)
 

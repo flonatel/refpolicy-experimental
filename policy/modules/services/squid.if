@@ -16,7 +16,62 @@ interface(`squid_domtrans',`
 	')
 
 	corecmd_search_bin($1)
-	domtrans_pattern($1,squid_exec_t,squid_t)
+	domtrans_pattern($1, squid_exec_t, squid_t)
+')
+
+########################################
+## <summary>
+##	Execute squid 
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`squid_exec',`
+	gen_require(`
+		type squid_exec_t;
+	')
+
+	can_exec($1, squid_exec_t)
+')
+
+########################################
+## <summary>
+##	Send generic signals to squid.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`squid_signal',`
+	gen_require(`
+		type squid_t;
+	')
+
+	allow $1 squid_t:process signal;
+')
+
+########################################
+## <summary>
+##	Allow read and write squid
+##	unix domain stream sockets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`squid_rw_stream_sockets',`
+	gen_require(`
+		type squid_t;
+	')
+
+	allow $1 squid_t:unix_stream_socket { getattr read write };
 ')
 
 ########################################
@@ -75,7 +130,7 @@ interface(`squid_read_log',`
 	')
 
 	logging_search_logs($1)
-	read_files_pattern($1,squid_log_t,squid_log_t)
+	read_files_pattern($1, squid_log_t, squid_log_t)
 ')
 
 ########################################
@@ -94,7 +149,7 @@ interface(`squid_append_log',`
 	')
 
 	logging_search_logs($1)
-	append_files_pattern($1,squid_log_t,squid_log_t)
+	append_files_pattern($1, squid_log_t, squid_log_t)
 ')
 
 ########################################
@@ -115,7 +170,7 @@ interface(`squid_manage_logs',`
 	')
 
 	logging_search_logs($1)
-	manage_files_pattern($1,squid_log_t,squid_log_t)
+	manage_files_pattern($1, squid_log_t, squid_log_t)
 ')
 
 ########################################
@@ -130,4 +185,49 @@ interface(`squid_manage_logs',`
 #
 interface(`squid_use',`
 	refpolicywarn(`$0($*) has been deprecated.')
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate 
+##	an squid environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed to manage the squid domain.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`squid_admin',`
+	gen_require(`
+		type squid_t, squid_cache_t, squid_conf_t;
+		type squid_log_t, squid_var_run_t;
+		type squid_initrc_exec_t;
+	')
+
+	allow $1 squid_t:process { ptrace signal_perms };
+	ps_process_pattern($1, squid_t)
+
+	init_labeled_script_domtrans($1, squid_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 squid_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	files_list_var($1)
+	admin_pattern($1, squid_cache_t)
+
+	files_list_etc($1)
+	admin_pattern($1, squid_conf_t)
+
+	logging_list_logs($1)
+	admin_pattern($1, squid_log_t)
+
+	files_list_pids($1)
+	admin_pattern($1, squid_var_run_t)
 ')

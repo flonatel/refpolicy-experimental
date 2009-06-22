@@ -17,7 +17,7 @@ interface(`certwatch_domtrans',`
 
 	files_search_usr($1)
 	corecmd_search_bin($1)
-	domtrans_pattern($1,certwatch_exec_t,certwatch_t)
+	domtrans_pattern($1, certwatch_exec_t, certwatch_t)
 ')
 
 ########################################
@@ -37,11 +37,6 @@ interface(`certwatch_domtrans',`
 ##	The role to be allowed the certwatch domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the certwatch domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`certwatch_run',`
@@ -51,7 +46,6 @@ interface(`certwatch_run',`
 
 	certwatch_domtrans($1)
 	role $2 types certwatch_t;
-	allow certwatch_t $3:chr_file rw_term_perms;
 ')
 
 ########################################

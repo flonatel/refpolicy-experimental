@@ -15,18 +15,18 @@ interface(`dovecot_manage_spool',`
 		type dovecot_spool_t;
 	')
 
-	manage_files_pattern($1,dovecot_spool_t,dovecot_spool_t)
-	manage_lnk_files_pattern($1,dovecot_spool_t,dovecot_spool_t)
+	manage_files_pattern($1, dovecot_spool_t, dovecot_spool_t)
+	manage_lnk_files_pattern($1, dovecot_spool_t, dovecot_spool_t)
 ')
 
 ########################################
 ## <summary>
-##      Do not audit attempts to delete dovecot lib files.
+##	Do not audit attempts to delete dovecot lib files.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain to not audit.
-##      </summary>
+##	<summary>
+##	Domain to not audit.
+##	</summary>
 ## </param>
 #
 interface(`dovecot_dontaudit_unlink_lib_files',`
@@ -35,4 +35,22 @@ interface(`dovecot_dontaudit_unlink_lib_files',`
 	')
 
 	dontaudit $1 dovecot_var_lib_t:file unlink;
+')
+
+########################################
+## <summary>
+##      Allow client to connect to Dovecot auth socket
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain to connect
+##      </summary>
+## </param>
+#
+interface(`dovecot_auth_client',`
+       gen_require(`
+               type dovecot_auth_t, dovecot_var_run_t;
+       ')
+
+       stream_connect_pattern(lda_t, dovecot_var_run_t, dovecot_var_run_t, dovecot_auth_t)
 ')

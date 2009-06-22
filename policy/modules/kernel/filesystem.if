@@ -285,7 +285,7 @@ interface(`fs_read_anon_inodefs_files',`
 
 	')
 
-	read_files_pattern($1,anon_inodefs_t,anon_inodefs_t)
+	read_files_pattern($1, anon_inodefs_t, anon_inodefs_t)
 ')
 
 ########################################
@@ -305,7 +305,7 @@ interface(`fs_rw_anon_inodefs_files',`
 
 	')
 
-	rw_files_pattern($1,anon_inodefs_t,anon_inodefs_t)
+	rw_files_pattern($1, anon_inodefs_t, anon_inodefs_t)
 ')
 
 ########################################
@@ -325,7 +325,6 @@ interface(`fs_mount_autofs',`
 
 	allow $1 autofs_t:filesystem mount;
 ')
-
 
 ########################################
 ## <summary>
@@ -457,7 +456,7 @@ interface(`fs_manage_autofs_symlinks',`
 		type autofs_t;
 	')
 
-	manage_lnk_files_pattern($1,autofs_t,autofs_t)
+	manage_lnk_files_pattern($1, autofs_t, autofs_t)
 ')
 
 ########################################
@@ -512,7 +511,7 @@ interface(`fs_register_binary_executable_type',`
 		type binfmt_misc_fs_t;
 	')
 
-	rw_files_pattern($1,binfmt_misc_fs_t,binfmt_misc_fs_t)
+	rw_files_pattern($1, binfmt_misc_fs_t, binfmt_misc_fs_t)
 ')
 
 ########################################
@@ -648,6 +647,24 @@ interface(`fs_dontaudit_list_cifs',`
 
 ########################################
 ## <summary>
+##	Mounton a CIFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_mounton_cifs',`
+	gen_require(`
+		type cifs_t;
+	')
+
+	allow $1 cifs_t:dir mounton;
+')
+
+########################################
+## <summary>
 ##	Read files on a CIFS or SMB filesystem.
 ## </summary>
 ## <param name="domain">
@@ -663,7 +680,7 @@ interface(`fs_read_cifs_files',`
 	')
 
 	allow $1 cifs_t:dir list_dir_perms;
-	read_files_pattern($1,cifs_t,cifs_t)
+	read_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -737,7 +754,25 @@ interface(`fs_read_noxattr_fs_files',`
 		attribute noxattrfs;
 	')
 
-	read_files_pattern($1,noxattrfs,noxattrfs)
+	read_files_pattern($1, noxattrfs, noxattrfs)
+')
+
+########################################
+## <summary>
+##	Dont audit attempts to write to noxattrfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_write_noxattr_fs_files',`
+	gen_require(`
+		attribute noxattrfs;
+	')
+
+	dontaudit $1 noxattrfs:file write;
 ')
 
 ########################################
@@ -755,7 +790,7 @@ interface(`fs_manage_noxattr_fs_files',`
 		attribute noxattrfs;
 	')
 
-	manage_files_pattern($1,noxattrfs,noxattrfs)
+	manage_files_pattern($1, noxattrfs, noxattrfs)
 ')
 
 ########################################
@@ -773,7 +808,7 @@ interface(`fs_read_noxattr_fs_symlinks',`
 		attribute noxattrfs;
 	')
 
-	read_lnk_files_pattern($1,noxattrfs,noxattrfs)
+	read_lnk_files_pattern($1, noxattrfs, noxattrfs)
 ')
 
 ########################################
@@ -793,6 +828,46 @@ interface(`fs_dontaudit_read_cifs_files',`
 	')
 
 	dontaudit $1 cifs_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Append files
+##	on a CIFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_append_cifs_files',`
+	gen_require(`
+		type cifs_t;
+	')
+
+	append_files_pattern($1, cifs_t, cifs_t)
+')
+
+########################################
+## <summary>
+##	dontaudit Append files
+##	on a CIFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_dontaudit_append_cifs_files',`
+	gen_require(`
+		type cifs_t;
+	')
+
+	dontaudit $1 cifs_t:file append_file_perms;
 ')
 
 ########################################
@@ -830,7 +905,7 @@ interface(`fs_read_cifs_symlinks',`
 	')
 
 	allow $1 cifs_t:dir list_dir_perms;
-	read_lnk_files_pattern($1,cifs_t,cifs_t)
+	read_lnk_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -849,7 +924,7 @@ interface(`fs_read_cifs_named_pipes',`
 		type cifs_t;
 	')
 
-	read_fifo_files_pattern($1,cifs_t,cifs_t)
+	read_fifo_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -868,7 +943,7 @@ interface(`fs_read_cifs_named_sockets',`
 		type cifs_t;
 	')
 
-	read_sock_files_pattern($1,cifs_t,cifs_t)
+	read_sock_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -890,7 +965,7 @@ interface(`fs_exec_cifs_files',`
 	')
 
 	allow $1 cifs_t:dir list_dir_perms;
-	exec_files_pattern($1,cifs_t,cifs_t)
+	exec_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -950,7 +1025,7 @@ interface(`fs_manage_cifs_files',`
 		type cifs_t;
 	')
 
-	manage_files_pattern($1,cifs_t,cifs_t)
+	manage_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -989,7 +1064,7 @@ interface(`fs_manage_cifs_symlinks',`
 		type cifs_t;
 	')
 
-	manage_lnk_files_pattern($1,cifs_t,cifs_t)
+	manage_lnk_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -1008,7 +1083,7 @@ interface(`fs_manage_cifs_named_pipes',`
 		type cifs_t;
 	')
 
-	manage_fifo_files_pattern($1,cifs_t,cifs_t)
+	manage_fifo_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -1027,7 +1102,7 @@ interface(`fs_manage_cifs_named_sockets',`
 		type cifs_t;
 	')
 
-	manage_sock_files_pattern($1,cifs_t,cifs_t)
+	manage_sock_files_pattern($1, cifs_t, cifs_t)
 ')
 
 ########################################
@@ -1071,7 +1146,7 @@ interface(`fs_cifs_domtrans',`
 	')
 
 	allow $1 cifs_t:dir search_dir_perms;
-	domain_auto_transition_pattern($1,cifs_t,$2)
+	domain_auto_transition_pattern($1, cifs_t, $2)
 ')
 
 ########################################
@@ -1191,6 +1266,25 @@ interface(`fs_search_dos',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete dirs
+##	on a DOS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_manage_dos_dirs',`
+	gen_require(`
+		type dosfs_t;
+	')
+
+	manage_dirs_pattern($1, dosfs_t, dosfs_t)
+')
+
+########################################
+## <summary>
 ##	Read files on a DOS filesystem.
 ## </summary>
 ## <param name="domain">
@@ -1204,7 +1298,7 @@ interface(`fs_read_dos_files',`
 		type dosfs_t;
 	')
 
-	read_files_pattern($1,dosfs_t,dosfs_t)
+	read_files_pattern($1, dosfs_t, dosfs_t)
 ')
 
 ########################################
@@ -1223,7 +1317,7 @@ interface(`fs_manage_dos_files',`
 		type dosfs_t;
 	')
 
-	manage_files_pattern($1,dosfs_t,dosfs_t)
+	manage_files_pattern($1, dosfs_t, dosfs_t)
 ')
 
 ########################################
@@ -1251,38 +1345,194 @@ interface(`fs_read_eventpollfs',`
 
 ########################################
 ## <summary>
-##      Mount a FUSE filesystem.
+##	Mount a FUSE filesystem.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`fs_mount_fusefs',`
-        gen_require(`
-                type fusefs_t;
-        ')
+	gen_require(`
+		type fusefs_t;
+	')
 
-        allow $1 fusefs_t:filesystem mount;
+	allow $1 fusefs_t:filesystem mount;
 ')
 
 ########################################
 ## <summary>
-##      Unmount a FUSE filesystem.
+##	Unmount a FUSE filesystem.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`fs_unmount_fusefs',`
-        gen_require(`
-                type fusefs_t;
-        ')
+	gen_require(`
+		type fusefs_t;
+	')
 
-        allow $1 fusefs_t:filesystem unmount;
+	allow $1 fusefs_t:filesystem unmount;
+')
+
+########################################
+## <summary>
+##	Search directories
+##	on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_search_fusefs',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	allow $1 fusefs_t:dir search_dir_perms;
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete directories
+##	on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_manage_fusefs_dirs',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	allow $1 fusefs_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to create, read,
+##	write, and delete directories
+##	on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_manage_fusefs_dirs',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	dontaudit $1 fusefs_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
+##	Read, a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_read_fusefs_files',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	read_files_pattern($1,fusefs_t,fusefs_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete files
+##	on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_manage_fusefs_files',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	manage_files_pattern($1, fusefs_t, fusefs_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to create,
+##	read, write, and delete files
+##	on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_manage_fusefs_files',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	dontaudit $1 fusefs_t:file manage_file_perms;
+')
+
+########################################
+## <summary>
+##	Read symbolic links on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_read_fusefs_symlinks',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	allow $1 fusefs_t:dir list_dir_perms;
+	read_lnk_files_pattern($1, fusefs_t, fusefs_t)
+')
+
+########################################
+## <summary>
+##	Read and write hugetlbfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_rw_hugetlbfs_files',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	rw_files_pattern($1, hugetlbfs_t, hugetlbfs_t)
 ')
 
 ########################################
@@ -1436,8 +1686,8 @@ interface(`fs_read_iso9660_files',`
 	')
 
 	allow $1 iso9660_t:dir list_dir_perms;
-	read_files_pattern($1,iso9660_t,iso9660_t)
-	read_lnk_files_pattern($1,iso9660_t,iso9660_t)
+	read_files_pattern($1, iso9660_t, iso9660_t)
+	read_lnk_files_pattern($1, iso9660_t, iso9660_t)
 ')
 
 ########################################
@@ -1571,6 +1821,24 @@ interface(`fs_dontaudit_list_nfs',`
 
 ########################################
 ## <summary>
+##	Mounton a NFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_mounton_nfs',`
+	gen_require(`
+		type nfs_t;
+	')
+
+	allow $1 nfs_t:dir mounton;
+')
+
+########################################
+## <summary>
 ##	Read files on a NFS filesystem.
 ## </summary>
 ## <param name="domain">
@@ -1586,7 +1854,7 @@ interface(`fs_read_nfs_files',`
 	')
 
 	allow $1 nfs_t:dir list_dir_perms;
-	read_files_pattern($1,nfs_t,nfs_t)
+	read_files_pattern($1, nfs_t, nfs_t)
 ')
 
 ########################################
@@ -1624,7 +1892,7 @@ interface(`fs_write_nfs_files',`
 	')
 
 	allow $1 nfs_t:dir list_dir_perms;
-	write_files_pattern($1,nfs_t,nfs_t)
+	write_files_pattern($1, nfs_t, nfs_t)
 ')
 
 ########################################
@@ -1644,7 +1912,47 @@ interface(`fs_exec_nfs_files',`
 	')
 
 	allow $1 nfs_t:dir list_dir_perms;
-	exec_files_pattern($1,nfs_t,nfs_t)
+	exec_files_pattern($1, nfs_t, nfs_t)
+')
+
+########################################
+## <summary>
+##	Append files
+##	on a NFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_append_nfs_files',`
+	gen_require(`
+		type nfs_t;
+	')
+
+	append_files_pattern($1, nfs_t, nfs_t)
+')
+
+########################################
+## <summary>
+##	dontaudit Append files
+##	on a NFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_dontaudit_append_nfs_files',`
+	gen_require(`
+		type nfs_t;
+	')
+
+	dontaudit $1 nfs_t:file append_file_perms;
 ')
 
 ########################################
@@ -1663,7 +1971,7 @@ interface(`fs_dontaudit_rw_nfs_files',`
 		type nfs_t;
 	')
 
-	dontaudit $1 nfs_t:file { read write };
+	dontaudit $1 nfs_t:file rw_file_perms;
 ')
 
 ########################################
@@ -1682,7 +1990,7 @@ interface(`fs_read_nfs_symlinks',`
 	')
 
 	allow $1 nfs_t:dir list_dir_perms;
-	read_lnk_files_pattern($1,nfs_t,nfs_t)
+	read_lnk_files_pattern($1, nfs_t, nfs_t)
 ')
 
 #########################################
@@ -1700,12 +2008,12 @@ interface(`fs_read_nfs_named_sockets',`
 		type nfs_t;
 	')
 
-	read_sock_files_pattern($1,nfs_t,nfs_t)
+	read_sock_files_pattern($1, nfs_t, nfs_t)
 ')
 
 #########################################
 ## <summary>
-##  Read named pipes on a NFS network filesystem.
+##	Read named pipes on a NFS network filesystem.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -1719,7 +2027,7 @@ interface(`fs_read_nfs_named_pipes',`
 		type nfs_t;
 	')
 
-	read_fifo_files_pattern($1,nfs_t,nfs_t)
+	read_fifo_files_pattern($1, nfs_t, nfs_t)
 ')
 
 ########################################
@@ -1810,7 +2118,7 @@ interface(`fs_read_removable_files',`
 		type removable_t;
 	')
 
-	read_files_pattern($1,removable_t,removable_t)
+	read_files_pattern($1, removable_t, removable_t)
 ')
 
 ########################################
@@ -1846,7 +2154,26 @@ interface(`fs_read_removable_symlinks',`
 		type removable_t;
 	')
 
-	read_lnk_files_pattern($1,removable_t,removable_t)
+	read_lnk_files_pattern($1, removable_t, removable_t)
+')
+
+########################################
+## <summary>
+##	Read and write block nodes on removable filesystems.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_rw_removable_blk_files',`
+	gen_require(`
+		type removable_t;
+	')
+
+	allow $1 removable_t:dir list_dir_perms;
+	rw_blk_files_pattern($1, removable_t, removable_t)
 ')
 
 ########################################
@@ -1882,7 +2209,7 @@ interface(`fs_read_rpc_files',`
 		type rpc_pipefs_t;
 	')
 
-	read_files_pattern($1,rpc_pipefs_t,rpc_pipefs_t)
+	read_files_pattern($1, rpc_pipefs_t, rpc_pipefs_t)
 ')
 
 ########################################
@@ -1900,7 +2227,7 @@ interface(`fs_read_rpc_symlinks',`
 		type rpc_pipefs_t;
 	')
 
-	read_lnk_files_pattern($1,rpc_pipefs_t,rpc_pipefs_t)
+	read_lnk_files_pattern($1, rpc_pipefs_t, rpc_pipefs_t)
 ')
 
 ########################################
@@ -1918,8 +2245,25 @@ interface(`fs_read_rpc_sockets',`
 		type rpc_pipefs_t;
 	')
 
-	allow $1 rpc_pipefs_t:sock_file { read write };
+	allow $1 rpc_pipefs_t:sock_file read;
+')
 
+########################################
+## <summary>
+##	Read and write sockets of RPC file system pipes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_rw_rpc_sockets',`
+	gen_require(`
+		type rpc_pipefs_t;
+	')
+
+	allow $1 rpc_pipefs_t:sock_file { read write };
 ')
 
 ########################################
@@ -1979,7 +2323,7 @@ interface(`fs_manage_nfs_files',`
 		type nfs_t;
 	')
 
-	manage_files_pattern($1,nfs_t,nfs_t)
+	manage_files_pattern($1, nfs_t, nfs_t)
 ')
 
 ########################################
@@ -2019,7 +2363,7 @@ interface(`fs_manage_nfs_symlinks',`
 		type nfs_t;
 	')
 
-	manage_lnk_files_pattern($1,nfs_t,nfs_t)
+	manage_lnk_files_pattern($1, nfs_t, nfs_t)
 ')
 
 #########################################
@@ -2038,7 +2382,7 @@ interface(`fs_manage_nfs_named_pipes',`
 		type nfs_t;
 	')
 
-	manage_fifo_files_pattern($1,nfs_t,nfs_t)
+	manage_fifo_files_pattern($1, nfs_t, nfs_t)
 ')
 
 #########################################
@@ -2057,7 +2401,7 @@ interface(`fs_manage_nfs_named_sockets',`
 		type nfs_t;
 	')
 
-	manage_sock_files_pattern($1,nfs_t,nfs_t)
+	manage_sock_files_pattern($1, nfs_t, nfs_t)
 ')
 
 ########################################
@@ -2101,7 +2445,7 @@ interface(`fs_nfs_domtrans',`
 	')
 
 	allow $1 nfs_t:dir search_dir_perms;
-	domain_auto_transition_pattern($1,nfs_t,$2)
+	domain_auto_transition_pattern($1, nfs_t, $2)
 ')
 
 ########################################
@@ -2211,7 +2555,7 @@ interface(`fs_rw_nfsd_fs',`
 		type nfsd_fs_t;
 	')
 
-	rw_files_pattern($1,nfsd_fs_t,nfsd_fs_t)
+	rw_files_pattern($1, nfsd_fs_t, nfsd_fs_t)
 ')
 
 ########################################
@@ -2412,7 +2756,7 @@ interface(`fs_manage_ramfs_files',`
 		type ramfs_t;
 	')
 
-	manage_files_pattern($1,ramfs_t,ramfs_t)
+	manage_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2430,7 +2774,7 @@ interface(`fs_write_ramfs_pipes',`
 		type ramfs_t;
 	')
 
-	write_fifo_files_pattern($1,ramfs_t,ramfs_t)
+	write_fifo_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2467,7 +2811,7 @@ interface(`fs_rw_ramfs_pipes',`
 		type ramfs_t;
 	')
 
-	rw_fifo_files_pattern($1,ramfs_t,ramfs_t)
+	rw_fifo_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2486,7 +2830,7 @@ interface(`fs_manage_ramfs_pipes',`
 		type ramfs_t;
 	')
 
-	manage_fifo_files_pattern($1,ramfs_t,ramfs_t)
+	manage_fifo_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2504,7 +2848,7 @@ interface(`fs_write_ramfs_sockets',`
 		type ramfs_t;
 	')
 
-	write_sock_files_pattern($1,ramfs_t,ramfs_t)
+	write_sock_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2523,7 +2867,7 @@ interface(`fs_manage_ramfs_sockets',`
 		type ramfs_t;
 	')
 
-	manage_sock_files_pattern($1,ramfs_t,ramfs_t)
+	manage_sock_files_pattern($1, ramfs_t, ramfs_t)
 ')
 
 ########################################
@@ -2689,7 +3033,7 @@ interface(`fs_rw_rpc_named_pipes',`
 		type rpc_pipefs_t;
 	')
 
-	allow $1 rpc_pipefs_t:fifo_file { read write };
+	allow $1 rpc_pipefs_t:fifo_file rw_fifo_file_perms;
 ')
 
 ########################################
@@ -2940,7 +3284,7 @@ interface(`fs_tmpfs_filetrans',`
 	')
 
 	allow $2 tmpfs_t:filesystem associate;
-	filetrans_pattern($1,tmpfs_t,$2,$3)
+	filetrans_pattern($1, tmpfs_t, $2, $3)
 ')
 
 ########################################
@@ -3033,7 +3377,7 @@ interface(`fs_rw_tmpfs_files',`
 		type tmpfs_t;
 	')
 
-	rw_files_pattern($1,tmpfs_t,tmpfs_t)
+	rw_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3051,7 +3395,7 @@ interface(`fs_read_tmpfs_symlinks',`
 		type tmpfs_t;
 	')
 
-	read_lnk_files_pattern($1,tmpfs_t,tmpfs_t)
+	read_lnk_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3070,7 +3414,7 @@ interface(`fs_rw_tmpfs_chr_files',`
 	')
 
 	allow $1 tmpfs_t:dir list_dir_perms;
-	rw_chr_files_pattern($1,tmpfs_t,tmpfs_t)
+	rw_chr_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3108,7 +3452,7 @@ interface(`fs_relabel_tmpfs_chr_file',`
 	')
 
 	allow $1 tmpfs_t:dir list_dir_perms;
-	relabel_chr_files_pattern($1,tmpfs_t,tmpfs_t)
+	relabel_chr_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3127,7 +3471,7 @@ interface(`fs_rw_tmpfs_blk_files',`
 	')
 
 	allow $1 tmpfs_t:dir list_dir_perms;
-	rw_blk_files_pattern($1,tmpfs_t,tmpfs_t)
+	rw_blk_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3146,7 +3490,7 @@ interface(`fs_relabel_tmpfs_blk_file',`
 	')
 
 	allow $1 tmpfs_t:dir list_dir_perms;
-	relabel_blk_files_pattern($1,tmpfs_t,tmpfs_t)
+	relabel_blk_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3165,7 +3509,7 @@ interface(`fs_manage_tmpfs_files',`
 		type tmpfs_t;
 	')
 
-	manage_files_pattern($1,tmpfs_t,tmpfs_t)
+	manage_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3184,7 +3528,7 @@ interface(`fs_manage_tmpfs_symlinks',`
 		type tmpfs_t;
 	')
 
-	manage_lnk_files_pattern($1,tmpfs_t,tmpfs_t)
+	manage_lnk_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3203,7 +3547,7 @@ interface(`fs_manage_tmpfs_sockets',`
 		type tmpfs_t;
 	')
 
-	manage_sock_files_pattern($1,tmpfs_t,tmpfs_t)
+	manage_sock_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3222,7 +3566,7 @@ interface(`fs_manage_tmpfs_chr_files',`
 		type tmpfs_t;
 	')
 
-	manage_chr_files_pattern($1,tmpfs_t,tmpfs_t)
+	manage_chr_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3241,7 +3585,7 @@ interface(`fs_manage_tmpfs_blk_files',`
 		type tmpfs_t;
 	')
 
-	manage_blk_files_pattern($1,tmpfs_t,tmpfs_t)
+	manage_blk_files_pattern($1, tmpfs_t, tmpfs_t)
 ')
 
 ########################################
@@ -3317,6 +3661,7 @@ interface(`fs_getattr_all_fs',`
 	')
 
 	allow $1 filesystem_type:filesystem getattr;
+	files_getattr_all_file_type_fs($1)
 ')
 
 ########################################
@@ -3465,7 +3810,7 @@ interface(`fs_getattr_all_files',`
 		attribute filesystem_type;
 	')
 
-	getattr_files_pattern($1,filesystem_type,filesystem_type)
+	getattr_files_pattern($1, filesystem_type, filesystem_type)
 ')
 
 ########################################
@@ -3484,7 +3829,7 @@ interface(`fs_getattr_all_symlinks',`
 		attribute filesystem_type;
 	')
 
-	getattr_lnk_files_pattern($1,filesystem_type,filesystem_type)
+	getattr_lnk_files_pattern($1, filesystem_type, filesystem_type)
 ')
 
 ########################################
@@ -3503,7 +3848,7 @@ interface(`fs_getattr_all_pipes',`
 		attribute filesystem_type;
 	')
 
-	getattr_fifo_files_pattern($1,filesystem_type,filesystem_type)
+	getattr_fifo_files_pattern($1, filesystem_type, filesystem_type)
 ')
 
 ########################################
@@ -3522,7 +3867,7 @@ interface(`fs_getattr_all_sockets',`
 		attribute filesystem_type;
 	')
 
-	getattr_sock_files_pattern($1,filesystem_type,filesystem_type)
+	getattr_sock_files_pattern($1, filesystem_type, filesystem_type)
 ')
 
 ########################################
@@ -3636,11 +3981,11 @@ interface(`fs_relabelfrom_noxattr_fs',`
 	')
 
 	allow $1 noxattrfs:dir list_dir_perms;
-	relabelfrom_dirs_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_files_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_lnk_files_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_fifo_files_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_sock_files_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_blk_files_pattern($1,noxattrfs,noxattrfs)
-	relabelfrom_chr_files_pattern($1,noxattrfs,noxattrfs)
+	relabelfrom_dirs_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_lnk_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_fifo_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_sock_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_blk_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_chr_files_pattern($1, noxattrfs, noxattrfs)
 ')

@@ -15,7 +15,7 @@ interface(`quota_domtrans',`
 		type quota_t, quota_exec_t;
 	')
 
-	domtrans_pattern($1,quota_exec_t,quota_t)
+	domtrans_pattern($1, quota_exec_t, quota_t)
 ')
 
 ########################################
@@ -33,11 +33,6 @@ interface(`quota_domtrans',`
 ##	The role to be allowed the quota domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the quota domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`quota_run',`
@@ -47,7 +42,6 @@ interface(`quota_run',`
 
 	quota_domtrans($1)
 	role $2 types quota_t;
-	allow quota_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -86,5 +80,5 @@ interface(`quota_manage_flags',`
 	')
 
 	files_search_var_lib($1)
-	manage_files_pattern($1,quota_flag_t,quota_flag_t)
+	manage_files_pattern($1, quota_flag_t, quota_flag_t)
 ')

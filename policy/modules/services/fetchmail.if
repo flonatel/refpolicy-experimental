@@ -14,17 +14,17 @@
 #
 interface(`fetchmail_admin',`
 	gen_require(`
-		type fetchmail_t, fetchmail_etc_t;
-		type fetchmail_uidl_cache_t, fetchmail_var_run_t;
+		type fetchmail_t, fetchmail_etc_t, fetchmail_uidl_cache_t;
+		type fetchmail_var_run_t;
 	')
 
 	ps_process_pattern($1, fetchmail_t)
 
 	files_list_etc($1)
-	manage_files_pattern($1, fetchmail_etc_t, fetchmail_etc_t)
+	admin_pattern($1, fetchmail_etc_t)
 
-	manage_files_pattern($1, fetchmail_uidl_cache_t, fetchmail_uidl_cache_t)
+	admin_pattern($1, fetchmail_uidl_cache_t)
 
 	files_list_pids($1)
-	manage_files_pattern($1, fetchmail_var_run_t, fetchmail_var_run_t)
+	admin_pattern($1, fetchmail_var_run_t)
 ')

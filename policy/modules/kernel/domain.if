@@ -525,7 +525,7 @@ interface(`domain_search_all_domains_state',`
 	')
 
 	kernel_search_proc($1)
-	allow $1 domain:dir search;
+	allow $1 domain:dir search_dir_perms;
 ')
 
 ########################################
@@ -565,8 +565,8 @@ interface(`domain_read_all_domains_state',`
 
 	kernel_search_proc($1)
 	allow $1 domain:dir list_dir_perms;
-	read_files_pattern($1,domain,domain)
-	read_lnk_files_pattern($1,domain,domain)
+	read_files_pattern($1, domain, domain)
+	read_lnk_files_pattern($1, domain, domain)
 ')
 
 ########################################
@@ -624,11 +624,12 @@ interface(`domain_read_confined_domains_state',`
 
 	kernel_search_proc($1)
 	allow $1 { domain -unconfined_domain_type }:dir list_dir_perms;
-	read_files_pattern($1,{ domain -unconfined_domain_type },{ domain -unconfined_domain_type })
-	read_lnk_files_pattern($1,{ domain -unconfined_domain_type },{ domain -unconfined_domain_type })
+	read_files_pattern($1, { domain -unconfined_domain_type }, { domain -unconfined_domain_type })
+	read_lnk_files_pattern($1, { domain -unconfined_domain_type }, { domain -unconfined_domain_type })
 
 	dontaudit $1 unconfined_domain_type:dir search_dir_perms;
-	dontaudit $1 unconfined_domain_type:file { getattr read };
+	dontaudit $1 unconfined_domain_type:file read_file_perms;
+	dontaudit $1 unconfined_domain_type:lnk_file read_lnk_file_perms;
 ')
 
 ########################################
@@ -747,8 +748,8 @@ interface(`domain_dontaudit_read_all_domains_state',`
 	dontaudit $1 domain:file read_file_perms;
 
 	# cjp: these should be removed:
-	dontaudit $1 domain:sock_file read_file_perms;
-	dontaudit $1 domain:fifo_file read_file_perms;
+	dontaudit $1 domain:sock_file read_sock_file_perms;
+	dontaudit $1 domain:fifo_file read_fifo_file_perms;
 ')
 
 ########################################
@@ -1130,7 +1131,7 @@ interface(`domain_exec_all_entry_files',`
 		attribute entry_type;
 	')
 
-	can_exec($1,entry_type)
+	can_exec($1, entry_type)
 ')
 
 ########################################
@@ -1221,7 +1222,7 @@ interface(`domain_mmap_all_entry_files',`
 ## </param>
 ## <param name="target_domain">
 ##	<summary>
-##      The type of the new process.
+##	The type of the new process.
 ##	</summary>
 ## </param>
 #
@@ -1231,15 +1232,15 @@ interface(`domain_entry_file_spec_domtrans',`
 		attribute entry_type;
 	')
 
-	domain_transition_pattern($1,entry_type,$2)
+	domain_transition_pattern($1, entry_type, $2)
 ')
 
 ########################################
 ## <summary>
 ##	Ability to mmap a low area of the address space,
-##      as configured by /proc/sys/kernel/mmap_min_addr.
-##      Preventing such mappings helps protect against
-##      exploiting null deref bugs in the kernel.
+##	as configured by /proc/sys/kernel/mmap_min_addr.
+##	Preventing such mappings helps protect against
+##	exploiting null deref bugs in the kernel.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -1274,7 +1275,7 @@ interface(`domain_all_recvfrom_all_domains',`
 		attribute domain;
  	')
 
-	corenet_all_recvfrom_labeled($1,domain)
+	corenet_all_recvfrom_labeled($1, domain)
 ')
 
 ########################################

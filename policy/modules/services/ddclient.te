@@ -1,5 +1,5 @@
 
-policy_module(ddclient, 1.5.0)
+policy_module(ddclient, 1.7.1)
 
 ########################################
 #
@@ -8,10 +8,13 @@ policy_module(ddclient, 1.5.0)
 
 type ddclient_t;
 type ddclient_exec_t;
-init_daemon_domain(ddclient_t,ddclient_exec_t)
+init_daemon_domain(ddclient_t, ddclient_exec_t)
 
 type ddclient_etc_t;
-files_type(ddclient_etc_t)
+files_config_file(ddclient_etc_t)
+
+type ddclient_initrc_exec_t;
+init_script_file(ddclient_initrc_exec_t)
 
 type ddclient_log_t;
 logging_log_file(ddclient_log_t)
@@ -41,18 +44,18 @@ allow ddclient_t ddclient_etc_t:file read_file_perms;
 allow ddclient_t ddclient_log_t:file manage_file_perms;
 logging_log_filetrans(ddclient_t,ddclient_log_t,file)
 
-manage_dirs_pattern(ddclient_t,ddclient_var_t,ddclient_var_t)
-manage_files_pattern(ddclient_t,ddclient_var_t,ddclient_var_t)
-manage_lnk_files_pattern(ddclient_t,ddclient_var_t,ddclient_var_t)
-manage_fifo_files_pattern(ddclient_t,ddclient_var_t,ddclient_var_t)
-manage_sock_files_pattern(ddclient_t,ddclient_var_t,ddclient_var_t)
-files_var_filetrans(ddclient_t,ddclient_var_t,{ file lnk_file sock_file fifo_file })
+manage_dirs_pattern(ddclient_t, ddclient_var_t, ddclient_var_t)
+manage_files_pattern(ddclient_t, ddclient_var_t, ddclient_var_t)
+manage_lnk_files_pattern(ddclient_t, ddclient_var_t, ddclient_var_t)
+manage_fifo_files_pattern(ddclient_t, ddclient_var_t, ddclient_var_t)
+manage_sock_files_pattern(ddclient_t, ddclient_var_t, ddclient_var_t)
+files_var_filetrans(ddclient_t, ddclient_var_t, { file lnk_file sock_file fifo_file })
 
-manage_files_pattern(ddclient_t,ddclient_var_lib_t,ddclient_var_lib_t)
-files_var_lib_filetrans(ddclient_t,ddclient_var_lib_t,file)
+manage_files_pattern(ddclient_t, ddclient_var_lib_t, ddclient_var_lib_t)
+files_var_lib_filetrans(ddclient_t, ddclient_var_lib_t, file)
 
-manage_files_pattern(ddclient_t,ddclient_var_run_t,ddclient_var_run_t)
-files_pid_filetrans(ddclient_t,ddclient_var_run_t,file)
+manage_files_pattern(ddclient_t, ddclient_var_run_t, ddclient_var_run_t)
+files_pid_filetrans(ddclient_t, ddclient_var_run_t, file)
 
 kernel_read_system_state(ddclient_t)
 kernel_read_network_state(ddclient_t)
@@ -68,8 +71,8 @@ corenet_all_recvfrom_unlabeled(ddclient_t)
 corenet_all_recvfrom_netlabel(ddclient_t)
 corenet_tcp_sendrecv_generic_if(ddclient_t)
 corenet_udp_sendrecv_generic_if(ddclient_t)
-corenet_tcp_sendrecv_all_nodes(ddclient_t)
-corenet_udp_sendrecv_all_nodes(ddclient_t)
+corenet_tcp_sendrecv_generic_node(ddclient_t)
+corenet_udp_sendrecv_generic_node(ddclient_t)
 corenet_tcp_sendrecv_all_ports(ddclient_t)
 corenet_udp_sendrecv_all_ports(ddclient_t)
 corenet_tcp_connect_all_ports(ddclient_t)
@@ -87,9 +90,6 @@ files_read_usr_files(ddclient_t)
 fs_getattr_all_fs(ddclient_t)
 fs_search_auto_mountpoints(ddclient_t)
 
-libs_use_ld_so(ddclient_t)
-libs_use_shared_libs(ddclient_t)
-
 logging_send_syslog_msg(ddclient_t)
 
 miscfiles_read_localization(ddclient_t)
@@ -98,8 +98,7 @@ sysnet_exec_ifconfig(ddclient_t)
 sysnet_read_config(ddclient_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ddclient_t)
-
-sysadm_dontaudit_search_home_dirs(ddclient_t)
+userdom_dontaudit_search_user_home_dirs(ddclient_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(ddclient_t)

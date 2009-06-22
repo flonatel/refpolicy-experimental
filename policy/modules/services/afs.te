@@ -1,5 +1,5 @@
 
-policy_module(afs, 1.3.0)
+policy_module(afs, 1.4.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(afs, 1.3.0)
 
 type afs_bosserver_t;
 type afs_bosserver_exec_t;
-init_daemon_domain(afs_bosserver_t,afs_bosserver_exec_t)
+init_daemon_domain(afs_bosserver_t, afs_bosserver_exec_t)
 
 type afs_config_t;
 files_type(afs_config_t)
@@ -23,7 +23,7 @@ files_type(afs_files_t)
 type afs_fsserver_t;
 type afs_fsserver_exec_t;
 domain_type(afs_fsserver_t)
-domain_entry_file(afs_fsserver_t,afs_fsserver_exec_t)
+domain_entry_file(afs_fsserver_t, afs_fsserver_exec_t)
 role system_r types afs_fsserver_t;
 
 type afs_ka_db_t;
@@ -32,7 +32,7 @@ files_type(afs_ka_db_t)
 type afs_kaserver_t;
 type afs_kaserver_exec_t;
 domain_type(afs_kaserver_t)
-domain_entry_file(afs_kaserver_t,afs_kaserver_exec_t)
+domain_entry_file(afs_kaserver_t, afs_kaserver_exec_t)
 role system_r types afs_kaserver_t;
 
 type afs_logfile_t;
@@ -44,7 +44,7 @@ files_type(afs_pt_db_t)
 type afs_ptserver_t;
 type afs_ptserver_exec_t;
 domain_type(afs_ptserver_t)
-domain_entry_file(afs_ptserver_t,afs_ptserver_exec_t)
+domain_entry_file(afs_ptserver_t, afs_ptserver_exec_t)
 role system_r types afs_ptserver_t;
 
 type afs_vl_db_t;
@@ -53,7 +53,7 @@ files_type(afs_vl_db_t)
 type afs_vlserver_t;
 type afs_vlserver_exec_t;
 domain_type(afs_vlserver_t)
-domain_entry_file(afs_vlserver_t,afs_vlserver_exec_t)
+domain_entry_file(afs_vlserver_t, afs_vlserver_exec_t)
 role system_r types afs_vlserver_t;
 
 ########################################
@@ -67,10 +67,10 @@ allow afs_bosserver_t self:udp_socket create_socket_perms;
 
 can_exec(afs_bosserver_t,afs_bosserver_exec_t)
 
-manage_dirs_pattern(afs_bosserver_t,afs_config_t,afs_config_t)
-manage_files_pattern(afs_bosserver_t,afs_config_t,afs_config_t)
+manage_dirs_pattern(afs_bosserver_t, afs_config_t, afs_config_t)
+manage_files_pattern(afs_bosserver_t, afs_config_t, afs_config_t)
 
-allow afs_bosserver_t afs_dbdir_t:dir { search read getattr };
+allow afs_bosserver_t afs_dbdir_t:dir list_dir_perms;
 
 allow afs_bosserver_t afs_fsserver_t:process signal_perms;
 domtrans_pattern(afs_bosserver_t, afs_fsserver_exec_t, afs_fsserver_t)
@@ -93,20 +93,17 @@ corenet_all_recvfrom_unlabeled(afs_bosserver_t)
 corenet_all_recvfrom_netlabel(afs_bosserver_t)
 corenet_tcp_sendrecv_generic_if(afs_bosserver_t)
 corenet_udp_sendrecv_generic_if(afs_bosserver_t)
-corenet_tcp_sendrecv_all_nodes(afs_bosserver_t)
-corenet_udp_sendrecv_all_nodes(afs_bosserver_t)
+corenet_tcp_sendrecv_generic_node(afs_bosserver_t)
+corenet_udp_sendrecv_generic_node(afs_bosserver_t)
 corenet_tcp_sendrecv_all_ports(afs_bosserver_t)
 corenet_udp_sendrecv_all_ports(afs_bosserver_t)
-corenet_udp_bind_all_nodes(afs_bosserver_t)
+corenet_udp_bind_generic_node(afs_bosserver_t)
 corenet_udp_bind_afs_bos_port(afs_bosserver_t)
 corenet_sendrecv_afs_bos_server_packets(afs_bosserver_t)
 
 files_read_etc_files(afs_bosserver_t)
 files_list_home(afs_bosserver_t)
 files_read_usr_files(afs_bosserver_t)
-
-libs_use_ld_so(afs_bosserver_t)
-libs_use_shared_libs(afs_bosserver_t)
 
 miscfiles_read_localization(afs_bosserver_t)
 
@@ -126,38 +123,38 @@ allow afs_fsserver_t self:fifo_file rw_fifo_file_perms;
 allow afs_fsserver_t self:tcp_socket create_stream_socket_perms;
 allow afs_fsserver_t self:udp_socket create_socket_perms;
 
-read_files_pattern(afs_fsserver_t,afs_config_t,afs_config_t)
+read_files_pattern(afs_fsserver_t, afs_config_t, afs_config_t)
 allow afs_fsserver_t afs_config_t:dir list_dir_perms;
 
-manage_dirs_pattern(afs_fsserver_t,afs_config_t,afs_config_t)
-manage_files_pattern(afs_fsserver_t,afs_config_t,afs_config_t)
+manage_dirs_pattern(afs_fsserver_t, afs_config_t, afs_config_t)
+manage_files_pattern(afs_fsserver_t, afs_config_t, afs_config_t)
 
 allow afs_fsserver_t afs_files_t:filesystem getattr;
-manage_dirs_pattern(afs_fsserver_t,afs_files_t,afs_files_t)
-manage_files_pattern(afs_fsserver_t,afs_files_t,afs_files_t)
-manage_lnk_files_pattern(afs_fsserver_t,afs_files_t,afs_files_t)
-manage_fifo_files_pattern(afs_fsserver_t,afs_files_t,afs_files_t)
-manage_sock_files_pattern(afs_fsserver_t,afs_files_t,afs_files_t)
-filetrans_pattern(afs_fsserver_t,afs_config_t,afs_files_t,{ file lnk_file sock_file fifo_file })
+manage_dirs_pattern(afs_fsserver_t, afs_files_t, afs_files_t)
+manage_files_pattern(afs_fsserver_t, afs_files_t, afs_files_t)
+manage_lnk_files_pattern(afs_fsserver_t, afs_files_t, afs_files_t)
+manage_fifo_files_pattern(afs_fsserver_t, afs_files_t, afs_files_t)
+manage_sock_files_pattern(afs_fsserver_t, afs_files_t, afs_files_t)
+filetrans_pattern(afs_fsserver_t, afs_config_t, afs_files_t, { file lnk_file sock_file fifo_file })
 
 can_exec(afs_fsserver_t, afs_fsserver_exec_t)
 
-manage_dirs_pattern(afs_fsserver_t,afs_logfile_t,afs_logfile_t)
-manage_files_pattern(afs_fsserver_t,afs_logfile_t,afs_logfile_t)
+manage_dirs_pattern(afs_fsserver_t, afs_logfile_t, afs_logfile_t)
+manage_files_pattern(afs_fsserver_t, afs_logfile_t, afs_logfile_t)
 
 kernel_read_system_state(afs_fsserver_t)
 kernel_read_kernel_sysctls(afs_fsserver_t)
 
 corenet_tcp_sendrecv_generic_if(afs_fsserver_t)
 corenet_udp_sendrecv_generic_if(afs_fsserver_t)
-corenet_tcp_sendrecv_all_nodes(afs_fsserver_t)
-corenet_udp_sendrecv_all_nodes(afs_fsserver_t)
+corenet_tcp_sendrecv_generic_node(afs_fsserver_t)
+corenet_udp_sendrecv_generic_node(afs_fsserver_t)
 corenet_tcp_sendrecv_all_ports(afs_fsserver_t)
 corenet_udp_sendrecv_all_ports(afs_fsserver_t)
 corenet_all_recvfrom_unlabeled(afs_fsserver_t)
 corenet_all_recvfrom_netlabel(afs_fsserver_t)
-corenet_tcp_bind_all_nodes(afs_fsserver_t)
-corenet_udp_bind_all_nodes(afs_fsserver_t)
+corenet_tcp_bind_generic_node(afs_fsserver_t)
+corenet_udp_bind_generic_node(afs_fsserver_t)
 corenet_tcp_bind_afs_fs_port(afs_fsserver_t)
 corenet_udp_bind_afs_fs_port(afs_fsserver_t)
 corenet_sendrecv_afs_fs_server_packets(afs_fsserver_t)
@@ -175,9 +172,6 @@ term_dontaudit_use_console(afs_fsserver_t)
 
 init_dontaudit_use_script_fds(afs_fsserver_t)
 
-libs_use_ld_so(afs_fsserver_t)
-libs_use_shared_libs(afs_fsserver_t)
-
 logging_send_syslog_msg(afs_fsserver_t)
 
 miscfiles_read_localization(afs_fsserver_t)
@@ -186,7 +180,7 @@ seutil_read_config(afs_fsserver_t)
 
 sysnet_read_config(afs_fsserver_t)
 
-sysadm_dontaudit_use_terms(afs_fsserver_t)
+userdom_dontaudit_use_user_terminals(afs_fsserver_t)
 
 ########################################
 #
@@ -197,13 +191,13 @@ allow afs_kaserver_t self:unix_stream_socket create_stream_socket_perms;
 allow afs_kaserver_t self:tcp_socket create_stream_socket_perms;
 allow afs_kaserver_t self:udp_socket create_socket_perms;
 
-manage_files_pattern(afs_kaserver_t,afs_config_t,afs_config_t)
+manage_files_pattern(afs_kaserver_t, afs_config_t, afs_config_t)
 
-manage_files_pattern(afs_kaserver_t,afs_dbdir_t,afs_ka_db_t)
-filetrans_pattern(afs_kaserver_t,afs_dbdir_t,afs_ka_db_t,file)
+manage_files_pattern(afs_kaserver_t, afs_dbdir_t, afs_ka_db_t)
+filetrans_pattern(afs_kaserver_t, afs_dbdir_t, afs_ka_db_t, file)
 
-manage_dirs_pattern(afs_kaserver_t,afs_logfile_t,afs_logfile_t)
-manage_files_pattern(afs_kaserver_t,afs_logfile_t,afs_logfile_t)
+manage_dirs_pattern(afs_kaserver_t, afs_logfile_t, afs_logfile_t)
+manage_files_pattern(afs_kaserver_t, afs_logfile_t, afs_logfile_t)
 
 kernel_read_kernel_sysctls(afs_kaserver_t)
 
@@ -211,11 +205,11 @@ corenet_all_recvfrom_unlabeled(afs_kaserver_t)
 corenet_all_recvfrom_netlabel(afs_kaserver_t)
 corenet_tcp_sendrecv_generic_if(afs_kaserver_t)
 corenet_udp_sendrecv_generic_if(afs_kaserver_t)
-corenet_tcp_sendrecv_all_nodes(afs_kaserver_t)
-corenet_udp_sendrecv_all_nodes(afs_kaserver_t)
+corenet_tcp_sendrecv_generic_node(afs_kaserver_t)
+corenet_udp_sendrecv_generic_node(afs_kaserver_t)
 corenet_tcp_sendrecv_all_ports(afs_kaserver_t)
 corenet_udp_sendrecv_all_ports(afs_kaserver_t)
-corenet_udp_bind_all_nodes(afs_kaserver_t)
+corenet_udp_bind_generic_node(afs_kaserver_t)
 corenet_udp_bind_afs_ka_port(afs_kaserver_t)
 corenet_udp_bind_kerberos_port(afs_kaserver_t)
 corenet_sendrecv_afs_ka_server_packets(afs_kaserver_t)
@@ -225,16 +219,13 @@ files_read_etc_files(afs_kaserver_t)
 files_list_home(afs_kaserver_t)
 files_read_usr_files(afs_kaserver_t)
 
-libs_use_ld_so(afs_kaserver_t)
-libs_use_shared_libs(afs_kaserver_t)
-
 miscfiles_read_localization(afs_kaserver_t)
 
 seutil_read_config(afs_kaserver_t)
 
 sysnet_read_config(afs_kaserver_t)
 
-sysadm_dontaudit_use_terms(afs_kaserver_t)
+userdom_dontaudit_use_user_terminals(afs_kaserver_t)
 
 ########################################
 #
@@ -248,34 +239,31 @@ allow afs_ptserver_t self:udp_socket create_socket_perms;
 read_files_pattern(afs_ptserver_t,afs_config_t,afs_config_t)
 allow afs_ptserver_t afs_config_t:dir list_dir_perms;
 
-manage_dirs_pattern(afs_ptserver_t,afs_logfile_t,afs_logfile_t)
-manage_files_pattern(afs_ptserver_t,afs_logfile_t,afs_logfile_t)
+manage_dirs_pattern(afs_ptserver_t, afs_logfile_t, afs_logfile_t)
+manage_files_pattern(afs_ptserver_t, afs_logfile_t, afs_logfile_t)
 
-manage_files_pattern(afs_ptserver_t,afs_dbdir_t,afs_pt_db_t)
-filetrans_pattern(afs_ptserver_t,afs_dbdir_t,afs_pt_db_t,file)
+manage_files_pattern(afs_ptserver_t, afs_dbdir_t, afs_pt_db_t)
+filetrans_pattern(afs_ptserver_t, afs_dbdir_t, afs_pt_db_t, file)
 
 corenet_all_recvfrom_unlabeled(afs_ptserver_t)
 corenet_all_recvfrom_netlabel(afs_ptserver_t)
 corenet_tcp_sendrecv_generic_if(afs_ptserver_t)
 corenet_udp_sendrecv_generic_if(afs_ptserver_t)
-corenet_tcp_sendrecv_all_nodes(afs_ptserver_t)
-corenet_udp_sendrecv_all_nodes(afs_ptserver_t)
+corenet_tcp_sendrecv_generic_node(afs_ptserver_t)
+corenet_udp_sendrecv_generic_node(afs_ptserver_t)
 corenet_tcp_sendrecv_all_ports(afs_ptserver_t)
 corenet_udp_sendrecv_all_ports(afs_ptserver_t)
-corenet_udp_bind_all_nodes(afs_ptserver_t)
+corenet_udp_bind_generic_node(afs_ptserver_t)
 corenet_udp_bind_afs_pt_port(afs_ptserver_t)
 corenet_sendrecv_afs_pt_server_packets(afs_ptserver_t)
 
 files_read_etc_files(afs_ptserver_t)
 
-libs_use_ld_so(afs_ptserver_t)
-libs_use_shared_libs(afs_ptserver_t)
-
 miscfiles_read_localization(afs_ptserver_t)
 
 sysnet_read_config(afs_ptserver_t)
 
-sysadm_dontaudit_use_terms(afs_ptserver_t)
+userdom_dontaudit_use_user_terminals(afs_ptserver_t)
 
 ########################################
 #
@@ -289,31 +277,28 @@ allow afs_vlserver_t self:udp_socket create_socket_perms;
 read_files_pattern(afs_vlserver_t,afs_config_t,afs_config_t)
 allow afs_vlserver_t afs_config_t:dir list_dir_perms;
 
-manage_dirs_pattern(afs_vlserver_t,afs_logfile_t,afs_logfile_t)
-manage_files_pattern(afs_vlserver_t,afs_logfile_t,afs_logfile_t)
+manage_dirs_pattern(afs_vlserver_t, afs_logfile_t, afs_logfile_t)
+manage_files_pattern(afs_vlserver_t, afs_logfile_t, afs_logfile_t)
 
-manage_files_pattern(afs_vlserver_t,afs_dbdir_t,afs_vl_db_t)
-filetrans_pattern(afs_vlserver_t,afs_dbdir_t,afs_vl_db_t,file)
+manage_files_pattern(afs_vlserver_t, afs_dbdir_t, afs_vl_db_t)
+filetrans_pattern(afs_vlserver_t, afs_dbdir_t,afs_vl_db_t, file)
 
 corenet_all_recvfrom_unlabeled(afs_vlserver_t)
 corenet_all_recvfrom_netlabel(afs_vlserver_t)
 corenet_tcp_sendrecv_generic_if(afs_vlserver_t)
 corenet_udp_sendrecv_generic_if(afs_vlserver_t)
-corenet_tcp_sendrecv_all_nodes(afs_vlserver_t)
-corenet_udp_sendrecv_all_nodes(afs_vlserver_t)
+corenet_tcp_sendrecv_generic_node(afs_vlserver_t)
+corenet_udp_sendrecv_generic_node(afs_vlserver_t)
 corenet_tcp_sendrecv_all_ports(afs_vlserver_t)
 corenet_udp_sendrecv_all_ports(afs_vlserver_t)
-corenet_udp_bind_all_nodes(afs_vlserver_t)
+corenet_udp_bind_generic_node(afs_vlserver_t)
 corenet_udp_bind_afs_vl_port(afs_vlserver_t)
 corenet_sendrecv_afs_vl_server_packets(afs_vlserver_t)
 
 files_read_etc_files(afs_vlserver_t)
 
-libs_use_ld_so(afs_vlserver_t)
-libs_use_shared_libs(afs_vlserver_t)
-
 miscfiles_read_localization(afs_vlserver_t)
 
 sysnet_read_config(afs_vlserver_t)
 
-sysadm_dontaudit_use_terms(afs_vlserver_t)
+userdom_dontaudit_use_user_terminals(afs_vlserver_t)

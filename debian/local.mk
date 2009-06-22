@@ -4,9 +4,9 @@
 ## Created On       : Sat Nov 15 10:42:10 2003
 ## Created On Node  : glaurung.green-gryphon.com
 ## Last Modified By : Manoj Srivastava
-## Last Modified On : Mon May  7 08:55:23 2007
-## Last Machine Used: glaurung.internal.golden-gryphon.com
-## Update Count     : 106
+## Last Modified On : Sat Feb 14 15:46:22 2009
+## Last Machine Used: anzu.internal.golden-gryphon.com
+## Update Count     : 130
 ## Status           : Unknown, Use with caution!
 ## HISTORY          : 
 ## Description      : 
@@ -17,179 +17,182 @@
 
 testdir:
 	$(testdir)
-CONFIG-common:: stamp-conf/selinux-policy-src
 
-BUILD/selinux-policy-mls::    build/selinux-policy-mls
-INST/selinux-policy-mls::     install/selinux-policy-mls
-BIN/selinux-policy-mls::      binary/selinux-policy-mls
+debian/stamp/pre-config-common:   debian/stamp/conf/common
+debian/stamp/pre-build-common:    debian/stamp/build/common
 
+debian/stamp/CONFIG/selinux-policy-mls: debian/stamp/conf/selinux-policy-mls
+debian/stamp/BUILD/selinux-policy-mls: debian/stamp/build/selinux-policy-mls
+debian/stamp/INST/selinux-policy-mls:  debian/stamp/install/selinux-policy-mls
+debian/stamp/BIN/selinux-policy-mls:   debian/stamp/binary/selinux-policy-mls
 
-BUILD/selinux-policy-default::   build/selinux-policy-default
-INST/selinux-policy-default::    install/selinux-policy-default
-BIN/selinux-policy-default::     binary/selinux-policy-default
-
-BUILD/selinux-policy-dev::    build/selinux-policy-dev
-INST/selinux-policy-dev::     install/selinux-policy-dev
-BIN/selinux-policy-dev::      binary/selinux-policy-dev
-
-
-BUILD/selinux-policy-src::    build/selinux-policy-src
-INST/selinux-policy-src::     install/selinux-policy-src
-BIN/selinux-policy-src::      binary/selinux-policy-src
+debian/stamp/CONFIG/selinux-policy-default: debian/stamp/conf/selinux-policy-default
+debian/stamp/BUILD/selinux-policy-default: debian/stamp/build/selinux-policy-default
+debian/stamp/INST/selinux-policy-default:  debian/stamp/install/selinux-policy-default
+debian/stamp/BIN/selinux-policy-default:   debian/stamp/binary/selinux-policy-default
 
 
-BUILD/selinux-policy-doc::    build/selinux-policy-doc
-INST/selinux-policy-doc::     install/selinux-policy-doc
-BIN/selinux-policy-doc::      binary/selinux-policy-doc
+debian/stamp/CONFIG/selinux-policy-src: debian/stamp/conf/selinux-policy-src
+debian/stamp/BUILD/selinux-policy-src: debian/stamp/build/selinux-policy-src
+debian/stamp/INST/selinux-policy-src:  debian/stamp/install/selinux-policy-src
+debian/stamp/BIN/selinux-policy-src:   debian/stamp/binary/selinux-policy-src
 
-CLEAN/selinux-policy-mls CLEAN/selinux-policy-default CLEAN/selinux-policy-src CLEAN/selinux-policy-src::
+debian/stamp/CONFIG/selinux-policy-dev: debian/stamp/conf/selinux-policy-dev
+debian/stamp/BUILD/selinux-policy-dev: debian/stamp/build/selinux-policy-dev
+debian/stamp/INST/selinux-policy-dev:  debian/stamp/install/selinux-policy-dev
+debian/stamp/BIN/selinux-policy-dev:   debian/stamp/binary/selinux-policy-dev
+
+
+debian/stamp/CONFIG/selinux-policy-doc: debian/stamp/conf/selinux-policy-doc
+debian/stamp/BUILD/selinux-policy-doc: debian/stamp/build/selinux-policy-doc
+debian/stamp/INST/selinux-policy-doc:  debian/stamp/install/selinux-policy-doc
+debian/stamp/BIN/selinux-policy-doc:   debian/stamp/binary/selinux-policy-doc
+
+CLEAN/selinux-policy-mls CLEAN/selinux-policy-default CLEAN/selinux-policy-src CLEAN/selinux-policy-src CLEAN/selinux-policy-dev CLEAN/selinux-policy-doc ::
 	$(REASON)
-	make bare
+	-test -f Makefile && $(MAKE) bare
 	test ! -d $(TMPTOP) || rm -rf $(TMPTOP)
 	test ! -d $(SRCTOP)/debian/build-$(package) || \
                                       rm -rf $(SRCTOP)/debian/build-$(package)
 
-stamp-conf/selinux-policy-src:
+debian/stamp/conf/common:
 	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
 	test -d $(SRCTOP)/config/appconfig-mcs  || \
             cp -a $(SRCTOP)/config/appconfig-mcs $(SRCTOP)/config/appconfig-default
 	test -d $(SRCTOP)/config/appconfig-mcs  || \
             cp -a $(SRCTOP)/config/appconfig-mls $(SRCTOP)/config/appconfig-mls
+	echo done > $@
 
-CONFIG/selinux-policy-mls::
+debian/stamp/conf/selinux-policy-mls:
 	$(REASON)
-	test -e debian/stamp-config-mls  ||                             \
-	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
+	test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-mls  ||                             \
-	  mkdir -p    $(SRCTOP)/debian/build-$(package)
+	mkdir -p    $(SRCTOP)/debian/build-$(package)
 	test -e debian/stamp-config-mls  ||                             \
 	  cp -lr policy support Makefile Rules.modular  doc                \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-mls  ||                             \
-	  cp debian/build.conf.mls $(SRCTOP)/debian/build-$(package)/build.conf
-	test -e debian/stamp-config-mls  ||                             \
-	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
+	cp debian/build.conf.mls $(SRCTOP)/debian/build-$(package)/build.conf
+	$(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                    NAME=mls TYPE=mls $(OPTIONS) bare
-	test -e debian/stamp-config-mls  ||                             \
-	  cp debian/modules.conf.mls.update debian/build-$(package)/policy/modules.conf
-	test -e debian/stamp-config-mls  ||                             \
-	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
+	(cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=mls TYPE=mls $(OPTIONS) conf)
-	echo done > debian/stamp-config-mls
-STAMPS_TO_CLEAN += debian/stamp-config-mls
-DIRS_TO_CLEAN  += debian/build-selinux-policy-mls
+	cp debian/modules.conf.mls                                      \
+                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
+	echo done > $@
 
-CONFIG/selinux-policy-default::
+debian/stamp/conf/selinux-policy-default:
 	$(REASON)
-	test -e debian/stamp-config-default  ||                           \
-	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
+	test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-default  ||                           \
-	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-default  ||                           \
-	  cp -lr policy support Makefile  Rules.modular  doc               \
+	mkdir -p    $(SRCTOP)/debian/build-$(package)
+	cp -lr policy support Makefile  Rules.modular  doc               \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-default  ||                           \
-	  cp debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
-	test -e debian/stamp-config-default  ||                           \
-	  $(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
+	cp debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
+	$(MAKE) -C $(SRCTOP)/debian/build-$(package)                     \
                  NAME=default TYPE=mcs $(OPTIONS) bare
-	test -e debian/stamp-config-default  ||                           \
-	  cp debian/modules.conf.default.update debian/build-$(package)/policy/modules.conf
-	test -e debian/stamp-config-default  ||                           \
-	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
+	(cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=default TYPE=mcs $(OPTIONS) conf)
-	echo done > debian/stamp-config-default
-STAMPS_TO_CLEAN += debian/stamp-config-default
-DIRS_TO_CLEAN  += debian/build-selinux-policy-default
+	cp debian/modules.conf.default                                    \
+                     $(SRCTOP)/debian/build-$(package)/policy/modules.conf
+	echo done > $@
 
-CONFIG/selinux-policy-src::
+debian/stamp/conf/selinux-policy-src:
 	$(REASON)
-	test -e debian/stamp-config-src         ||                        \
-	  test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
+	test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-src         ||                        \
-	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-src         ||                        \
-	  cp -lr policy support Makefile Rules.modular  doc               \
+	mkdir -p    $(SRCTOP)/debian/build-$(package)
+	cp -lr policy support Makefile Rules.modular  doc               \
                Rules.monolithic config VERSION Changelog COPYING INSTALL  \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-src         ||                        \
-           cp  debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
-	test -e debian/stamp-config-src         ||                        \
-	  (cd $(SRCTOP)/debian/build-$(package) ;                         \
+	cp  debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
+	(cd $(SRCTOP)/debian/build-$(package) ;                         \
            $(MAKE) NAME=default $(OPTIONS) conf)
 	cp debian/modules.conf.*      $(SRCTOP)/debian/build-$(package)/policy/
 	cp debian/build.conf.default $(SRCTOP)/debian/build-$(package)/policy/
-	echo done > debian/stamp-config-src
-STAMPS_TO_CLEAN += debian/stamp-config-src
-DIRS_TO_CLEAN  += debian/build-selinux-policy-src
+	echo done > $@
 
-CONFIG/selinux-policy-dev::
+debian/stamp/conf/selinux-policy-dev:
 	$(REASON)
-	test -e debian/stamp-config-dev         ||                        \
-	  test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
+	test ! -d $(SRCTOP)/debian/build-$(package) ||                  \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-dev         ||                        \
-	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	echo done > debian/stamp-config-dev
-STAMPS_TO_CLEAN += debian/stamp-config-dev
-DIRS_TO_CLEAN  += debian/build-selinux-policy-dev
+	mkdir -p    $(SRCTOP)/debian/build-$(package)
+	echo done > $@
 
-CONFIG/selinux-policy-doc::
+debian/stamp/conf/selinux-policy-doc::
 	$(REASON)
-	test -e debian/stamp-config-doc         ||                         \
-	  test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
+	$(checkdir)
+	@test -d debian/stamp/conf || mkdir -p debian/stamp/conf
+	test ! -d $(SRCTOP)/debian/build-$(package) ||                   \
             rm -rf $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-doc         ||                         \
-	  mkdir -p    $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-doc         ||                         \
-	  cp -lr policy support Makefile Rules.modular  doc                \
+	mkdir -p    $(SRCTOP)/debian/build-$(package)
+	cp -lr policy support Makefile Rules.modular  doc                \
                Rules.monolithic config VERSION Changelog COPYING INSTALL   \
                 README man $(SRCTOP)/debian/build-$(package)
-	test -e debian/stamp-config-doc         ||                        \
-           cp  debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
-	test -e debian/stamp-config-doc         ||                         \
-	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
+	cp  debian/build.conf.default $(SRCTOP)/debian/build-$(package)/build.conf
+	(cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=default $(OPTIONS) conf )
-	echo done > debian/stamp-config-doc
-STAMPS_TO_CLEAN += debian/stamp-config-doc
-DIRS_TO_CLEAN  += debian/build-selinux-policy-doc
+	echo done > $@
 
-BUILD-common::
-	perl -wc debian/postinst.policy
-
-build/selinux-policy-mls:
+debian/stamp/build/common:
 	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
+	perl -wc debian/postinst.policy
+	echo done > $@
+
+debian/stamp/build/selinux-policy-mls:
+	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
 	test -e debian/stamp-build-mls                    ||            \
 	  (cd $(SRCTOP)/debian/build-$(package) ;                          \
            $(MAKE) NAME=mls TYPE=mls $(OPTIONS) policy all)
-	echo done > debian/stamp-build-mls   
-STAMPS_TO_CLEAN += debian/stamp-build-mls   
+	echo done > $@ 
 
-build/selinux-policy-default:
+debian/stamp/build/selinux-policy-default:
 	$(REASON)
-	test -e debian/stamp-build-default                    ||            \
-	  (cd $(SRCTOP)/debian/build-$(package) ;                            \
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
+	(cd $(SRCTOP)/debian/build-$(package) ;                            \
            $(MAKE) NAME=default TYPE=mcs $(OPTIONS) policy all)
-	echo done > debian/stamp-build-default 
-STAMPS_TO_CLEAN += debian/stamp-build-default   
+	echo done > $@ 
 
-build/selinux-policy-src:
+debian/stamp/build/selinux-policy-src:
 	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
+	echo done > $@ 
 
-build/selinux-policy-dev:
+debian/stamp/build/selinux-policy-dev:
 	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
+	echo done > $@ 
 
-build/selinux-policy-doc:
+debian/stamp/build/selinux-policy-doc:
 	$(REASON)
+	$(checkdir)
+	@test -d debian/stamp/build || mkdir -p debian/stamp/build
+	echo done > $@ 
 
 
-install/selinux-policy-mls:
+debian/stamp/install/selinux-policy-mls:
 	$(REASON)
+	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/install || mkdir -p debian/stamp/install
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(TMPTOP)/etc/selinux/mls/modules/active
@@ -219,10 +222,13 @@ install/selinux-policy-mls:
 	$(install_file)      debian/changelog      $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
 	$(install_file)      debian/copyright      $(DOCDIR)/
-DIRS_TO_CLEAN  += debian/selinux-policy-mls
+	echo done > $@ 
 
-install/selinux-policy-default:
+debian/stamp/install/selinux-policy-default:
 	$(REASON)
+	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/install || mkdir -p debian/stamp/install
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/
 	$(make_directory)    $(TMPTOP)/etc/selinux/default/modules/active
@@ -250,10 +256,13 @@ install/selinux-policy-default:
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
 	$(install_file)      debian/copyright     $(DOCDIR)/
-DIRS_TO_CLEAN  += debian/selinux-policy-default
+	echo done > $@ 
 
-install/selinux-policy-src:
+debian/stamp/install/selinux-policy-src:
 	$(REASON)
+	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/install || mkdir -p debian/stamp/install
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)
 	$(make_directory)    $(TMPTOP)/usr/src
@@ -289,10 +298,13 @@ install/selinux-policy-src:
 	$(install_file)      debian/changelog     $(DOCDIR)/changelog.Debian
 	gzip -9fqr           $(DOCDIR)
 	$(install_file)      debian/copyright     $(DOCDIR)/
-DIRS_TO_CLEAN  += debian/selinux-policy-src
+	echo done > $@ 
 
-install/selinux-policy-dev: install/selinux-policy-mls install/selinux-policy-default
+debian/stamp/install/selinux-policy-dev: debian/stamp/install/selinux-policy-mls debian/stamp/install/selinux-policy-default
 	$(REASON)
+	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/install || mkdir -p debian/stamp/install
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)/examples
 	$(make_directory)    $(MAN1DIR)
@@ -340,10 +352,13 @@ install/selinux-policy-dev: install/selinux-policy-mls install/selinux-policy-de
 	$(install_program)   debian/policygentool   $(TMPTOP)/usr/bin
 	$(install_file)      debian/policygentool.1 $(MAN1DIR)
 	gzip -9fqr           $(MAN1DIR)
-DIRS_TO_CLEAN  += debian/selinux-policy-dev
+	echo done > $@ 
 
-install/selinux-policy-doc:
+debian/stamp/install/selinux-policy-doc:
 	$(REASON)
+	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/install || mkdir -p debian/stamp/install
 	rm -rf               $(TMPTOP) $(TMPTOP).deb
 	$(make_directory)    $(DOCDIR)
 	$(make_directory)    $(DOCBASEDIR)
@@ -363,14 +378,17 @@ install/selinux-policy-doc:
 	gzip -9fq $(DOCDIR)/example.if $(DOCDIR)/example.fc $(DOCDIR)/Makefile.example 
 	$(install_file)      debian/copyright     $(DOCDIR)/
 	$(install_file)      debian/docentry         $(DOCBASEDIR)/$(package)
-DIRS_TO_CLEAN  += debian/selinux-policy-doc
+	echo done > $@ 
 
-binary/selinux-policy-mls:
+debian/stamp/binary/selinux-policy-mls:
 	$(REASON)
 	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/binary || mkdir -p debian/stamp/binary
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
-	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
+	test ! -f $(TMPTOP)/DEBIAN/conffiles || test -s $(TMPTOP)/DEBIAN/conffiles || \
+           rm $(TMPTOP)/DEBIAN/conffiles
 	sed -e 's/=T/mls/g' debian/postinst.policy  > $(TMPTOP)/DEBIAN/postinst
 	chmod 755                                      $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/mls.postrm      $(TMPTOP)/DEBIAN/postrm
@@ -380,13 +398,17 @@ binary/selinux-policy-mls:
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
+	echo done > $@ 
 
-binary/selinux-policy-default:
+debian/stamp/binary/selinux-policy-default:
 	$(REASON)
 	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/binary || mkdir -p debian/stamp/binary
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,'  > DEBIAN/conffiles)
-	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
+	test ! -f $(TMPTOP)/DEBIAN/conffiles || test -s $(TMPTOP)/DEBIAN/conffiles ||\
+           rm $(TMPTOP)/DEBIAN/conffiles
 	sed -e 's/=T/default/g' debian/postinst.policy >$(TMPTOP)/DEBIAN/postinst
 	chmod 755                                       $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/default.postrm     $(TMPTOP)/DEBIAN/postrm
@@ -396,10 +418,13 @@ binary/selinux-policy-default:
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
+	echo done > $@ 
 
-binary/selinux-policy-src:
+debian/stamp/binary/selinux-policy-src:
 	$(REASON)
 	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/binary || mkdir -p debian/stamp/binary
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
@@ -407,10 +432,13 @@ binary/selinux-policy-src:
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
+	echo done > $@ 
 
-binary/selinux-policy-dev:
+debian/stamp/binary/selinux-policy-dev:
 	$(REASON)
 	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/binary || mkdir -p debian/stamp/binary
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
                               -p$(package) -isp   -P$(TMPTOP)
@@ -418,13 +446,17 @@ binary/selinux-policy-dev:
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
+	echo done > $@ 
 
-binary/selinux-policy-doc:
+debian/stamp/binary/selinux-policy-doc:
 	$(REASON)
 	$(checkdir)
+	$(TESTROOT)
+	@test -d debian/stamp/binary || mkdir -p debian/stamp/binary
 	$(make_directory)    $(TMPTOP)/DEBIAN
 	(cd $(TMPTOP); find etc -type f | sed 's,^,/,' > DEBIAN/conffiles)
-	test ! -f DEBIAN/conffiles || test -s DEBIAN/conffiles || rm DEBIAN/conffiles
+	test ! -f $(TMPTOP)/DEBIAN/conffiles || test -s $(TMPTOP)/DEBIAN/conffiles || \
+           rm $(TMPTOP)/DEBIAN/conffiles
 	$(install_program)   debian/doc.postinst      $(TMPTOP)/DEBIAN/postinst
 	$(install_program)   debian/doc.prerm         $(TMPTOP)/DEBIAN/prerm
 	dpkg-gencontrol    -V'debconf-depends=debconf (>= $(MINDEBCONFVER))' \
@@ -433,5 +465,6 @@ binary/selinux-policy-doc:
 	chown -R root:root $(TMPTOP)
 	chmod -R u+w,go=rX $(TMPTOP)
 	dpkg --build       $(TMPTOP) ..
+	echo done > $@ 
 
 

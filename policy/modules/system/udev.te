@@ -1,5 +1,5 @@
 
-policy_module(udev,1.9.1)
+policy_module(udev, 1.10.2)
 
 ########################################
 #
@@ -19,11 +19,6 @@ init_domtrans_script(udev_t)
 
 type udev_etc_t alias etc_udev_t;
 files_config_file(udev_etc_t)
-
-# udev_runtime_t is the type of the udev table file
-# cjp: this is probably a copy of udev_tbl_t and can be removed
-type udev_runtime_t;
-files_type(udev_runtime_t)
 
 type udev_tbl_t alias udev_tdb_t;
 files_type(udev_tbl_t)
@@ -47,7 +42,7 @@ allow udev_t self:process ~{ setcurrent setexec setfscreate setrlimit execmem ex
 allow udev_t self:process { execmem setfscreate };
 allow udev_t self:fd use;
 allow udev_t self:fifo_file rw_fifo_file_perms;
-allow udev_t self:sock_file read_file_perms;
+allow udev_t self:sock_file read_sock_file_perms;
 allow udev_t self:shm create_shm_perms;
 allow udev_t self:sem create_sem_perms;
 allow udev_t self:msgq create_msgq_perms;
@@ -62,6 +57,7 @@ allow udev_t udev_helper_exec_t:dir list_dir_perms;
 can_exec(udev_t, udev_exec_t)
 
 allow udev_t udev_helper_exec_t:dir list_dir_perms;
+can_exec(udev_t, udev_helper_exec_t)
 
 # read udev config
 allow udev_t udev_etc_t:file read_file_perms;
@@ -87,10 +83,12 @@ kernel_rw_hotplug_sysctls(udev_t)
 kernel_rw_unix_dgram_sockets(udev_t)
 kernel_dgram_send(udev_t)
 kernel_signal(udev_t)
+kernel_search_debugfs(udev_t)
 
 #https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=235182
 kernel_rw_net_sysctls(udev_t)
 kernel_read_network_state(udev_t)
+kernel_read_software_raid_state(udev_t)
 
 corecmd_exec_all_executables(udev_t)
 
@@ -141,11 +139,9 @@ init_read_utmp(udev_t)
 init_dontaudit_write_utmp(udev_t)
 init_getattr_initctl(udev_t)
 
-libs_use_ld_so(udev_t)
-libs_use_shared_libs(udev_t)
-
 logging_search_logs(udev_t)
 logging_send_syslog_msg(udev_t)
+logging_send_audit_msgs(udev_t)
 
 miscfiles_read_localization(udev_t)
 
@@ -168,7 +164,7 @@ sysnet_signal_dhcpc(udev_t)
 sysnet_manage_config(udev_t)
 sysnet_etc_filetrans_config(udev_t)
 
-userdom_dontaudit_search_all_users_home_content(udev_t)
+userdom_dontaudit_search_user_home_content(udev_t)
 
 fstools_getattr_swap_files(udev_t)
 
@@ -197,10 +193,15 @@ ifdef(`distro_redhat',`
 
 	# for arping used for static IP addresses on PCMCIA ethernet
 	netutils_domtrans(udev_t)
+
+	optional_policy(`
+		unconfined_domain(udev_t)
+	')
 ')
 
 optional_policy(`
 	alsa_domtrans(udev_t)
+	alsa_read_lib(udev_t)
 	alsa_read_rw_config(udev_t)
 ')
 
@@ -209,11 +210,19 @@ optional_policy(`
 ')
 
 optional_policy(`
+	clock_domtrans(udev_t)
+')
+
+optional_policy(`
 	consoletype_exec(udev_t)
 ')
 
 optional_policy(`
-	dbus_system_bus_client_template(udev,udev_t)
+	dbus_system_bus_client(udev_t)
+')
+
+optional_policy(`
+	lvm_domtrans(udev_t)
 ')
 
 optional_policy(`

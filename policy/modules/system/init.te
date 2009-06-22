@@ -1,5 +1,5 @@
 
-policy_module(init, 1.11.0)
+policy_module(init, 1.13.1)
 
 gen_require(`
 	class passwd rootok;
@@ -22,6 +22,10 @@ gen_tunable(init_upstart,false)
 attribute direct_run_init;
 attribute direct_init;
 attribute direct_init_entry;
+
+attribute init_script_domain_type;
+attribute init_script_file_type;
+attribute init_run_all_scripts_domain;
 
 # Mark process types as daemons
 attribute daemon;
@@ -51,8 +55,8 @@ type initctl_t;
 files_type(initctl_t)
 mls_trusted_object(initctl_t)
 
-type initrc_t;
-type initrc_exec_t;
+type initrc_t, init_script_domain_type, init_run_all_scripts_domain;
+type initrc_exec_t, init_script_file_type;
 domain_type(initrc_t)
 domain_entry_file(initrc_t,initrc_exec_t)
 role system_r types initrc_t;
@@ -147,15 +151,13 @@ mls_file_write_all_levels(init_t)
 mls_process_write_down(init_t)
 mls_fd_use_all_levels(init_t)
 
-selinux_set_boolean(init_t)
+selinux_set_all_booleans(init_t)
 
 term_use_all_terms(init_t)
 
 # Run init scripts.
 init_domtrans_script(init_t)
 
-libs_use_ld_so(init_t)
-libs_use_shared_libs(init_t)
 libs_rw_ld_so_cache(init_t)
 
 logging_send_syslog_msg(init_t)
@@ -218,7 +220,9 @@ term_create_pty(initrc_t,initrc_devpts_t)
 # Going to single user mode
 init_exec(initrc_t)
 
-can_exec(initrc_t,initrc_exec_t)
+can_exec(initrc_t, init_script_file_type)
+
+domtrans_pattern(init_run_all_scripts_domain, initrc_exec_t, initrc_t)
 
 manage_dirs_pattern(initrc_t,initrc_state_t,initrc_state_t)
 manage_files_pattern(initrc_t,initrc_state_t,initrc_state_t)
@@ -277,8 +281,13 @@ dev_read_lvm_control(initrc_t)
 dev_delete_lvm_control_dev(initrc_t)
 dev_manage_generic_symlinks(initrc_t)
 dev_manage_generic_files(initrc_t)
-# Wants to remove udev.tbl:
-dev_delete_generic_symlinks(initrc_t)
+
+optional_policy(`
+       # Wants to remove udev.tbl:
+       dev_delete_generic_symlinks(initrc_t)
+       udev_unlink_table(initrc_t)
+       dev_delete_generic_dirs(initrc_t)
+')
 
 fs_register_binary_executable_type(initrc_t)
 # rhgb-console writes to ramfs
@@ -364,8 +373,6 @@ files_mounton_default(initrc_t)
 auth_use_nsswitch(initrc_t)
 
 libs_rw_ld_so_cache(initrc_t)
-libs_use_ld_so(initrc_t)
-libs_use_shared_libs(initrc_t)
 libs_exec_lib_files(initrc_t)
 
 logging_send_syslog_msg(initrc_t)
@@ -384,12 +391,11 @@ modutils_domtrans_insmod(initrc_t)
 
 seutil_read_config(initrc_t)
 
-userdom_read_all_users_home_content_files(initrc_t)
-
+userdom_read_user_home_content_files(initrc_t)
 # Allow access to the sysadm TTYs. Note that this will give access to the 
 # TTYs to any process in the initrc_t domain. Therefore, daemons and such
 # started from init should be placed in their own domain.
-sysadm_use_terms(initrc_t)
+userdom_use_user_terminals(initrc_t)
 
 # seed udev /dev
 dev_create_generic_dirs(initrc_t)
@@ -553,10 +559,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	automount_exec_config(initrc_t)
-')
-
-optional_policy(`
 	bind_read_config(initrc_t)
 
 	# for chmod in start script
@@ -592,7 +594,7 @@ optional_policy(`
 
 optional_policy(`
 	dbus_connect_system_bus(initrc_t)
-	dbus_system_bus_client_template(initrc,initrc_t)
+	dbus_system_bus_client(initrc_t)
 	dbus_read_config(initrc_t)
 
 	optional_policy(`

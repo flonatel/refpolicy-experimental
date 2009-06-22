@@ -1,5 +1,5 @@
 
-policy_module(ppp, 1.8.0)
+policy_module(ppp, 1.10.2)
 
 ########################################
 #
@@ -11,20 +11,20 @@ policy_module(ppp, 1.8.0)
 ## Allow pppd to load kernel modules for certain modems
 ## </p>
 ## </desc>
-gen_tunable(pppd_can_insmod,false)
+gen_tunable(pppd_can_insmod, false)
 
 ## <desc>
 ## <p>
 ## Allow pppd to be run for a regular user
 ## </p>
 ## </desc>
-gen_tunable(pppd_for_user,false)
+gen_tunable(pppd_for_user, false)
 
 # pppd_t is the domain for the pppd program.
 # pppd_exec_t is the type of the pppd executable.
 type pppd_t;
 type pppd_exec_t;
-init_daemon_domain(pppd_t,pppd_exec_t)
+init_daemon_domain(pppd_t, pppd_exec_t)
 
 type pppd_devpts_t;
 term_pty(pppd_devpts_t)
@@ -58,7 +58,7 @@ files_pid_file(pppd_var_run_t)
 
 type pptp_t;
 type pptp_exec_t;
-init_daemon_domain(pptp_t,pptp_exec_t)
+init_daemon_domain(pptp_t, pptp_exec_t)
 
 type pptp_log_t;
 logging_log_file(pptp_log_t)
@@ -71,7 +71,7 @@ files_pid_file(pptp_var_run_t)
 # PPPD Local policy
 #
 
-allow pppd_t self:capability { net_admin setuid setgid fsetid fowner net_raw dac_override };
+allow pppd_t self:capability { kill net_admin setuid setgid fsetid fowner net_raw dac_override };
 dontaudit pppd_t self:capability sys_tty_config;
 allow pppd_t self:process signal;
 allow pppd_t self:fifo_file rw_fifo_file_perms;
@@ -91,22 +91,22 @@ allow pppd_t pppd_etc_t:dir rw_dir_perms;
 allow pppd_t pppd_etc_t:file read_file_perms;
 allow pppd_t pppd_etc_t:lnk_file { getattr read };
 
-manage_files_pattern(pppd_t,pppd_etc_rw_t,pppd_etc_rw_t)
+manage_files_pattern(pppd_t, pppd_etc_rw_t, pppd_etc_rw_t)
 # Automatically label newly created files under /etc/ppp with this type
-filetrans_pattern(pppd_t,pppd_etc_t,pppd_etc_rw_t,file)
+filetrans_pattern(pppd_t, pppd_etc_t, pppd_etc_rw_t, file)
 
 allow pppd_t pppd_lock_t:file manage_file_perms;
-files_lock_filetrans(pppd_t,pppd_lock_t,file)
+files_lock_filetrans(pppd_t, pppd_lock_t, file)
 
 allow pppd_t pppd_log_t:file manage_file_perms;
-logging_log_filetrans(pppd_t,pppd_log_t,file)
+logging_log_filetrans(pppd_t, pppd_log_t, file)
 
-manage_dirs_pattern(pppd_t,pppd_tmp_t,pppd_tmp_t)
-manage_files_pattern(pppd_t,pppd_tmp_t,pppd_tmp_t)
+manage_dirs_pattern(pppd_t, pppd_tmp_t, pppd_tmp_t)
+manage_files_pattern(pppd_t, pppd_tmp_t, pppd_tmp_t)
 files_tmp_filetrans(pppd_t, pppd_tmp_t, { file dir })
 
-manage_files_pattern(pppd_t,pppd_var_run_t,pppd_var_run_t)
-files_pid_filetrans(pppd_t,pppd_var_run_t,file)
+manage_files_pattern(pppd_t, pppd_var_run_t, pppd_var_run_t)
+files_pid_filetrans(pppd_t, pppd_var_run_t, file)
 
 allow pppd_t pptp_t:process signal;
 
@@ -116,7 +116,7 @@ allow pppd_t pppd_secret_t:file read_file_perms;
 
 kernel_read_kernel_sysctls(pppd_t)
 kernel_read_system_state(pppd_t)
-kernel_read_net_sysctls(pppd_t)
+kernel_rw_net_sysctls(pppd_t)
 kernel_read_network_state(pppd_t)
 kernel_load_module(pppd_t)
 
@@ -126,12 +126,12 @@ dev_read_sysfs(pppd_t)
 
 corenet_all_recvfrom_unlabeled(pppd_t)
 corenet_all_recvfrom_netlabel(pppd_t)
-corenet_tcp_sendrecv_all_if(pppd_t)
-corenet_raw_sendrecv_all_if(pppd_t)
-corenet_udp_sendrecv_all_if(pppd_t)
-corenet_tcp_sendrecv_all_nodes(pppd_t)
-corenet_raw_sendrecv_all_nodes(pppd_t)
-corenet_udp_sendrecv_all_nodes(pppd_t)
+corenet_tcp_sendrecv_generic_if(pppd_t)
+corenet_raw_sendrecv_generic_if(pppd_t)
+corenet_udp_sendrecv_generic_if(pppd_t)
+corenet_tcp_sendrecv_generic_node(pppd_t)
+corenet_raw_sendrecv_generic_node(pppd_t)
+corenet_udp_sendrecv_generic_node(pppd_t)
 corenet_tcp_sendrecv_all_ports(pppd_t)
 corenet_udp_sendrecv_all_ports(pppd_t)
 # Access /dev/ppp.
@@ -144,7 +144,7 @@ term_use_unallocated_ttys(pppd_t)
 term_setattr_unallocated_ttys(pppd_t)
 term_ioctl_generic_ptys(pppd_t)
 # for pppoe
-term_create_pty(pppd_t,pppd_devpts_t)
+term_create_pty(pppd_t, pppd_devpts_t)
 
 # allow running ip-up and ip-down scripts and running chat.
 corecmd_exec_bin(pppd_t)
@@ -164,9 +164,6 @@ init_dontaudit_write_utmp(pppd_t)
 
 auth_use_nsswitch(pppd_t)
 
-libs_use_ld_so(pppd_t)
-libs_use_shared_libs(pppd_t)
-
 logging_send_syslog_msg(pppd_t)
 
 miscfiles_read_localization(pppd_t)
@@ -175,15 +172,12 @@ sysnet_exec_ifconfig(pppd_t)
 sysnet_manage_config(pppd_t)
 sysnet_etc_filetrans_config(pppd_t)
 
+userdom_use_user_terminals(pppd_t)
 userdom_dontaudit_use_unpriv_user_fds(pppd_t)
 # for ~/.ppprc - if it actually exists then you need some policy to read it
-#allow pppd_t { sysadm_home_dir_t home_root_t user_home_dir_type }:dir search;
-userdom_search_unpriv_users_home_dirs(pppd_t)
+userdom_search_user_home_dirs(pppd_t)
 
 ppp_exec(pppd_t)
-
-sysadm_dontaudit_search_home_dirs(pppd_t)
-sysadm_search_home_dirs(pppd_t)
 
 optional_policy(`
 	ddclient_domtrans(pppd_t)
@@ -197,6 +191,10 @@ optional_policy(`
 
 optional_policy(`
 	mta_send_mail(pppd_t)
+')
+
+optional_policy(`
+	networkmanager_signal(pppd_t)
 ')
 
 optional_policy(`
@@ -219,30 +217,30 @@ optional_policy(`
 allow pptp_t self:capability net_raw;
 dontaudit pptp_t self:capability sys_tty_config;
 allow pptp_t self:process signal;
-allow pptp_t self:fifo_file { read write };
+allow pptp_t self:fifo_file rw_fifo_file_perms;
 allow pptp_t self:unix_dgram_socket create_socket_perms;
 allow pptp_t self:unix_stream_socket { connectto create_stream_socket_perms };
 allow pptp_t self:rawip_socket create_socket_perms;
 allow pptp_t self:tcp_socket create_socket_perms;
 
-allow pptp_t pppd_etc_t:dir { getattr read search };
-allow pptp_t pppd_etc_t:file { read getattr };
+allow pptp_t pppd_etc_t:dir list_dir_perms;
+allow pptp_t pppd_etc_t:file read_file_perms;
 allow pptp_t pppd_etc_t:lnk_file { getattr read };
 
-allow pptp_t pppd_etc_rw_t:dir { getattr read search };
-allow pptp_t pppd_etc_rw_t:file { read getattr };
+allow pptp_t pppd_etc_rw_t:dir list_dir_perms;
+allow pptp_t pppd_etc_rw_t:file read_file_perms;
 allow pptp_t pppd_etc_rw_t:lnk_file { getattr read };
 can_exec(pptp_t, pppd_etc_rw_t)
 
 # Allow pptp to append to pppd log files
-allow pptp_t pppd_log_t:file append;
+allow pptp_t pppd_log_t:file append_file_perms;
 
 allow pptp_t pptp_log_t:file manage_file_perms;
-logging_log_filetrans(pptp_t,pptp_log_t,file)
+logging_log_filetrans(pptp_t, pptp_log_t, file)
 
-manage_files_pattern(pptp_t,pptp_var_run_t,pptp_var_run_t)
-manage_sock_files_pattern(pptp_t,pptp_var_run_t,pptp_var_run_t)
-files_pid_filetrans(pptp_t,pptp_var_run_t,file)
+manage_files_pattern(pptp_t, pptp_var_run_t, pptp_var_run_t)
+manage_sock_files_pattern(pptp_t, pptp_var_run_t, pptp_var_run_t)
+files_pid_filetrans(pptp_t, pptp_var_run_t, file)
 
 kernel_list_proc(pptp_t)
 kernel_read_kernel_sysctls(pptp_t)
@@ -252,12 +250,12 @@ dev_read_sysfs(pptp_t)
 
 corenet_all_recvfrom_unlabeled(pptp_t)
 corenet_all_recvfrom_netlabel(pptp_t)
-corenet_tcp_sendrecv_all_if(pptp_t)
-corenet_raw_sendrecv_all_if(pptp_t)
-corenet_tcp_sendrecv_all_nodes(pptp_t)
-corenet_raw_sendrecv_all_nodes(pptp_t)
+corenet_tcp_sendrecv_generic_if(pptp_t)
+corenet_raw_sendrecv_generic_if(pptp_t)
+corenet_tcp_sendrecv_generic_node(pptp_t)
+corenet_raw_sendrecv_generic_node(pptp_t)
 corenet_tcp_sendrecv_all_ports(pptp_t)
-corenet_tcp_bind_all_nodes(pptp_t)
+corenet_tcp_bind_generic_node(pptp_t)
 corenet_tcp_connect_generic_port(pptp_t)
 corenet_tcp_connect_all_reserved_ports(pptp_t)
 corenet_sendrecv_generic_client_packets(pptp_t)
@@ -271,9 +269,6 @@ term_use_ptmx(pptp_t)
 
 domain_use_interactive_fds(pptp_t)
 
-libs_use_ld_so(pptp_t)
-libs_use_shared_libs(pptp_t)
-
 logging_send_syslog_msg(pptp_t)
 
 miscfiles_read_localization(pptp_t)
@@ -281,8 +276,7 @@ miscfiles_read_localization(pptp_t)
 sysnet_read_config(pptp_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pptp_t)
-
-sysadm_dontaudit_search_home_dirs(pptp_t)
+userdom_dontaudit_search_user_home_dirs(pptp_t)
 
 optional_policy(`
 	consoletype_exec(pppd_t)
@@ -297,11 +291,11 @@ optional_policy(`
 ')
 
 optional_policy(`
-        seutil_sigchld_newrole(pptp_t)
+	seutil_sigchld_newrole(pptp_t)
 ')
 
 optional_policy(`
-        udev_read_db(pptp_t)
+	udev_read_db(pptp_t)
 ')
 
 optional_policy(`

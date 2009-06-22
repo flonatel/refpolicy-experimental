@@ -1,48 +1,5 @@
 ## <summary>Qmail Mail Server</summary>
 
-#######################################
-## <summary>
-##      The per role template for qmail
-## </summary>
-## <desc>
-##      <p>
-##      This template is invoked automatically for each user, and
-##      generally does not need to be invoked directly
-##      by policy writers.
-##      </p>
-## </desc>
-## <param name="userdomain_prefix" unused="true">
-##      <summary>
-##      The prefix of the user domain (e.g., user
-##      is the prefix for user_t).
-##      </summary>
-## </param>
-## <param name="user_domain">
-##      <summary>
-##      The type of the user domain.
-##      </summary>
-## </param>
-## <param name="user_role">
-##      <summary>
-##      The role associated with the user domain.
-##      </summary>
-## </param>
-#
-template(`qmail_per_role_template',`
-	gen_require(`
-		attribute qmail_user_domains;
-	')
-
-	role $3 types qmail_user_domains;
-
-	qmail_domtrans_inject($2)
-
-	allow qmail_user_domains $2:process sigchld;
-	allow qmail_user_domains $2:fifo_file { write getattr };
-	allow qmail_user_domains $2:fd use;
-
-')
-
 ########################################
 ## <summary>
 ##	Template for qmail parent/sub-domain pairs
@@ -62,7 +19,7 @@ template(`qmail_child_domain_template',`
 	type $1_t;
 	domain_type($1_t)
 	type $1_exec_t;
-	domain_entry_file($1_t,$1_exec_t)
+	domain_entry_file($1_t, $1_exec_t)
 	domain_auto_trans($2, $1_exec_t, $1_t)
 	role system_r types $1_t;
 
@@ -72,9 +29,9 @@ template(`qmail_child_domain_template',`
 	allow $1_t $2:fifo_file rw_file_perms;
 	allow $1_t $2:process sigchld;
 
-	allow $1_t qmail_etc_t:dir { getattr read search };
-	allow $1_t qmail_etc_t:file { getattr read };
-	allow $1_t qmail_etc_t:lnk_file { getattr read };
+	allow $1_t qmail_etc_t:dir list_dir_perms;
+	allow $1_t qmail_etc_t:file read_file_perms;
+	allow $1_t qmail_etc_t:lnk_file read_lnk_file_perms;
 
 	allow $1_t qmail_start_t:fd use;
 
@@ -86,9 +43,6 @@ template(`qmail_child_domain_template',`
 	files_search_var($1_t)
 
 	fs_getattr_xattr_fs($1_t)
-
-	libs_use_ld_so($1_t)
-	libs_use_shared_libs($1_t)
 
 	miscfiles_read_localization($1_t)
 ')
@@ -105,8 +59,7 @@ template(`qmail_child_domain_template',`
 #
 interface(`qmail_domtrans_inject',`
 	gen_require(`
-		type qmail_inject_t;
-		type qmail_inject_exec_t;
+		type qmail_inject_t, qmail_inject_exec_t;
 	')
 
 	domtrans_pattern($1, qmail_inject_exec_t, qmail_inject_t)
@@ -132,8 +85,7 @@ interface(`qmail_domtrans_inject',`
 #
 interface(`qmail_domtrans_queue',`
 	gen_require(`
-		type qmail_queue_t;
-		type qmail_queue_exec_t;
+		type qmail_queue_t, qmail_queue_exec_t;
 	')
 
 	domtrans_pattern($1, qmail_queue_exec_t, qmail_queue_t)
@@ -163,9 +115,9 @@ interface(`qmail_read_config',`
 		type qmail_etc_t;
 	')
 
-	allow $1 qmail_etc_t:dir { getattr read search };
-	allow $1 qmail_etc_t:file { getattr read };
-	allow $1 qmail_etc_t:lnk_file { getattr read };
+	allow $1 qmail_etc_t:dir list_dir_perms;
+	allow $1 qmail_etc_t:file read_file_perms;
+	allow $1 qmail_etc_t:lnk_file read_lnk_file_perms;
 	files_search_var($1)
 
 	ifdef(`distro_debian',`

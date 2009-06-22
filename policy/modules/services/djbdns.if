@@ -2,12 +2,12 @@
 
 ########################################
 ## <summary>
-##      Create a set of derived types for djbdns 
+##	Create a set of derived types for djbdns 
 ##	components that are directly supervised by daemontools.
 ## </summary>
 ## <param name="prefix">
 ##	<summary>
-##      The prefix to be used for deriving type names.
+##	The prefix to be used for deriving type names.
 ##	</summary>
 ## </param>
 #
@@ -19,7 +19,7 @@ template(`djbdns_daemontools_domain_template',`
 	files_config_file(djbdns_$1_conf_t)
 
 	domain_type(djbdns_$1_t)
-	domain_entry_file(djbdns_$1_t,djbdns_$1_exec_t)
+	domain_entry_file(djbdns_$1_t, djbdns_$1_exec_t)
 	role system_r types djbdns_$1_t;
 
 	daemontools_service_domain(djbdns_$1_t, djbdns_$1_exec_t)
@@ -34,14 +34,14 @@ template(`djbdns_daemontools_domain_template',`
 
 	corenet_all_recvfrom_unlabeled(djbdns_$1_t)
 	corenet_all_recvfrom_netlabel(djbdns_$1_t)
-	corenet_tcp_sendrecv_all_if(djbdns_$1_t)
-	corenet_udp_sendrecv_all_if(djbdns_$1_t)
-	corenet_tcp_sendrecv_all_nodes(djbdns_$1_t)
-	corenet_udp_sendrecv_all_nodes(djbdns_$1_t)
+	corenet_tcp_sendrecv_generic_if(djbdns_$1_t)
+	corenet_udp_sendrecv_generic_if(djbdns_$1_t)
+	corenet_tcp_sendrecv_generic_node(djbdns_$1_t)
+	corenet_udp_sendrecv_generic_node(djbdns_$1_t)
 	corenet_tcp_sendrecv_all_ports(djbdns_$1_t)
 	corenet_udp_sendrecv_all_ports(djbdns_$1_t)
-	corenet_tcp_bind_all_nodes(djbdns_$1_t)
-	corenet_udp_bind_all_nodes(djbdns_$1_t)
+	corenet_tcp_bind_generic_node(djbdns_$1_t)
+	corenet_udp_bind_generic_node(djbdns_$1_t)
 	corenet_tcp_bind_dns_port(djbdns_$1_t)
 	corenet_udp_bind_dns_port(djbdns_$1_t)
 	corenet_udp_bind_generic_port(djbdns_$1_t)
@@ -49,7 +49,4 @@ template(`djbdns_daemontools_domain_template',`
 	corenet_sendrecv_generic_server_packets(djbdns_$1_t)
 
 	files_search_var(djbdns_$1_t)
-
-	libs_use_ld_so(djbdns_$1_t)
-	libs_use_shared_libs(djbdns_$1_t)
 ')

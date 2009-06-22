@@ -1,5 +1,5 @@
 
-policy_module(resmgr,1.2.0)
+policy_module(resmgr, 1.2.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(resmgr,1.2.0)
 
 type resmgrd_t;
 type resmgrd_exec_t;
-init_daemon_domain(resmgrd_t,resmgrd_exec_t)
+init_daemon_domain(resmgrd_t, resmgrd_exec_t)
 
 type resmgrd_etc_t;
 files_config_file(resmgrd_etc_t)
@@ -25,12 +25,12 @@ allow resmgrd_t self:capability { dac_override sys_admin sys_rawio };
 dontaudit resmgrd_t self:capability sys_tty_config;
 allow resmgrd_t self:process signal_perms;
 
-allow resmgrd_t resmgrd_etc_t:file { getattr read };
+allow resmgrd_t resmgrd_etc_t:file read_file_perms;
 files_search_etc(resmgrd_t)
 
 allow resmgrd_t resmgrd_var_run_t:file manage_file_perms;
 allow resmgrd_t resmgrd_var_run_t:sock_file manage_sock_file_perms;
-files_pid_filetrans(resmgrd_t,resmgrd_var_run_t,{ file sock_file })
+files_pid_filetrans(resmgrd_t, resmgrd_var_run_t, { file sock_file })
 
 kernel_list_proc(resmgrd_t)
 kernel_read_proc_symlinks(resmgrd_t)
@@ -51,9 +51,6 @@ storage_raw_read_removable_device(resmgrd_t)
 # not sure if it needs write access, needs to be investigated further...
 storage_write_scsi_generic(resmgrd_t)
 storage_raw_write_removable_device(resmgrd_t)
-
-libs_use_ld_so(resmgrd_t)
-libs_use_shared_libs(resmgrd_t)
 
 logging_send_syslog_msg(resmgrd_t)
 

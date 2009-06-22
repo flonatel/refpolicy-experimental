@@ -1,5 +1,5 @@
 
-policy_module(smartmon, 1.6.0)
+policy_module(smartmon, 1.8.1)
 
 ########################################
 #
@@ -8,7 +8,10 @@ policy_module(smartmon, 1.6.0)
 
 type fsdaemon_t;
 type fsdaemon_exec_t;
-init_daemon_domain(fsdaemon_t,fsdaemon_exec_t)
+init_daemon_domain(fsdaemon_t, fsdaemon_exec_t)
+
+type fsdaemon_initrc_exec_t;
+init_script_file(fsdaemon_initrc_exec_t)
 
 type fsdaemon_var_run_t;
 files_pid_file(fsdaemon_var_run_t)
@@ -28,13 +31,14 @@ allow fsdaemon_t self:fifo_file rw_fifo_file_perms;
 allow fsdaemon_t self:unix_dgram_socket create_socket_perms;
 allow fsdaemon_t self:unix_stream_socket create_stream_socket_perms;
 allow fsdaemon_t self:udp_socket create_socket_perms;
+allow fsdaemon_t self:netlink_route_socket r_netlink_socket_perms;
 
-manage_dirs_pattern(fsdaemon_t,fsdaemon_tmp_t,fsdaemon_tmp_t)
-manage_files_pattern(fsdaemon_t,fsdaemon_tmp_t,fsdaemon_tmp_t)
+manage_dirs_pattern(fsdaemon_t, fsdaemon_tmp_t, fsdaemon_tmp_t)
+manage_files_pattern(fsdaemon_t, fsdaemon_tmp_t, fsdaemon_tmp_t)
 files_tmp_filetrans(fsdaemon_t, fsdaemon_tmp_t, { file dir })
 
-manage_files_pattern(fsdaemon_t,fsdaemon_var_run_t,fsdaemon_var_run_t)
-files_pid_filetrans(fsdaemon_t,fsdaemon_var_run_t,file)
+manage_files_pattern(fsdaemon_t, fsdaemon_var_run_t, fsdaemon_var_run_t)
+files_pid_filetrans(fsdaemon_t, fsdaemon_var_run_t, file)
 
 kernel_read_kernel_sysctls(fsdaemon_t)
 kernel_read_software_raid_state(fsdaemon_t)
@@ -45,7 +49,7 @@ corecmd_exec_all_executables(fsdaemon_t)
 corenet_all_recvfrom_unlabeled(fsdaemon_t)
 corenet_all_recvfrom_netlabel(fsdaemon_t)
 corenet_udp_sendrecv_generic_if(fsdaemon_t)
-corenet_udp_sendrecv_all_nodes(fsdaemon_t)
+corenet_udp_sendrecv_generic_node(fsdaemon_t)
 corenet_udp_sendrecv_all_ports(fsdaemon_t)
 
 dev_read_sysfs(fsdaemon_t)
@@ -69,8 +73,6 @@ storage_raw_read_removable_device(fsdaemon_t)
 
 term_dontaudit_search_ptys(fsdaemon_t)
 
-libs_use_ld_so(fsdaemon_t)
-libs_use_shared_libs(fsdaemon_t)
 libs_exec_ld_so(fsdaemon_t)
 libs_exec_lib_files(fsdaemon_t)
 
@@ -78,14 +80,13 @@ logging_send_syslog_msg(fsdaemon_t)
 
 miscfiles_read_localization(fsdaemon_t)
 
-sysnet_read_config(fsdaemon_t)
+sysnet_dns_name_resolve(fsdaemon_t)
 
 userdom_dontaudit_use_unpriv_user_fds(fsdaemon_t)
-
-sysadm_dontaudit_search_home_dirs(fsdaemon_t)
+userdom_dontaudit_search_user_home_dirs(fsdaemon_t)
 
 optional_policy(`
-        mta_send_mail(fsdaemon_t)
+	mta_send_mail(fsdaemon_t)
 ')
 
 optional_policy(`

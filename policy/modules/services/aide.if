@@ -2,23 +2,22 @@
 
 ########################################
 ## <summary>
-##      Execute aide in the aide domain
+##	Execute aide in the aide domain
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`aide_domtrans',`
-        gen_require(`
-                type aide_t, aide_exec_t;
-        ')
+	gen_require(`
+		type aide_t, aide_exec_t;
+	')
 
 	corecmd_search_bin($1)
-        domtrans_pattern($1,aide_exec_t,aide_t)
+	domtrans_pattern($1, aide_exec_t, aide_t)
 ')
-
 
 ########################################
 ## <summary>
@@ -34,11 +33,6 @@ interface(`aide_domtrans',`
 ##	The role to allow the AIDE domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the AIDE domain to use.
-##	</summary>
-## </param>
 #
 interface(`aide_run',`
 	gen_require(`
@@ -47,7 +41,6 @@ interface(`aide_run',`
 
 	aide_domtrans($1)
 	role $2 types aide_t;
-	allow aide_t $3:chr_file rw_chr_file_perms;
 ')
 
 ########################################
@@ -71,8 +64,8 @@ interface(`aide_admin',`
 	ps_process_pattern($1, aide_t)
 
 	files_list_etc($1)
-	manage_files_pattern($1, aide_db_t, aide_db_t)
+	admin_pattern($1, aide_db_t)
 
 	logging_list_logs($1)
-	manage_files_pattern($1, aide_log_t, aide_log_t)
+	admin_pattern($1, aide_log_t)
 ')

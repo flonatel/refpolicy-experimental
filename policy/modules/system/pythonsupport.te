@@ -40,5 +40,5 @@ miscfiles_read_localization(pythoncompile_t)
 # create compiled python modules
 allow pythoncompile_t python_compiled_t:dir manage_dir_perms;
 allow pythoncompile_t python_compiled_t:file manage_file_perms;
-allow pythoncompile_t python_compiled_t:lnk_file read_lnk_file_perms;
+allow pythoncompile_t python_compiled_t:lnk_file manage_lnk_file_perms;
 files_var_lib_filetrans(pythoncompile_t, python_compiled_t, dir)

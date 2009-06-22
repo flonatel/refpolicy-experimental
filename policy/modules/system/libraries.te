@@ -1,5 +1,5 @@
 
-policy_module(libraries, 2.2.0)
+policy_module(libraries, 2.4.1)
 
 ########################################
 #
@@ -81,13 +81,11 @@ files_delete_etc_files(ldconfig_t)
 
 init_use_script_ptys(ldconfig_t)
 
-libs_use_ld_so(ldconfig_t)
-libs_use_shared_libs(ldconfig_t)
-
 miscfiles_read_localization(ldconfig_t)
 
 logging_send_syslog_msg(ldconfig_t)
 
+userdom_use_user_terminals(ldconfig_t)
 userdom_use_all_users_fds(ldconfig_t)
 
 optional_policy(`
@@ -120,7 +118,7 @@ optional_policy(`
 
 optional_policy(`
 	# When you install a kernel the postinstall builds a initrd image in tmp 
-	# and executes ldconfig on it.  If you dont allow this kernel installs 
+	# and executes ldconfig on it. If you dont allow this kernel installs 
 	# blow up.
 	rpm_manage_script_tmp_files(ldconfig_t)
 ')

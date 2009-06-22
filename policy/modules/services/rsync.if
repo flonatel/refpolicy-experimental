@@ -16,7 +16,7 @@ interface(`rsync_entry_type',`
 		type rsync_exec_t;
 	')
 
-	domain_entry_file($1,rsync_exec_t)
+	domain_entry_file($1, rsync_exec_t)
 ')
 
 ########################################
@@ -24,14 +24,14 @@ interface(`rsync_entry_type',`
 ##	Execute a rsync in a specified domain.
 ## </summary>
 ## <desc>
-##      <p>
+##	<p>
 ##	Execute a rsync in a specified domain.
-##      </p>
-##      <p>
-##      No interprocess communication (signals, pipes,
-##      etc.) is provided by this interface since
-##      the domains are not owned by this module.
-##      </p>
+##	</p>
+##	<p>
+##	No interprocess communication (signals, pipes,
+##	etc.) is provided by this interface since
+##	the domains are not owned by this module.
+##	</p>
 ## </desc>
 ## <param name="source_domain">
 ##	<summary>
@@ -49,7 +49,7 @@ interface(`rsync_entry_spec_domtrans',`
 		type rsync_exec_t;
 	')
 
-	domain_trans($1,rsync_exec_t,$2)
+	domain_trans($1, rsync_exec_t, $2)
 ')
 
 ########################################
@@ -57,14 +57,14 @@ interface(`rsync_entry_spec_domtrans',`
 ##	Execute a rsync in a specified domain.
 ## </summary>
 ## <desc>
-##      <p>
+##	<p>
 ##	Execute a rsync in a specified domain.
-##      </p>
-##      <p>
-##      No interprocess communication (signals, pipes,
-##      etc.) is provided by this interface since
-##      the domains are not owned by this module.
-##      </p>
+##	</p>
+##	<p>
+##	No interprocess communication (signals, pipes,
+##	etc.) is provided by this interface since
+##	the domains are not owned by this module.
+##	</p>
 ## </desc>
 ## <param name="source_domain">
 ##	<summary>
@@ -82,7 +82,7 @@ interface(`rsync_entry_domtrans',`
 		type rsync_exec_t;
 	')
 
-	domain_auto_trans($1,rsync_exec_t,$2)
+	domain_auto_trans($1, rsync_exec_t, $2)
 ')
 
 ########################################
@@ -101,5 +101,5 @@ interface(`rsync_exec',`
 		type rsync_exec_t;
 	')
 
-	can_exec($1,rsync_exec_t)
+	can_exec($1, rsync_exec_t)
 ')

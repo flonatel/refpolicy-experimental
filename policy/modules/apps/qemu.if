@@ -32,11 +32,6 @@ interface(`qemu_domtrans',`
 ##	The role to allow the qemu domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the qemu domain to use.
-##	</summary>
-## </param>
 #
 interface(`qemu_run',`
 	gen_require(`
@@ -45,7 +40,6 @@ interface(`qemu_run',`
 
 	qemu_domtrans($1)
 	role $2 types qemu_t;
-	allow qemu_t $3:chr_file rw_file_perms;
 ')
 
 ########################################
@@ -164,10 +158,10 @@ template(`qemu_domain_template',`
 
 	corenet_all_recvfrom_unlabeled($1_t)
 	corenet_all_recvfrom_netlabel($1_t)
-	corenet_tcp_sendrecv_all_if($1_t)
-	corenet_tcp_sendrecv_all_nodes($1_t)
+	corenet_tcp_sendrecv_generic_if($1_t)
+	corenet_tcp_sendrecv_generic_node($1_t)
 	corenet_tcp_sendrecv_all_ports($1_t)
-	corenet_tcp_bind_all_nodes($1_t)
+	corenet_tcp_bind_generic_node($1_t)
 	corenet_tcp_bind_vnc_port($1_t)
 	corenet_rw_tun_tap_dev($1_t)
 
@@ -191,12 +185,11 @@ template(`qemu_domain_template',`
 	term_getattr_pty_fs($1_t)
 	term_use_generic_ptys($1_t)
 
-	libs_use_ld_so($1_t)
-	libs_use_shared_libs($1_t)
-
 	miscfiles_read_localization($1_t)
 
 	sysnet_read_config($1_t)
+
+	userdom_use_user_terminals($1_t)
 
 #	optional_policy(`
 #		samba_domtrans_smb($1_t)
@@ -209,7 +202,7 @@ template(`qemu_domain_template',`
 	')
 
 	optional_policy(`
-		xserver_stream_connect_xdm_xserver($1_t)
+		xserver_stream_connect($1_t)
 		xserver_read_xdm_tmp_files($1_t)
 		xserver_read_xdm_pid($1_t)
 #		xserver_xdm_rw_shm($1_t)

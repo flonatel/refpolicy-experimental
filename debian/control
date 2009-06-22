@@ -1,17 +1,17 @@
 Source: refpolicy
-VCS-Arch: http://arch.debian.org/arch/private/srivasta/grab/refpolicy
-VCS-Browser: http://arch.debian.org/cgi-bin/archzoom.cgi/srivasta@debian.org--lenny/refpolicy?expand
+VCS-Git: git://git.debian.org/git/users/srivasta/debian/refpolicy.git
+VCS-Browser: http://git.debian.org/?p=users/srivasta/debian/refpolicy.git;a=summary
 Priority: standard
 Section: admin
 Homepage: http://serefpolicy.sourceforge.net/
 Maintainer: Russell Coker <russell@coker.com.au>
 Uploaders: Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
-Standards-Version: 3.7.3.0
-Build-Depends: policycoreutils (>= 2.0.49), checkpolicy (>= 2.0.16), python, m4, bzip2, gawk, libsepol1 (>=2.0.30-2)
+Standards-Version: 3.8.2.0
+Build-Depends: policycoreutils (>= 2.0.55), checkpolicy (>= 2.0.19), python, m4, bzip2, gawk, libsepol1 (>=2.0.36)
 
 Package: selinux-policy-default
 Architecture: all
-Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.30-2)
+Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5), python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.36)
 Recommends: checkpolicy, setools
 Priority: standard
 Suggests: logcheck, syslog-summary

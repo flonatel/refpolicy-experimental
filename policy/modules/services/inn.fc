@@ -4,14 +4,15 @@
 #
 /etc/news(/.*)?				gen_context(system_u:object_r:innd_etc_t,s0)
 /etc/news/boot		--		gen_context(system_u:object_r:innd_exec_t,s0)
+/etc/rc\.d/init\.d/innd	--		gen_context(system_u:object_r:innd_initrc_exec_t,s0)
 
 #
 # /usr
 #
 /usr/bin/inews		--		gen_context(system_u:object_r:innd_exec_t,s0)
 /usr/bin/rnews		--		gen_context(system_u:object_r:innd_exec_t,s0)
-/usr/bin/rpost          --      	gen_context(system_u:object_r:innd_exec_t,s0)
-/usr/bin/suck           --      	gen_context(system_u:object_r:innd_exec_t,s0)
+/usr/bin/rpost		--		gen_context(system_u:object_r:innd_exec_t,s0)
+/usr/bin/suck		--		gen_context(system_u:object_r:innd_exec_t,s0)
 
 /usr/sbin/in\.nnrpd	--		gen_context(system_u:object_r:innd_exec_t,s0)
 /usr/sbin/innd.*	--		gen_context(system_u:object_r:innd_exec_t,s0)

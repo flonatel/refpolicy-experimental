@@ -1,5 +1,5 @@
 
-policy_module(asterisk, 1.5.0)
+policy_module(asterisk, 1.6.1)
 
 ########################################
 #
@@ -8,10 +8,13 @@ policy_module(asterisk, 1.5.0)
 
 type asterisk_t;
 type asterisk_exec_t;
-init_daemon_domain(asterisk_t,asterisk_exec_t)
+init_daemon_domain(asterisk_t, asterisk_exec_t)
 
 type asterisk_etc_t;
 files_config_file(asterisk_etc_t)
+
+type asterisk_initrc_exec_t;
+init_script_file(asterisk_initrc_exec_t)
 
 type asterisk_log_t;
 logging_log_file(asterisk_log_t)
@@ -47,34 +50,34 @@ allow asterisk_t self:tcp_socket create_stream_socket_perms;
 allow asterisk_t self:udp_socket create_socket_perms;
 
 allow asterisk_t asterisk_etc_t:dir list_dir_perms;
-read_files_pattern(asterisk_t,asterisk_etc_t,asterisk_etc_t)
-read_lnk_files_pattern(asterisk_t,asterisk_etc_t,asterisk_etc_t)
+read_files_pattern(asterisk_t, asterisk_etc_t, asterisk_etc_t)
+read_lnk_files_pattern(asterisk_t, asterisk_etc_t, asterisk_etc_t)
 files_search_etc(asterisk_t)
 
-manage_files_pattern(asterisk_t,asterisk_log_t,asterisk_log_t)
-logging_log_filetrans(asterisk_t,asterisk_log_t,{ file dir })
+manage_files_pattern(asterisk_t, asterisk_log_t, asterisk_log_t)
+logging_log_filetrans(asterisk_t, asterisk_log_t, { file dir })
 
-manage_dirs_pattern(asterisk_t,asterisk_spool_t,asterisk_spool_t)
-manage_files_pattern(asterisk_t,asterisk_spool_t,asterisk_spool_t)
-manage_lnk_files_pattern(asterisk_t,asterisk_spool_t,asterisk_spool_t)
+manage_dirs_pattern(asterisk_t, asterisk_spool_t, asterisk_spool_t)
+manage_files_pattern(asterisk_t, asterisk_spool_t, asterisk_spool_t)
+manage_lnk_files_pattern(asterisk_t, asterisk_spool_t, asterisk_spool_t)
 
-manage_dirs_pattern(asterisk_t,asterisk_tmp_t,asterisk_tmp_t)
-manage_files_pattern(asterisk_t,asterisk_tmp_t,asterisk_tmp_t)
+manage_dirs_pattern(asterisk_t, asterisk_tmp_t, asterisk_tmp_t)
+manage_files_pattern(asterisk_t, asterisk_tmp_t, asterisk_tmp_t)
 files_tmp_filetrans(asterisk_t, asterisk_tmp_t, { file dir })
 
-manage_files_pattern(asterisk_t,asterisk_tmpfs_t,asterisk_tmpfs_t)
-manage_lnk_files_pattern(asterisk_t,asterisk_tmpfs_t,asterisk_tmpfs_t)
-manage_fifo_files_pattern(asterisk_t,asterisk_tmpfs_t,asterisk_tmpfs_t)
-manage_sock_files_pattern(asterisk_t,asterisk_tmpfs_t,asterisk_tmpfs_t)
-fs_tmpfs_filetrans(asterisk_t,asterisk_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_files_pattern(asterisk_t, asterisk_tmpfs_t, asterisk_tmpfs_t)
+manage_lnk_files_pattern(asterisk_t, asterisk_tmpfs_t, asterisk_tmpfs_t)
+manage_fifo_files_pattern(asterisk_t, asterisk_tmpfs_t, asterisk_tmpfs_t)
+manage_sock_files_pattern(asterisk_t, asterisk_tmpfs_t, asterisk_tmpfs_t)
+fs_tmpfs_filetrans(asterisk_t, asterisk_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
-manage_files_pattern(asterisk_t,asterisk_var_lib_t,asterisk_var_lib_t)
-files_var_lib_filetrans(asterisk_t,asterisk_var_lib_t,file)
+manage_files_pattern(asterisk_t, asterisk_var_lib_t, asterisk_var_lib_t)
+files_var_lib_filetrans(asterisk_t, asterisk_var_lib_t, file)
 
-manage_files_pattern(asterisk_t,asterisk_var_run_t,asterisk_var_run_t)
-manage_fifo_files_pattern(asterisk_t,asterisk_var_run_t,asterisk_var_run_t)
-manage_sock_files_pattern(asterisk_t,asterisk_var_run_t,asterisk_var_run_t)
-files_pid_filetrans(asterisk_t,asterisk_var_run_t,file)
+manage_files_pattern(asterisk_t, asterisk_var_run_t, asterisk_var_run_t)
+manage_fifo_files_pattern(asterisk_t, asterisk_var_run_t, asterisk_var_run_t)
+manage_sock_files_pattern(asterisk_t, asterisk_var_run_t, asterisk_var_run_t)
+files_pid_filetrans(asterisk_t, asterisk_var_run_t, file)
 
 kernel_read_system_state(asterisk_t)
 kernel_read_kernel_sysctls(asterisk_t)
@@ -86,12 +89,12 @@ corenet_all_recvfrom_unlabeled(asterisk_t)
 corenet_all_recvfrom_netlabel(asterisk_t)
 corenet_tcp_sendrecv_generic_if(asterisk_t)
 corenet_udp_sendrecv_generic_if(asterisk_t)
-corenet_tcp_sendrecv_all_nodes(asterisk_t)
-corenet_udp_sendrecv_all_nodes(asterisk_t)
+corenet_tcp_sendrecv_generic_node(asterisk_t)
+corenet_udp_sendrecv_generic_node(asterisk_t)
 corenet_tcp_sendrecv_all_ports(asterisk_t)
 corenet_udp_sendrecv_all_ports(asterisk_t)
-corenet_tcp_bind_all_nodes(asterisk_t)
-corenet_udp_bind_all_nodes(asterisk_t)
+corenet_tcp_bind_generic_node(asterisk_t)
+corenet_udp_bind_generic_node(asterisk_t)
 corenet_tcp_bind_asterisk_port(asterisk_t)
 corenet_udp_bind_asterisk_port(asterisk_t)
 corenet_sendrecv_asterisk_server_packets(asterisk_t)
@@ -116,9 +119,6 @@ files_read_usr_files(asterisk_t)
 fs_getattr_all_fs(asterisk_t)
 fs_search_auto_mountpoints(asterisk_t)
 
-libs_use_ld_so(asterisk_t)
-libs_use_shared_libs(asterisk_t)
-
 logging_send_syslog_msg(asterisk_t)
 
 miscfiles_read_localization(asterisk_t)
@@ -126,8 +126,7 @@ miscfiles_read_localization(asterisk_t)
 sysnet_read_config(asterisk_t)
 
 userdom_dontaudit_use_unpriv_user_fds(asterisk_t)
-
-sysadm_dontaudit_search_home_dirs(asterisk_t)
+userdom_dontaudit_search_user_home_dirs(asterisk_t)
 
 optional_policy(`
 	nis_use_ypbind(asterisk_t)

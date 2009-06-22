@@ -1,5 +1,5 @@
 
-policy_module(setroubleshoot, 1.7.0)
+policy_module(setroubleshoot, 1.9.1)
 
 ########################################
 #
@@ -36,18 +36,18 @@ allow setroubleshootd_t self:unix_dgram_socket create_socket_perms;
 
 # database files
 allow setroubleshootd_t setroubleshoot_var_lib_t:dir setattr;
-manage_files_pattern(setroubleshootd_t,setroubleshoot_var_lib_t,setroubleshoot_var_lib_t)
-files_var_lib_filetrans(setroubleshootd_t,setroubleshoot_var_lib_t,{ file dir })
+manage_files_pattern(setroubleshootd_t, setroubleshoot_var_lib_t, setroubleshoot_var_lib_t)
+files_var_lib_filetrans(setroubleshootd_t, setroubleshoot_var_lib_t, { file dir })
 
 # log files
 allow setroubleshootd_t setroubleshoot_var_log_t:dir setattr;
-manage_files_pattern(setroubleshootd_t,setroubleshoot_var_log_t,setroubleshoot_var_log_t)
-manage_sock_files_pattern(setroubleshootd_t,setroubleshoot_var_log_t,setroubleshoot_var_log_t)
-logging_log_filetrans(setroubleshootd_t,setroubleshoot_var_log_t,{ file dir })
+manage_files_pattern(setroubleshootd_t, setroubleshoot_var_log_t, setroubleshoot_var_log_t)
+manage_sock_files_pattern(setroubleshootd_t, setroubleshoot_var_log_t, setroubleshoot_var_log_t)
+logging_log_filetrans(setroubleshootd_t, setroubleshoot_var_log_t, { file dir })
 
 # pid file
-manage_files_pattern(setroubleshootd_t,setroubleshoot_var_run_t,setroubleshoot_var_run_t)
-manage_sock_files_pattern(setroubleshootd_t,setroubleshoot_var_run_t,setroubleshoot_var_run_t)
+manage_files_pattern(setroubleshootd_t, setroubleshoot_var_run_t, setroubleshoot_var_run_t)
+manage_sock_files_pattern(setroubleshootd_t, setroubleshoot_var_run_t, setroubleshoot_var_run_t)
 files_pid_filetrans(setroubleshootd_t,setroubleshoot_var_run_t, { file sock_file })
 
 kernel_read_kernel_sysctls(setroubleshootd_t)
@@ -60,9 +60,9 @@ corecmd_exec_shell(setroubleshootd_t)
 corenet_all_recvfrom_unlabeled(setroubleshootd_t)
 corenet_all_recvfrom_netlabel(setroubleshootd_t)
 corenet_tcp_sendrecv_generic_if(setroubleshootd_t)
-corenet_tcp_sendrecv_all_nodes(setroubleshootd_t)
+corenet_tcp_sendrecv_generic_node(setroubleshootd_t)
 corenet_tcp_sendrecv_all_ports(setroubleshootd_t)
-corenet_tcp_bind_all_nodes(setroubleshootd_t)
+corenet_tcp_bind_generic_node(setroubleshootd_t)
 corenet_tcp_connect_smtp_port(setroubleshootd_t)
 corenet_sendrecv_smtp_client_packets(setroubleshootd_t)
 
@@ -90,30 +90,27 @@ auth_use_nsswitch(setroubleshootd_t)
 init_read_utmp(setroubleshootd_t)
 init_dontaudit_write_utmp(setroubleshootd_t)
 
-libs_use_ld_so(setroubleshootd_t)
-libs_use_shared_libs(setroubleshootd_t)
-
 miscfiles_read_localization(setroubleshootd_t)
 
 locallogin_dontaudit_use_fds(setroubleshootd_t)
 
 logging_send_syslog_msg(setroubleshootd_t)
-logging_stream_connect_auditd(setroubleshootd_t)
+logging_stream_connect_dispatcher(setroubleshootd_t)
 
 seutil_read_config(setroubleshootd_t)
 seutil_read_file_contexts(setroubleshootd_t)
 
 sysnet_read_config(setroubleshootd_t)
 
-sysadm_dontaudit_read_home_content_files(setroubleshootd_t)
+userdom_dontaudit_read_user_home_content_files(setroubleshootd_t)
 
 optional_policy(`
-	dbus_system_bus_client_template(setroubleshootd, setroubleshootd_t)
+	dbus_system_bus_client(setroubleshootd_t)
 	dbus_connect_system_bus(setroubleshootd_t)
 ')
 
 optional_policy(`
 	rpm_read_db(setroubleshootd_t)
 	rpm_dontaudit_manage_db(setroubleshootd_t)
-        rpm_use_script_fds(setroubleshootd_t)
+	rpm_use_script_fds(setroubleshootd_t)
 ')

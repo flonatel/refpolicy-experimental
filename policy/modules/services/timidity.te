@@ -1,5 +1,5 @@
 
-policy_module(timidity, 1.7.0)
+policy_module(timidity, 1.8.1)
 
 # Note: You only need this policy if you want to run timidity as a server
 
@@ -10,8 +10,8 @@ policy_module(timidity, 1.7.0)
 
 type timidity_t;
 type timidity_exec_t;
-init_daemon_domain(timidity_t,timidity_exec_t)
-application_domain(timidity_t,timidity_exec_t)
+init_daemon_domain(timidity_t, timidity_exec_t)
+application_domain(timidity_t, timidity_exec_t)
 
 type timidity_tmpfs_t;
 files_tmpfs_file(timidity_tmpfs_t)
@@ -29,12 +29,12 @@ allow timidity_t self:unix_stream_socket create_stream_socket_perms;
 allow timidity_t self:tcp_socket create_stream_socket_perms;
 allow timidity_t self:udp_socket create_socket_perms;
 
-manage_dirs_pattern(timidity_t,timidity_tmpfs_t,timidity_tmpfs_t)
-manage_files_pattern(timidity_t,timidity_tmpfs_t,timidity_tmpfs_t)
-manage_lnk_files_pattern(timidity_t,timidity_tmpfs_t,timidity_tmpfs_t)
-manage_fifo_files_pattern(timidity_t,timidity_tmpfs_t,timidity_tmpfs_t)
-manage_sock_files_pattern(timidity_t,timidity_tmpfs_t,timidity_tmpfs_t)
-fs_tmpfs_filetrans(timidity_t,timidity_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(timidity_t, timidity_tmpfs_t, timidity_tmpfs_t)
+manage_files_pattern(timidity_t, timidity_tmpfs_t, timidity_tmpfs_t)
+manage_lnk_files_pattern(timidity_t, timidity_tmpfs_t, timidity_tmpfs_t)
+manage_fifo_files_pattern(timidity_t, timidity_tmpfs_t, timidity_tmpfs_t)
+manage_sock_files_pattern(timidity_t, timidity_tmpfs_t, timidity_tmpfs_t)
+fs_tmpfs_filetrans(timidity_t, timidity_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
 kernel_read_kernel_sysctls(timidity_t)
 # read /proc/cpuinfo
@@ -44,8 +44,8 @@ corenet_all_recvfrom_unlabeled(timidity_t)
 corenet_all_recvfrom_netlabel(timidity_t)
 corenet_tcp_sendrecv_generic_if(timidity_t)
 corenet_udp_sendrecv_generic_if(timidity_t)
-corenet_tcp_sendrecv_all_nodes(timidity_t)
-corenet_udp_sendrecv_all_nodes(timidity_t)
+corenet_tcp_sendrecv_generic_node(timidity_t)
+corenet_udp_sendrecv_generic_node(timidity_t)
 corenet_tcp_sendrecv_all_ports(timidity_t)
 corenet_udp_sendrecv_all_ports(timidity_t)
 
@@ -63,8 +63,6 @@ files_read_usr_files(timidity_t)
 # read /etc/esd.conf
 files_read_etc_files(timidity_t)
 
-libs_use_ld_so(timidity_t)
-libs_use_shared_libs(timidity_t)
 # read libartscbackend.la
 libs_read_lib_files(timidity_t)
 
@@ -77,7 +75,7 @@ userdom_dontaudit_use_unpriv_user_fds(timidity_t)
 # stupid timidity won't start if it can't search its current directory.
 # allow this so /etc/init.d/alsasound start works from /root
 # cjp: this should be fixed if possible so this rule can be removed.
-sysadm_search_home_dirs(timidity_t)
+userdom_search_user_home_dirs(timidity_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(timidity_t)

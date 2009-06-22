@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##     The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -34,11 +34,6 @@ interface(`sysnet_domtrans_dhcpc',`
 ##	The role to be allowed the clock domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the clock domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`sysnet_run_dhcpc',`
@@ -48,7 +43,6 @@ interface(`sysnet_run_dhcpc',`
 
 	sysnet_domtrans_dhcpc($1)
 	role $2 types dhcpc_t;
-	allow dhcpc_t $3:chr_file { getattr read write ioctl };
 ')
 
 ########################################
@@ -198,7 +192,7 @@ interface(`sysnet_read_dhcpc_state',`
 		type dhcpc_state_t;
 	')
 
-	allow $1 dhcpc_state_t:file { getattr read };
+	allow $1 dhcpc_state_t:file read_file_perms;
 ')
 
 #######################################
@@ -349,7 +343,7 @@ interface(`sysnet_read_dhcpc_pid',`
 	')
 
 	files_list_pids($1)
-	allow $1 dhcpc_var_run_t:file { getattr read };
+	allow $1 dhcpc_var_run_t:file read_file_perms;
 ')
 
 #######################################
@@ -405,11 +399,6 @@ interface(`sysnet_domtrans_ifconfig',`
 ##	The role to be allowed the ifconfig domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the ifconfig domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`sysnet_run_ifconfig',`
@@ -420,7 +409,6 @@ interface(`sysnet_run_ifconfig',`
 	corecmd_search_bin($1)
 	sysnet_domtrans_ifconfig($1)
 	role $2 types ifconfig_t;
-	allow ifconfig_t $3:chr_file rw_term_perms;
 ')
 
 #######################################
@@ -559,10 +547,10 @@ interface(`sysnet_dns_name_resolve',`
 
 	corenet_all_recvfrom_unlabeled($1)
 	corenet_all_recvfrom_netlabel($1)
-	corenet_tcp_sendrecv_all_if($1)
-	corenet_udp_sendrecv_all_if($1)
-	corenet_tcp_sendrecv_all_nodes($1)
-	corenet_udp_sendrecv_all_nodes($1)
+	corenet_tcp_sendrecv_generic_if($1)
+	corenet_udp_sendrecv_generic_if($1)
+	corenet_tcp_sendrecv_generic_node($1)
+	corenet_udp_sendrecv_generic_node($1)
 	corenet_tcp_sendrecv_dns_port($1)
 	corenet_udp_sendrecv_dns_port($1)
 	corenet_tcp_connect_dns_port($1)
@@ -591,8 +579,8 @@ interface(`sysnet_use_ldap',`
 
 	corenet_all_recvfrom_unlabeled($1)
 	corenet_all_recvfrom_netlabel($1)
-	corenet_tcp_sendrecv_all_if($1)
-	corenet_tcp_sendrecv_all_nodes($1)
+	corenet_tcp_sendrecv_generic_if($1)
+	corenet_tcp_sendrecv_generic_node($1)
 	corenet_tcp_sendrecv_ldap_port($1)
 	corenet_tcp_connect_ldap_port($1)
 	corenet_sendrecv_ldap_client_packets($1)
@@ -621,10 +609,10 @@ interface(`sysnet_use_portmap',`
 
 	corenet_all_recvfrom_unlabeled($1)
 	corenet_all_recvfrom_netlabel($1)
-	corenet_tcp_sendrecv_all_if($1)
-	corenet_udp_sendrecv_all_if($1)
-	corenet_tcp_sendrecv_all_nodes($1)
-	corenet_udp_sendrecv_all_nodes($1)
+	corenet_tcp_sendrecv_generic_if($1)
+	corenet_udp_sendrecv_generic_if($1)
+	corenet_tcp_sendrecv_generic_node($1)
+	corenet_udp_sendrecv_generic_node($1)
 	corenet_tcp_sendrecv_portmap_port($1)
 	corenet_udp_sendrecv_portmap_port($1)
 	corenet_tcp_connect_portmap_port($1)

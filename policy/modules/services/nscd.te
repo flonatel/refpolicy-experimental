@@ -1,5 +1,5 @@
 
-policy_module(nscd, 1.7.0)
+policy_module(nscd, 1.8.2)
 
 gen_require(`
 	class nscd all_nscd_perms;
@@ -18,7 +18,7 @@ files_pid_file(nscd_var_run_t)
 # nscd is both the client program and the daemon.
 type nscd_t;
 type nscd_exec_t;
-init_daemon_domain(nscd_t,nscd_exec_t)
+init_daemon_domain(nscd_t, nscd_exec_t)
 
 type nscd_log_t;
 logging_log_file(nscd_log_t)
@@ -31,7 +31,7 @@ logging_log_file(nscd_log_t)
 allow nscd_t self:capability { kill setgid setuid audit_write };
 dontaudit nscd_t self:capability sys_tty_config;
 allow nscd_t self:process { getattr setsched signal_perms };
-allow nscd_t self:fifo_file { read write };
+allow nscd_t self:fifo_file read_fifo_file_perms;
 allow nscd_t self:unix_stream_socket create_stream_socket_perms;
 allow nscd_t self:unix_dgram_socket create_socket_perms;
 allow nscd_t self:netlink_selinux_socket create_socket_perms;
@@ -44,11 +44,11 @@ allow nscd_t self:udp_socket create_socket_perms;
 allow nscd_t self:nscd { admin getstat };
 
 allow nscd_t nscd_log_t:file manage_file_perms;
-logging_log_filetrans(nscd_t,nscd_log_t,file)
+logging_log_filetrans(nscd_t, nscd_log_t, file)
 
-manage_files_pattern(nscd_t,nscd_var_run_t,nscd_var_run_t)
-manage_sock_files_pattern(nscd_t,nscd_var_run_t,nscd_var_run_t)
-files_pid_filetrans(nscd_t,nscd_var_run_t,{ file sock_file })
+manage_files_pattern(nscd_t, nscd_var_run_t, nscd_var_run_t)
+manage_sock_files_pattern(nscd_t, nscd_var_run_t, nscd_var_run_t)
+files_pid_filetrans(nscd_t, nscd_var_run_t, { file sock_file })
 
 kernel_read_kernel_sysctls(nscd_t)
 kernel_list_proc(nscd_t)
@@ -67,10 +67,10 @@ auth_use_nsswitch(nscd_t)
 
 corenet_all_recvfrom_unlabeled(nscd_t)
 corenet_all_recvfrom_netlabel(nscd_t)
-corenet_tcp_sendrecv_all_if(nscd_t)
-corenet_udp_sendrecv_all_if(nscd_t)
-corenet_tcp_sendrecv_all_nodes(nscd_t)
-corenet_udp_sendrecv_all_nodes(nscd_t)
+corenet_tcp_sendrecv_generic_if(nscd_t)
+corenet_udp_sendrecv_generic_if(nscd_t)
+corenet_tcp_sendrecv_generic_node(nscd_t)
+corenet_udp_sendrecv_generic_node(nscd_t)
 corenet_tcp_sendrecv_all_ports(nscd_t)
 corenet_udp_sendrecv_all_ports(nscd_t)
 corenet_tcp_connect_all_ports(nscd_t)
@@ -90,9 +90,6 @@ files_read_generic_tmp_symlinks(nscd_t)
 # Needed to read files created by firstboot "/etc/hesiod.conf"
 files_read_etc_runtime_files(nscd_t)
 
-libs_use_ld_so(nscd_t)
-libs_use_shared_libs(nscd_t)
-
 logging_send_syslog_msg(nscd_t)
 
 miscfiles_read_localization(nscd_t)
@@ -103,9 +100,9 @@ seutil_sigchld_newrole(nscd_t)
 
 sysnet_read_config(nscd_t)
 
+userdom_dontaudit_use_user_terminals(nscd_t)
 userdom_dontaudit_use_unpriv_user_fds(nscd_t)
-
-sysadm_dontaudit_search_home_dirs(nscd_t)
+userdom_dontaudit_search_user_home_dirs(nscd_t)
 
 optional_policy(`
 	udev_read_db(nscd_t)

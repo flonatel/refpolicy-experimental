@@ -1,3 +1,13 @@
+refpolicy (2:0.0.20090621-1) unstable; urgency=low
+
+  * There have been some major updates in the file contexts in this
+    release, so a relabelling of the file system is recommended after this
+    upgrade. Please install selinux-basics, touch /.autorelabel as root,
+    and reboot.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 22 Jun 2009 02:42:42 -0500
+
+
 refpolicy (0.0.20061018-2) unstable; urgency=high
 
 

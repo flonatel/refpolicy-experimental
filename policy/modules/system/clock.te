@@ -1,5 +1,5 @@
 
-policy_module(clock,1.5.0)
+policy_module(clock, 1.6.0)
 
 ########################################
 #
@@ -24,7 +24,7 @@ role system_r types hwclock_t;
 allow hwclock_t self:capability { dac_override sys_rawio sys_time sys_tty_config };
 dontaudit hwclock_t self:capability sys_tty_config;
 allow hwclock_t self:process signal_perms;
-allow hwclock_t self:fifo_file { getattr read write };
+allow hwclock_t self:fifo_file rw_fifo_file_perms;
 
 # Allow hwclock to store & retrieve correction factors.
 allow hwclock_t adjtime_t:file { rw_file_perms setattr };
@@ -54,9 +54,6 @@ init_use_script_ptys(hwclock_t)
 files_read_etc_files(hwclock_t)
 # for when /usr is not mounted:
 files_dontaudit_search_isid_type_dirs(hwclock_t)
-
-libs_use_ld_so(hwclock_t)
-libs_use_shared_libs(hwclock_t)
 
 logging_send_audit_msgs(hwclock_t)
 logging_send_syslog_msg(hwclock_t)

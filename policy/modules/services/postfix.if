@@ -31,7 +31,7 @@ template(`postfix_domain_template',`
 	type postfix_$1_t;
 	type postfix_$1_exec_t;
 	domain_type(postfix_$1_t)
-	domain_entry_file(postfix_$1_t,postfix_$1_exec_t)
+	domain_entry_file(postfix_$1_t, postfix_$1_exec_t)
 	role system_r types postfix_$1_t;
 
 	dontaudit postfix_$1_t self:capability sys_tty_config;
@@ -45,7 +45,7 @@ template(`postfix_domain_template',`
 	allow postfix_$1_t postfix_master_t:file read;
 
 	allow postfix_$1_t postfix_etc_t:dir list_dir_perms;
-	read_files_pattern(postfix_$1_t,postfix_etc_t,postfix_etc_t)
+	read_files_pattern(postfix_$1_t, postfix_etc_t, postfix_etc_t)
 
 	can_exec(postfix_$1_t, postfix_$1_exec_t)
 
@@ -56,7 +56,7 @@ template(`postfix_domain_template',`
 	allow postfix_$1_t postfix_spool_t:dir list_dir_perms;
 
 	allow postfix_$1_t postfix_var_run_t:file manage_file_perms;
-	files_pid_filetrans(postfix_$1_t,postfix_var_run_t,file)
+	files_pid_filetrans(postfix_$1_t, postfix_var_run_t, file)
 
 	kernel_read_system_state(postfix_$1_t)
 	kernel_read_network_state(postfix_$1_t)
@@ -84,9 +84,6 @@ template(`postfix_domain_template',`
 	init_sigchld(postfix_$1_t)
 
 	auth_use_nsswitch(postfix_$1_t)
-
-	libs_use_ld_so(postfix_$1_t)
-	libs_use_shared_libs(postfix_$1_t)
 
 	logging_send_syslog_msg(postfix_$1_t)
 
@@ -122,14 +119,14 @@ template(`postfix_server_domain_template',`
 
 	corenet_all_recvfrom_unlabeled(postfix_$1_t)
 	corenet_all_recvfrom_netlabel(postfix_$1_t)
-	corenet_tcp_sendrecv_all_if(postfix_$1_t)
-	corenet_udp_sendrecv_all_if(postfix_$1_t)
-	corenet_tcp_sendrecv_all_nodes(postfix_$1_t)
-	corenet_udp_sendrecv_all_nodes(postfix_$1_t)
+	corenet_tcp_sendrecv_generic_if(postfix_$1_t)
+	corenet_udp_sendrecv_generic_if(postfix_$1_t)
+	corenet_tcp_sendrecv_generic_node(postfix_$1_t)
+	corenet_udp_sendrecv_generic_node(postfix_$1_t)
 	corenet_tcp_sendrecv_all_ports(postfix_$1_t)
 	corenet_udp_sendrecv_all_ports(postfix_$1_t)
-	corenet_tcp_bind_all_nodes(postfix_$1_t)
-	corenet_udp_bind_all_nodes(postfix_$1_t)
+	corenet_tcp_bind_generic_node(postfix_$1_t)
+	corenet_udp_bind_generic_node(postfix_$1_t)
 	corenet_tcp_connect_all_ports(postfix_$1_t)
 	corenet_sendrecv_all_client_packets(postfix_$1_t)
 ')
@@ -163,42 +160,6 @@ template(`postfix_user_domain_template',`
 
 ########################################
 ## <summary>
-##	The per role template for the postfix module.
-## </summary>
-## <param name="prefix" unused="true">
-##	<summary>
-##	The prefix of the user domain.
-##	(e.g., user is the prefix of user_t)
-##	</summary>
-## </param>
-## <param name="user_domain">
-##	<summary>
-##	User domain type.
-##	</summary>
-## </param>
-## <param name="user_role">
-##	<summary>
-##	User role
-##	</summary>
-## </param>
-#
-template(`postfix_per_role_template',`
-	gen_require(`
-		attribute postfix_user_domains;
-		type postfix_postdrop_t;
-		type postfix_postqueue_t;
-	')
-
-	role $3 types postfix_postdrop_t;
-	role $3 types postfix_postqueue_t;
-
-	allow postfix_user_domains $2:process sigchld;
-	allow postfix_user_domains $2:fifo_file { write getattr };
-	allow postfix_user_domains $2:fd use;
-')
-
-########################################
-## <summary>
 ##	Read postfix configuration files.
 ## </summary>
 ## <param name="domain">
@@ -213,9 +174,9 @@ interface(`postfix_read_config',`
 		type postfix_etc_t;
 	')
 
-	allow $1 postfix_etc_t:dir { getattr read search };
-	allow $1 postfix_etc_t:file { read getattr };
-	allow $1 postfix_etc_t:lnk_file { getattr read };
+	allow $1 postfix_etc_t:dir list_dir_perms;
+	allow $1 postfix_etc_t:file read_file_perms;
+	allow $1 postfix_etc_t:lnk_file read_lnk_file_perms;
 	files_search_etc($1)
 ')
 
@@ -246,7 +207,7 @@ interface(`postfix_config_filetrans',`
 	')
 
 	files_search_etc($1)
-	filetrans_pattern($1,postfix_etc_t,$2,$3)
+	filetrans_pattern($1, postfix_etc_t, $2, $3)
 ')
 
 ########################################
@@ -284,7 +245,7 @@ interface(`postfix_read_local_state',`
 		type postfix_local_t;
 	')
 
-	read_files_pattern($1,postfix_local_t,postfix_local_t)
+	read_files_pattern($1, postfix_local_t, postfix_local_t)
 ')
 
 ########################################
@@ -302,7 +263,7 @@ interface(`postfix_read_master_state',`
 		type postfix_master_t;
 	')
 
-	read_files_pattern($1,postfix_master_t,postfix_master_t)
+	read_files_pattern($1, postfix_master_t, postfix_master_t)
 ')
 
 ########################################
@@ -340,7 +301,7 @@ interface(`postfix_domtrans_map',`
 		type postfix_map_t, postfix_map_exec_t;
 	')
 
-	domtrans_pattern($1,postfix_map_exec_t,postfix_map_t)
+	domtrans_pattern($1, postfix_map_exec_t, postfix_map_t)
 ')
 
 ########################################
@@ -358,11 +319,6 @@ interface(`postfix_domtrans_map',`
 ##	The role to be allowed the postfix_map domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the postfix_map domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`postfix_run_map',`
@@ -372,7 +328,6 @@ interface(`postfix_run_map',`
 
 	postfix_domtrans_map($1)
 	role $2 types postfix_map_t;
-	allow postfix_map_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -391,7 +346,7 @@ interface(`postfix_domtrans_master',`
 		type postfix_master_t, postfix_master_exec_t;
 	')
 
-	domtrans_pattern($1,postfix_master_exec_t,postfix_master_t)
+	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
 ')
 
 ########################################
@@ -429,7 +384,7 @@ interface(`postfix_create_pivate_sockets',`
 	')
 
 	allow $1 postfix_private_t:dir list_dir_perms;
-	create_sock_files_pattern($1,postfix_private_t,postfix_private_t)
+	create_sock_files_pattern($1, postfix_private_t, postfix_private_t)
 ')
 
 ########################################
@@ -448,7 +403,7 @@ interface(`postfix_domtrans_smtp',`
 		type postfix_smtp_t, postfix_smtp_exec_t;
 	')
 
-	domtrans_pattern($1,postfix_smtp_exec_t,postfix_smtp_t)
+	domtrans_pattern($1, postfix_smtp_exec_t, postfix_smtp_t)
 ')
 
 ########################################
@@ -505,7 +460,26 @@ interface(`postfix_read_spool_files',`
 	')
 
 	files_search_spool($1)
-	read_files_pattern($1,postfix_spool_t, postfix_spool_t)
+	read_files_pattern($1, postfix_spool_t, postfix_spool_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete postfix mail spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`postfix_manage_spool_files',`
+	gen_require(`
+		type postfix_spool_t;
+	')
+
+	files_search_spool($1)
+	manage_files_pattern($1, postfix_spool_t, postfix_spool_t)
 ')
 
 ########################################

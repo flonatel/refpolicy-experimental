@@ -40,7 +40,7 @@ template(`rpc_domain_template', `
 
 	type $1_t;
 	type $1_exec_t;
-	init_daemon_domain($1_t,$1_exec_t)
+	init_daemon_domain($1_t, $1_exec_t)
 	domain_use_interactive_fds($1_t)
 
 	####################################
@@ -56,8 +56,8 @@ template(`rpc_domain_template', `
 	allow $1_t self:tcp_socket create_stream_socket_perms;
 	allow $1_t self:udp_socket create_socket_perms;
 
-	manage_dirs_pattern($1_t,var_lib_nfs_t,var_lib_nfs_t)
-	manage_files_pattern($1_t,var_lib_nfs_t,var_lib_nfs_t)
+	manage_dirs_pattern($1_t, var_lib_nfs_t, var_lib_nfs_t)
+	manage_files_pattern($1_t, var_lib_nfs_t, var_lib_nfs_t)
 
 	kernel_list_proc($1_t)
 	kernel_read_proc_symlinks($1_t)
@@ -71,24 +71,25 @@ template(`rpc_domain_template', `
 
 	corenet_all_recvfrom_unlabeled($1_t)
 	corenet_all_recvfrom_netlabel($1_t)
-	corenet_tcp_sendrecv_all_if($1_t)
-	corenet_udp_sendrecv_all_if($1_t)
-	corenet_tcp_sendrecv_all_nodes($1_t)
-	corenet_udp_sendrecv_all_nodes($1_t)
+	corenet_tcp_sendrecv_generic_if($1_t)
+	corenet_udp_sendrecv_generic_if($1_t)
+	corenet_tcp_sendrecv_generic_node($1_t)
+	corenet_udp_sendrecv_generic_node($1_t)
 	corenet_tcp_sendrecv_all_ports($1_t)
 	corenet_udp_sendrecv_all_ports($1_t)
-	corenet_tcp_bind_all_nodes($1_t)
-	corenet_udp_bind_all_nodes($1_t)
+	corenet_tcp_bind_generic_node($1_t)
+	corenet_udp_bind_generic_node($1_t)
 	corenet_tcp_bind_reserved_port($1_t)
 	corenet_tcp_connect_all_ports($1_t)
 	corenet_sendrecv_portmap_client_packets($1_t)
 	# do not log when it tries to bind to a port belonging to another domain
-	corenet_dontaudit_tcp_bind_all_reserved_ports($1_t)
-	corenet_dontaudit_udp_bind_all_reserved_ports($1_t)
+	corenet_dontaudit_tcp_bind_all_ports($1_t)
+	corenet_dontaudit_udp_bind_all_ports($1_t)
 	# bind to arbitary unused ports
 	corenet_tcp_bind_generic_port($1_t)
 	corenet_udp_bind_generic_port($1_t)
-	corenet_udp_bind_reserved_port($1_t)
+	corenet_tcp_bind_all_rpc_ports($1_t)
+	corenet_udp_bind_all_rpc_ports($1_t)
 	corenet_sendrecv_generic_server_packets($1_t)
 
 	fs_rw_rpc_named_pipes($1_t) 
@@ -100,9 +101,6 @@ template(`rpc_domain_template', `
 	files_search_var_lib($1_t)
 
 	auth_use_nsswitch($1_t)
-
-	libs_use_ld_so($1_t)
-	libs_use_shared_libs($1_t)
 
 	logging_send_syslog_msg($1_t)
 
@@ -121,11 +119,11 @@ template(`rpc_domain_template', `
 
 ########################################
 ## <summary>
-##      Send UDP network traffic to rpc and recieve UDP traffic from rpc.  (Deprecated)
+##	Send UDP network traffic to rpc and recieve UDP traffic from rpc.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -135,12 +133,12 @@ interface(`rpc_udp_send',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to get the attributes
+##	Do not audit attempts to get the attributes
 ##	of the NFS export file.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -154,11 +152,11 @@ interface(`rpc_dontaudit_getattr_exports',`
 
 ########################################
 ## <summary>
-##      Allow read access to exports.
+##	Allow read access to exports.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -172,11 +170,11 @@ interface(`rpc_read_exports',`
 
 ########################################
 ## <summary>
-##      Allow write access to exports.
+##	Allow write access to exports.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -190,11 +188,11 @@ interface(`rpc_write_exports',`
 
 ########################################
 ## <summary>
-##      Execute domain in nfsd domain.
+##	Execute domain in nfsd domain.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      The type of the process performing this action.
+##	The type of the process performing this action.
 ##	</summary>
 ## </param>
 #
@@ -203,16 +201,35 @@ interface(`rpc_domtrans_nfsd',`
 		type nfsd_t, nfsd_exec_t;
 	')
 
-	domtrans_pattern($1,nfsd_exec_t,nfsd_t)
+	domtrans_pattern($1, nfsd_exec_t, nfsd_t)
 ')
 
 ########################################
 ## <summary>
-##      Read NFS exported content.
+##      Execute domain in nfsd domain.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##      The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`rpc_domtrans_rpcd',`
+	gen_require(`
+		type rpcd_t, rpcd_exec_t;
+	')
+
+	domtrans_pattern($1, rpcd_exec_t, rpcd_t)
+	allow rpcd_t $1:process signal;
+')
+
+########################################
+## <summary>
+##	Read NFS exported content.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -229,11 +246,11 @@ interface(`rpc_read_nfs_content',`
 
 ########################################
 ## <summary>
-##      Allow domain to create read and write NFS directories.
+##	Allow domain to create read and write NFS directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -243,18 +260,18 @@ interface(`rpc_manage_nfs_rw_content',`
 		type nfsd_rw_t;	
 	')
 
-	manage_dirs_pattern($1,nfsd_rw_t,nfsd_rw_t)
-	manage_files_pattern($1,nfsd_rw_t,nfsd_rw_t)
-	manage_lnk_files_pattern($1,nfsd_rw_t,nfsd_rw_t)
+	manage_dirs_pattern($1, nfsd_rw_t, nfsd_rw_t)
+	manage_files_pattern($1, nfsd_rw_t, nfsd_rw_t)
+	manage_lnk_files_pattern($1, nfsd_rw_t, nfsd_rw_t)
 ')
 
 ########################################
 ## <summary>
-##      Allow domain to create read and write NFS directories.
+##	Allow domain to create read and write NFS directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -264,18 +281,18 @@ interface(`rpc_manage_nfs_ro_content',`
 		type nfsd_ro_t;	
 	')
 
-	manage_dirs_pattern($1,nfsd_ro_t,nfsd_ro_t)
-	manage_files_pattern($1,nfsd_ro_t,nfsd_ro_t)
-	manage_lnk_files_pattern($1,nfsd_ro_t,nfsd_ro_t)
+	manage_dirs_pattern($1, nfsd_ro_t, nfsd_ro_t)
+	manage_files_pattern($1, nfsd_ro_t, nfsd_ro_t)
+	manage_lnk_files_pattern($1, nfsd_ro_t, nfsd_ro_t)
 ')
 
 ########################################
 ## <summary>
-##      Allow domain to read and write to an NFS UDP socket.
+##	Allow domain to read and write to an NFS UDP socket.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -293,7 +310,7 @@ interface(`rpc_udp_rw_nfs_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -307,7 +324,7 @@ interface(`rpc_udp_send_nfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -326,7 +343,7 @@ interface(`rpc_search_nfs_state_data',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##      Domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -336,5 +353,24 @@ interface(`rpc_read_nfs_state_data',`
 	')
 
 	files_search_var_lib($1)
-	read_files_pattern($1,var_lib_nfs_t,var_lib_nfs_t)
+	read_files_pattern($1, var_lib_nfs_t, var_lib_nfs_t)
+')
+
+########################################
+## <summary>
+##	Manage NFS state data in /var/lib/nfs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##      Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`rpc_manage_nfs_state_data',`
+	gen_require(`
+		type var_lib_nfs_t;
+	')
+
+	files_search_var_lib($1)
+	manage_files_pattern($1, var_lib_nfs_t, var_lib_nfs_t)
 ')

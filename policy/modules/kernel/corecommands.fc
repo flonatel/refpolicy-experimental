@@ -7,6 +7,7 @@
 /bin/d?ash			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /bin/bash			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /bin/bash2			--	gen_context(system_u:object_r:shell_exec_t,s0)
+/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /bin/ksh.*			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /bin/sash			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /bin/tcsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
@@ -32,6 +33,8 @@ ifdef(`distro_redhat',`
 #
 # /etc
 #
+/etc/acpi/actions(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+
 /etc/apcupsd/apccontrol		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/apcupsd/changeme		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/apcupsd/commfailure	--	gen_context(system_u:object_r:bin_t,s0)
@@ -43,6 +46,8 @@ ifdef(`distro_redhat',`
 
 /etc/cipe/ip-up.*		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/cipe/ip-down.*		--	gen_context(system_u:object_r:bin_t,s0)
+
+/etc/ConsoleKit/run-session.d(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 
 /etc/cron.daily/.*		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/cron.hourly/.*		--	gen_context(system_u:object_r:bin_t,s0)
@@ -56,6 +61,8 @@ ifdef(`distro_redhat',`
 
 /etc/init\.d/functions		--	gen_context(system_u:object_r:bin_t,s0)
 
+/etc/mail/make			--	gen_context(system_u:object_r:bin_t,s0)
+
 /etc/netplug\.d(/.*)? 	 		gen_context(system_u:object_r:bin_t,s0)
 
 /etc/ppp/ip-down\..*		--	gen_context(system_u:object_r:bin_t,s0)
@@ -63,20 +70,22 @@ ifdef(`distro_redhat',`
 /etc/ppp/ipv6-up\..*		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/ppp/ipv6-down\..*		--	gen_context(system_u:object_r:bin_t,s0)
 
+/etc/racoon/scripts(/.*)?		gen_context(system_u:object_r:bin_t,s0)
+
 /etc/rc\.d/init\.d/functions	--	gen_context(system_u:object_r:bin_t,s0)
 
 /etc/security/namespace.init    --      gen_context(system_u:object_r:bin_t,s0)
-
 
 /etc/sysconfig/crond		-- gen_context(system_u:object_r:bin_t,s0)
 /etc/sysconfig/init		-- gen_context(system_u:object_r:bin_t,s0)
 /etc/sysconfig/libvirtd		-- gen_context(system_u:object_r:bin_t,s0)
 /etc/sysconfig/netconsole	-- gen_context(system_u:object_r:bin_t,s0)
 /etc/sysconfig/readonly-root 	-- gen_context(system_u:object_r:bin_t,s0)
-/etc/sysconfig/network-scripts/ifup-.*	-- gen_context(system_u:object_r:bin_t,s0)
-/etc/sysconfig/network-scripts/ifup-.*	-l gen_context(system_u:object_r:bin_t,s0)
-/etc/sysconfig/network-scripts/ifdown-.* -- gen_context(system_u:object_r:bin_t,s0)
-/etc/sysconfig/network-scripts/ifdown-.* -l gen_context(system_u:object_r:bin_t,s0)
+
+/etc/sysconfig/network-scripts/ifup.*	gen_context(system_u:object_r:bin_t,s0)
+/etc/sysconfig/network-scripts/ifdown.* gen_context(system_u:object_r:bin_t,s0)
+/etc/sysconfig/network-scripts/net.* gen_context(system_u:object_r:bin_t,s0)
+/etc/sysconfig/network-scripts/init.* gen_context(system_u:object_r:bin_t,s0)
 
 /etc/X11/xdm/GiveConsole	--	gen_context(system_u:object_r:bin_t,s0)
 /etc/X11/xdm/TakeConsole	--	gen_context(system_u:object_r:bin_t,s0)
@@ -123,6 +132,7 @@ ifdef(`distro_gentoo',`
 
 /opt/(.*/)?sbin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 
+/opt/real/RealPlayer/realplay(\.bin)?	gen_context(system_u:object_r:bin_t,s0)
 ifdef(`distro_gentoo',`
 /opt/RealPlayer/realplay(\.bin)?	gen_context(system_u:object_r:bin_t,s0)
 /opt/RealPlayer/postint(/.*)?		gen_context(system_u:object_r:bin_t,s0)
@@ -135,6 +145,7 @@ ifdef(`distro_gentoo',`
 /usr/(.*/)?Bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 /usr/(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
+/usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /usr/bin/scponly		--	gen_context(system_u:object_r:shell_exec_t,s0)
 
 /usr/lib(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
@@ -147,6 +158,8 @@ ifdef(`distro_gentoo',`
 /usr/lib/qt.*/bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/apt/methods.+	--	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib(64)?/ConsoleKit/scripts(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib(64)?/ConsoleKit/run-session.d(/.*)? gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/courier(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/cups(/.*)? 		gen_context(system_u:object_r:bin_t,s0)
 
@@ -184,11 +197,9 @@ ifdef(`distro_gentoo',`
 /usr/libexec/openssh/sftp-server --	gen_context(system_u:object_r:bin_t,s0)
 
 /usr/local/lib(64)?/ipsec/.*	-- 	gen_context(system_u:object_r:bin_t,s0)
-/usr/local/Brother(/.*)?/cupswrapper(/.*)? gen_context(system_u:object_r:bin_t,s0)
-/usr/local/Brother(/.*)?/lpd(/.*)?	gen_context(system_u:object_r:bin_t,s0)
-/usr/local/Printer/[^/]*/cupswrapper(/.*)? gen_context(system_u:object_r:bin_t,s0)
-/usr/local/Printer/[^/]*/lpd(/.*)?     	gen_context(system_u:object_r:bin_t,s0)
-/usr/local/linuxprinter/filters(/.*)?   gen_context(system_u:object_r:bin_t,s0)
+/usr/local/Brother(/.*)?		gen_context(system_u:object_r:bin_t,s0)
+/usr/local/Printer(/.*)?		gen_context(system_u:object_r:bin_t,s0)
+/usr/local/linuxprinter/filters(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 
 /usr/sbin/scponlyc		--	gen_context(system_u:object_r:shell_exec_t,s0)
 /usr/sbin/sesh			--	gen_context(system_u:object_r:shell_exec_t,s0)
@@ -202,8 +213,16 @@ ifdef(`distro_gentoo',`
 /usr/share/hal/device-manager/hal-device-manager -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/hal/scripts(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/share/mc/extfs/.*		--	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/Modules/init(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/share/printconf/util/print\.py --	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/PackageKit/pk-upgrade-distro\.sh -- 	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/PackageKit/helpers(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/selinux/devel/policygentool -- gen_context(system_u:object_r:bin_t,s0)
+/usr/share/shorewall/configpath	--      gen_context(system_u:object_r:bin_t,s0)
+/usr/share/shorewall-perl(/.*)?	        gen_context(system_u:object_r:bin_t,s0)
+/usr/share/shorewall-shell(/.*)?        gen_context(system_u:object_r:bin_t,s0)
+/usr/share/shorewall-lite(/.*)? 	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/shorewall6-lite(/.*)?        gen_context(system_u:object_r:bin_t,s0)
 /usr/share/turboprint/lib(/.*)?	--	gen_context(system_u:object_r:bin_t,s0)
 
 /usr/X11R6/lib(64)?/X11/xkb/xkbcomp --	gen_context(system_u:object_r:bin_t,s0)
@@ -220,16 +239,17 @@ ifdef(`distro_redhat', `
 
 /usr/lib/.*/program(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib64/.*/program(/.*)?		gen_context(system_u:object_r:bin_t,s0)
-/usr/lib/bluetooth(/.*)?	--      gen_context(system_u:object_r:bin_t,s0)
-/usr/lib64/bluetooth(/.*)?	--      gen_context(system_u:object_r:bin_t,s0)
-/usr/lib/vmware-tools/sbin32(/.*)?      gen_context(system_u:object_r:bin_t,s0)
-/usr/lib/vmware-tools/sbin64(/.*)?      gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/bluetooth(/.*)?	--	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib64/bluetooth(/.*)?	--	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/vmware-tools/(s)?bin32(/.*)?      gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/vmware-tools/(s)?bin64(/.*)?      gen_context(system_u:object_r:bin_t,s0)
 /usr/share/authconfig/authconfig-gtk\.py -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/authconfig/authconfig-tui\.py -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/authconfig/authconfig\.py --	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/cvs/contrib/rcs2log	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/clamav/clamd-gen	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/clamav/freshclam-sleep --	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/createrepo(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/share/fedora-usermgmt/wrapper --	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/hplip/[^/]*		--	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/hwbrowser/hwbrowser --	gen_context(system_u:object_r:bin_t,s0)
@@ -286,8 +306,8 @@ ifdef(`distro_suse', `
 /usr/lib64/yp/.+		--	gen_context(system_u:object_r:bin_t,s0)
 
 /var/qmail/bin                  -d      gen_context(system_u:object_r:bin_t,s0)
-/var/qmail/bin(/.*)?                    gen_context(system_u:object_r:bin_t,s0)
-/var/qmail/rc                   --      gen_context(system_u:object_r:bin_t,s0)
+/var/qmail/bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+/var/qmail/rc			--	gen_context(system_u:object_r:bin_t,s0)
 
 ifdef(`distro_suse',`
 /var/lib/samba/bin/.+			gen_context(system_u:object_r:bin_t,s0)

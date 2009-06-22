@@ -1,5 +1,5 @@
 
-policy_module(gatekeeper, 1.5.0)
+policy_module(gatekeeper, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(gatekeeper, 1.5.0)
 
 type gatekeeper_t;
 type gatekeeper_exec_t;
-init_daemon_domain(gatekeeper_t,gatekeeper_exec_t)
+init_daemon_domain(gatekeeper_t, gatekeeper_exec_t)
 
 type gatekeeper_etc_t;
 files_config_file(gatekeeper_etc_t)
@@ -35,18 +35,18 @@ allow gatekeeper_t self:tcp_socket create_stream_socket_perms;
 allow gatekeeper_t self:udp_socket create_socket_perms;
 
 allow gatekeeper_t gatekeeper_etc_t:lnk_file { getattr read };
-allow gatekeeper_t gatekeeper_etc_t:file { getattr read };
+allow gatekeeper_t gatekeeper_etc_t:file read_file_perms;
 files_search_etc(gatekeeper_t)
 
-manage_files_pattern(gatekeeper_t,gatekeeper_log_t,gatekeeper_log_t)
-logging_log_filetrans(gatekeeper_t,gatekeeper_log_t,{ file dir })
+manage_files_pattern(gatekeeper_t, gatekeeper_log_t, gatekeeper_log_t)
+logging_log_filetrans(gatekeeper_t, gatekeeper_log_t, { file dir })
 
-manage_dirs_pattern(gatekeeper_t,gatekeeper_tmp_t,gatekeeper_tmp_t)
-manage_files_pattern(gatekeeper_t,gatekeeper_tmp_t,gatekeeper_tmp_t)
+manage_dirs_pattern(gatekeeper_t, gatekeeper_tmp_t, gatekeeper_tmp_t)
+manage_files_pattern(gatekeeper_t, gatekeeper_tmp_t, gatekeeper_tmp_t)
 files_tmp_filetrans(gatekeeper_t, gatekeeper_tmp_t, { file dir })
 
-manage_files_pattern(gatekeeper_t,gatekeeper_var_run_t,gatekeeper_var_run_t)
-files_pid_filetrans(gatekeeper_t,gatekeeper_var_run_t,file)
+manage_files_pattern(gatekeeper_t, gatekeeper_var_run_t, gatekeeper_var_run_t)
+files_pid_filetrans(gatekeeper_t, gatekeeper_var_run_t, file)
 
 kernel_read_system_state(gatekeeper_t)
 kernel_read_kernel_sysctls(gatekeeper_t)
@@ -57,12 +57,12 @@ corenet_all_recvfrom_unlabeled(gatekeeper_t)
 corenet_all_recvfrom_netlabel(gatekeeper_t)
 corenet_tcp_sendrecv_generic_if(gatekeeper_t)
 corenet_udp_sendrecv_generic_if(gatekeeper_t)
-corenet_tcp_sendrecv_all_nodes(gatekeeper_t)
-corenet_udp_sendrecv_all_nodes(gatekeeper_t)
+corenet_tcp_sendrecv_generic_node(gatekeeper_t)
+corenet_udp_sendrecv_generic_node(gatekeeper_t)
 corenet_tcp_sendrecv_all_ports(gatekeeper_t)
 corenet_udp_sendrecv_all_ports(gatekeeper_t)
-corenet_tcp_bind_all_nodes(gatekeeper_t)
-corenet_udp_bind_all_nodes(gatekeeper_t)
+corenet_tcp_bind_generic_node(gatekeeper_t)
+corenet_udp_bind_generic_node(gatekeeper_t)
 corenet_tcp_bind_gatekeeper_port(gatekeeper_t)
 corenet_udp_bind_gatekeeper_port(gatekeeper_t)
 corenet_sendrecv_gatekeeper_server_packets(gatekeeper_t)
@@ -78,9 +78,6 @@ files_read_etc_files(gatekeeper_t)
 fs_getattr_all_fs(gatekeeper_t)
 fs_search_auto_mountpoints(gatekeeper_t)
 
-libs_use_ld_so(gatekeeper_t)
-libs_use_shared_libs(gatekeeper_t)
-
 logging_send_syslog_msg(gatekeeper_t)
 
 miscfiles_read_localization(gatekeeper_t)
@@ -88,8 +85,7 @@ miscfiles_read_localization(gatekeeper_t)
 sysnet_read_config(gatekeeper_t)
 
 userdom_dontaudit_use_unpriv_user_fds(gatekeeper_t)
-
-sysadm_dontaudit_search_home_dirs(gatekeeper_t)
+userdom_dontaudit_search_user_home_dirs(gatekeeper_t)
 
 optional_policy(`
 	nis_use_ypbind(gatekeeper_t)
