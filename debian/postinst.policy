@@ -50,7 +50,7 @@ my @all_modules;
 # Full path of all modules in the policy
 my %Module_Path;
 # Dpendencies for policy modules, as determined by semodule_deps
-my %Deps;
+my %Deps = ( 'cups' => 'lpd', 'telnet' => 'remotelogin', 'ricci' => 'consoletype' );
 # A hash of all modules already processed
 my %Seen;
 # A hash of all packages installed on this machine

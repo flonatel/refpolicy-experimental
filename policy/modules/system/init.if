@@ -336,7 +336,7 @@ interface(`init_domtrans',`
 		type init_t, init_exec_t;
 	')
 
-	domtrans_pattern($1,init_exec_t,init_t)
+	domtrans_pattern($1, init_exec_t, init_t)
 ')
 
 ########################################
@@ -356,7 +356,7 @@ interface(`init_exec',`
 	')
 
 	corecmd_search_bin($1)
-	can_exec($1,init_exec_t)
+	can_exec($1, init_exec_t)
 ')
 
 ########################################
@@ -606,7 +606,7 @@ interface(`init_script_file_entry_type',`
 		type initrc_exec_t;
 	')
 
-	domain_entry_file($1,initrc_exec_t)
+	domain_entry_file($1, initrc_exec_t)
 ')
 
 ########################################
@@ -625,7 +625,7 @@ interface(`init_spec_domtrans_script',`
 	')
 
 	files_list_etc($1)
-	spec_domtrans_pattern($1,initrc_exec_t,initrc_t)
+	spec_domtrans_pattern($1, initrc_exec_t, initrc_t)
 
 	ifdef(`enable_mcs',`
 		range_transition $1 initrc_exec_t:process s0;
@@ -652,7 +652,7 @@ interface(`init_domtrans_script',`
 	')
 
 	files_list_etc($1)
-	domtrans_pattern($1,initrc_exec_t,initrc_t)
+	domtrans_pattern($1, initrc_exec_t, initrc_t)
 
 	ifdef(`enable_mcs',`
 		range_transition $1 initrc_exec_t:process s0;
@@ -694,7 +694,7 @@ interface(`init_script_file_domtrans',`
 	')
 
 	files_list_etc($1)
-	domain_auto_trans($1,initrc_exec_t,$2)
+	domain_auto_trans($1, initrc_exec_t,$2)
 ')
 
 ########################################
@@ -865,7 +865,7 @@ interface(`init_exec_script_files',`
 	')
 
 	files_list_etc($1)
-	can_exec($1,initrc_exec_t)
+	can_exec($1, initrc_exec_t)
 ')
 
 ########################################
@@ -941,9 +941,9 @@ interface(`init_read_script_state',`
 	')
 
 	kernel_search_proc($1)
-	read_files_pattern($1,initrc_t,initrc_t)
-	read_lnk_files_pattern($1,initrc_t,initrc_t)
-	list_dirs_pattern($1,initrc_t,initrc_t)
+	read_files_pattern($1, initrc_t, initrc_t)
+	read_lnk_files_pattern($1, initrc_t, initrc_t)
+	list_dirs_pattern($1, initrc_t, initrc_t)
 
 	# should move this to separate interface
 	allow $1 initrc_t:process getattr;
@@ -1249,7 +1249,7 @@ interface(`init_getattr_script_status_files',`
 		type initrc_state_t;
 	')
 
-	getattr_files_pattern($1,initrc_state_t,initrc_state_t)
+	getattr_files_pattern($1, initrc_state_t, initrc_state_t)
 ')
 
 ########################################
@@ -1288,7 +1288,7 @@ interface(`init_rw_script_tmp_files',`
 	')
 
 	files_search_tmp($1)
-	rw_files_pattern($1,initrc_tmp_t,initrc_tmp_t)
+	rw_files_pattern($1, initrc_tmp_t, initrc_tmp_t)
 ')
 
 ########################################
@@ -1318,7 +1318,7 @@ interface(`init_script_tmp_filetrans',`
 	')
 
 	files_search_tmp($1)
-	filetrans_pattern($1,initrc_tmp_t,$2,$3)
+	filetrans_pattern($1, initrc_tmp_t, $2, $3)
 ')
 
 ########################################

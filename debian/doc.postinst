@@ -208,11 +208,4 @@ case "$1" in
      exit 0;;
 esac
 
-# Install doc base documentation
-if which install-docs >/dev/null 2>&1; then
-  if [ -e /usr/share/doc-base/${package_name} ]; then
-    install-docs -i /usr/share/doc-base/${package_name}
-  fi
-fi
-
 exit 0

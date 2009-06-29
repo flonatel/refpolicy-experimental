@@ -7,6 +7,12 @@
 
 /etc/pki/dovecot(/.*)?			gen_context(system_u:object_r:dovecot_cert_t,s0)
 
+# Debian uses /etc/dovecot/
+ifdef(`distro_debian', `
+/etc/dovecot(/.*)?                     gen_context(system_u:object_r:dovecot_etc_t,s0)
+/etc/dovecot/passwd.*                  gen_context(system_u:object_r:dovecot_passwd_t,s0)
+')
+
 #
 # /usr
 #

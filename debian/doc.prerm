@@ -66,11 +66,6 @@ case "$1" in
     # Withdraw our version of a program.
     ##: update-alternatives --remove program /usr/bin/alternative
 
-    # Get rid of the installed docs
-    if which install-docs >/dev/null 2>&1; then
-        install-docs -r $package_name
-    fi
-    
     # Get rid of the byte compiled files
     ##: if [ -x /usr/lib/emacsen-common/emacs-package-remove ]; then
     ##:      /usr/lib/emacsen-common/emacs-package-remove $package_name

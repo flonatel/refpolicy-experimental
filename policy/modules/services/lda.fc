@@ -1,9 +1,0 @@
-
-/usr/bin/procmail	--	gen_context(system_u:object_r:lda_exec_t,s0)
-/usr/bin/maildrop	--	gen_context(system_u:object_r:lda_exec_t,s0)
-/usr/sbin/deliverquota.maildrop	--	gen_context(system_u:object_r:lda_exec_t,s0)
-/usr/lib/dovecot/deliver --	gen_context(system_u:object_r:lda_exec_t,s0)
-/usr/bin/mailbot	--	gen_context(system_u:object_r:lda_exec_t,s0)
-
-/etc/courier/maildroprc	--	gen_context(system_u:object_r:lda_etc_t,s0)
-/var/log/maildrop.log	--	gen_context(system_u:object_r:lda_log_t,s0)

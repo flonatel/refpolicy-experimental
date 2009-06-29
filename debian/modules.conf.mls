@@ -270,7 +270,7 @@ netutils = module
 # Portage Package Management System. The primary package management and
 # distribution system for Gentoo.
 # 
-portage = module
+portage = off
 
 # Layer: admin
 # Module: prelink
@@ -1127,13 +1127,6 @@ kerneloops = module
 # KDE Talk daemon
 # 
 ktalk = module
-
-# Layer: services
-# Module: lda
-#
-# mail delivery agent
-# 
-lda = module
 
 # Layer: services
 # Module: ldap

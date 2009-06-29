@@ -1,3 +1,17 @@
+refpolicy (2:0.0.20090629-1) unstable; urgency=low
+
+  * New upstream snapshot.
+  * [82f63f3]: Removed the lda policy package. There were a number of
+    reasons for doing so: this package was created in order to deal with
+    local mail delivery in Debian, and has not been adopted upstream. I
+    would like to remove the divergence from upstream policy, and not
+    maintian it. so that was incentive. Also, upstream policy for
+    mail-related packages has been improved in the meanwhile, and the lda
+    package was conflicting with some of the changes, so that was added
+    reason for it to go.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Mon, 29 Jun 2009 02:14:30 -0500
+
 refpolicy (2:0.0.20090621-1) unstable; urgency=low
 
   * New upstream snapshot.

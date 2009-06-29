@@ -84,7 +84,7 @@ userdom_dontaudit_use_unpriv_user_fds(fetchmail_t)
 userdom_dontaudit_search_user_home_dirs(fetchmail_t)
 
 optional_policy(`
-	 lda_domtrans(fetchmail_t)
+	procmail_domtrans(fetchmail_t)
 ')
 
 optional_policy(`
