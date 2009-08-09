@@ -1,4 +1,4 @@
-## <summary>APT advanced package toll.</summary>
+## <summary>APT advanced package tool.</summary>
 
 ########################################
 ## <summary>
@@ -72,7 +72,7 @@ interface(`apt_use_fds',`
 ## <param name="domain">
 ##	<summary>
 ##	The type of the process attempting performing this action
-##      which should not be audited.
+##	which should not be audited.
 ##	</summary>
 ## </param>
 #
@@ -206,7 +206,7 @@ interface(`apt_manage_db',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to create, read, 
+##	Do not audit attempts to create, read,
 ##	write, and delete the apt package database.
 ## </summary>
 ## <param name="domain">

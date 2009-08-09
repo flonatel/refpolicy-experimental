@@ -1,3 +1,18 @@
+refpolicy (2:0.2.20090730-1) unstable; urgency=low
+
+  * New upstream release.
+  * Updated the location of dovecot's configuration files.
+  * Bug fix: "dovecot&#39;s etc files are in unexpected location", thanks
+    to Frank Engler                                     (Closes: #517712).
+  * Fixed rules to note that parallel=N fails.
+  * Bug fix: "FTBFS: tmp/rolemap.conf&quot;:2194:ERROR &#39;syntax
+    error&#39; at token &#39;genfscon&#39; on line 704548:", thanks to
+    Lucas Nussbaum                                      (Closes: #536899).
+  * Bug fix: "dpkg-buildpackage -j2 fails on AMD64", thanks to Russell
+    Coker (Closes: #538789).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Sun, 09 Aug 2009 15:03:37 -0500
+
 refpolicy (2:0.0.20090629-1) unstable; urgency=low
 
   * New upstream snapshot.
@@ -409,7 +424,7 @@ refpolicy (0.0.20071214-1) unstable; urgency=low
   * Allow use of wildcards when trying to map package names to policy
     modules. Thanks to Vaclav Ovsik for the heavy lifting. Closes: #427906
   * Debian puts hpssd.py in /usr/lib -- not /usr/share. Thanks to Frodo
-    Looijaard.                                             Closes: #443177 
+    Looijaard.                                             Closes: #443177
   * Alsa needs changes in file context as well. Thanks to  Martin Orr
     for pointing this out.                                 Closes: #428464
   * Allow apache to read munin files. Thanks to Vesa-Pekka Palmu for
@@ -459,18 +474,18 @@ refpolicy (0.0.20070507-4) unstable; urgency=low
     self:netlink_route_socket.
   * Allow apt/aptitude to update, and install files
     - Added an interface to apt.if allow silently ignoring processes that
-      attempt to use file descriptors from apt. 
+      attempt to use file descriptors from apt.
     - Bump the apt policy module version number, since we have added to
-      the interface. 
+      the interface.
     - Added some stuff to dpkg.te to allow debconf .config file
-      interactions back to the user 
+      interactions back to the user
     - Add an optional  dontaudit rule to libraries.te to allow
-      apt-get/aptitude to install packages silently. 
+      apt-get/aptitude to install packages silently.
   * Very early in boot, /lib/init/rw is created as a mandatory tmpfs for
     state information. Label that directory as initrc_tmp_t to allow
     mount.te to be permitted to mount a tmpfs there.
   * In init.te, allow /etc/network/if-up.d/mountnfs to create
-    /var/run/network/mountnfs as a poor mans lock. 
+    /var/run/network/mountnfs as a poor mans lock.
 
  -- Manoj Srivastava <srivasta@debian.org>  Fri, 11 May 2007 00:55:07 -0500
 
@@ -499,7 +514,7 @@ refpolicy (0.0.20070507-1) unstable; urgency=low
     - Patch to have avahi use the nsswitch interface rather than individual
       permissions from Dan Walsh.
     - Patch to dontaudit logrotate searching avahi pid directory from Dan
-      Walsh. 
+      Walsh.
     - Patch to allow insmod to mount kvmfs and dontaudit rw unconfined_t
       pipes to handle usage from userhelper from Dan Walsh.
     - Patch to allow amavis to read spamassassin libraries from Dan Walsh.
@@ -534,7 +549,7 @@ refpolicy (0.0.20061018-5) unstable; urgency=high
     proper function; so one does not need to go into permissive mode to
     run aptitude.  Stolen from Erich. This is a low risk change.
   * Debian puts grub in /usr/sbin/grub. Reflect that in the initial file
-    context. 
+    context.
   * Debian creates /dev/xconsole independently of whether or not a xserver
     has been installed or not. So move the policy related to /dev/sconsole
     out of the xserver policy, and into places where relevant (init.te,
@@ -550,14 +565,14 @@ refpolicy (0.0.20061018-4) unstable; urgency=low
 
   * Bug fix: "selinux-policy-refpolicy-targeted: does not suggest a way to
     fix the 'maybe failing' attempt in postinst", thanks to Eddy Petrisor.
-    While this does not belong in the postinst, I have addedthis to the 
+    While this does not belong in the postinst, I have addedthis to the
     README.Debian file. This should be a low risk change. (Closes: #407691).
   * Bug fix: "Default build.conf doesn't match default strict/targeted
     policy", thanks to Stefan.The build.conf included in the reference
     source policy describe to build a policy of the type "strict". The
     default binary policies coming with Debian are build with the policy
     type "strict-mcs" or "targeted-mcs". Change the build.conf shipped in
-    source to conform to what we really use. (changes TYPE=strict to 
+    source to conform to what we really use. (changes TYPE=strict to
     TYPE=strict-mcs, very low risk change.                (Closes: #411256).
   * Bug fix: "selinux-policy-refpolicy-targeted: openvpn policy do not
     allow tcp connection mode", thanks to Rafal Kupka. This bug really
@@ -624,7 +639,7 @@ refpolicy (0.0.20061018-2) unstable; urgency=high
     - releasing etch without MCS will make things painful for SE Linux
     users on the upgrade to lenny. This feature has been extensively
     tested by Russel Coker and myself, and does not otherwise impact the
-    install. 
+    install.
   * Allow semanage to use the initrd file descriptor in targeted policy.
   * Fix a bug with restorecon.
   * Bug fix: "refpolicy: qemu should have execmem permissions", thanks to
@@ -715,21 +730,21 @@ refpolicy (0.0.20060813-2) unstable; urgency=low
   * Bug fix: "Move /etc/selinux/refpolicy/src/policy/man/man8/*
     manpages?", thanks to Uwe Hermann                    (Closes: #372789).
   * Fix errors in post installation initial policy creation process in the
-    postinst. 
+    postinst.
   * Add directories required during policy build during postinst. This bug
     prevented any policies being built when the package was initially
     installed. Also, create an empty  file_contexts.local file if it does
-    not already exist. 
+    not already exist.
   * Make selinux-policy-refpolicy-targeted provide and replace the
     obsolete package selinux-policy-default; which should in the future be
-    just a virtual package. 
+    just a virtual package.
   * Added postrm packages to strict and targeted policy packages, in order
     to clean out the directories in which files are created during policy
-    build. 
+    build.
   * Rewrote the postinst in perl to allow us to do module dependency
     checks, and to map policy modules to debian packages, in order to
     better detect the modules that would be necessary for the target
-    machine. 
+    machine.
   * Also, compiling with either MCS or MLS produced errors while
     installing policy, since we lack setrans daemon. So we are now
     building with out them, created an easy to modify option to re-enable
@@ -759,7 +774,7 @@ refpolicy (0.0.20060509-2) unstable; urgency=low
 
 refpolicy (0.0.20060509-1) unstable; urgency=low
 
-  * New upstream release. First packaging for Sid. 
+  * New upstream release. First packaging for Sid.
 
  -- Manoj Srivastava <srivasta@debian.org>  Tue,  9 May 2006 13:56:10 -0500
 

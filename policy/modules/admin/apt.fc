@@ -18,4 +18,4 @@
 /var/log/aptitude			gen_context(system_u:object_r:apt_var_log_t,s0)
 
 # dpkg terminal log
-/var/log/apt(/.*)?                    gen_context(system_u:object_r:apt_var_log_t,s0)
+/var/log/apt(/.*)?			gen_context(system_u:object_r:apt_var_log_t,s0)
