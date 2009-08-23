@@ -1,3 +1,14 @@
+refpolicy (2:0.2.20090730-2) unstable; urgency=low
+
+  * Bug fix: "selinux policy violation &quot;Unknown&quot; fo rs2ram
+    (hald_t)", thanks to Ritesh Raj Sarraf. This has been fixed for a
+    while, but I only just tested it.                (Closes: #515566).
+  * Re-enable building in parallel. The current statge should be
+    friendlier to jobserver mode, disabling which causewd all the issues
+    with the previous  state.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Sat, 22 Aug 2009 19:47:20 -0500
+
 refpolicy (2:0.2.20090730-1) unstable; urgency=low
 
   * New upstream release.
