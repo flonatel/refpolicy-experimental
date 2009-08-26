@@ -1,3 +1,27 @@
+refpolicy (2:0.2.20090818-1) unstable; urgency=low
+
+  * New upstream snapshot, with a number of improvements.
+    - Misc Gentoo fixes from Corentin Labbe.
+    - Debian policykit fixes from Martin Orr.
+    - Fix unconfined_r use of unconfined_java_t.
+    - Add missing x_device rules for XI2 functions, from Eamon Walsh.
+    - Add missing rules to make unconfined_cronjob_t a valid cron job domain.
+    - Add btrfs and ext4 to labeling targets.
+    - Fix infrastructure to expand macros in initrc_context when installing.
+    - Handle unix_chkpwd usage by useradd and groupadd.
+    - Add missing compatibility aliases for xdm_xserver*_t types.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Wed, 26 Aug 2009 16:31:37 -0500
+
+refpolicy (2:0.2.20090730-2.1) unstable; urgency=low
+
+  * Build policykit policy and default to loading it when the policykit
+    package is installed.
+  * Default to loading the consolekit module when the consolekit package is
+    installed.
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 26 Aug 2009 18:55:23 +1000
+
 refpolicy (2:0.2.20090730-2) unstable; urgency=low
 
   * Bug fix: "selinux policy violation &quot;Unknown&quot; fo rs2ram

@@ -102,6 +102,8 @@ get_type_attr_decl := $(SED) -r -f $(support)/get_type_attr_decl.sed
 comment_move_decl := $(SED) -r -f $(support)/comment_move_decl.sed
 gennetfilter := $(PYTHON) -E $(support)/gennetfilter.py
 m4iferror := $(support)/iferror.m4
+m4divert := $(support)/divert.m4
+m4undivert := $(support)/undivert.m4
 # use our own genhomedircon to make sure we have a known usable one,
 # so policycoreutils updates are not required (RHEL4)
 genhomedircon := $(PYTHON) -E $(support)/genhomedircon
@@ -231,10 +233,11 @@ endif
 
 CTAGS ?= ctags
 
-m4support := $(wildcard $(poldir)/support/*.spt)
+m4support := $(m4divert) $(wildcard $(poldir)/support/*.spt)
 ifdef LOCAL_ROOT
 m4support += $(wildcard $(local_poldir)/support/*.spt)
 endif
+m4support += $(m4undivert)
 
 appconf := config/appconfig-$(TYPE)
 seusers := $(appconf)/seusers
@@ -300,7 +303,8 @@ off_mods += $(filter-out $(cmdline_off) $(cmdline_base) $(cmdline_mods), $(mod_c
 off_mods += $(filter-out $(base_mods) $(mod_mods) $(off_mods),$(notdir $(detected_mods)))
 
 # filesystems to be used in labeling targets
-filesystems = $(shell mount | grep -v "context=" | egrep -v '\((|.*,)bind(,.*|)\)' | awk '/(ext[23]| xfs| jfs).*rw/{print $$3}';)
+filesystems = $(shell mount | grep -v "context=" | egrep -v '\((|.*,)bind(,.*|)\)' | awk '/(ext[234]|btrfs| xfs| jfs).*rw/{print $$3}';)
+fs_names := "btrfs ext2 ext3 ext4 xfs jfs"
 
 ########################################
 #
@@ -529,7 +533,7 @@ $(contextpath)/users/%: $(appconf)/%_default_contexts
 
 $(appdir)/%: $(appconf)/%
 	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
+	$(verbose) $(M4) $(M4PARAM) $(m4support) $< > $@
 
 ########################################
 #
@@ -537,7 +541,7 @@ $(appdir)/%: $(appconf)/%
 #
 install-headers: $(layerxml) $(tunxml) $(boolxml)
 	@mkdir -p $(headerdir)
-	@echo "Installing $(TYPE) policy headers."
+	@echo "Installing $(NAME) policy headers."
 	$(verbose) $(INSTALL) -m 644 $^ $(headerdir)
 	$(verbose) $(M4) $(M4PARAM) $(rolemap) > $(headerdir)/$(notdir $(rolemap))
 	$(verbose) mkdir -p $(headerdir)/support
@@ -601,7 +605,7 @@ $(tags):
 # Filesystem labeling
 #
 checklabels:
-	@echo "Checking labels on filesystem types: ext2 ext3 xfs jfs"
+	@echo "Checking labels on filesystem types: $(fs_names)"
 	@if test -z "$(filesystems)"; then \
 		echo "No filesystems with extended attributes found!" ;\
 		false ;\
@@ -609,7 +613,7 @@ checklabels:
 	$(verbose) $(SETFILES) -v -n $(fcpath) $(filesystems)
 
 restorelabels:
-	@echo "Restoring labels on filesystem types: ext2 ext3 xfs jfs"
+	@echo "Restoring labels on filesystem types: $(fs_names)"
 	@if test -z "$(filesystems)"; then \
 		echo "No filesystems with extended attributes found!" ;\
 		false ;\
@@ -617,7 +621,7 @@ restorelabels:
 	$(verbose) $(SETFILES) -v $(fcpath) $(filesystems)
 
 relabel:
-	@echo "Relabeling filesystem types: ext2 ext3 xfs jfs"
+	@echo "Relabeling filesystem types: $(fs_names)"
 	@if test -z "$(filesystems)"; then \
 		echo "No filesystems with extended attributes found!" ;\
 		false ;\
@@ -625,7 +629,7 @@ relabel:
 	$(verbose) $(SETFILES) $(fcpath) $(filesystems)
 
 resetlabels:
-	@echo "Resetting labels on filesystem types: ext2 ext3 xfs jfs"
+	@echo "Resetting labels on filesystem types: $(fs_names)"
 	@if test -z "$(filesystems)"; then \
 		echo "No filesystems with extended attributes found!" ;\
 		false ;\

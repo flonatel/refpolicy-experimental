@@ -414,6 +414,13 @@ calamaris = module
 cdrecord = module
 
 # Layer: apps
+# Module: cpufreqselector
+#
+# Command-line CPU frequency settings.
+# 
+cpufreqselector = module
+
+# Layer: apps
 # Module: ethereal
 #
 # Ethereal packet capture tool.
@@ -512,6 +519,13 @@ mplayer = module
 podsleuth = module
 
 # Layer: apps
+# Module: pulseaudio
+#
+# Pulseaudio network sound server.
+# 
+pulseaudio = module
+
+# Layer: apps
 # Module: qemu
 #
 # QEMU machine emulator and virtualizer
@@ -601,6 +615,13 @@ wine = module
 # Wireshark packet capture tool.
 # 
 wireshark = module
+
+# Layer: apps
+# Module: wm
+#
+# X Window Managers
+# 
+wm = module
 
 # Layer: apps
 # Module: yam
@@ -919,6 +940,13 @@ dcc = module
 ddclient = module
 
 # Layer: services
+# Module: devicekit
+#
+# Devicekit modular hardware abstraction layer
+# 
+devicekit = module
+
+# Layer: services
 # Module: dhcp
 #
 # Dynamic host configuration protocol (DHCP) server
@@ -1001,6 +1029,13 @@ fetchmail = module
 # Finger user information service.
 # 
 finger = module
+
+# Layer: services
+# Module: fprintd
+#
+# DBus fingerprint reader service
+# 
+fprintd = module
 
 # Layer: services
 # Module: ftp
@@ -1306,6 +1341,13 @@ openct = module
 openvpn = module
 
 # Layer: services
+# Module: pads
+#
+# Passive Asset Detection System
+# 
+pads = module
+
+# Layer: services
 # Module: pcscd
 #
 # PCSC smart card service
@@ -1332,6 +1374,14 @@ perdition = module
 # Pingd of the Whatsup cluster node up/down detection utility
 # 
 pingd = module
+
+# Layer: services
+# Module: policykit
+#
+# PolicyKit is an application-level toolkit for defining and handling the policy
+# that allows unprivileged processes to speak to privileged processes.
+#
+policykit = module
 
 # Layer: services
 # Module: portmap
@@ -1644,6 +1694,13 @@ squid = module
 ssh = module
 
 # Layer: services
+# Module: sssd
+#
+# System Security Services Daemon
+# 
+sssd = module
+
+# Layer: services
 # Module: stunnel
 #
 # SSL Tunneling Proxy
@@ -1733,6 +1790,13 @@ uucp = module
 # University of Washington IMAP toolkit POP3 and IMAP mail server
 # 
 uwimap = module
+
+# Layer: services
+# Module: varnishd
+#
+# Varnishd http accelerator daemon
+# 
+varnishd = module
 
 # Layer: services
 # Module: virt
