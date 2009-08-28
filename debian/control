@@ -12,7 +12,7 @@ Build-Depends: policycoreutils (>= 2.0.55), checkpolicy (>= 2.0.19),
 
 Package: selinux-policy-default
 Architecture: all
-Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5),
+Depends: policycoreutils (>= 2.0.71), libpam-modules (>= 0.77-0.se5),
           python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.36)
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
@@ -31,7 +31,7 @@ Description: Strict and Targeted variants of the SELinux policy
 Package: selinux-policy-mls
 Architecture: all
 Priority: extra
-Depends: policycoreutils (>= 2.0.49-2.1), libpam-modules (>= 0.77-0.se5),
+Depends: policycoreutils (>= 2.0.71), libpam-modules (>= 0.77-0.se5),
           python, libselinux1 (>= 2.0.35), libsepol1 (>=2.0.30-2)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1),
            selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1),
@@ -50,7 +50,7 @@ Description: MLS (Multi Level Security) variant of the SELinux policy
 
 Package: selinux-policy-src
 Architecture: all
-Depends: python, policycoreutils (>= 2.0.42), checkpolicy (>= 2.0.4), gawk
+Depends: python, policycoreutils (>= 2.0.71), checkpolicy (>= 2.0.4), gawk
 Conflicts: selinux-policy-refpolicy-targeted, selinux-policy-refpolicy-src
 Recommends: setools
 Suggests: logcheck, syslog-summary
@@ -78,7 +78,7 @@ Description: Source of the SELinux reference policy for customization
 
 Package: selinux-policy-dev
 Architecture: all
-Depends: python, policycoreutils (>= 2.0.42), checkpolicy (>= 2.0.4), gawk, make, m4
+Depends: python, policycoreutils (>= 2.0.71), checkpolicy (>= 2.0.4), gawk, make, m4
 Recommends: setools
 Conflicts: selinux-policy-refpolicy-dev
 Homepage: http://serefpolicy.sourceforge.net/

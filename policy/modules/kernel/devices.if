@@ -1232,6 +1232,27 @@ interface(`dev_dontaudit_rw_cardmgr',`
 ########################################
 ## <summary>
 ##	Create, read, write, and delete
+##	the PCMCIA card manager device
+##	with the correct type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_create_cardmgr_dev',`
+	gen_require(`
+		type device_t, cardmgr_dev_t;
+	')
+
+	create_chr_files_pattern($1, device_t, cardmgr_dev_t)
+	create_blk_files_pattern($1, device_t, cardmgr_dev_t)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete
 ##	the PCMCIA card manager device.
 ## </summary>
 ## <param name="domain">
@@ -1251,9 +1272,9 @@ interface(`dev_manage_cardmgr_dev',`
 
 ########################################
 ## <summary>
-##	Create, read, write, and delete
-##	the PCMCIA card manager device
-##	with the correct type.
+##	Automatic type transition to the type
+##	for PCMCIA card manager device nodes when
+##	created in /dev.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -1261,13 +1282,11 @@ interface(`dev_manage_cardmgr_dev',`
 ##	</summary>
 ## </param>
 #
-interface(`dev_create_cardmgr_dev',`
+interface(`dev_filetrans_cardmgr',`
 	gen_require(`
 		type device_t, cardmgr_dev_t;
 	')
 
-	create_chr_files_pattern($1, device_t, cardmgr_dev_t)
-	create_blk_files_pattern($1, device_t, cardmgr_dev_t)
 	filetrans_pattern($1, device_t, cardmgr_dev_t, { chr_file blk_file })
 ')
 
@@ -1452,6 +1471,24 @@ interface(`dev_manage_dri_dev',`
 	')
 
 	manage_chr_files_pattern($1, device_t, dri_device_t)
+')
+
+########################################
+## <summary>
+##	Automatic type transition to the type
+##	for DRI device nodes when created in /dev.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_filetrans_dri',`
+	gen_require(`
+		type device_t, dri_device_t;
+	')
+
 	filetrans_pattern($1, device_t, dri_device_t, chr_file)
 ')
 

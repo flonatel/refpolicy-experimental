@@ -50,7 +50,9 @@ my @all_modules;
 # Full path of all modules in the policy
 my %Module_Path;
 # Dpendencies for policy modules, as determined by semodule_deps
-my %Deps = ( 'cups' => 'lpd', 'telnet' => 'remotelogin', 'ricci' => 'consoletype' );
+my %Deps = ( 'cups'  => 'lpd',         'telnet'    => 'remotelogin',
+             'ricci' => 'consoletype', 'devicekit' => 'consoletype'
+           );
 # A hash of all modules already processed
 my %Seen;
 # A hash of all packages installed on this machine
@@ -64,7 +66,7 @@ my @load_order;
 # A mapping of policy modules to Debian package names.
 my %map = (
            'amavis'          => [ 'amavisd-new' ],
-           'apache'          => [ 'apache*' ],
+           'apache'          => [ 'apache*', 'cvsweb' ],
            'apm'             => [ 'acpid' ],
            'asterisk'        => [ 'asterisk' ],
            'audioentropy'    => [ 'randomsound' ],
@@ -79,6 +81,7 @@ my %map = (
            'cpufreqselector' => [ 'cpufreqd', 'cpufrequtils', 'gnome-applets'  ],
            'cups'            => [ 'cupsys*' ],
            'cyrus'           => [ 'cyrus*' ],
+           'devicekit'       => [ 'udev', 'hal' ],
            'dovecot'         => [ 'dovecot-imapd', 'dovecot-pop3d' ],
            'dhcp'            => [ 'dhcp*', 'dhclient*', 'pump' ],
            'dkim'            => [ 'dkim-filter' ],

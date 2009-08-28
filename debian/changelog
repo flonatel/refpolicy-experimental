@@ -1,3 +1,34 @@
+refpolicy (2:0.2.20090828-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - Deprecated the userdom_xwindwos_client_template(). 
+  * Modified the list of modules we build (added consolekit, and added a
+    dependency on consolekit to the devicekit policymodule. Turned off
+    ddcprobe, since it needs kudzu.
+  * Bug fix: "linking policy fails", thanks to Jonathan Nieder 
+                                                        (Closes: #544079).
+  * Bug fix: "linking policy fails (with a statement to file a bug)",
+    thanks to Philipp Kern                              (Closes: #543148).
+  * Bug fix: "module cvs appears to depend on module apache", thanks to
+    Russell Coker                                       (Closes: #539855).
+  * Bug fix: "SELinux prevented console-kit-dae from using the terminal
+    /dev/tty0", thanks to Ritesh Raj Sarraf. We now have:
+    policy/modules/services/consolekit.te:term_use_all_terms(consolekit_t) 
+    This should allow access to all terms and ttys.     (Closes: #515167).
+  * Bug fix: "SELinux is preventing pulseaudio from loading
+    /usr/lib/libFLAC.so.8.2.0 which requires text relocation", thanks to
+    Ritesh Raj Sarraf.  /usr/lib/libFLAC\.so.* now has the context
+    system_u:object_r:textrel_shlib_t, so this should now work.
+                                                       (Closes: #515166).
+  * [1ba2425]: nscd cache location changed from /var/db/nscd to
+    /var/cache/nscd. The nscd policy module uses the old
+    nscd cache location. The cache location changed with glibc 2.7-1,
+    and the current nscd does place the files in /var/cache/nscd/.
+    Bug fix: "nscd cache location changed from /var/db/nscd to
+    /var/cache/nscd", thanks to Sami Haahtinen           (Closes: #506779).
+
+ -- Manoj Srivastava <srivasta@debian.org>  Fri, 28 Aug 2009 15:10:50 -0500
+
 refpolicy (2:0.2.20090818-1) unstable; urgency=low
 
   * New upstream snapshot, with a number of improvements.
