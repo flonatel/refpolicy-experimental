@@ -249,6 +249,7 @@ allow ifconfig_t self:shm create_shm_perms;
 allow ifconfig_t self:sem create_sem_perms;
 allow ifconfig_t self:msgq create_msgq_perms;
 allow ifconfig_t self:msg { send receive };
+term_read_console(ifconfig_t)
 # Create UDP sockets, necessary when called from dhcpc
 allow ifconfig_t self:udp_socket create_socket_perms;
 # for /sbin/ip

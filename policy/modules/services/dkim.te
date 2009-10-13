@@ -1,64 +1,32 @@
 
-policy_module(dkim,1.0.0)
+policy_module(dkim, 1.0.0)
 
 ########################################
 #
 # Declarations
 #
 
-# Main dkim domain
-type dkim_t;
-type dkim_exec_t;
-init_daemon_domain(dkim_t, dkim_exec_t)
+milter_template(dkim)
 
-# configuration files
-type dkim_etc_t;
-files_type(dkim_etc_t)
-
-# pid files
-type dkim_var_run_t;
-files_pid_file(dkim_var_run_t)
-manage_files_pattern(dkim_t, dkim_var_run_t, dkim_var_run_t)
+# Type for the private key of dkim-filter
+type dkim_milter_private_key_t;
+files_type(dkim_milter_private_key_t)
 
 ########################################
 #
-# dkim local policy
+# Local policy
 #
 
-allow dkim_t self:capability { setgid setuid };
-allow dkim_t self:fifo_file rw_fifo_file_perms;
-allow dkim_t self:unix_stream_socket create_stream_socket_perms;
-allow dkim_t self:tcp_socket { listen accept };
-files_search_tmp(dkim_t)
+allow dkim_milter_t self:capability { setgid setuid };
 
-# configuration files
-allow dkim_t dkim_etc_t:dir list_dir_perms;
-read_files_pattern(dkim_t,dkim_etc_t,dkim_etc_t)
-read_lnk_files_pattern(dkim_t,dkim_etc_t,dkim_etc_t)
+read_files_pattern(dkim_milter_t, dkim_milter_private_key_t, dkim_milter_private_key_t)
 
-manage_sock_files_pattern(dkim_t,dkim_var_run_t,dkim_var_run_t)
+kernel_read_kernel_sysctls(dkim_milter_t)
 
-corenet_all_recvfrom_unlabeled(dkim_t)
-corenet_all_recvfrom_netlabel(dkim_t)
-corenet_tcp_sendrecv_all_if(dkim_t)
-corenet_tcp_sendrecv_all_nodes(dkim_t)
-corenet_tcp_sendrecv_all_ports(dkim_t)
-corenet_tcp_bind_all_nodes(dkim_t)
+dev_read_urand(dkim_milter_t)
 
-dev_read_rand(dkim_t)
-dev_read_urand(dkim_t)
+files_read_etc_files(dkim_milter_t)
 
-files_read_etc_files(dkim_t)
+sysnet_dns_name_resolve(dkim_milter_t)
 
-libs_use_ld_so(dkim_t)
-libs_use_shared_libs(dkim_t)
-
-logging_send_syslog_msg(dkim_t)
-
-miscfiles_read_localization(dkim_t)
-
-sysnet_dns_name_resolve(dkim_t)
-
-kernel_read_system_state(dkim_t)
-kernel_read_sysctl(dkim_t)
-kernel_read_kernel_sysctls(dkim_t)
+mta_read_config(dkim_milter_t)

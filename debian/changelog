@@ -1,3 +1,23 @@
+refpolicy (2:0.2.20091013-1) unstable; urgency=low
+
+  * New upstream VCS snapshot
+  * Added modules: hddtemp, shorewall, kdump, gnomeclock, nslcd, rtkit,
+    seunshare (Dan Walsh); dkim (Stefan Schulze Frielinghaus); gitosis
+    (Miroslav Grepl); xscreensaver (Corentin Labbe)
+  * [dd26539]: [topic--urand-fix]: Fix issues related to
+    /dev/{urandom,console}
+    + Allow: load_policy_t, audisp_t, auditd_t, restorecond_t, portmap_t,
+      hwclock_t, auditctl_t, hostname_t, portmap_helper_t, ndc_t, mount_t,
+      dmidecode_t, getty_t, and setfiles_t to read /dev/urandom
+    + Allow: portmap_helper_t, insmod_t, ifconfig_t, setfiles_t and
+      portmap_t to read /dev/console
+    + Allow udev_t to access anon_inodefs_t
+    These changes take care of most of the problems encountered in recent
+    reference policy packages in Debian. Thanks to Russell Coker for the
+    fixes. 
+
+ -- Manoj Srivastava <srivasta@debian.org>  Tue, 13 Oct 2009 15:29:54 -0500
+
 refpolicy (2:0.2.20090828-1) unstable; urgency=low
 
   * New upstream snapshot.

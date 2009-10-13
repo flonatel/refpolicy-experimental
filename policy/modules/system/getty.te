@@ -38,6 +38,7 @@ allow getty_t self:capability { dac_override chown setgid sys_resource sys_tty_c
 dontaudit getty_t self:capability sys_tty_config;
 allow getty_t self:process { getpgid setpgid getsession signal_perms };
 allow getty_t self:fifo_file rw_fifo_file_perms;
+dev_read_urand(getty_t)
 
 read_files_pattern(getty_t, getty_etc_t, getty_etc_t)
 read_lnk_files_pattern(getty_t, getty_etc_t, getty_etc_t)

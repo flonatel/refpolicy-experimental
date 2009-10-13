@@ -1087,6 +1087,7 @@ template(`network_user_template',`
 #
 template(`userdom_admin_user_template',`
 	gen_require(`
+		attribute admindomain;
 		class passwd { passwd chfn chsh rootok };
 	')
 
@@ -1102,6 +1103,8 @@ template(`userdom_admin_user_template',`
 	domain_obj_id_change_exemption($1_t)
 	role system_r types $1_t;
 
+	typeattribute $1_t admindomain;
+
 	ifdef(`direct_sysadm_daemon',`
 		domain_system_change_exemption($1_t)
 	')
@@ -1113,14 +1116,12 @@ template(`userdom_admin_user_template',`
 
 	allow $1_t self:capability ~{ sys_module audit_control audit_write };
 	allow $1_t self:process { setexec setfscreate };
-
+	allow $1_t self:netlink_audit_socket nlmsg_readpriv;
+	allow $1_t self:tun_socket create;
 	# Set password information for other users.
 	allow $1_t self:passwd { passwd chfn chsh };
-
 	# Skip authentication when pam_rootok is specified.
 	allow $1_t self:passwd rootok;
-
-	allow $1_t self:netlink_audit_socket nlmsg_readpriv;
 
 	kernel_read_software_raid_state($1_t)
 	kernel_getattr_core_if($1_t)
@@ -1328,6 +1329,25 @@ interface(`userdom_user_home_content',`
 	allow $1 user_home_t:filesystem associate;
 	files_type($1)
 	ubac_constrained($1)
+')
+
+########################################
+## <summary>
+##	Allow domain to attach to TUN devices created by administrative users.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_attach_admin_tun_iface',`
+	gen_require(`
+		attribute admindomain;
+	')
+
+	allow $1 admindomain:tun_socket relabelfrom;
+	allow $1 self:tun_socket relabelto;
 ')
 
 ########################################
@@ -2415,6 +2435,26 @@ interface(`userdom_tmp_filetrans_user_tmp',`
 	')
 
 	files_tmp_filetrans($1, user_tmp_t, $2)
+')
+
+########################################
+## <summary>
+##	Read user tmpfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_read_user_tmpfs_files',`
+	gen_require(`
+		type user_tmpfs_t;
+	')
+
+	read_files_pattern($1, user_tmpfs_t, user_tmpfs_t)
+	allow $1 user_tmpfs_t:dir list_dir_perms;
+	fs_search_tmpfs($1)
 ')
 
 ########################################

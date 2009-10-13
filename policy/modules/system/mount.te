@@ -38,6 +38,7 @@ application_domain(unconfined_mount_t, mount_exec_t)
 # setuid/setgid needed to mount cifs 
 allow mount_t self:capability { ipc_lock sys_rawio sys_admin dac_override chown sys_tty_config setuid setgid };
 
+dev_read_urand(mount_t)
 allow mount_t mount_loopback_t:file read_file_perms;
 
 allow mount_t mount_tmp_t:file manage_file_perms;

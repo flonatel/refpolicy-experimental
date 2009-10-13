@@ -1,5 +1,5 @@
 
-policy_module(mcs, 1.1.0)
+policy_module(mcs, 1.1.1)
 
 ########################################
 #
@@ -16,3 +16,6 @@ attribute mcssetcats;
 attribute mcssetlow;
 # object may be accessed by any process at a higher level
 attribute mcstrustedobject;
+
+attribute mcswriteall;
+attribute mcsreadall;

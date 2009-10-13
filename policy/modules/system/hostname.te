@@ -26,6 +26,7 @@ kernel_list_proc(hostname_t)
 kernel_read_proc_symlinks(hostname_t)
 
 dev_read_sysfs(hostname_t)
+dev_read_urand(hostname_t)
 
 domain_use_interactive_fds(hostname_t)
 

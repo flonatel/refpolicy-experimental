@@ -18,6 +18,7 @@ role system_r types dmidecode_t;
 
 allow dmidecode_t self:capability sys_rawio;
 
+dev_read_urand(dmidecode_t)
 dev_read_sysfs(dmidecode_t)
 # Allow dmidecode to read /dev/mem
 dev_read_raw_memory(dmidecode_t)

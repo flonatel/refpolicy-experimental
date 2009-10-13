@@ -96,6 +96,7 @@ allow insmod_t self:process { execmem sigchld sigkill sigstop signull signal };
 
 allow insmod_t self:udp_socket create_socket_perms; 
 allow insmod_t self:rawip_socket create_socket_perms; 
+term_read_console(insmod_t)
 
 # Read module config and dependency information
 allow insmod_t { modules_conf_t modules_dep_t }:file read_file_perms;

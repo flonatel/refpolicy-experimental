@@ -1,5 +1,5 @@
 
-policy_module(userdomain, 4.2.2)
+policy_module(userdomain, 4.2.4)
 
 ########################################
 #
@@ -48,6 +48,8 @@ gen_tunable(user_rw_noexattrfile, false)
 ## </p>
 ## </desc>
 gen_tunable(user_ttyfile_stat, false)
+
+attribute admindomain;
 
 # all user domains
 attribute userdomain;

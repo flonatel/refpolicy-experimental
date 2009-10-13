@@ -147,7 +147,7 @@ anaconda = off
 # Layer: admin
 # Module: apt
 #
-# APT advanced package toll.
+# APT advanced package tool.
 # 
 apt = base
 
@@ -301,6 +301,13 @@ readahead = module
 rpm = off
 
 # Layer: admin
+# Module: shorewall
+#
+# Shoreline Firewall high-level tool for configuring netfilter
+# 
+shorewall = module
+ 
+# Layer: admin
 # Module: su
 #
 # Run shells with substitute user and group
@@ -449,6 +456,13 @@ games = module
 gift = module
 
 # Layer: apps
+# Module: gitosis
+#
+# Tools for managing and hosting git repositories.
+# 
+gitosis = module
+
+# Layer: apps
 # Module: gnome
 #
 # GNU network object model environment (GNOME)
@@ -519,6 +533,13 @@ mplayer = module
 podsleuth = module
 
 # Layer: apps
+# Module: ptchown
+#
+# helper function for grantpt(3), changes ownship and permissions of pseudotty
+# 
+ptchown = module
+
+# Layer: apps
 # Module: pulseaudio
 #
 # Pulseaudio network sound server.
@@ -545,6 +566,13 @@ rssh = module
 # GNU terminal multiplexer
 # 
 screen = module
+
+# Layer: apps
+# Module: seunshare
+#
+# Filesystem namespacing/polyinstantiation application.
+# 
+seunshare = module
 
 # Layer: apps
 # Module: slocate
@@ -624,6 +652,13 @@ wireshark = module
 wm = module
 
 # Layer: apps
+# Module: xscreensaver
+#
+# X Screensaver
+# 
+xscreensaver = module
+
+# Layer: apps
 # Module: yam
 #
 # Yum/Apt Mirroring
@@ -699,6 +734,13 @@ webadm = module
 # Least privledge xwindows user role
 # 
 xguest = module
+
+# Layer: services
+# Module: abrt
+#
+# ABRT - automated bug-reporting tool
+# 
+abrt = off
 
 # Layer: services
 # Module: afs
@@ -977,7 +1019,7 @@ djbdns = module
 # Layer: services
 # Module: dkim
 #
-# DKIM Milter - add and validate public key signatures on email
+# DomainKeys Identified Mail milter.
 # 
 dkim = module
 
@@ -1059,6 +1101,13 @@ gatekeeper = module
 git = module
 
 # Layer: services
+# Module: gnomeclock
+#
+# Gnome clock handler for setting the time.
+# 
+gnomeclock = module
+
+# Layer: services
 # Module: gpm
 #
 # General Purpose Mouse driver
@@ -1079,6 +1128,13 @@ gpsd = module
 # 
 hal = base
 
+# Layer: services
+# Module: hddtemp
+#
+# hddtemp hard disk temperature tool running as a daemon
+# 
+hddtemp = module
+ 
 # Layer: services
 # Module: howl
 #
@@ -1206,6 +1262,13 @@ memcached = module
 milter = module
 
 # Layer: services
+# Module: modemmanager
+#
+# Provides a DBus interface to communicate with mobile broadband (GSM, CDMA, UMTS, ...) cards.
+# 
+modemmanager = module
+
+# Layer: services
 # Module: monop
 #
 # Monopoly daemon
@@ -1274,6 +1337,13 @@ nscd = module
 # Authoritative only name server
 # 
 nsd = module
+
+# Layer: services
+# Module: nslcd
+#
+# nslcd - local LDAP name service daemon.
+# 
+nslcd = module
 
 # Layer: services
 # Module: ntop
@@ -1378,8 +1448,7 @@ pingd = module
 # Layer: services
 # Module: policykit
 #
-# PolicyKit is an application-level toolkit for defining and handling the policy
-# that allows unprivileged processes to speak to privileged processes.
+# Policy framework for controlling privileges for system-wide services.
 #
 policykit = module
 
@@ -1592,6 +1661,13 @@ rshd = module
 # Fast incremental file transfer for synchronization
 # 
 rsync = module
+
+# Layer: services
+# Module: rtkit
+#
+# Realtime scheduling for user processes.
+# 
+rtkit = module
 
 # Layer: services
 # Module: rwho
@@ -1945,6 +2021,13 @@ iptables = base
 # Establish connections to iSCSI devices
 # 
 iscsi = module
+
+# Layer: system
+# Module: kdump
+#
+# Kernel crash dumping mechanism
+# 
+kdump = module
 
 # Layer: system
 # Module: libraries

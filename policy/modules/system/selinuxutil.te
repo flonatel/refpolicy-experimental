@@ -108,6 +108,8 @@ type setfiles_t alias restorecon_t, can_relabelto_binary_policy;
 type setfiles_exec_t alias restorecon_exec_t;
 init_system_domain(setfiles_t, setfiles_exec_t)
 domain_obj_id_change_exemption(setfiles_t)
+term_read_console(setfiles_t)
+dev_read_urand(setfiles_t)
 
 ########################################
 #
@@ -160,6 +162,7 @@ allow load_policy_t self:capability dac_override;
 read_files_pattern(load_policy_t,{ policy_src_t policy_config_t },policy_config_t)
 
 domain_use_interactive_fds(load_policy_t)
+dev_read_urand(load_policy_t)
 
 # for mcs.conf
 files_read_etc_files(load_policy_t)
@@ -305,6 +308,7 @@ tunable_policy(`allow_polyinstantiation',`
 
 allow restorecond_t self:capability { dac_override dac_read_search fowner };
 allow restorecond_t self:fifo_file rw_fifo_file_perms;
+dev_read_urand(restorecond_t)
 
 allow restorecond_t restorecond_var_run_t:file manage_file_perms;
 files_pid_filetrans(restorecond_t, restorecond_var_run_t, file)

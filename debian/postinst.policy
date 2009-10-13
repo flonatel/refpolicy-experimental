@@ -1,13 +1,13 @@
 #! /usr/bin/perl
 #                              -*- Mode: Cperl -*-
 # postinst.pl ---
-# Author           : Manoj Srivastava ( srivasta@glaurung.internal.golden-gryphon.com )
+# Author           : Manoj Srivastava ( srivasta@golden-gryphon.com )
 # Created On       : Mon Aug 21 01:14:21 2006
 # Created On Node  : glaurung.internal.golden-gryphon.com
 # Last Modified By : Manoj Srivastava
-# Last Modified On : Mon May  7 11:10:26 2007
-# Last Machine Used: glaurung.internal.golden-gryphon.com
-# Update Count     : 32
+# Last Modified On : Tue Sep  1 22:50:34 2009
+# Last Machine Used: anzu.internal.golden-gryphon.com
+# Update Count     : 35
 # Status           : Unknown, Use with caution!
 # HISTORY          :
 # Description      :
@@ -79,7 +79,8 @@ my %map = (
            'courier'         => [ 'courier*' ],
            'consolekit'      => [ 'consolekit' ],
            'cpufreqselector' => [ 'cpufreqd', 'cpufrequtils', 'gnome-applets'  ],
-           'cups'            => [ 'cupsys*' ],
+           'cups'            => [ 'cupsys*', 'cups', 'cups-bsd', 'cups-client',
+                                  'cups-common' ],
            'cyrus'           => [ 'cyrus*' ],
            'devicekit'       => [ 'udev', 'hal' ],
            'dovecot'         => [ 'dovecot-imapd', 'dovecot-pop3d' ],
@@ -89,12 +90,16 @@ my %map = (
            'exim'            => [ 'exim4' ],
            'finger'          => [ 'finger', '*fingerd' ],
            'ftp'             => [ 'ftp', '*ftpd' ],
+           'gitosis'         => [ 'gitosis' ],
            'gpg'             => [ 'gnupg' ],
+           'hddtemp'         => [ 'hddtemp' ],
            'hwclock'         => [ 'util-linux' ],
-           'inetd'           => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd', 'rinetd', 'rlinetd', 'xinetd' ],
+           'inetd'           => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd',
+                                  'rinetd', 'rlinetd', 'xinetd' ],
            'jabber'          => [ 'jabber', 'ejabberd' ],
            'java'            => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
-                                'java*', 'jvm*', 'jre*', 'jsdk*' ],
+                                  'java*', 'jvm*', 'jre*', 'jsdk*' ],
+           'kdump'           => [ 'crash' ],
            'lda'             => [ 'procmail', 'courier-maildrop', 'dovecot-common' ],
            'ldap'            => [ 'slapd' ],
            'lpd'             => [ 'lprng', 'rlpr' ],
@@ -107,13 +112,19 @@ my %map = (
                                 'mozilla-*', 'firefox*', 'epiphany-browser' ],
            'nagios'          => [ 'nagios*' ],
            'netutils'        => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
+           'nslcd'           => [ 'nslcd' ],
            'pcmcia'          => [ 'pcmciautils' ],
            'policykit'       => [ 'policykit' ],
+           'ptchown'         => [ 'libc-bin' ],
            'pythonsupport'   => [ 'python-support' ],
            'radius'          => [ 'freeradius*', 'radiusd*' ],
            'raid'            => [ 'mdadm' ],
            'rpc'             => [ 'nfs-common', 'nfs-kernel-server' ],
            'sasl'            => [ 'libsasl2' ],
+           'shorewall'       => [ 'shorewall-common', 'shorewall-lite',
+                                  'shorewall-perl', 'shorewall-shell',
+                                  'shorewall6', 'shorewall6-lite'
+                                ],
            'ssh'             => [ 'openssh*' ],
 #           'su'             => [ 'login' ],
            'sysstat'         => [ 'atsar' ],
@@ -134,6 +145,9 @@ my %map = (
                                   'xfwm4', 'xmonad', 'ion3', 'kwin', 'amiwm'
                                 ],
            'xen'             => [ 'xen-utils-common' ],
+           'xscreensaver'    => [ 'xscreensaver', 'kscreensaver',
+                                  'gnome-screensaver', 'innerspace.app',
+                                  'kanjisaver', 'kannasaver' ],
            'xserver'         => [ 'gdm', 'kdm', 'xdm', 'xserver*', 'xbase-clients' ]
           );
 

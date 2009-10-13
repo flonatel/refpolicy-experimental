@@ -52,6 +52,7 @@ allow udev_t self:unix_dgram_socket sendto;
 allow udev_t self:unix_stream_socket connectto;
 allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
 allow udev_t self:rawip_socket create_socket_perms;
+fs_read_anon_inodefs_files(udev_t)
 
 allow udev_t udev_helper_exec_t:dir list_dir_perms;
 can_exec(udev_t, udev_exec_t)
