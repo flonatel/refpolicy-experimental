@@ -1,3 +1,9 @@
+refpolicy (2:0.2.20091117-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Manoj Srivastava <srivasta@debian.org>  Thu, 19 Nov 2009 23:08:14 -0600
+
 refpolicy (2:0.2.20091013-1) unstable; urgency=low
 
   * New upstream VCS snapshot

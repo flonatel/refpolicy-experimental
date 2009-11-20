@@ -51,7 +51,8 @@ my @all_modules;
 my %Module_Path;
 # Dpendencies for policy modules, as determined by semodule_deps
 my %Deps = ( 'cups'  => 'lpd',         'telnet'    => 'remotelogin',
-             'ricci' => 'consoletype', 'devicekit' => 'consoletype'
+             'ricci' => 'consoletype', 'devicekit' => 'consoletype',
+             'devicekit' => 'dbus'
            );
 # A hash of all modules already processed
 my %Seen;

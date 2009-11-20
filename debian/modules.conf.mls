@@ -298,7 +298,7 @@ readahead = module
 #
 # Policy for the RPM package manager.
 # 
-rpm = off
+rpm = module
 
 # Layer: admin
 # Module: shorewall
@@ -1544,6 +1544,13 @@ psad = module
 publicfile = module
 
 # Layer: services
+# Module: puppet
+#
+# Puppet client daemon
+# 
+puppet = module
+
+# Layer: services
 # Module: pxe
 #
 # Server for the PXE network boot protocol
@@ -1812,6 +1819,13 @@ telnet = module
 tftp = module
 
 # Layer: services
+# Module: tgtd
+#
+# Linux Target Framework Daemon.
+# 
+tgtd = module
+
+# Layer: services
 # Module: timidity
 #
 # MIDI to WAV converter and player configured as a service
@@ -1831,6 +1845,13 @@ tor = module
 # HTTP transperant proxy
 # 
 transproxy = module
+
+# Layer: services
+# Module: tuned
+#
+# Dynamic adaptive system tuning daemon
+# 
+tuned = module
 
 # Layer: services
 # Module: ucspitcp
@@ -2139,7 +2160,7 @@ udev = base
 #
 # The unconfined domain.
 # 
-unconfined = off
+unconfined = module
 
 # Layer: system
 # Module: userdomain
