@@ -292,6 +292,26 @@ interface(`files_tmpfs_file',`
 
 ########################################
 ## <summary>
+##	Transform the type into a file, for use on a
+##	virtual memory filesystem (hugetlbfs).
+## </summary>
+## <param name="type">
+##	<summary>
+##	The type to be transformed.
+##	</summary>
+## </param>
+#
+interface(`files_hugetlbfs_file',`
+	gen_require(`
+		attribute hugetlbfsfile;
+	')
+
+	files_type($1)
+	typeattribute $1 hugetlbfsfile;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of all directories.
 ## </summary>
 ## <param name="domain">

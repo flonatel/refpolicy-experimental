@@ -93,7 +93,9 @@ genfscon futexfs / gen_context(system_u:object_r:futexfs_t,s0)
 type hugetlbfs_t;
 fs_type(hugetlbfs_t)
 files_mountpoint(hugetlbfs_t)
-genfscon hugetlbfs / gen_context(system_u:object_r:hugetlbfs_t,s0)
+files_type(hugetlbfs_t)
+files_poly_parent(hugetlbfs_t)
+fs_use_trans hugetlbfs gen_context(system_u:object_r:hugetlbfs_t,s0);
 
 type ibmasmfs_t;
 fs_type(ibmasmfs_t)
@@ -171,8 +173,14 @@ files_poly_parent(tmpfs_t)
 fs_use_trans mqueue gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans shm gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans tmpfs gen_context(system_u:object_r:tmpfs_t,s0);
+fs_use_trans devtmpfs gen_context(system_u:object_r:tmpfs_t,s0);
 
 allow tmpfs_t noxattrfs:filesystem associate;
+
+type xenfs_t;
+fs_noxattr_type(xenfs_t)
+files_mountpoint(xenfs_t)
+genfscon xenfs / gen_context(system_u:object_r:xenfs_t,s0)
 
 ##############################
 #
@@ -251,7 +259,6 @@ genfscon lustre / gen_context(system_u:object_r:nfs_t,s0)
 genfscon ncpfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon reiserfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon panfs / gen_context(system_u:object_r:nfs_t,s0)
-genfscon xenfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon gadgetfs / gen_context(system_u:object_r:nfs_t,s0)
 
 ########################################

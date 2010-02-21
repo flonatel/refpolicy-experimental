@@ -363,6 +363,7 @@ interface(`userdom_exec_user_tmp_files',`
 interface(`userdom_manage_tmpfs_role',`
 	gen_require(`
 		type user_tmpfs_t;
+		type user_hugetlbfs_t;
 	')
 
 	role $1 types user_tmpfs_t;
@@ -373,6 +374,8 @@ interface(`userdom_manage_tmpfs_role',`
 	manage_sock_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
 	manage_fifo_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
 	fs_tmpfs_filetrans($2, user_tmpfs_t, { dir file lnk_file sock_file fifo_file })
+	manage_files_pattern($2, user_hugetlbfs_t, user_hugetlbfs_t)
+	fs_hugetlbfs_filetrans($2, user_hugetlbfs_t, { file })
 ')
 
 #######################################

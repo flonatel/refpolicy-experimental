@@ -1220,6 +1220,13 @@ kerneloops = module
 ktalk = module
 
 # Layer: services
+# Module: lda
+#
+# mail delivery agent
+#
+lda = module
+
+# Layer: services
 # Module: ldap
 #
 # OpenLDAP directory server
@@ -1521,13 +1528,6 @@ prelude = module
 # Privacy enhancing web proxy.
 # 
 privoxy = module
-
-# Layer: services
-# Module: procmail
-#
-# Procmail mail delivery agent
-# 
-procmail = module
 
 # Layer: services
 # Module: psad

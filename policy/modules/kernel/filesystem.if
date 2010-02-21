@@ -1537,6 +1537,54 @@ interface(`fs_rw_hugetlbfs_files',`
 
 ########################################
 ## <summary>
+##      Allow the type to associate to hugetlbfs filesystems.
+## </summary>
+## <param name="type">
+##      <summary>
+##      The type of the object to be associated.
+##      </summary>
+## </param>
+#
+interface(`fs_associate_hugetlbfs',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	allow $1 hugetlbfs_t:filesystem associate;
+')
+
+########################################
+## <summary>
+##     Create an object in a hugetlbfs filesystem, with a private
+##     type using a type transition.
+## </summary>
+## <param name="domain">
+##     <summary>
+##     Domain allowed access.
+##     </summary>
+## </param>
+## <param name="private type">
+##     <summary>
+##     The type of the object to be created.
+##     </summary>
+## </param>
+## <param name="object">
+##     <summary>
+##     The object class of the object being created.
+##     </summary>
+## </param>
+#
+interface(`fs_hugetlbfs_filetrans',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	allow $2 hugetlbfs_t:filesystem associate;
+	filetrans_pattern($1, hugetlbfs_t, $2, $3)
+')
+
+########################################
+## <summary>
 ##	Search inotifyfs filesystem. 
 ## </summary>
 ## <param name="domain">
@@ -3336,11 +3384,11 @@ interface(`fs_dontaudit_rw_tmpfs_files',`
 ## </param>
 #
 interface(`fs_allow_tmpfs_file_read',`
-       gen_require(`
-               type tmpfs_t;
-       ')
+	gen_require(`
+		type tmpfs_t;
+	')
 
-       allow $1 tmpfs_t:file read;
+	allow $1 tmpfs_t:file read;
 ')
 
 ########################################
@@ -3586,6 +3634,122 @@ interface(`fs_manage_tmpfs_blk_files',`
 	')
 
 	manage_blk_files_pattern($1, tmpfs_t, tmpfs_t)
+')
+
+########################################
+## <summary>
+##      Mount a XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`fs_mount_xenfs',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	allow $1 xenfs_t:filesystem mount;
+')
+
+########################################
+## <summary>
+##      Search the XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`fs_search_xenfs',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	allow $1 xenfs_t:dir search_dir_perms;
+')
+
+########################################
+## <summary>
+##      Create, read, write, and delete directories
+##      on a XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_manage_xenfs_dirs',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	allow $1 xenfs_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
+##      Do not audit attempts to create, read,
+##      write, and delete directories
+##      on a XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain to not audit.
+##      </summary>
+## </param>
+#
+interface(`fs_dontaudit_manage_xenfs_dirs',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	dontaudit $1 xenfs_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
+##      Create, read, write, and delete files
+##      on a XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_manage_xenfs_files',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	manage_files_pattern($1, xenfs_t, xenfs_t)
+')
+
+########################################
+## <summary>
+##      Do not audit attempts to create,
+##      read, write, and delete files
+##      on a XENFS filesystem.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain to not audit.
+##      </summary>
+## </param>
+#
+interface(`fs_dontaudit_manage_xenfs_files',`
+	gen_require(`
+		type xenfs_t;
+	')
+
+	dontaudit $1 xenfs_t:file manage_file_perms;
 ')
 
 ########################################

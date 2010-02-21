@@ -51,6 +51,7 @@ type xenstored_exec_t;
 domain_type(xenstored_t)
 domain_entry_file(xenstored_t, xenstored_exec_t)
 role system_r types xenstored_t;
+init_daemon_domain(xenstored_t, xenstored_exec_t)
 
 # var/lib files
 type xenstored_var_lib_t;
@@ -65,6 +66,7 @@ type xenconsoled_exec_t;
 domain_type(xenconsoled_t)
 domain_entry_file(xenconsoled_t, xenconsoled_exec_t)
 role system_r types xenconsoled_t;
+init_daemon_domain(xenconsoled_t, xenconsoled_exec_t)
 
 # pid files
 type xenconsoled_var_run_t;
@@ -195,6 +197,9 @@ optional_policy(`
 
 miscfiles_read_localization(xend_t)
 
+fs_manage_xenfs_dirs(xend_t)
+fs_manage_xenfs_files(xend_t)
+
 mount_domtrans(xend_t)
 
 sysnet_domtrans_dhcpc(xend_t)
@@ -230,8 +235,13 @@ optional_policy(`
 allow xenconsoled_t self:capability { dac_override fsetid ipc_lock };
 allow xenconsoled_t self:unix_stream_socket create_stream_socket_perms;
 allow xenconsoled_t self:fifo_file rw_fifo_file_perms;
+files_read_etc_files(xenconsoled_t)
+allow xenconsoled_t self:process setrlimit;
 
-allow xenconsoled_t xen_devpts_t:chr_file rw_term_perms;
+# for /usr/lib/pt_chown
+libs_exec_lib_files(xenconsoled_t)
+
+allow xenconsoled_t xen_devpts_t:chr_file { setattr rw_term_perms };
 
 # pid file
 manage_files_pattern(xenconsoled_t, xenconsoled_var_run_t, xenconsoled_var_run_t)
@@ -250,6 +260,10 @@ domain_dontaudit_ptrace_all_domains(xenconsoled_t)
 
 corecmd_search_bin(xenconsoled_t)
 files_read_usr_files(xenconsoled_t)
+
+fs_list_tmpfs(xenconsoled_t)
+fs_manage_xenfs_dirs(xenconsoled_t)
+fs_manage_xenfs_files(xenconsoled_t)
 
 term_create_pty(xenconsoled_t, xen_devpts_t)
 term_use_generic_ptys(xenconsoled_t)
@@ -285,6 +299,8 @@ files_var_lib_filetrans(xenstored_t,xenstored_var_lib_t,{ file dir sock_file })
 allow xend_t xenstored_var_lib_t:dir rw_dir_perms;
 allow xend_t xenstored_var_lib_t:file unlink;
 corecmd_search_bin(xenstored_t)
+fs_manage_xenfs_dirs(xenstored_t)
+fs_manage_xenfs_files(xenstored_t)
 
 kernel_write_xen_state(xenstored_t)
 kernel_read_xen_state(xenstored_t)
@@ -351,6 +367,10 @@ files_read_usr_files(xm_t)
 files_list_mnt(xm_t)
 # Some common macros (you might be able to remove some)
 files_read_etc_files(xm_t)
+
+fs_getattr_all_fs(xm_t)
+fs_manage_xenfs_dirs(xm_t)
+fs_manage_xenfs_files(xm_t)
 
 storage_raw_read_fixed_disk(xm_t)
 

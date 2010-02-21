@@ -30,6 +30,7 @@ files_tmp_file(mount_tmp_t)
 type unconfined_mount_t;
 application_domain(unconfined_mount_t, mount_exec_t)
 
+kernel_request_load_module(mount_t)
 ########################################
 #
 # mount local policy

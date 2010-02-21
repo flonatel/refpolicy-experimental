@@ -1,3 +1,26 @@
+refpolicy (2:0.2.20091117-2) unstable; urgency=low
+
+  * Label /etc/gdm/Xsession, /etc/gdm/PostSession/* and /etc/gdm/PreSession/*
+    as xsession_exec_t.
+  * Label /usr/lib/dbus-1.0/dbus-daemon-launch-helper as dbusd_exec_t.
+  * Allow syslogd_t to read/write access to xconsole_device_t.
+  * Allow system_dbusd_t list access to inotifyfs.
+  * Allow udev to manage symlinks under /dev
+  * Treat devtmpfs the same way as tmpfs.
+  * Changed upstream to http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
+  * Allow iptables_t, insmod_t and mount_t to do module_request
+  * Use lib32 instead of lib64
+  * Make manage_lnk_file_perms allow write access for setting the timestamp.
+  * Use filesystem transitions for hugetlbfs_t.
+  * Label xenfs_t and allow xend etc to use it.
+  * Use lda_t for mail local delivery
+  * Allow udev to manage xenfs_t files, to write to etc_runtime_t (for ifstate),
+    and to load modules.
+  * Allow ifconfig to load modules.
+  * Made auth_domtrans_chk_passwd() specify dontaudit for shadow_t file open.
+
+ -- Russell Coker <russell@coker.com.au>  Mon, 22 Feb 2010 07:58:07 +1100
+
 refpolicy (2:0.2.20091117-1) unstable; urgency=low
 
   * New upstream release.

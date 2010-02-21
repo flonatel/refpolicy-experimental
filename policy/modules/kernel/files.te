@@ -32,6 +32,7 @@ attribute non_security_file_type;
 
 attribute tmpfile;
 attribute tmpfsfile;
+attribute hugetlbfsfile;
 
 # this attribute is not currently used and will be removed in the future.
 # unfortunately, this attribute can not be removed yet because it may cause
@@ -194,6 +195,7 @@ fs_associate(file_type)
 fs_associate_noxattr(file_type)
 fs_associate_tmpfs(file_type)
 fs_associate_ramfs(file_type)
+fs_associate_hugetlbfs(file_type)
 
 ########################################
 #
@@ -210,6 +212,13 @@ fs_associate_tmpfs(tmpfile)
 #
 
 fs_associate_tmpfs(tmpfsfile)
+
+########################################
+#
+# Rules for all hugetlbfs file types
+#
+
+fs_associate_hugetlbfs(hugetlbfsfile)
 
 ########################################
 #

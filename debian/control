@@ -3,7 +3,7 @@ VCS-Git: git://git.debian.org/git/users/srivasta/debian/refpolicy.git
 VCS-Browser: http://git.debian.org/?p=users/srivasta/debian/refpolicy.git;a=summary
 Priority: optional
 Section: admin
-Homepage: http://serefpolicy.sourceforge.net/
+Homepage: http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
 Maintainer: Russell Coker <russell@coker.com.au>
 Uploaders: Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
 Standards-Version: 3.8.3.0

@@ -88,6 +88,7 @@ type xconsole_device_t;
 files_type(xconsole_device_t)
 fs_associate_tmpfs(xconsole_device_t)
 files_associate_tmp(xconsole_device_t)
+allow syslogd_t xconsole_device_t:fifo_file rw_file_perms;
 
 ifdef(`enable_mls',`
 	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)

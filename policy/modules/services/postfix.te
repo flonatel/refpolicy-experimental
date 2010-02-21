@@ -199,6 +199,8 @@ optional_policy(`
 
 optional_policy(`
 	mysql_stream_connect(postfix_master_t)
+	mysql_stream_connect(postfix_smtpd_t)
+	mysql_stream_connect(postfix_cleanup_t)
 ')
 
 optional_policy(`
@@ -264,7 +266,8 @@ corecmd_exec_bin(postfix_cleanup_t)
 
 # for milters - may be a bug in postfix
 allow postfix_cleanup_t postfix_smtpd_t:fd use;
-allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write };
+allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write shutdown };
+allow postfix_cleanup_t postfix_smtpd_t:tcp_socket { read write getattr getopt };
 
 ########################################
 #
@@ -306,7 +309,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	procmail_domtrans(postfix_local_t)
+	lda_domtrans(postfix_local_t)
 ')
 
 ########################################
@@ -400,8 +403,14 @@ write_fifo_files_pattern(postfix_pipe_t, postfix_public_t, postfix_public_t)
 
 rw_files_pattern(postfix_pipe_t, postfix_spool_t, postfix_spool_t)
 
+corecmd_exec_bin(postfix_pipe_t)
+
 optional_policy(`
 	procmail_domtrans(postfix_pipe_t)
+')
+
+optional_policy(`
+	lda_domtrans(postfix_pipe_t)
 ')
 
 optional_policy(`
@@ -568,6 +577,11 @@ optional_policy(`
 
 optional_policy(`
 	clamav_stream_connect(postfix_smtpd_t)
+')
+
+optional_policy(`
+	dkim_stream_connect(postfix_smtpd_t)
+	dkim_stream_connect(postfix_cleanup_t)
 ')
 
 optional_policy(`

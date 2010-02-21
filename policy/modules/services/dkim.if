@@ -1,1 +1,20 @@
 ## <summary>DomainKeys Identified Mail milter.</summary>
+
+########################################
+## <summary>
+##      Connect to dkim-milter.
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed to connect.
+##      </summary>
+## </param>
+#
+interface(`dkim_stream_connect',`
+	gen_require(`
+		type dkim_t, dkim_var_run_t;
+	')
+
+	stream_connect_pattern($1,dkim_var_run_t,dkim_var_run_t,dkim_t)
+')
+

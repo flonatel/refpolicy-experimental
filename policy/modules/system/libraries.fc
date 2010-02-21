@@ -37,13 +37,20 @@ ifdef(`distro_redhat',`
 #
 /lib					-d	gen_context(system_u:object_r:lib_t,s0)
 /lib/.*						gen_context(system_u:object_r:lib_t,s0)
+ifdef(`distro_debian', `
+/lib32					-d	gen_context(system_u:object_r:lib_t,s0)
+/lib32/.*					gen_context(system_u:object_r:lib_t,s0)
+/lib32/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
+/lib32/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+', `
 /lib64					-d	gen_context(system_u:object_r:lib_t,s0)
 /lib64/.*					gen_context(system_u:object_r:lib_t,s0)
-/lib/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
 /lib64/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
+/lib64/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+')
+/lib/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
 
 /lib/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
-/lib64/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 
 ifdef(`distro_debian',`
 /lib32					-l	gen_context(system_u:object_r:lib_t,s0)
@@ -61,7 +68,11 @@ ifdef(`distro_gentoo',`
 # /opt
 #
 /opt/(.*/)?lib(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+ifdef(`distro_debian',`
+/opt/(.*/)?lib32(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+', `
 /opt/(.*/)?lib64(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+')
 /opt/(.*/)?java/.+\.jar			--	gen_context(system_u:object_r:lib_t,s0)
 /opt/(.*/)?jre.*/.+\.so(\.[^/]*)*	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /opt/(.*/)?jre/.+\.jar			--	gen_context(system_u:object_r:lib_t,s0)
@@ -109,9 +120,14 @@ ifdef(`distro_redhat',`
 /usr/(.*/)?java/.+\.jsa			--	gen_context(system_u:object_r:lib_t,s0)
 
 /usr/(.*/)?lib(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+ifdef(`distro_debian',`
+/usr/(.*/)?lib32(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+/usr/(.*/)?lib(32)?(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
+', `
 /usr/(.*/)?lib64(/.*)?				gen_context(system_u:object_r:lib_t,s0)
-
 /usr/(.*/)?lib(64)?(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
+')
+
 
 /usr/(.*/)?nvidia/.+\.so(\..*)?		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 
