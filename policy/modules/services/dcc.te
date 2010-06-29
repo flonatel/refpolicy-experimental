@@ -1,5 +1,5 @@
 
-policy_module(dcc, 1.8.0)
+policy_module(dcc, 1.9.0)
 
 ########################################
 #
@@ -81,7 +81,7 @@ files_pid_file(dccm_var_run_t)
 # dcc daemon controller local policy
 #
 
-allow cdcc_t self:capability setuid;
+allow cdcc_t self:capability { setuid setgid };
 allow cdcc_t self:unix_dgram_socket create_socket_perms;
 allow cdcc_t self:udp_socket create_socket_perms;
 
@@ -136,7 +136,7 @@ ifdef(`distro_debian',`
 files_search_var_lib(dcc_client_t)
 ')
 allow dcc_client_t dcc_var_t:dir list_dir_perms;
-read_files_pattern(dcc_client_t, dcc_var_t, dcc_var_t)
+manage_files_pattern(dcc_client_t, dcc_var_t, dcc_var_t)
 read_lnk_files_pattern(dcc_client_t, dcc_var_t, dcc_var_t)
 
 kernel_read_system_state(dcc_client_t)
@@ -151,6 +151,8 @@ corenet_udp_bind_generic_node(dcc_client_t)
 files_read_etc_files(dcc_client_t)
 files_read_etc_runtime_files(dcc_client_t)
 
+fs_getattr_all_fs(dcc_client_t)
+
 auth_use_nsswitch(dcc_client_t)
 
 logging_send_syslog_msg(dcc_client_t)
@@ -158,6 +160,10 @@ logging_send_syslog_msg(dcc_client_t)
 miscfiles_read_localization(dcc_client_t)
 
 userdom_use_user_terminals(dcc_client_t)
+
+optional_policy(`
+	amavis_read_spool_files(dcc_client_t)
+')
 
 optional_policy(`
 	spamassassin_read_spamd_tmp_files(dcc_client_t)

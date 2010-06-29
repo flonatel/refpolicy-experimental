@@ -93,7 +93,7 @@ fs_manage_dos_files(bootloader_t)
 mls_file_read_all_levels(bootloader_t)
 mls_file_write_all_levels(bootloader_t)
 
-term_getattr_all_user_ttys(bootloader_t)
+term_getattr_all_ttys(bootloader_t)
 term_dontaudit_manage_pty_dirs(bootloader_t)
 
 corecmd_exec_all_executables(bootloader_t)
@@ -163,7 +163,6 @@ ifdef(`distro_redhat',`
 	# new file system defaults to file_t, granting file_t access is still bad.
 	allow bootloader_t boot_runtime_t:file { read_file_perms unlink };
 
-	# new file system defaults to file_t, granting file_t access is still bad.
 	files_manage_isid_type_dirs(bootloader_t)
 	files_manage_isid_type_files(bootloader_t)
 	files_manage_isid_type_symlinks(bootloader_t)
@@ -199,7 +198,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	modutils_exec_insmod(bootloader_t)
 	modutils_read_module_deps(bootloader_t)
 	modutils_read_module_config(bootloader_t)
 	modutils_exec_insmod(bootloader_t)

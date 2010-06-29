@@ -140,11 +140,38 @@ interface(`corenet_server_packet',`
 
 ########################################
 ## <summary>
-##	Send and receive TCP network traffic on the generic interfaces.
+##	Send and receive TCP network traffic on generic interfaces.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to send and receive TCP network
+##	traffic on generic network interfaces.
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_tcp_sendrecv_generic_node()</li>
+##		<li>corenet_tcp_sendrecv_all_ports()</li>
+##		<li>corenet_tcp_connect_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to connect to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:tcp_socket create_stream_socket_perms;
+##	corenet_tcp_sendrecv_generic_if(myclient_t)
+##	corenet_tcp_sendrecv_generic_node(myclient_t)
+##	corenet_tcp_sendrecv_all_ports(myclient_t)
+##	corenet_tcp_connect_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <infoflow type="both" weight="10"/>
@@ -233,13 +260,39 @@ interface(`corenet_dontaudit_udp_receive_generic_if',`
 
 ########################################
 ## <summary>
-##	Send and Receive UDP network traffic on generic interfaces.
+##	Send and receive UDP network traffic on generic interfaces.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to send and receive UDP network
+##	traffic on generic network interfaces.
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_udp_sendrecv_generic_node()</li>
+##		<li>corenet_udp_sendrecv_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to send to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:udp_socket create_socket_perms;
+##	corenet_udp_sendrecv_generic_if(myclient_t)
+##	corenet_udp_sendrecv_generic_node(myclient_t)
+##	corenet_udp_sendrecv_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`corenet_udp_sendrecv_generic_if',`
 	corenet_udp_send_generic_if($1)
@@ -491,11 +544,39 @@ interface(`corenet_raw_sendrecv_all_if',`
 ## <summary>
 ##	Send and receive TCP network traffic on generic nodes.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to send and receive TCP network
+##	traffic to/from generic network nodes (hostnames/networks).
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_tcp_sendrecv_generic_if()</li>
+##		<li>corenet_tcp_sendrecv_all_ports()</li>
+##		<li>corenet_tcp_connect_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to connect to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:tcp_socket create_stream_socket_perms;
+##	corenet_tcp_sendrecv_generic_if(myclient_t)
+##	corenet_tcp_sendrecv_generic_node(myclient_t)
+##	corenet_tcp_sendrecv_all_ports(myclient_t)
+##	corenet_tcp_connect_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`corenet_tcp_sendrecv_generic_node',`
 	gen_require(`
@@ -545,11 +626,37 @@ interface(`corenet_udp_receive_generic_node',`
 ## <summary>
 ##	Send and receive UDP network traffic on generic nodes.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to send and receive UDP network
+##	traffic to/from generic network nodes (hostnames/networks).
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_udp_sendrecv_generic_if()</li>
+##		<li>corenet_udp_sendrecv_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to send to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:udp_socket create_socket_perms;
+##	corenet_udp_sendrecv_generic_if(myclient_t)
+##	corenet_udp_sendrecv_generic_node(myclient_t)
+##	corenet_udp_sendrecv_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`corenet_udp_sendrecv_generic_node',`
 	corenet_udp_send_generic_node($1)
@@ -611,11 +718,26 @@ interface(`corenet_raw_sendrecv_generic_node',`
 ## <summary>
 ##	Bind TCP sockets to generic nodes.
 ## </summary>
+## <desc>
+##	<p>
+##	Bind TCP sockets to generic nodes.  This is
+##	necessary for binding a socket so it
+##	can be used for servers to listen
+##	for incoming connections.
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_udp_bind_generic_node()</li>
+##	</ul>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="1"/>
 #
 interface(`corenet_tcp_bind_generic_node',`
 	gen_require(`
@@ -629,11 +751,26 @@ interface(`corenet_tcp_bind_generic_node',`
 ## <summary>
 ##	Bind UDP sockets to generic nodes.
 ## </summary>
+## <desc>
+##	<p>
+##	Bind UDP sockets to generic nodes.  This is
+##	necessary for binding a socket so it
+##	can be used for servers to listen
+##	for incoming connections.
+##	</p>
+##	<p>
+##	Related interface:
+##	</p>
+##	<ul>
+##		<li>corenet_tcp_bind_generic_node()</li>
+##	</ul>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="1"/>
 #
 interface(`corenet_udp_bind_generic_node',`
 	gen_require(`
@@ -1112,11 +1249,37 @@ interface(`corenet_tcp_connect_generic_port',`
 ## <summary>
 ##	Send and receive TCP network traffic on all ports.
 ## </summary>
+## <desc>
+##	<p>
+##	Send and receive TCP network traffic on all ports.
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_tcp_sendrecv_generic_if()</li>
+##		<li>corenet_tcp_sendrecv_generic_node()</li>
+##		<li>corenet_tcp_connect_all_ports()</li>
+##		<li>corenet_tcp_bind_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to connect to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:tcp_socket create_stream_socket_perms;
+##	corenet_tcp_sendrecv_generic_if(myclient_t)
+##	corenet_tcp_sendrecv_generic_node(myclient_t)
+##	corenet_tcp_sendrecv_all_ports(myclient_t)
+##	corenet_tcp_connect_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`corenet_tcp_sendrecv_all_ports',`
 	gen_require(`
@@ -1166,11 +1329,35 @@ interface(`corenet_udp_receive_all_ports',`
 ## <summary>
 ##	Send and receive UDP network traffic on all ports.
 ## </summary>
+## <desc>
+##	<p>
+##	Send and receive UDP network traffic on all ports.
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_udp_sendrecv_generic_if()</li>
+##		<li>corenet_udp_sendrecv_generic_node()</li>
+##		<li>corenet_udp_bind_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to send to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:udp_socket create_socket_perms;
+##	corenet_udp_sendrecv_generic_if(myclient_t)
+##	corenet_udp_sendrecv_generic_node(myclient_t)
+##	corenet_udp_sendrecv_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`corenet_udp_sendrecv_all_ports',`
 	corenet_udp_send_all_ports($1)
@@ -1255,11 +1442,39 @@ interface(`corenet_dontaudit_udp_bind_all_ports',`
 ## <summary>
 ##	Connect TCP sockets to all ports.
 ## </summary>
+## <desc>
+##	<p>
+##	Connect TCP sockets to all ports
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>corenet_all_recvfrom_unlabeled()</li>
+##		<li>corenet_tcp_sendrecv_generic_if()</li>
+##		<li>corenet_tcp_sendrecv_generic_node()</li>
+##		<li>corenet_tcp_sendrecv_all_ports()</li>
+##		<li>corenet_tcp_bind_all_ports()</li>
+##	</ul>
+##	<p>
+##	Example client being able to connect to all ports over
+##	generic nodes, without labeled networking:
+##	</p>
+##	<p>
+##	allow myclient_t self:tcp_socket create_stream_socket_perms;
+##	corenet_tcp_sendrecv_generic_if(myclient_t)
+##	corenet_tcp_sendrecv_generic_node(myclient_t)
+##	corenet_tcp_sendrecv_all_ports(myclient_t)
+##	corenet_tcp_connect_all_ports(myclient_t)
+##	corenet_all_recvfrom_unlabeled(myclient_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="write" weight="1"/>
 #
 interface(`corenet_tcp_connect_all_ports',`
 	gen_require(`
@@ -1701,6 +1916,25 @@ interface(`corenet_rw_tun_tap_dev',`
 
 	dev_list_all_dev_nodes($1)
 	allow $1 tun_tap_device_t:chr_file rw_chr_file_perms;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read or write the TUN/TAP
+##	virtual network device.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corenet_dontaudit_rw_tun_tap_dev',`
+	gen_require(`
+		type tun_tap_device_t;
+	')
+
+	dontaudit $1 tun_tap_device_t:chr_file { read write };
 ')
 
 ########################################
@@ -2207,11 +2441,23 @@ interface(`corenet_dontaudit_raw_recvfrom_unlabeled',`
 ## <summary>
 ##	Receive packets from an unlabeled connection.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to receive packets from an
+##	unlabeled connection.  On machines that do not utilize
+##	labeled networking, this will be required on all
+##	networking domains.  On machines tha do utilize
+##	labeled networking, this will be required for any
+##	networking domain that is allowed to receive
+##	network traffic that does not have a label.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`corenet_all_recvfrom_unlabeled',`
 	kernel_tcp_recvfrom_unlabeled($1)
@@ -2229,11 +2475,22 @@ interface(`corenet_all_recvfrom_unlabeled',`
 ## <summary>
 ##	Receive packets from a NetLabel connection.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to receive NetLabel
+##	network traffic, which utilizes the Commercial IP
+##	Security Option (CIPSO) to set the MLS level
+##	of the network packets.  This is required for
+##	all networking domains that receive NetLabel
+##	network traffic.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`corenet_all_recvfrom_netlabel',`
 	gen_require(`

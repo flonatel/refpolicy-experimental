@@ -1,5 +1,5 @@
 ## <summary>
-##	Policy for kernel threads, proc filesystem, 
+##	Policy for kernel threads, proc filesystem,
 ##	and unlabeled processes and objects.
 ## </summary>
 ## <required val="true">
@@ -57,7 +57,7 @@ interface(`kernel_ranged_domtrans_to',`
 		type kernel_t;
 	')
 
-	kernel_domtrans_to($1,$2)
+	kernel_domtrans_to($1, $2)
 
 	ifdef(`enable_mcs',`
 		range_transition kernel_t $2:process $3;
@@ -140,6 +140,24 @@ interface(`kernel_sigchld',`
 	')
 
 	allow $1 kernel_t:process sigchld;
+')
+
+########################################
+## <summary>
+##	Send a kill signal to kernel threads.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process sending the signal.
+##	</summary>
+## </param>
+#
+interface(`kernel_kill',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	allow $1 kernel_t:process sigkill;
 ')
 
 ########################################
@@ -485,14 +503,26 @@ interface(`kernel_clear_ring_buffer',`
 
 ########################################
 ## <summary>
-##      Allows caller to request the kernel to load a module
+##	Allows caller to request the kernel to load a module
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to request that the kernel
+##	load a kernel module.  An example of this is the
+##	auto-loading of network drivers when doing an
+##	ioctl() on a network interface.
+##	</p>
+##	<p>
+##	In the specific case of a module loading request
+##	on a network interface, the domain will also
+##	need the net_admin capability.
+##	</p>
+## </desc>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
-## <rolecap/>
 #
 interface(`kernel_request_load_module',`
 	gen_require(`
@@ -508,7 +538,7 @@ interface(`kernel_request_load_module',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -608,6 +638,24 @@ interface(`kernel_search_debugfs',`
 	')
 
 	search_dirs_pattern($1, debugfs_t, debugfs_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to search the kernel debugging filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_search_debugfs',`
+	gen_require(`
+		type debugfs_t;
+	')
+
+	dontaudit $1 debugfs_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -759,13 +807,22 @@ interface(`kernel_getattr_proc_files',`
 
 ########################################
 ## <summary>
-##	Read symbolic links in /proc.
+##	Read generic symbolic links in /proc.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read (follow) generic
+##	symbolic links (symlinks) in the proc filesystem (/proc).
+##	This interface does not include access to the targets of
+##	these links.  An example symlink is /proc/self.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`kernel_read_proc_symlinks',`
 	gen_require(`
@@ -777,13 +834,33 @@ interface(`kernel_read_proc_symlinks',`
 
 ########################################
 ## <summary>
-##	Allows caller to read system state information in proc.
+##	Allows caller to read system state information in /proc.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read general system
+##	state information from the proc filesystem (/proc).
+##	</p>
+##	<p>
+##	Generally it should be safe to allow this access.  Some
+##	example files that can be read based on this interface:
+##	</p>
+##	<ul>
+##		<li>/proc/cpuinfo</li>
+##		<li>/proc/meminfo</li>
+##		<li>/proc/uptime</li>
+##	</ul>
+##	<p>
+##	This does not allow access to sysctl entries (/proc/sys/*)
+##	nor process state information (/proc/pid).
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the system state information.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 ## <rolecap/>
 #
 interface(`kernel_read_system_state',`
@@ -960,6 +1037,29 @@ interface(`kernel_dontaudit_getattr_core_if',`
 
 ########################################
 ## <summary>
+##	Allows caller to read the core kernel interface.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_read_core_if',`
+	gen_require(`
+		type proc_t, proc_kcore_t;
+		attribute can_dump_kernel;
+	')
+
+	allow $1 self:capability sys_rawio;
+	read_files_pattern($1, proc_t, proc_kcore_t)
+	list_dirs_pattern($1, proc_t, proc_t)
+
+	typeattribute $1 can_dump_kernel;
+')
+
+########################################
+## <summary>
 ##	Allow caller to read kernel messages
 ##	using the /proc/kmsg interface.
 ## </summary>
@@ -1059,13 +1159,24 @@ interface(`kernel_search_network_state',`
 
 ########################################
 ## <summary>
-##	Allow caller to read the network state information.
+##	Read the network state information.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read the networking
+##	state information. This includes several pieces
+##	of networking information, such as network interface
+##	names, netfilter (iptables) statistics, protocol
+##	information, routes, and remote procedure call (RPC)
+##	information.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 ## <rolecap/>
 #
 interface(`kernel_read_network_state',`
@@ -1627,13 +1738,35 @@ interface(`kernel_read_crypto_sysctls',`
 
 ########################################
 ## <summary>
-##	Read generic kernel sysctls.
+##	Read general kernel sysctls.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read general
+##	kernel sysctl settings. These settings are typically
+##	read using the sysctl program.  The settings
+##	that are included by this interface are prefixed
+##	with "kernel.", for example, kernel.sysrq.
+##	</p>
+##	<p>
+##	This does not include access to the hotplug
+##	handler setting (kernel.hotplug)
+##	nor the module installer handler setting
+##	(kernel.modprobe).
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>kernel_rw_kernel_sysctl()</li>
+##	</ul>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`kernel_read_kernel_sysctls',`
 	gen_require(`
@@ -1894,6 +2027,25 @@ interface(`kernel_kill_unlabeled',`
 
 	allow $1 unlabeled_t:process sigkill;
 ')
+
+########################################
+## <summary>
+##	Mount a kernel unlabeled filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the domain mounting the filesystem.
+##	</summary>
+## </param>
+#
+interface(`kernel_mount_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:filesystem mount;
+')
+
 
 ########################################
 ## <summary>

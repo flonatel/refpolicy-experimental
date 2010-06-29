@@ -61,7 +61,9 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
 
 /usr/lib(64)?/qt-.*/etc/settings(/.*)?	gen_context(system_u:object_r:xdm_var_run_t,s0)
 
+ifndef(`distro_debian', `
 /usr/var/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+')
 
 /usr/X11R6/bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
 /usr/X11R6/bin/iceauth	--	gen_context(system_u:object_r:iceauth_exec_t,s0)
@@ -81,7 +83,7 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
 /var/lib/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
 /var/lib/xkb(/.*)?		gen_context(system_u:object_r:xkb_var_lib_t,s0)
 
-/var/log/[kw]dm\.log	--	gen_context(system_u:object_r:xserver_log_t,s0)
+/var/log/[kw]dm\.log.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
 /var/log/gdm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
 /var/log/XFree86.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
 /var/log/Xorg.*		--	gen_context(system_u:object_r:xserver_log_t,s0)

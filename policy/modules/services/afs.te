@@ -1,5 +1,5 @@
 
-policy_module(afs, 1.5.0)
+policy_module(afs, 1.6.0)
 
 ########################################
 #
@@ -71,8 +71,8 @@ role system_r types afs_vlserver_t;
 # afs client local policy
 #
 
-allow afs_t self:capability { sys_nice sys_tty_config };
-allow afs_t self:process setsched;
+allow afs_t self:capability { sys_admin sys_nice sys_tty_config };
+allow afs_t self:process { setsched signal };
 allow afs_t self:udp_socket create_socket_perms;
 allow afs_t self:fifo_file rw_file_perms;
 allow afs_t self:unix_stream_socket create_stream_socket_perms;
@@ -83,6 +83,7 @@ files_var_filetrans(afs_t, afs_cache_t, { file dir })
 
 files_mounton_mnt(afs_t)
 files_read_etc_files(afs_t)
+files_read_usr_files(afs_t)
 files_rw_etc_runtime_files(afs_t)
 
 fs_getattr_xattr_fs(afs_t)
@@ -103,6 +104,8 @@ corenet_udp_bind_generic_node(afs_t)
 logging_send_syslog_msg(afs_t)
 
 miscfiles_read_localization(afs_t)
+
+sysnet_dns_name_resolve(afs_t)
 
 ########################################
 #

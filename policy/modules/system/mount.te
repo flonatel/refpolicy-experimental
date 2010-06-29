@@ -24,6 +24,8 @@ files_type(mount_loopback_t)
 type mount_tmp_t;
 files_tmp_file(mount_tmp_t)
 
+dev_read_sysfs(mount_t)
+
 # causes problems with interfaces when
 # this is optionally declared in monolithic
 # policy--duplicate type declaration
@@ -35,6 +37,8 @@ kernel_request_load_module(mount_t)
 #
 # mount local policy
 #
+
+kernel_setsched(mount_t)
 
 # setuid/setgid needed to mount cifs 
 allow mount_t self:capability { ipc_lock sys_rawio sys_admin dac_override chown sys_tty_config setuid setgid };
@@ -62,6 +66,7 @@ dev_rw_lvm_control(mount_t)
 dev_dontaudit_getattr_all_chr_files(mount_t)
 dev_dontaudit_getattr_memory_dev(mount_t)
 dev_getattr_sound_dev(mount_t)
+dev_rw_generic_chr_files(mount_t)
 
 domain_use_interactive_fds(mount_t)
 

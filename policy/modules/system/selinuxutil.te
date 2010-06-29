@@ -1,5 +1,5 @@
 
-policy_module(selinuxutil, 1.13.0)
+policy_module(selinuxutil, 1.14.0)
 
 gen_require(`
 	bool secure_mode;
@@ -110,6 +110,7 @@ init_system_domain(setfiles_t, setfiles_exec_t)
 domain_obj_id_change_exemption(setfiles_t)
 term_read_console(setfiles_t)
 dev_read_urand(setfiles_t)
+dev_rw_generic_chr_files(setfiles_t)
 
 ########################################
 #
@@ -257,10 +258,10 @@ selinux_compute_create_context(newrole_t)
 selinux_compute_relabel_context(newrole_t)
 selinux_compute_user_contexts(newrole_t)
 
-term_use_all_user_ttys(newrole_t)
-term_use_all_user_ptys(newrole_t)
-term_relabel_all_user_ttys(newrole_t)
-term_relabel_all_user_ptys(newrole_t)
+term_use_all_ttys(newrole_t)
+term_use_all_ptys(newrole_t)
+term_relabel_all_ttys(newrole_t)
+term_relabel_all_ptys(newrole_t)
 term_getattr_unallocated_ttys(newrole_t)
 term_dontaudit_use_unallocated_ttys(newrole_t)
 
@@ -547,6 +548,7 @@ files_read_etc_runtime_files(setfiles_t)
 files_read_etc_files(setfiles_t)
 files_list_all(setfiles_t)
 files_relabel_all_files(setfiles_t)
+files_read_usr_symlinks(setfiles_t)
 
 fs_getattr_xattr_fs(setfiles_t)
 fs_list_all(setfiles_t)
@@ -564,8 +566,8 @@ selinux_compute_create_context(setfiles_t)
 selinux_compute_relabel_context(setfiles_t)
 selinux_compute_user_contexts(setfiles_t)
 
-term_use_all_user_ttys(setfiles_t)
-term_use_all_user_ptys(setfiles_t)
+term_use_all_ttys(setfiles_t)
+term_use_all_ptys(setfiles_t)
 term_use_unallocated_ttys(setfiles_t)
 
 # this is to satisfy the assertion:

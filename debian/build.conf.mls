@@ -52,7 +52,7 @@ MONOLITHIC = n
 
 # User-based access control (UBAC)
 # Enable UBAC for role separations.
-UBAC = y
+UBAC = n
 
 # Number of MLS Sensitivities
 # The sensitivities will be s0 to s(MLS_SENS-1).

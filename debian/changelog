@@ -1,3 +1,37 @@
+refpolicy (2:0.2.20100524-1) unstable; urgency=low
+
+  * New Upstream release.  This version has had a good deal of testing for
+    server use but almost no testing for desktop use.  The usual "Unstable"
+    disclaimers apply.
+
+  * Disable UBAC - see http://etbe.coker.com.au/2010/05/26/ubac-selinux-debian/
+  * Allow mount_t to read sysfs_t.
+  * Allow lvm_t to create semaphores.
+  * Allow mount_t and setfiles_t to read/write device_t chr_file.
+  * Allow udev to read sym-links in it's config directory.
+  * Allow vbetool_t to read inotify directories.
+  * Allow gpm_t self signull and signal access.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 29 Jun 2010 10:42:00 +1000
+
+refpolicy (2:0.2.20091117-3) unstable; urgency=low
+
+  * label Google Chrome as unconfined_execmem_exec_t
+  * Change the apache_content_template() macro to not define the type
+    httpd_$1_script_exec_t, now the caller must unconditionally define it and
+    can therefore use it in it's .fc file without making a .fc dependency.
+  * Allow setrans_t to read proc_t files.
+  * Allow pppd to load modules.
+  * Allow watchdog_t to read/write /dev/watchdog
+  * Allow rpcd_t getcap and setcap access.
+  * Allow insmod_t to mount a rpc_pipefs_t filesystem.
+  * Correctly label kdm.log.* pm-*log* aptitude*
+  * Allow consolekit_t to access pam console data.
+  * Correctly label consolekit scripts
+  * Allow mount_t to set the scheduling for kernel threads.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 18 May 2010 19:06:24 +1000
+
 refpolicy (2:0.2.20091117-2) unstable; urgency=low
 
   * Label /etc/gdm/Xsession, /etc/gdm/PostSession/* and /etc/gdm/PreSession/*

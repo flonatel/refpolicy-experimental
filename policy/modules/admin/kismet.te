@@ -1,5 +1,5 @@
 
-policy_module(kismet, 1.4.0)
+policy_module(kismet, 1.5.0)
 
 ########################################
 #
@@ -10,6 +10,9 @@ type kismet_t;
 type kismet_exec_t;
 application_domain(kismet_t, kismet_exec_t)
 role system_r types kismet_t;
+
+type kismet_home_t;
+userdom_user_home_content(kismet_home_t)
 
 type kismet_log_t;
 logging_log_file(kismet_log_t)
@@ -39,13 +42,19 @@ allow kismet_t self:unix_dgram_socket { create_socket_perms sendto };
 allow kismet_t self:unix_stream_socket create_stream_socket_perms;
 allow kismet_t self:tcp_socket create_stream_socket_perms;
 
+manage_dirs_pattern(kismet_t, kismet_home_t, kismet_home_t)
+manage_files_pattern(kismet_t, kismet_home_t, kismet_home_t)
+manage_lnk_files_pattern(kismet_t, kismet_home_t, kismet_home_t)
+userdom_user_home_dir_filetrans(kismet_t, kismet_home_t, { file dir })
+
 manage_files_pattern(kismet_t, kismet_log_t, kismet_log_t)
 allow kismet_t kismet_log_t:dir setattr;
 logging_log_filetrans(kismet_t, kismet_log_t, { file dir })
 
 manage_dirs_pattern(kismet_t, kismet_tmp_t, kismet_tmp_t)
 manage_files_pattern(kismet_t, kismet_tmp_t, kismet_tmp_t)
-files_tmp_filetrans(kismet_t, kismet_tmp_t, { file dir })
+manage_sock_files_pattern(kismet_t, kismet_tmp_t, kismet_tmp_t)
+files_tmp_filetrans(kismet_t, kismet_tmp_t, { file dir sock_file })
 
 manage_dirs_pattern(kismet_t, kismet_tmpfs_t, kismet_tmpfs_t)
 manage_files_pattern(kismet_t, kismet_tmpfs_t, kismet_tmpfs_t)
@@ -61,6 +70,7 @@ files_pid_filetrans(kismet_t, kismet_var_run_t, { file dir })
 
 kernel_search_debugfs(kismet_t)
 kernel_read_system_state(kismet_t)
+kernel_read_network_state(kismet_t)
 
 corecmd_exec_bin(kismet_t)
 

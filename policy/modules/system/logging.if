@@ -1,15 +1,42 @@
 ## <summary>Policy for the kernel message logger and system logging daemon.</summary>
 
-#######################################
+########################################
 ## <summary>
-##	Make the specified type a file
-##	used for logs.
+##	Make the specified type usable for log files
+##	in a filesystem.
 ## </summary>
-## <param name="file_type">
+## <desc>
+##	<p>
+##	Make the specified type usable for log files in a filesystem.
+##	This will also make the type usable for files, making 
+##	calls to files_type() redundant.  Failure to use this interface
+##	for a log file type may result in problems with log
+##	rotation, log analysis, and log monitoring programs.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>logging_log_filetrans()</li>
+##	</ul>
+##	<p>
+##	Example usage with a domain that can create
+##	and append to a private log file stored in the
+##	general directories (e.g., /var/log):
+##	</p>
+##	<p>
+##	type mylogfile_t;
+##	logging_log_file(mylogfile_t)
+##	allow mydomain_t mylogfile_t:file { create_file_perms append_file_perms };
+##	logging_log_filetrans(mydomain_t, mylogfile_t, file)
+##	</p>
+## </desc>
+## <param name="type">
 ##	<summary>
-##	Type of the file to be used as a log.
+##	Type to be used for files.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`logging_log_file',`
 	gen_require(`
@@ -65,6 +92,20 @@ interface(`logging_dontaudit_send_audit_msgs',`
 interface(`logging_set_loginuid',`
 	allow $1 self:capability audit_control;
 	allow $1 self:netlink_audit_socket { r_netlink_socket_perms nlmsg_relay };
+')
+
+########################################
+## <summary>
+##	Set tty auditing
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_set_tty_audit',`
+	allow $1 self:netlink_audit_socket { r_netlink_socket_perms nlmsg_tty_audit };
 ')
 
 ########################################
@@ -395,9 +436,35 @@ interface(`logging_domtrans_syslog',`
 
 ########################################
 ## <summary>
-##	Create an object in the log directory, with a private
-##	type using a type transition.
+##	Create an object in the log directory, with a private type.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to create an object
+##	in the general system log directories (e.g., /var/log)
+##	with a private type.  Typically this is used for creating
+##	private log files in /var/log with the private type instead
+##	of the general system log type. To accomplish this goal,
+##	either the program must be SELinux-aware, or use this interface.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>logging_log_file()</li>
+##	</ul>
+##	<p>
+##	Example usage with a domain that can create
+##	and append to a private log file stored in the
+##	general directories (e.g., /var/log):
+##	</p>
+##	<p>
+##	type mylogfile_t;
+##	logging_log_file(mylogfile_t)
+##	allow mydomain_t mylogfile_t:file { create_file_perms append_file_perms };
+##	logging_log_filetrans(mydomain_t, mylogfile_t, file)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
@@ -413,6 +480,7 @@ interface(`logging_domtrans_syslog',`
 ##	The object class of the object being created.
 ##	</summary>
 ## </param>
+## <infoflow type="write" weight="10"/>
 #
 interface(`logging_log_filetrans',`
 	gen_require(`
@@ -427,6 +495,28 @@ interface(`logging_log_filetrans',`
 ## <summary>
 ##	Send system log messages.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to connect to the
+##	system log service (syslog), to send messages be added to
+##	the system logs. Typically this is used by services
+##	that do not have their own log file in /var/log.
+##	</p>
+##	<p>
+##	This does not allow messages to be sent to
+##	the auditing system.
+##	</p>
+##	<p>
+##	Programs which use the libc function syslog() will
+##	require this access.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>logging_send_audit_msgs()</li>
+##	</ul>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
@@ -450,6 +540,7 @@ interface(`logging_send_syslog_msg',`
 	# If syslog is down, the glibc syslog() function
 	# will write to the console.
 	term_write_console($1)
+	term_dontaudit_read_console($1)
 ')
 
 ########################################

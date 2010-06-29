@@ -1,5 +1,5 @@
 
-policy_module(filesystem, 1.12.0)
+policy_module(filesystem, 1.13.0)
 
 ########################################
 #
@@ -29,6 +29,7 @@ fs_use_xattr ext4 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr ext4dev gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr gfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr gfs2 gen_context(system_u:object_r:fs_t,s0);
+fs_use_xattr gpfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jffs2 gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr jfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_xattr lustre gen_context(system_u:object_r:fs_t,s0);
@@ -38,7 +39,7 @@ fs_use_xattr xfs gen_context(system_u:object_r:fs_t,s0);
 # types, and label the filesystem itself with the specified context.
 # This is appropriate for pseudo filesystems that represent objects
 # like pipes and sockets, so that these objects are labeled with the same
-# type as the creating task.  
+# type as the creating task.
 fs_use_task eventpollfs gen_context(system_u:object_r:fs_t,s0);
 fs_use_task pipefs gen_context(system_u:object_r:fs_t,s0);
 fs_use_task sockfs gen_context(system_u:object_r:fs_t,s0);
@@ -170,10 +171,10 @@ files_poly_parent(tmpfs_t)
 # and label the filesystem itself with the specified context.
 # This is appropriate for pseudo filesystems like devpts and tmpfs
 # where we want to label objects with a derived type.
+fs_use_trans devtmpfs gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans mqueue gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans shm gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans tmpfs gen_context(system_u:object_r:tmpfs_t,s0);
-fs_use_trans devtmpfs gen_context(system_u:object_r:tmpfs_t,s0);
 
 allow tmpfs_t noxattrfs:filesystem associate;
 
@@ -186,6 +187,7 @@ genfscon xenfs / gen_context(system_u:object_r:xenfs_t,s0)
 #
 # Filesystems without extended attribute support
 #
+
 type autofs_t;
 fs_noxattr_type(autofs_t)
 files_mountpoint(autofs_t)
@@ -208,6 +210,7 @@ genfscon smbfs / gen_context(system_u:object_r:cifs_t,s0)
 #
 type dosfs_t;
 fs_noxattr_type(dosfs_t)
+files_mountpoint(dosfs_t)
 allow dosfs_t fs_t:filesystem associate;
 genfscon fat / gen_context(system_u:object_r:dosfs_t,s0)
 genfscon hfs / gen_context(system_u:object_r:dosfs_t,s0)
@@ -219,6 +222,7 @@ genfscon vfat / gen_context(system_u:object_r:dosfs_t,s0)
 
 type fusefs_t;
 fs_noxattr_type(fusefs_t)
+files_mountpoint(fusefs_t)
 allow fusefs_t self:filesystem associate;
 allow fusefs_t fs_t:filesystem associate;
 genfscon fuse / gen_context(system_u:object_r:fusefs_t,s0)
@@ -231,6 +235,7 @@ genfscon fusectl / gen_context(system_u:object_r:fusefs_t,s0)
 #
 type iso9660_t;
 fs_noxattr_type(iso9660_t)
+files_mountpoint(iso9660_t)
 genfscon iso9660 / gen_context(system_u:object_r:iso9660_t,s0)
 genfscon udf / gen_context(system_u:object_r:iso9660_t,s0)
 
@@ -240,7 +245,7 @@ genfscon udf / gen_context(system_u:object_r:iso9660_t,s0)
 type removable_t;
 allow removable_t noxattrfs:filesystem associate;
 fs_noxattr_type(removable_t)
-files_type(removable_t)
+files_mountpoint(removable_t)
 
 #
 # nfs_t is the default type for NFS file systems
@@ -254,7 +259,6 @@ genfscon nfs4 / gen_context(system_u:object_r:nfs_t,s0)
 genfscon afs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon dazukofs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon coda / gen_context(system_u:object_r:nfs_t,s0)
-genfscon hostfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon lustre / gen_context(system_u:object_r:nfs_t,s0)
 genfscon ncpfs / gen_context(system_u:object_r:nfs_t,s0)
 genfscon reiserfs / gen_context(system_u:object_r:nfs_t,s0)
@@ -283,7 +287,7 @@ fs_associate_noxattr(noxattrfs)
 
 allow filesystem_unconfined_type filesystem_type:filesystem *;
 
-# Create/access other files.  fs_type is to pick up various
+# Create/access other files. fs_type is to pick up various
 # pseudo filesystem types that are applied to both the filesystem
 # and its files.
 allow filesystem_unconfined_type filesystem_type:{ dir file lnk_file sock_file fifo_file chr_file blk_file } *;

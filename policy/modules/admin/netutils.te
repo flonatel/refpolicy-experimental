@@ -1,5 +1,5 @@
 
-policy_module(netutils, 1.9.0)
+policy_module(netutils, 1.10.0)
 
 ########################################
 #
@@ -44,6 +44,7 @@ allow netutils_t self:netlink_route_socket { bind create getattr nlmsg_read nlms
 allow netutils_t self:packet_socket create_socket_perms;
 allow netutils_t self:udp_socket create_socket_perms;
 allow netutils_t self:tcp_socket create_stream_socket_perms;
+allow netutils_t self:socket create_socket_perms;
 
 manage_dirs_pattern(netutils_t, netutils_tmp_t, netutils_tmp_t)
 manage_files_pattern(netutils_t, netutils_tmp_t, netutils_tmp_t)
@@ -85,6 +86,7 @@ logging_send_syslog_msg(netutils_t)
 
 miscfiles_read_localization(netutils_t)
 
+term_dontaudit_use_console(netutils_t)
 userdom_use_user_terminals(netutils_t)
 userdom_use_all_users_fds(netutils_t)
 
@@ -144,11 +146,6 @@ ifdef(`hide_broken_symptoms',`
 	optional_policy(`
 		nagios_dontaudit_rw_pipes(ping_t)
 	')
-')
-
-tunable_policy(`user_ping',`
-	term_use_all_user_ttys(ping_t)
-	term_use_all_user_ptys(ping_t)
 ')
 
 optional_policy(`
@@ -216,8 +213,3 @@ userdom_use_user_terminals(traceroute_t)
 dev_read_rand(traceroute_t)
 dev_read_urand(traceroute_t)
 files_read_usr_files(traceroute_t)
-
-tunable_policy(`user_ping',`
-	term_use_all_user_ttys(traceroute_t)
-	term_use_all_user_ptys(traceroute_t)
-')

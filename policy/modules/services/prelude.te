@@ -1,5 +1,5 @@
 
-policy_module(prelude, 1.1.0)
+policy_module(prelude, 1.2.0)
 
 ########################################
 #
@@ -90,6 +90,7 @@ corenet_tcp_bind_generic_node(prelude_t)
 corenet_tcp_bind_prelude_port(prelude_t)
 corenet_tcp_connect_prelude_port(prelude_t)
 corenet_tcp_connect_postgresql_port(prelude_t)
+corenet_tcp_connect_mysqld_port(prelude_t)
 
 dev_read_rand(prelude_t)
 dev_read_urand(prelude_t)
@@ -122,7 +123,9 @@ optional_policy(`
 #
 # prelude_audisp local policy
 #
-allow prelude_audisp_t self:capability dac_override;
+
+allow prelude_audisp_t self:capability { dac_override ipc_lock setpcap };
+allow prelude_audisp_t self:process { getcap setcap };
 allow prelude_audisp_t self:fifo_file rw_file_perms;
 allow prelude_audisp_t self:unix_stream_socket create_stream_socket_perms;
 allow prelude_audisp_t self:unix_dgram_socket create_socket_perms;
@@ -248,6 +251,8 @@ files_list_etc(prelude_lml_t)
 files_read_etc_files(prelude_lml_t)
 files_read_etc_runtime_files(prelude_lml_t)
 
+fs_getattr_all_fs(prelude_lml_t)
+fs_list_inotifyfs(prelude_lml_t)
 fs_rw_anon_inodefs_files(prelude_lml_t)
 
 auth_use_nsswitch(prelude_lml_t)
@@ -274,6 +279,7 @@ optional_policy(`
 # prewikka_cgi Declarations
 #
 
+apache_script_exec_domain(prewikka)
 optional_policy(`
 	apache_content_template(prewikka)
 

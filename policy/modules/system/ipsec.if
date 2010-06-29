@@ -39,6 +39,25 @@ interface(`ipsec_stream_connect',`
 
 ########################################
 ## <summary>
+##	Connect to racoon using a unix domain stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	The type of the process performing this action.
+##	</summary>
+## </param>
+#
+interface(`ipsec_stream_connect_racoon',`
+	gen_require(`
+		type racoon_t, ipsec_var_run_t;
+	')
+
+	files_search_pids($1)
+	stream_connect_pattern($1, ipsec_var_run_t, ipsec_var_run_t, racoon_t)
+')
+
+########################################
+## <summary>
 ##	Get the attributes of an IPSEC key socket.
 ## </summary>
 ## <param name="domain">
@@ -185,6 +204,31 @@ interface(`ipsec_domtrans_racoon',`
 	')
 
 	domtrans_pattern($1, racoon_exec_t, racoon_t)
+')
+
+########################################
+## <summary>
+##	Execute racoon and allow the specified role the domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`ipsec_run_racoon',`
+	gen_require(`
+		type racoon_t;
+	')
+
+	ipsec_domtrans_racoon($1)
+	role $2 types racoon_t;
 ')
 
 ########################################

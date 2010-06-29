@@ -1,5 +1,5 @@
 
-policy_module(logrotate, 1.12.0)
+policy_module(logrotate, 1.13.0)
 
 ########################################
 #
@@ -32,7 +32,7 @@ files_type(logrotate_var_lib_t)
 # Change ownership on log files.
 allow logrotate_t self:capability { chown dac_override dac_read_search kill fsetid fowner sys_resource sys_nice };
 # for mailx
-dontaudit logrotate_t self:capability { setuid setgid };
+dontaudit logrotate_t self:capability { setuid setgid sys_ptrace };
 
 allow logrotate_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 
@@ -98,6 +98,7 @@ files_read_etc_files(logrotate_t)
 files_read_etc_runtime_files(logrotate_t)
 files_read_all_pids(logrotate_t)
 files_search_all(logrotate_t)
+files_read_var_lib_files(logrotate_t)
 # Write to /var/spool/slrnpull - should be moved into its own type.
 files_manage_generic_spool(logrotate_t)
 files_manage_generic_spool_dirs(logrotate_t)
@@ -111,6 +112,7 @@ init_dontaudit_write_utmp(logrotate_t)
 
 logging_manage_all_logs(logrotate_t)
 logging_send_syslog_msg(logrotate_t)
+logging_send_audit_msgs(logrotate_t)
 # cjp: why is this needed?
 logging_exec_all_logs(logrotate_t)
 
@@ -119,7 +121,7 @@ miscfiles_read_localization(logrotate_t)
 seutil_dontaudit_read_config(logrotate_t)
 
 userdom_use_user_terminals(logrotate_t)
-userdom_dontaudit_search_user_home_dirs(logrotate_t)
+userdom_list_user_home_dirs(logrotate_t)
 userdom_use_unpriv_users_fds(logrotate_t)
 
 cron_system_entry(logrotate_t, logrotate_exec_t)
@@ -140,6 +142,10 @@ ifdef(`distro_debian', `
 ')
 
 optional_policy(`
+	abrt_cache_manage(logrotate_t)
+')
+
+optional_policy(`
 	unconfined_dontaudit_search_home_dirs(logrotate_t)
 ')
 
@@ -156,6 +162,14 @@ optional_policy(`
 ')
 
 optional_policy(`
+	asterisk_domtrans(logrotate_t)
+')
+
+optional_policy(`
+	bind_manage_cache(logrotate_t)
+')
+
+optional_policy(`
 	webalizer_domtrans(logrotate_t)
 ')
 
@@ -168,11 +182,15 @@ optional_policy(`
 ')
 
 optional_policy(`
+	fail2ban_stream_connect(logrotate_t)
+')
+
+optional_policy(`
 	hostname_exec(logrotate_t)
 ')
 
 optional_policy(`
-	samba_exec_log(logrotate_t)
+	icecast_signal(logrotate_t)
 ')
 
 optional_policy(`
@@ -194,11 +212,29 @@ optional_policy(`
 ')
 
 optional_policy(`
+	psad_domtrans(logrotate_t)
+')
+
+
+optional_policy(`
+	samba_exec_log(logrotate_t)
+')
+
+optional_policy(`
+	sssd_domtrans(logrotate_t)
+')
+
+optional_policy(`
 	slrnpull_manage_spool(logrotate_t)
 ')
 
 optional_policy(`
 	squid_domtrans(logrotate_t)
+')
+
+optional_policy(`
+	#Red Hat bug 564565
+	su_exec(logrotate_t)
 ')
 
 optional_policy(`

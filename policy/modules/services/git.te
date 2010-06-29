@@ -6,4 +6,5 @@ policy_module(git, 1.0)
 # Declarations
 #
 
+apache_script_exec_domain(git)
 apache_content_template(git)

@@ -1,5 +1,5 @@
 
-policy_module(mta, 2.2.0)
+policy_module(mta, 2.3.0)
 
 ########################################
 #
@@ -27,6 +27,9 @@ files_type(etc_aliases_t)
 
 type etc_mail_t;
 files_config_file(etc_mail_t)
+
+type mail_forward_t;
+files_type(mail_forward_t)
 
 type mqueue_spool_t;
 files_mountpoint(mqueue_spool_t)
@@ -58,7 +61,10 @@ allow system_mail_t self:capability { dac_override fowner };
 allow system_mail_t self:fifo_file rw_fifo_file_perms;
 
 read_files_pattern(system_mail_t, etc_mail_t, etc_mail_t)
+
 read_files_pattern(system_mail_t, mailcontent_type, mailcontent_type)
+
+allow system_mail_t mail_forward_t:file read_file_perms;
 
 allow system_mail_t mta_exec_type:file entrypoint;
 
@@ -66,14 +72,19 @@ can_exec(system_mail_t, mta_exec_type)
 
 kernel_read_system_state(system_mail_t)
 kernel_read_network_state(system_mail_t)
+kernel_request_load_module(system_mail_t)
 
 dev_read_sysfs(system_mail_t)
 dev_read_rand(system_mail_t)
 dev_read_urand(system_mail_t)
 
+files_read_usr_files(system_mail_t)
+
 fs_rw_anon_inodefs_files(system_mail_t)
 
 selinux_getattr_fs(system_mail_t)
+
+term_dontaudit_use_unallocated_ttys(system_mail_t)
 
 init_use_script_ptys(system_mail_t)
 
@@ -107,6 +118,7 @@ optional_policy(`
 optional_policy(`
 	cron_read_system_job_tmp_files(system_mail_t)
 	cron_dontaudit_write_pipes(system_mail_t)
+	cron_rw_system_job_stream_sockets(system_mail_t)
 ')
 
 optional_policy(`
@@ -202,6 +214,47 @@ optional_policy(`
 	optional_policy(`
 		cron_read_system_job_tmp_files(mta_user_agent)
 	')
+')
+
+########################################
+#
+# Mailserver delivery local policy
+#
+
+allow mailserver_delivery mail_spool_t:dir list_dir_perms;
+create_files_pattern(mailserver_delivery, mail_spool_t, mail_spool_t)
+read_files_pattern(mailserver_delivery, mail_spool_t, mail_spool_t)
+append_files_pattern(mailserver_delivery, mail_spool_t, mail_spool_t)
+create_lnk_files_pattern(mailserver_delivery, mail_spool_t, mail_spool_t)
+read_lnk_files_pattern(mailserver_delivery, mail_spool_t, mail_spool_t)
+
+read_files_pattern(mailserver_delivery, mail_forward_t, mail_forward_t)
+
+read_files_pattern(mailserver_delivery, system_mail_tmp_t, system_mail_tmp_t)
+
+tunable_policy(`use_samba_home_dirs',`
+	fs_manage_cifs_dirs(mailserver_delivery)
+	fs_manage_cifs_files(mailserver_delivery)
+	fs_manage_cifs_symlinks(mailserver_delivery)
+')
+
+tunable_policy(`use_nfs_home_dirs',`
+	fs_manage_nfs_dirs(mailserver_delivery)
+	fs_manage_nfs_files(mailserver_delivery)
+	fs_manage_nfs_symlinks(mailserver_delivery)
+')
+
+optional_policy(`
+	dovecot_manage_spool(mailserver_delivery)
+	dovecot_domtrans_deliver(mailserver_delivery)
+')
+
+optional_policy(`
+	# so MTA can access /var/lib/mailman/mail/wrapper
+	files_search_var_lib(mailserver_delivery)
+
+	mailman_domtrans(mailserver_delivery)
+	mailman_read_data_symlinks(mailserver_delivery)
 ')
 
 ########################################
