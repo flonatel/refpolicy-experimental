@@ -69,6 +69,7 @@ dev_getattr_sound_dev(mount_t)
 dev_rw_generic_chr_files(mount_t)
 
 domain_use_interactive_fds(mount_t)
+kernel_search_debugfs(mount_t)
 
 files_search_all(mount_t)
 files_read_etc_files(mount_t)

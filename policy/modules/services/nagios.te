@@ -216,7 +216,6 @@ corenet_tcp_sendrecv_all_nodes(nrpe_t)
 corenet_tcp_sendrecv_generic_port(nrpe_t)
 corenet_tcp_bind_all_nodes(nrpe_t)
 corenet_tcp_bind_nrpe_port(nrpe_t)
-allow nrpe_t self:tcp_socket create_stream_socket_perms;
 sysnet_dns_name_resolve(nrpe_t)
 
 allow nrpe_t self:netlink_route_socket create_netlink_socket_perms;
@@ -297,6 +296,7 @@ files_getattr_all_file_type_fs(nagios_admin_plugin_t)
 #
 
 allow nagios_mail_plugin_t self:capability { setuid setgid dac_override };
+dontaudit nagios_mail_plugin_t self:capability { sys_resource };
 
 allow nagios_mail_plugin_t self:netlink_route_socket r_netlink_socket_perms;
 allow nagios_mail_plugin_t self:tcp_socket create_stream_socket_perms;
@@ -321,12 +321,18 @@ optional_policy(`
 ')
 
 optional_policy(`
+	can_exec_sudo(nagios_mail_plugin_t)
+')
+
+optional_policy(`
 	nscd_dontaudit_search_pid(nagios_mail_plugin_t)
 ')
 
 optional_policy(`
 	postfix_stream_connect_master(nagios_mail_plugin_t)
 	posftix_exec_postqueue(nagios_mail_plugin_t)
+	postfix_list_spool(nagios_mail_plugin_t)
+	postfix_read_spool_files(nagios_mail_plugin_t)
 ')
 
 ######################################

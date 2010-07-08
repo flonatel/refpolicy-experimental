@@ -318,6 +318,10 @@ debian/stamp/install/selinux-policy-dev: debian/stamp/install/selinux-policy-mls
 	(cd $(SRCTOP)/debian/selinux-policy-default/usr/share/selinux/default; \
          tar cfh - include | (cd $(TMPTOP)/usr/share/selinux/default; umask 000;      \
              tar xpsf -))
+	sed -e s/^[^#]*genfscon/###genfscon/ < $(TMPTOP)/usr/share/selinux/default/include/kernel/selinux.if > $(TMPTOP)/usr/share/selinux/default/include/kernel/selinux.if-new
+	mv $(TMPTOP)/usr/share/selinux/default/include/kernel/selinux.if-new $(TMPTOP)/usr/share/selinux/default/include/kernel/selinux.if
+	sed -e s/^[^#]*genfscon/###genfscon/ < $(TMPTOP)/usr/share/selinux/mls/include/kernel/selinux.if > $(TMPTOP)/usr/share/selinux/mls/include/kernel/selinux.if-new
+	mv $(TMPTOP)/usr/share/selinux/mls/include/kernel/selinux.if-new $(TMPTOP)/usr/share/selinux/mls/include/kernel/selinux.if
 	rm -rf $(SRCTOP)/debian/selinux-policy-mls/usr/share/selinux/mls/include
 	rm -rf $(SRCTOP)/debian/selinux-policy-default/usr/share/selinux/default/include
 	$(install_file)      policy/rolemap                                                   \

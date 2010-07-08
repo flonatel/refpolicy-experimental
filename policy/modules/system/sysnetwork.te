@@ -304,7 +304,6 @@ logging_send_syslog_msg(ifconfig_t)
 miscfiles_read_localization(ifconfig_t)
 
 modutils_domtrans_insmod(ifconfig_t)
-kernel_request_load_module(ifconfig_t)
 
 seutil_use_runinit_fds(ifconfig_t)
 

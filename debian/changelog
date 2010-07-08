@@ -1,3 +1,25 @@
+refpolicy (2:0.2.20100524-2) unstable; urgency=low
+
+  * Include tmpreaper in base policy as mountnfs-bootclean.sh and
+    mountall-bootclean.sh need to run as tmpreaper_t.
+  * Added a new mcsdeleteall attribute for tmpreaper_t so that it can
+    delete files and directories regardless of mcs level.
+  * Allow perdition netlink_route_socket access.
+  * Allow nrpe_t to execute sudo and search /var/spool
+    also don't audit capability sys_resource.
+  * Allow postfix_local_t to run sendmail for programs like vacation
+  * Make the milter module be loaded if the milter-greylist or spamass-milter
+    package is installed.  Make spamassassin policy optional when using the
+    milter module.
+  * Added a bunch of fixes from git mostly trivial stuff but also allowed
+    bootloader_t to load modules, allowed kismet_t to search home directories,
+  * Don't allow cron daemon to search /var/lib/logrotate.
+  * Fixed a typo in gitosis.if
+  * Commented out the genfscon line in selinux.if for the includes directory,
+    now sepolgen-ifgen works without error.
+
+ -- Russell Coker <russell@coker.com.au>  Fri,  9 Jul 2010 09:47:00 +1000
+
 refpolicy (2:0.2.20100524-1) unstable; urgency=low
 
   * New Upstream release.  This version has had a good deal of testing for

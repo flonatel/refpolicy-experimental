@@ -1,4 +1,3 @@
-
 policy_module(dbus, 1.13.0)
 
 gen_require(`
@@ -28,7 +27,6 @@ ubac_constrained(session_dbusd_tmp_t)
 
 type system_dbusd_t;
 init_system_domain(system_dbusd_t, dbusd_exec_t)
-fs_list_inotifyfs(system_dbusd_t)
 
 type system_dbusd_tmp_t;
 files_tmp_file(system_dbusd_tmp_t)

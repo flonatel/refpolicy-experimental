@@ -57,7 +57,6 @@ allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
 allow udev_t self:rawip_socket create_socket_perms;
 fs_read_anon_inodefs_files(udev_t)
 
-allow udev_t udev_helper_exec_t:dir list_dir_perms;
 can_exec(udev_t, udev_exec_t)
 
 allow udev_t udev_helper_exec_t:dir list_dir_perms;
@@ -88,7 +87,6 @@ kernel_use_fds(udev_t)
 kernel_read_device_sysctls(udev_t)
 kernel_read_hotplug_sysctls(udev_t)
 kernel_read_modprobe_sysctls(udev_t)
-kernel_request_load_module(udev_t)
 kernel_read_kernel_sysctls(udev_t)
 kernel_rw_hotplug_sysctls(udev_t)
 kernel_rw_unix_dgram_sockets(udev_t)
@@ -180,7 +178,6 @@ sysnet_rw_dhcp_config(udev_t)
 sysnet_read_dhcpc_pid(udev_t)
 sysnet_delete_dhcpc_pid(udev_t)
 sysnet_signal_dhcpc(udev_t)
-sysnet_manage_config(udev_t)
 sysnet_etc_filetrans_config(udev_t)
 
 userdom_dontaudit_search_user_home_content(udev_t)

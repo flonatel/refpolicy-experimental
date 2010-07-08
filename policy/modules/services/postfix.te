@@ -27,6 +27,9 @@ application_executable_file(postfix_exec_t)
 postfix_server_domain_template(local)
 mta_mailserver_delivery(postfix_local_t)
 
+# allow postfix_local_t to run programs like vacation that send mail
+mta_sendmail_domtrans(postfix_local_t, postfix_postdrop_t)
+
 # Program for creating database files
 type postfix_map_t;
 type postfix_map_exec_t;
@@ -582,7 +585,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	milter_stream_connect_all(postfix_smtp_t)
+	milter_stream_connect_all(postfix_smtpd_t)
 ')
 
 ########################################

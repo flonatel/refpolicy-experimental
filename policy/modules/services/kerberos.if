@@ -237,8 +237,10 @@ template(`kerberos_keytab_template',`
 
  	allow $2 $1_keytab_t:file read_file_perms;
 
-	kerberos_read_keytab($2)
-	kerberos_use($2)
+	optional_policy(`
+		kerberos_read_keytab($2)
+		kerberos_use($2)
+	')
 ')
 
 ########################################

@@ -333,7 +333,7 @@ sxid = module
 #
 # Manage temporary directory sizes and file ages
 # 
-tmpreaper = module
+tmpreaper = base
 
 # Layer: admin
 # Module: tripwire

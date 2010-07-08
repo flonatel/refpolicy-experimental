@@ -277,8 +277,6 @@ allow xenconsoled_t self:capability { dac_override fsetid ipc_lock };
 allow xenconsoled_t self:process setrlimit;
 allow xenconsoled_t self:unix_stream_socket create_stream_socket_perms;
 allow xenconsoled_t self:fifo_file rw_fifo_file_perms;
-files_read_etc_files(xenconsoled_t)
-allow xenconsoled_t self:process setrlimit;
 
 # for /usr/lib/pt_chown
 libs_exec_lib_files(xenconsoled_t)
@@ -307,7 +305,7 @@ files_read_usr_files(xenconsoled_t)
 fs_list_tmpfs(xenconsoled_t)
 fs_manage_xenfs_dirs(xenconsoled_t)
 fs_manage_xenfs_files(xenconsoled_t)
-fs_list_tmpfs(xenconsoled_t)
+
 term_create_pty(xenconsoled_t, xen_devpts_t)
 term_use_generic_ptys(xenconsoled_t)
 term_use_console(xenconsoled_t)
@@ -357,7 +355,6 @@ allow xend_t xenstored_var_lib_t:dir rw_dir_perms;
 allow xend_t xenstored_var_lib_t:file unlink;
 corecmd_search_bin(xenstored_t)
 fs_manage_xenfs_dirs(xenstored_t)
-fs_manage_xenfs_files(xenstored_t)
 
 stream_connect_pattern(xenstored_t, evtchnd_var_run_t, evtchnd_var_run_t, evtchnd_t)
 
@@ -433,10 +430,6 @@ files_read_usr_files(xm_t)
 files_list_mnt(xm_t)
 # Some common macros (you might be able to remove some)
 files_read_etc_files(xm_t)
-
-fs_getattr_all_fs(xm_t)
-fs_manage_xenfs_dirs(xm_t)
-fs_manage_xenfs_files(xm_t)
 
 fs_getattr_all_fs(xm_t)
 fs_manage_xenfs_dirs(xm_t)

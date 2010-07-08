@@ -16,6 +16,9 @@ attribute mcssetcats;
 attribute mcssetlow;
 # object may be accessed by any process at a higher level
 attribute mcstrustedobject;
-
+# process may write all files/dirs
 attribute mcswriteall;
+# process may read all files/dirs
 attribute mcsreadall;
+# process may delete all files and write dirs as appropriate
+attribute mcsdeleteall;

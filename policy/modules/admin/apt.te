@@ -1,4 +1,3 @@
-
 policy_module(apt, 1.6.0)
 
 ########################################
@@ -60,9 +59,6 @@ allow apt_t self:msg { send receive };
 # Run update
 allow apt_t self:netlink_route_socket r_netlink_socket_perms;
 
-# Access /var/cache/apt files
-manage_files_pattern(apt_t, apt_var_cache_t, apt_var_cache_t)
-files_var_filetrans(apt_t, apt_var_cache_t, dir)
 # lock files
 allow apt_t apt_lock_t:dir manage_dir_perms;
 allow apt_t apt_lock_t:file manage_file_perms;
@@ -78,6 +74,10 @@ manage_lnk_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
 manage_fifo_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
 manage_sock_files_pattern(apt_t, apt_tmpfs_t, apt_tmpfs_t)
 fs_tmpfs_filetrans(apt_t, apt_tmpfs_t, { dir file lnk_file sock_file fifo_file })
+
+# Access /var/cache/apt files
+manage_files_pattern(apt_t, apt_var_cache_t, apt_var_cache_t)
+files_var_filetrans(apt_t, apt_var_cache_t, dir)
 
 # Access /var/lib/apt files
 manage_files_pattern(apt_t, apt_var_lib_t, apt_var_lib_t)

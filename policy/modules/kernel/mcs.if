@@ -45,6 +45,26 @@ interface(`mcs_file_write_all',`
 
 ########################################
 ## <summary>
+##	This domain is allowed to delete files and directories
+##	regardless of their MCS category set.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain target for user exemption.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`mcs_file_delete_all',`
+	gen_require(`
+		attribute mcsdeleteall;
+	')
+
+	typeattribute $1 mcsdeleteall;
+')
+
+########################################
+## <summary>
 ##	This domain is allowed to sigkill and sigstop 
 ##	all domains regardless of their MCS category set.
 ## </summary>

@@ -28,13 +28,9 @@ files_type(entropyd_tmpfs_t)
 manage_files_pattern(entropyd_t,entropyd_tmpfs_t,entropyd_tmpfs_t)
 fs_tmpfs_filetrans(entropyd_t,entropyd_tmpfs_t, file)
 
-# for alsa config
-files_read_usr_files(entropyd_t)
-
 manage_files_pattern(entropyd_t, entropyd_var_run_t, entropyd_var_run_t)
 files_pid_filetrans(entropyd_t, entropyd_var_run_t, file)
 
-files_read_etc_files(entropyd_t)
 corecmd_search_bin(entropyd_t)
 corecmd_exec_bin(entropyd_t)
 

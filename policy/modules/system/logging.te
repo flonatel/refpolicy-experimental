@@ -378,7 +378,6 @@ manage_files_pattern(syslogd_t, var_log_t, var_log_t)
 rw_fifo_files_pattern(syslogd_t, var_log_t, var_log_t)
 
 # for rsyslogd, this access is harmless so making it unconditional
-files_read_kernel_symbol_table(syslogd_t)
 allow syslogd_t proc_t:file { getattr read };
 
 # Allow access for syslog-ng

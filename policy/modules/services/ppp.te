@@ -159,8 +159,6 @@ files_exec_etc_files(pppd_t)
 files_manage_etc_runtime_files(pppd_t)
 files_dontaudit_write_etc_files(pppd_t)
 
-kernel_request_load_module(pppd_t)
-
 # for scripts
 files_read_etc_files(pppd_t)
 

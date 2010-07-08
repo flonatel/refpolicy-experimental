@@ -21,6 +21,7 @@ files_pid_file(perdition_var_run_t)
 # Local policy
 #
 
+allow perdition_t self:netlink_route_socket create_netlink_socket_perms;
 allow perdition_t self:capability { setgid setuid };
 dontaudit perdition_t self:capability sys_tty_config;
 allow perdition_t self:process signal_perms;

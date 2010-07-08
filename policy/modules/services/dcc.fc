@@ -21,14 +21,10 @@ ifdef(`distro_debian',`
 ifdef(`distro_redhat',`
 /var/dcc(/.*)?				gen_context(system_u:object_r:dcc_var_t,s0)
 /var/dcc/map			--	gen_context(system_u:object_r:dcc_client_map_t,s0)
-')
-ifdef(`distro_debian',`
+', `
 /var/lib/dcc(/.*)?			gen_context(system_u:object_r:dcc_var_t,s0)
 /var/lib/dcc/map		--	gen_context(system_u:object_r:dcc_client_map_t,s0)
 ')
-
-/var/lib/dcc(/.*)?			gen_context(system_u:object_r:dcc_var_t,s0)
-/var/lib/dcc/map		--	gen_context(system_u:object_r:dcc_client_map_t,s0)
 
 /var/run/dcc(/.*)?			gen_context(system_u:object_r:dcc_var_run_t,s0)
 /var/run/dcc/map		--	gen_context(system_u:object_r:dcc_client_map_t,s0)

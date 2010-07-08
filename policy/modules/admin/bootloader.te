@@ -1,4 +1,3 @@
-
 policy_module(bootloader, 1.11.0)
 
 ########################################
@@ -163,6 +162,7 @@ ifdef(`distro_redhat',`
 	# new file system defaults to file_t, granting file_t access is still bad.
 	allow bootloader_t boot_runtime_t:file { read_file_perms unlink };
 
+	# new file system defaults to file_t, granting file_t access is still bad.
 	files_manage_isid_type_dirs(bootloader_t)
 	files_manage_isid_type_files(bootloader_t)
 	files_manage_isid_type_symlinks(bootloader_t)
@@ -198,6 +198,7 @@ optional_policy(`
 ')
 
 optional_policy(`
+	modutils_exec_insmod(bootloader_t)
 	modutils_read_module_deps(bootloader_t)
 	modutils_read_module_config(bootloader_t)
 	modutils_exec_insmod(bootloader_t)

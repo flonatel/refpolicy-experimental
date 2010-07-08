@@ -171,3 +171,29 @@ interface(`sudo_sigchld',`
 
 	allow $1 sudodomain:process sigchld;
 ')
+
+#######################################
+## <summary>
+##	Execute sudo_exec_t without a domain transition
+## </summary>
+## <desc>
+##	<p>
+##	This interface allows a domain to execute sudo_exec_t without a
+##	domain transition.  It is for daemons that already have setuid
+##	access but are running as uid != 0.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	The domain that can execute sudo.
+##	</summary>
+## </param>
+#
+template(`can_exec_sudo',`
+
+	gen_require(`
+		type sudo_exec_t;
+	')
+
+	can_exec($1, sudo_exec_t)
+')

@@ -1,4 +1,3 @@
-
 policy_module(dcc, 1.9.0)
 
 ########################################
@@ -186,9 +185,9 @@ files_tmp_filetrans(dcc_dbclean_t, dcc_dbclean_tmp_t, { file dir })
 ifdef(`distro_debian',`
 files_search_var_lib(dcc_dbclean_t)
 ')
-manage_dirs_pattern(dcc_dbclean_t,dcc_var_t,dcc_var_t)
-manage_files_pattern(dcc_dbclean_t,dcc_var_t,dcc_var_t)
-manage_lnk_files_pattern(dcc_dbclean_t,dcc_var_t,dcc_var_t)
+manage_dirs_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
+manage_files_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
+manage_lnk_files_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
 
 kernel_read_system_state(dcc_dbclean_t)
 
@@ -303,14 +302,14 @@ allow dccifd_t dcc_client_map_t:file rw_file_perms;
 ifdef(`distro_debian',`
 files_search_var_lib(dccifd_t)
 ')
-manage_dirs_pattern(dccifd_t,dcc_var_t,dcc_var_t)
-manage_files_pattern(dccifd_t,dcc_var_t,dcc_var_t)
-manage_lnk_files_pattern(dccifd_t,dcc_var_t,dcc_var_t)
-manage_fifo_files_pattern(dccifd_t,dcc_var_t,dcc_var_t)
-manage_sock_files_pattern(dccifd_t,dcc_var_t,dcc_var_t)
+manage_dirs_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+manage_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+manage_lnk_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+manage_fifo_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+manage_sock_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
 
-manage_dirs_pattern(dccifd_t,dccifd_tmp_t,dccifd_tmp_t)
-manage_files_pattern(dccifd_t,dccifd_tmp_t,dccifd_tmp_t)
+manage_dirs_pattern(dccifd_t, dccifd_tmp_t, dccifd_tmp_t)
+manage_files_pattern(dccifd_t, dccifd_tmp_t, dccifd_tmp_t)
 files_tmp_filetrans(dccifd_t, dccifd_tmp_t, { file dir })
 
 manage_files_pattern(dccifd_t, dccifd_var_run_t, dccifd_var_run_t)
@@ -370,11 +369,11 @@ allow dccm_t dcc_client_map_t:file rw_file_perms;
 ifdef(`distro_debian',`
 files_search_var_lib(dccm_t)
 ')
-manage_dirs_pattern(dccm_t,dcc_var_t,dcc_var_t)
-manage_files_pattern(dccm_t,dcc_var_t,dcc_var_t)
-manage_lnk_files_pattern(dccm_t,dcc_var_t,dcc_var_t)
-manage_fifo_files_pattern(dccm_t,dcc_var_t,dcc_var_t)
-manage_sock_files_pattern(dccm_t,dcc_var_t,dcc_var_t)
+manage_dirs_pattern(dccm_t, dcc_var_t, dcc_var_t)
+manage_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
+manage_lnk_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
+manage_fifo_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
+manage_sock_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
 
 manage_dirs_pattern(dccm_t, dccm_tmp_t, dccm_tmp_t)
 manage_files_pattern(dccm_t, dccm_tmp_t, dccm_tmp_t)

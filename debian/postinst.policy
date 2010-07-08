@@ -106,6 +106,7 @@ my %map = (
            'lpd'             => [ 'lprng', 'rlpr' ],
            'loadkeys'        => [ 'console-tools' ],
            'lvm'             => [ 'lvm2' ],
+           'milter'            => [ 'milter-greylist', 'spamass-milter' ],
            'mono'            => [ 'mono*' ],
            'munin'           => [ 'munin-node' ],
            'mysql'           => [ 'mysql-server', 'mysql-server*' ],
