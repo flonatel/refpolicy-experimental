@@ -1,3 +1,27 @@
+refpolicy (2:0.2.20100524-3) unstable; urgency=low
+
+  * Give freshclam_t and clamd_t the same access WRT execmem.
+  * Install lvm.pp when dmsetup is installed.
+  * Add label for /usr/lib/udisks/udisks-daemon .
+  * Made devicekit.pp and ricci.pp not depend on consoletype.pp and don't
+    build consoletype.
+  * label /usr/lib/udisks/.* as bin_t
+  * label /etc/kde4 the same way as /etc/kde3.
+  * Escape the . in /etc/init.d/mount...
+  * Allow insmod_t the capability sys_admin.
+  * Label all of /etc/network/run/* as etc_runtime_t and allow udev_t to manage
+    such files.
+  * Label /etc/network/if-(up|down).d/postfix as initrc_exec_t so that udev
+    can reload Postfix and push the queue.
+  * Label /usr/lib/ConsoleKit(/.*)? as bin_t to avoid an error message on
+    graphical login.
+  * On initial install load module policykit.pp when policykit-1 is installed.
+  * label /lib/init/rw(/.*)? as var_run_t.
+  * label /var/run/xauth as xdm_var_run_t.
+  * label /var/run/motd as initrc_var_run_t.
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 25 Jul 2010 09:39:00 +1000
+
 refpolicy (2:0.2.20100524-2) unstable; urgency=low
 
   * Include tmpreaper in base policy as mountnfs-bootclean.sh and

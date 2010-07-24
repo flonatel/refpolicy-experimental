@@ -30,6 +30,8 @@ ifdef(`distro_redhat', `
 /usr/lib/postfix/bounce	--	gen_context(system_u:object_r:postfix_bounce_exec_t,s0)
 /usr/lib/postfix/pipe	--	gen_context(system_u:object_r:postfix_pipe_exec_t,s0)
 /usr/lib/postfix/virtual --	gen_context(system_u:object_r:postfix_virtual_exec_t,s0)
+/etc/network/if-down.d/postfix -- gen_context(system_u:object_r:initrc_exec_t,s0)
+/etc/network/if-up.d/postfix -- gen_context(system_u:object_r:initrc_exec_t,s0)
 ')
 /etc/postfix/postfix-script.* -- gen_context(system_u:object_r:postfix_exec_t,s0)
 /etc/postfix/prng_exch	--	gen_context(system_u:object_r:postfix_prng_t,s0)

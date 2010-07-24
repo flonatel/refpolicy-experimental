@@ -51,7 +51,6 @@ my @all_modules;
 my %Module_Path;
 # Dpendencies for policy modules, as determined by semodule_deps
 my %Deps = ( 'cups'  => 'lpd',         'telnet'    => 'remotelogin',
-             'ricci' => 'consoletype', 'devicekit' => 'consoletype',
              'devicekit' => 'dbus'
            );
 # A hash of all modules already processed
@@ -83,7 +82,7 @@ my %map = (
            'cups'            => [ 'cupsys*', 'cups', 'cups-bsd', 'cups-client',
                                   'cups-common' ],
            'cyrus'           => [ 'cyrus*' ],
-           'devicekit'       => [ 'udev', 'hal' ],
+           'devicekit'       => [ 'udev', 'hal', 'udisks' ],
            'dovecot'         => [ 'dovecot-imapd', 'dovecot-pop3d' ],
            'dhcp'            => [ 'dhcp*', 'dhclient*', 'pump' ],
            'dkim'            => [ 'dkim-filter' ],
@@ -105,7 +104,7 @@ my %map = (
            'ldap'            => [ 'slapd' ],
            'lpd'             => [ 'lprng', 'rlpr' ],
            'loadkeys'        => [ 'console-tools' ],
-           'lvm'             => [ 'lvm2' ],
+           'lvm'             => [ 'lvm2', 'dmsetup' ],
            'milter'            => [ 'milter-greylist', 'spamass-milter' ],
            'mono'            => [ 'mono*' ],
            'munin'           => [ 'munin-node' ],
@@ -116,7 +115,7 @@ my %map = (
            'netutils'        => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
            'nslcd'           => [ 'nslcd' ],
            'pcmcia'          => [ 'pcmciautils' ],
-           'policykit'       => [ 'policykit' ],
+           'policykit'       => [ 'policykit', 'policykit-1' ],
            'ptchown'         => [ 'libc-bin' ],
            'pythonsupport'   => [ 'python-support' ],
            'radius'          => [ 'freeradius*', 'radiusd*' ],

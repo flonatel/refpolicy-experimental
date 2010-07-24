@@ -214,7 +214,9 @@ modutils_domtrans_insmod(ricci_modcluster_t)
 
 mount_domtrans(ricci_modcluster_t)
 
-consoletype_exec(ricci_modcluster_t)
+optional_policy(`
+	consoletype_exec(ricci_modcluster_t)
+')
 
 ricci_stream_connect_modclusterd(ricci_modcluster_t)
 
@@ -399,7 +401,9 @@ files_search_usr(ricci_modservice_t)
 # Needed for running chkconfig
 files_manage_etc_symlinks(ricci_modservice_t)
 
-consoletype_exec(ricci_modservice_t)
+optional_policy(`
+	consoletype_exec(ricci_modservice_t)
+')
 
 init_domtrans_script(ricci_modservice_t)
 
@@ -461,7 +465,9 @@ miscfiles_read_localization(ricci_modstorage_t)
 
 modutils_read_module_deps(ricci_modstorage_t)
 
-consoletype_exec(ricci_modstorage_t)
+optional_policy(`
+	consoletype_exec(ricci_modstorage_t)
+')
 
 mount_domtrans(ricci_modstorage_t)
 

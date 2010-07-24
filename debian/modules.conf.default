@@ -184,7 +184,7 @@ certwatch = module
 #
 # Determine of the console connected to the controlling terminal.
 # 
-consoletype = module
+consoletype = off
 
 # Layer: admin
 # Module: ddcprobe

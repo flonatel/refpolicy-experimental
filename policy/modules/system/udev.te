@@ -118,7 +118,7 @@ domain_dontaudit_ptrace_all_domains(udev_t) #pidof triggers these
 
 files_read_usr_files(udev_t)
 ifdef(`distro_debian', `
-files_rw_etc_runtime_files(udev_t)
+files_manage_etc_runtime_files(udev_t)
 ', `
 files_read_etc_runtime_files(udev_t)
 ')
