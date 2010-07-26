@@ -1,3 +1,11 @@
+refpolicy (2:0.2.20100524-4) unstable; urgency=low
+
+  * Label /dev/vd* as fixed_disk_device_t, closes: #589997
+  * Remove mcskillall and mcsptraceall from unconfined_t, the sysadmin should
+    have unconfined_t:SystemLow-SystemHigh.
+
+ -- Russell Coker <russell@coker.com.au>  Mon, 26 Jul 2010 11:18:00 +1000
+
 refpolicy (2:0.2.20100524-3) unstable; urgency=low
 
   * Give freshclam_t and clamd_t the same access WRT execmem.
