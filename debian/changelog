@@ -1,3 +1,44 @@
+refpolicy (2:0.2.20100524-5) unstable; urgency=low
+
+  * Label /usr/bin/tcsh as shell_exec_t
+  * Domain trans from unconfined_t to depmod_t
+  * Don't include /usr/lib/dovecot/deliver in dovecot.fc/te as it's in lda.pp
+  * Don't include /usr/sbin/spamass-milter and /var/spool/postfix/spamass in
+    spamassassin.fc as they are in milter.fc
+  * Label /var/run/spamass as spamass_milter_data_t
+  * Allow lvm_t rw access to unconfined_t semaphores.
+  * Added in_unconfined_r() interface and made postfix user domains use it
+    so they can be in the role unconfined_r.  Ugly but no better solution at
+    this time
+    Closes: #592038 #599053
+  * Include Chromium policy in mozilla.pp
+  * Allow sshd getcap and setcap access
+  * Correctly label ~/.xsession-errors
+  * Allow spamc_t to be in system_r and allow it access to netlink_route_socket
+  * Allow lda_t to talk to the Courier Authdaemon - for courier maildrop
+  * Allow fetchmail_t to read usr_t for certificates and to create /tmp files
+  * Allow cron jobs to write to crond_tmp_t
+  * Label courier socket files as courier_var_run_t
+  * Run /usr/sbin/authdaemond as courier_authdaemon_t
+  * Allow dkim_milter_t to read proc_t files and create /tmp files
+  * Allow dovecot domains to search dovecot_etc_t dirs
+  * Allow dovecot_auth_t to talk to mysqld via TCP and read /etc/mysql/my.cnf
+  * Label /etc/network/run as etc_t
+  * Label X as spamass_milter_var_run_t
+  * Remove unconfined_exec_t label from /usr/bin/qemu
+    Closes: #601686
+  * Label /usr/lib/apache2/mpm-*/apache2 as httpd_exec_t
+    Closes: #608291
+  * Allow nagios.pp to be installed without apache.pp
+    Closes: #587596
+  * Removed amavis.pp because it doesn't work and it's functionality is covered
+    by clamav.pp
+    Closes: #559860
+  * Allow mono_t to be in role unconfined_r
+    Closes: #540143
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 08 Jan 2011 14:13:43 +1100
+
 refpolicy (2:0.2.20100524-4) unstable; urgency=low
 
   * Label /dev/vd* as fixed_disk_device_t, closes: #589997
@@ -98,6 +139,7 @@ refpolicy (2:0.2.20091117-2) unstable; urgency=low
   * Changed upstream to http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
   * Allow iptables_t, insmod_t and mount_t to do module_request
   * Use lib32 instead of lib64
+    Closes: #569297
   * Make manage_lnk_file_perms allow write access for setting the timestamp.
   * Use filesystem transitions for hugetlbfs_t.
   * Label xenfs_t and allow xend etc to use it.

@@ -46,6 +46,7 @@ optional_policy(`
 	unconfined_domain(mono_t)
 	unconfined_dbus_chat(mono_t)
 	unconfined_dbus_connect(mono_t)
+	in_unconfined_r(mono_t)
 ')
 
 optional_policy(`

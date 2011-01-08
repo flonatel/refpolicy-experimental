@@ -320,6 +320,37 @@ interface(`unconfined_run_to',`
 
 ########################################
 ## <summary>
+##	Allow a domain to be in role unconfined_r
+## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to be run in the role unconfined_r
+##	This is suitable for domains that are entered indirectly from
+##	unconfined_t
+##	</p>
+##	<p>
+##	Also allow the domain to send sigchld to unconfined_t and use fds
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain to be in unconfined_r
+##	</summary>
+## </param>
+#
+interface(`in_unconfined_r',`
+	gen_require(`
+		type unconfined_t;
+		role unconfined_r;
+	')
+
+	role unconfined_r types $1;
+	allow $1 unconfined_t:process sigchld;
+	allow $1 unconfined_t:fd use;
+')
+
+########################################
+## <summary>
 ##	Inherit file descriptors from the unconfined domain.
 ## </summary>
 ## <param name="domain">
@@ -334,6 +365,24 @@ interface(`unconfined_use_fds',`
 	')
 
 	allow $1 unconfined_t:fd use;
+')
+
+########################################
+## <summary>
+##	rw access to a semaphore created by the unconfined domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`unconfined_sem_rw',`
+	gen_require(`
+		type unconfined_t;
+	')
+
+	allow $1 unconfined_t:sem rw_sem_perms;
 ')
 
 ########################################

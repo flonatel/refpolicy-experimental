@@ -78,6 +78,12 @@ userdom_use_user_terminals(depmod_t)
 files_list_home(depmod_t)
 userdom_read_user_home_content_files(depmod_t)
 
+ifdef(`distro_debian',`
+	optional_policy(`
+		unconfined_run_to(depmod_t, depmod_exec_t)
+	')
+')
+
 ifdef(`distro_ubuntu',`
 	optional_policy(`
 		unconfined_domain(depmod_t)

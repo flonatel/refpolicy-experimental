@@ -17,16 +17,16 @@
 #
 interface(`mozilla_role',`
 	gen_require(`
-		type mozilla_t, mozilla_exec_t, mozilla_home_t;
+		type mozilla_t, chrome_sandbox_t, mozilla_exec_t, chrome_browser_exec_t, mozilla_home_t;
 	')
 
-	role $1 types mozilla_t;
+	role $1 types { mozilla_t chrome_sandbox_t };
 
-	domain_auto_trans($2, mozilla_exec_t, mozilla_t)
+	domain_auto_trans($2, { mozilla_exec_t chrome_browser_exec_t }, mozilla_t)
 	# Unrestricted inheritance from the caller.
 	allow $2 mozilla_t:process { noatsecure siginh rlimitinh };
-	allow mozilla_t $2:fd use;
-	allow mozilla_t $2:process { sigchld signull };
+	allow { mozilla_t chrome_sandbox_t } $2:fd use;
+	allow { mozilla_t chrome_sandbox_t } $2:process { sigchld signull };
 	allow mozilla_t $2:unix_stream_socket connectto;
 
 	# Allow the user domain to signal/ps.
@@ -142,10 +142,10 @@ interface(`mozilla_dontaudit_manage_user_home_files',`
 #
 interface(`mozilla_domtrans',`
 	gen_require(`
-		type mozilla_t, mozilla_exec_t;
+		type mozilla_t, mozilla_exec_t, chrome_browser_exec_t;
 	')
 
-	domtrans_pattern($1, mozilla_exec_t, mozilla_t)
+	domtrans_pattern($1, { mozilla_exec_t chrome_browser_exec_t }, mozilla_t)
 ')
 
 ########################################

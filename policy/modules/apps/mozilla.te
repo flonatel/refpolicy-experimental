@@ -20,6 +20,51 @@ typealias mozilla_t alias { auditadm_mozilla_t secadm_mozilla_t };
 application_domain(mozilla_t, mozilla_exec_t)
 ubac_constrained(mozilla_t)
 
+type chrome_sandbox_t;
+type chrome_sandbox_exec_t;
+type chrome_browser_exec_t;
+application_domain(mozilla_t, chrome_browser_exec_t)
+domain_auto_trans(chrome_sandbox_t, chrome_browser_exec_t, mozilla_t)
+application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
+ubac_constrained(chrome_sandbox_t)
+fs_getattr_xattr_fs(chrome_sandbox_t)
+fs_getattr_xattr_fs(mozilla_t)
+
+allow chrome_sandbox_t mozilla_t:dir list_dir_perms;
+allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
+allow chrome_sandbox_t mozilla_t:file read_file_perms;
+allow chrome_sandbox_t mozilla_t:lnk_file read_lnk_file_perms;
+allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
+allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
+allow chrome_sandbox_t mozilla_t:fd use;
+allow chrome_sandbox_t mozilla_t:file write;
+allow chrome_sandbox_t proc_t:dir read;
+allow chrome_sandbox_t self:process setrlimit;
+type chrome_sandbox_tmp_t;
+files_tmp_file(chrome_sandbox_tmp_t)
+ubac_constrained(chrome_sandbox_tmp_t)
+files_tmp_filetrans(chrome_sandbox_t, chrome_sandbox_tmp_t, { file dir })
+allow chrome_sandbox_t chrome_sandbox_tmp_t:dir manage_dir_perms;
+type mozilla_tmp_t;
+files_tmp_file(mozilla_tmp_t)
+ubac_constrained(mozilla_tmp_t)
+files_tmp_filetrans(mozilla_t, mozilla_tmp_t, file)
+allow mozilla_t mozilla_tmp_t:file manage_file_perms;
+allow mozilla_t self:unix_dgram_socket sendto;
+allow mozilla_t chrome_browser_exec_t:file execute_no_trans;
+# for V8
+allow mozilla_t self:process execmem;
+
+
+allow mozilla_t chrome_sandbox_t:shm { write unix_read getattr unix_write associate read };
+allow mozilla_t chrome_sandbox_t:unix_dgram_socket { read write };
+
+
+ifdef(`distro_debian', `
+# bug in chromium
+allow mozilla_t chrome_browser_exec_t:file execmod;
+')
+
 type mozilla_conf_t;
 files_config_file(mozilla_conf_t)
 
@@ -39,6 +84,19 @@ ubac_constrained(mozilla_tmpfs_t)
 #
 # Local policy
 #
+
+dontaudit chrome_sandbox_t domain:dir getattr;
+application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
+domain_auto_trans(mozilla_t, chrome_sandbox_exec_t, chrome_sandbox_t)
+allow mozilla_t mozilla_home_t:sock_file manage_sock_file_perms;
+allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
+allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
+allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
+allow chrome_sandbox_t self:capability { chown dac_override fsetid setgid setuid net_raw net_raw sys_chroot sys_ptrace sys_admin };
+allow chrome_sandbox_t mozilla_t:process { share sigchld };
+allow mozilla_t chrome_sandbox_t:fd use;
+allow mozilla_t chrome_sandbox_t:unix_stream_socket { read write };
+dev_read_sysfs(mozilla_t)
 
 allow mozilla_t self:capability { sys_nice setgid setuid };
 allow mozilla_t self:process { sigkill signal setsched getsched setrlimit };

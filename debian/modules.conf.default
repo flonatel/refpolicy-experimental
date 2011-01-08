@@ -762,7 +762,7 @@ aide = module
 # Daemon that interfaces mail transfer agents and content
 # checkers, such as virus scanners.
 # 
-amavis = module
+amavis = off
 
 # Layer: services
 # Module: apache

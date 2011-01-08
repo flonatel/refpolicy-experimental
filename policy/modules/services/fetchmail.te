@@ -20,6 +20,11 @@ files_config_file(fetchmail_etc_t)
 type fetchmail_uidl_cache_t;
 files_type(fetchmail_uidl_cache_t)
 
+type fetchmail_tmp_t;
+files_tmp_file(fetchmail_tmp_t)
+ubac_constrained(fetchmail_tmp_t)
+files_tmp_filetrans(fetchmail_t, fetchmail_tmp_t, file)
+
 ########################################
 #
 # Local policy
@@ -34,6 +39,7 @@ allow fetchmail_t self:tcp_socket create_socket_perms;
 allow fetchmail_t self:udp_socket create_socket_perms;
 
 allow fetchmail_t fetchmail_etc_t:file read_file_perms;
+files_read_usr_files(fetchmail_t)
 
 allow fetchmail_t fetchmail_uidl_cache_t:file manage_file_perms;
 mta_spool_filetrans(fetchmail_t, fetchmail_uidl_cache_t, file)

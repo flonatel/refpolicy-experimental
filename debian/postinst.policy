@@ -65,7 +65,6 @@ my %Loaded;
 my @load_order;
 # A mapping of policy modules to Debian package names.
 my %map = (
-           'amavis'          => [ 'amavisd-new' ],
            'apache'          => [ 'apache*', 'cvsweb' ],
            'apm'             => [ 'acpid' ],
            'asterisk'        => [ 'asterisk' ],
@@ -75,7 +74,7 @@ my %map = (
            'bind'            => [ 'bind9' ],
 #           'bootloader'     => [ 'grub', 'lilo' ],
            'cdrecord'        => [ 'wodim' ],
-           'clamav'          => [ 'clamav' ],
+           'clamav'          => [ 'clamav', 'amavisd-new' ],
            'courier'         => [ 'courier*' ],
            'consolekit'      => [ 'consolekit' ],
            'cpufreqselector' => [ 'cpufreqd', 'cpufrequtils', 'gnome-applets'  ],
@@ -110,7 +109,8 @@ my %map = (
            'munin'           => [ 'munin-node' ],
            'mysql'           => [ 'mysql-server', 'mysql-server*' ],
            'mozilla'         => [ 'mozilla-browser', 'firefox', 'galeon',
-                                'mozilla-*', 'firefox*', 'epiphany-browser' ],
+                                'mozilla-*', 'firefox*', 'epiphany-browser',
+                                'chromium-browser' ],
            'nagios'          => [ 'nagios*' ],
            'netutils'        => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
            'nslcd'           => [ 'nslcd' ],

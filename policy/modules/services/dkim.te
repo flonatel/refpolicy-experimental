@@ -12,12 +12,18 @@ milter_template(dkim)
 type dkim_milter_private_key_t;
 files_type(dkim_milter_private_key_t)
 
+type dkim_milter_tmp_t;
+files_tmp_file(dkim_milter_tmp_t)
+ubac_constrained(dkim_milter_tmp_t)
+files_tmp_filetrans(dkim_milter_t, dkim_milter_tmp_t, file)
+
 ########################################
 #
 # Local policy
 #
 
 allow dkim_milter_t self:capability { setgid setuid };
+kernel_read_system_state(dkim_milter_t)
 
 read_files_pattern(dkim_milter_t, dkim_milter_private_key_t, dkim_milter_private_key_t)
 

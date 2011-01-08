@@ -32,8 +32,12 @@ HOME_DIR/((www)|(web)|(public_html))(/.+)? gen_context(system_u:object_r:httpd_u
 /usr/lib(64)?/httpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
 /usr/lib(64)?/lighttpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
 
+ifdef(`distro_debian', `
+/usr/lib/apache2/mpm-.*/.*$	--	gen_context(system_u:object_r:httpd_exec_t,s0)
+', `
 /usr/sbin/apache(2)?		--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/apache-ssl(2)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
+')
 /usr/sbin/httpd(\.worker)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/lighttpd		--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/rotatelogs		--	gen_context(system_u:object_r:httpd_rotatelogs_exec_t,s0)

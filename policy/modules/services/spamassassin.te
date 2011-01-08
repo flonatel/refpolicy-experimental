@@ -45,6 +45,7 @@ typealias spamc_t alias { user_spamc_t staff_spamc_t sysadm_spamc_t };
 typealias spamc_t alias { auditadm_spamc_t secadm_spamc_t };
 application_domain(spamc_t, spamc_exec_t)
 ubac_constrained(spamc_t)
+role system_r types spamc_t;
 
 type spamc_tmp_t;
 typealias spamc_tmp_t alias { user_spamc_tmp_t staff_spamc_tmp_t sysadm_spamc_tmp_t };
@@ -209,6 +210,7 @@ allow spamc_t self:unix_dgram_socket sendto;
 allow spamc_t self:unix_stream_socket connectto;
 allow spamc_t self:tcp_socket create_stream_socket_perms;
 allow spamc_t self:udp_socket create_socket_perms;
+allow spamc_t self:netlink_route_socket { read write bind create getattr nlmsg_read };
 
 manage_dirs_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)
 manage_files_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)

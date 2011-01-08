@@ -21,6 +21,10 @@ milter_template(spamass)
 type spamass_milter_state_t;
 files_type(spamass_milter_state_t)
 
+files_pid_file(spamass_milter_data_t)
+files_pid_filetrans(spamass_milter_t, spamass_milter_data_t, { file sock_file })
+allow spamass_milter_t spamass_milter_data_t:{ file sock_file } manage_file_perms;
+
 ########################################
 #
 # milter-greylist local policy
@@ -94,4 +98,8 @@ mta_send_mail(spamass_milter_t)
 # The main job of the milter is to pipe spam through spamc and act on the result
 optional_policy(`
 	spamassassin_domtrans_client(spamass_milter_t)
+')
+
+optional_policy(`
+	postfix_search_spool(spamass_milter_t)
 ')

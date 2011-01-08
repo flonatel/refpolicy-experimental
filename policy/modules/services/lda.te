@@ -124,6 +124,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	courier_authdaemon_client(lda_t)
+')
+
+optional_policy(`
 	munin_dontaudit_search_lib(lda_t)
 ')
 

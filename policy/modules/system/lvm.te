@@ -43,6 +43,9 @@ type lvm_tmp_t;
 files_tmp_file(lvm_tmp_t)
 
 allow lvm_t self:sem create_sem_perms;
+optional_policy(`
+	unconfined_sem_rw(lvm_t)
+')
 
 ########################################
 #

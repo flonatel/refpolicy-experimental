@@ -163,6 +163,7 @@ template(`postfix_user_domain_template',`
 	allow postfix_$1_t self:capability dac_override;
 
 	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
+	in_unconfined_r(postfix_$1_t)
 
 	domain_use_interactive_fds(postfix_$1_t)
 ')
