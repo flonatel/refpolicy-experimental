@@ -1,3 +1,10 @@
+refpolicy (2:0.2.20100524-7) unstable; urgency=low
+
+  * Allow crontab_t to create a directory of type crontab_tmp_t, necessary to
+    allow crontab -e to work
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 13 Jan 2011 21:32:24 +1100
+
 refpolicy (2:0.2.20100524-6) unstable; urgency=low
 
   * Allow mysqld_safe_t to send messages to syslogd

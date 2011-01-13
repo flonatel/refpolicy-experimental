@@ -35,7 +35,8 @@ template(`cron_common_crontab_template',`
 	allow $1_t self:fifo_file rw_fifo_file_perms;
 
 	allow $1_t $1_tmp_t:file manage_file_perms;
-	files_tmp_filetrans($1_t, $1_tmp_t, file)
+	allow $1_t $1_tmp_t:dir manage_dir_perms;
+	files_tmp_filetrans($1_t, $1_tmp_t, { file dir })
 
 	# create files in /var/spool/cron
 	manage_files_pattern($1_t, { cron_spool_t user_cron_spool_t }, user_cron_spool_t)
@@ -207,7 +208,7 @@ interface(`cron_admin_role',`
 		class passwd crontab;
 	')
 
-	role $1 types { cronjob_t admin_crontab_t admin_crontab_tmp_t };
+	role $1 types { cronjob_t admin_crontab_t };
 
 	# cronjob shows up in user ps
 	ps_process_pattern($2, cronjob_t)
