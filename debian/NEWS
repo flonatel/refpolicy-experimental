@@ -1,0 +1,27 @@
+refpolicy (2:0.2.20100524-6) unstable; urgency=low
+
+  http://etbe.coker.com.au/2010/04/21/upgrading-se-linux-system-squeez/
+
+  * I've documented the process of upgrading a SE Linux system to Lenny at
+    the above URL.  But I'll summarise it here.
+
+  deb http://www.coker.com.au lenny selinux
+
+  * To run a Squeeze kernel with Lenny policy you need to use the latest Lenny
+    SE Linux policy from the above APT repository, install that and run
+    "selinux-policy-upgrade" to apply it before booting the Lenny kernel.
+
+  * If you run a Lenny kernel with Squeeze policy then you will get a large
+    number of annoying kernel messages due to a minor kernel bug.  The
+    command “dmesg -n 1” will prevent such messages from going to the system
+    console, this is necessary for a usable console login.
+
+  * To upgrade a system to the Squeeze policy you should run the following
+    commands.  They must be run in single-user mode if SE Linux is a critical
+    part of the system's security model but may be run from multi-user mode
+    if your use of SE Linux is just to catch any attacks that get past Unix
+    security.
+
+    setenforce 0 ; selinux-policy-upgrade ; touch /.autorelabel ; reboot
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 13 Jan 2011 11:38:32 +1100

@@ -901,3 +901,20 @@ interface(`mta_rw_user_mail_stream_sockets',`
 
 	allow $1 user_mail_domain:unix_stream_socket rw_socket_perms;
 ')
+
+########################################
+## <summary>
+##	Allow system_mail_t to access files of specified types
+## </summary>
+## <param name="private type">
+##	<summary>
+##	File type that system_mail_t can access
+##	</summary>
+## </param>
+#
+interface(`system_mail_file_access',`
+	gen_require(`
+		type system_mail_t;
+	')
+	allow system_mail_t $1:file { read write };
+')

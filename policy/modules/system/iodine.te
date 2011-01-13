@@ -1,0 +1,25 @@
+policy_module(iodine,1.0.0)
+
+# policy for the iodine IP over DNS tunneling daemon
+type iodine_t;
+type iodine_exec_t;
+files_type(iodine_exec_t)
+init_daemon_domain(iodine_t, iodine_exec_t)
+
+logging_send_syslog_msg(iodine_t)
+kernel_search_network_sysctl(iodine_t)
+kernel_read_network_state(iodine_t)
+kernel_request_load_module(iodine_t)
+files_read_etc_files(iodine_t)
+corecmd_exec_shell(iodine_t)
+allow iodine_t self:capability { setgid setuid net_bind_service net_admin net_raw sys_chroot };
+sysnet_domtrans_ifconfig(iodine_t)
+
+allow iodine_t self:rawip_socket { write read create };
+allow iodine_t self:unix_dgram_socket { create connect };
+corenet_raw_receive_generic_node(iodine_t)
+corenet_rw_tun_tap_dev(iodine_t)
+corenet_udp_bind_dns_port(iodine_t)
+corenet_udp_bind_generic_node(iodine_t)
+allow iodine_t self:udp_socket connected_socket_perms;
+allow iodine_t self:tun_socket create;

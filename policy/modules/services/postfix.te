@@ -287,6 +287,9 @@ stream_connect_pattern(postfix_local_t, postfix_public_t, postfix_public_t, post
 # for .forward - maybe we need a new type for it?
 rw_sock_files_pattern(postfix_local_t, postfix_private_t, postfix_private_t)
 
+# so it can write to the lock file
+mta_rw_spool(postfix_local_t)
+
 allow postfix_local_t postfix_spool_t:file rw_file_perms;
 
 corecmd_exec_shell(postfix_local_t)

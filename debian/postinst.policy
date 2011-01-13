@@ -95,6 +95,8 @@ my %map = (
            'hwclock'         => [ 'util-linux' ],
            'inetd'           => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd',
                                   'rinetd', 'rlinetd', 'xinetd' ],
+           'iodine'          => [ 'iodine' ],
+           'ipsec'           => [ 'ipsec-tools', 'racoon' ],
            'jabber'          => [ 'jabber', 'ejabberd' ],
            'java'            => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
                                   'java*', 'jvm*', 'jre*', 'jsdk*' ],

@@ -222,6 +222,7 @@ userdom_use_unpriv_users_fds(crond_t)
 userdom_list_user_home_dirs(crond_t)
 
 mta_send_mail(crond_t)
+system_mail_file_access(crond_tmp_t)
 
 ifdef(`distro_debian',`
 	# pam_limits is used
