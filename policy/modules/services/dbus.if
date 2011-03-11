@@ -163,6 +163,10 @@ template(`dbus_role_template',`
 		xserver_use_xdm_fds($1_dbusd_t)
 		xserver_rw_xdm_pipes($1_dbusd_t)
 	')
+
+	optional_policy(`
+		gnome_role($2, $1_dbusd_t)
+	')
 ')
 
 #######################################

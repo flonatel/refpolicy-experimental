@@ -1,19 +1,21 @@
-refpolicy (2:0.2.20100524-7+squeeze1) stable; urgency=low
+refpolicy (2:0.2.20100524-8) unstable; urgency=low
 
-  * Like the 2:0.2.20100524-8 that was uploaded to unstable.
   * Add tunable user_manage_dos_files which defaults to true
   * Correctly label /usr/lib/xulrunner-1.9.1/xulrunner-stub
   * Allow mozilla to create directories under /tmp
+  * Use correct label for /usr/lib/libgconf2-4/gconfd-2 and load gnome.pp on
+    installation if libgconf2-4 is installed
   * Use correct label for /usr/lib/upower/upowerd
   * Dontaudit bind_t write attempts to / for lwresd calling access(".", W_OK)
   * Allow user domains to execute mysqld_exec_t, for KDE
+  * Allow user_dbusd_t to execute gconfd_exec_t in user_gconfd_t.
   * Label /var/lib/fetchmail as fetchmail_uidl_cache_t and allow fetchmail_t to
     search /var/lib and manage fetchmail_uidl_cache_t dirs
   * Allow xm_t to read kernel image files, needed for DomU startup on boot
   * Allow gpg_agent_t to read etc_t files and sysctl_crypto_t.
   * Allow network manager to run wpa_cli_exec_t programs.
 
- -- Russell Coker <russell@coker.com.au>  Sat, 19 Mar 2011 16:55:50 +1100
+ -- Russell Coker <russell@coker.com.au>  Fri, 11 Mar 2011 14:28:58 +1100
 
 refpolicy (2:0.2.20100524-7) unstable; urgency=low
 
