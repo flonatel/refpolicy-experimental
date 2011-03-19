@@ -104,3 +104,10 @@ gen_tunable(use_samba_home_dirs,false)
 ## </p>
 ## </desc>
 gen_tunable(user_tcp_server,false)
+
+## <desc>
+## <p>
+## Allow users to manage files on dosfs_t devices, usually removable media
+## </p>
+## </desc>
+gen_tunable(user_manage_dos_files,true)

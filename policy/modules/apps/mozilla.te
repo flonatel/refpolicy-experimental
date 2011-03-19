@@ -48,8 +48,9 @@ allow chrome_sandbox_t chrome_sandbox_tmp_t:dir manage_dir_perms;
 type mozilla_tmp_t;
 files_tmp_file(mozilla_tmp_t)
 ubac_constrained(mozilla_tmp_t)
-files_tmp_filetrans(mozilla_t, mozilla_tmp_t, file)
+files_tmp_filetrans(mozilla_t, mozilla_tmp_t, { file dir })
 allow mozilla_t mozilla_tmp_t:file manage_file_perms;
+allow mozilla_t mozilla_tmp_t:dir manage_dir_perms;
 allow mozilla_t self:unix_dgram_socket sendto;
 allow mozilla_t chrome_browser_exec_t:file execute_no_trans;
 # for V8

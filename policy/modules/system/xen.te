@@ -404,6 +404,7 @@ manage_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 manage_fifo_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 manage_sock_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 files_search_var_lib(xm_t)
+files_read_kernel_img(xm_t)
 
 allow xm_t xen_image_t:dir rw_dir_perms;
 allow xm_t xen_image_t:file read_file_perms;

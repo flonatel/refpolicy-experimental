@@ -32,3 +32,4 @@ ifdef(`distro_debian', `
 /usr/lib64/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:mozilla_exec_t,s0)
 /usr/lib/chromium-browser/chromium-browser-sandbox -- gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
 /usr/lib/chromium-browser/chromium-browser -- gen_context(system_u:object_r:chrome_browser_exec_t,s0)
+/usr/lib/xulrunner-1.9.1/xulrunner-stub -- gen_context(system_u:object_r:mozilla_exec_t,s0)

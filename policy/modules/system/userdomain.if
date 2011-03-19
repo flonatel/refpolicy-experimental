@@ -118,6 +118,11 @@ template(`userdom_base_user_template',`
 		allow $1_t self:process execstack;
 	')
 
+	tunable_policy(`user_manage_dos_files',`
+		fs_manage_dos_dirs($1_t)
+		fs_manage_dos_files($1_t)
+	')
+
 	ifdef(`distro_debian', `
 		# allow reading /var/lib/apt/lists
 		apt_read_db($1_t)
@@ -1017,6 +1022,10 @@ template(`userdom_unpriv_user_template', `
 
 	optional_policy(`
 		setroubleshoot_stream_connect($1_t)
+	')
+
+	optional_policy(`
+		mysqld_exec($1_t)
 	')
 ')
 
