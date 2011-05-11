@@ -262,6 +262,10 @@ tunable_policy(`use_samba_home_dirs',`
 	fs_manage_cifs_symlinks(gpg_agent_t)
 ')
 
+optional_policy(`
+	xdm_sigchld(gpg_agent_t)
+')
+
 ##############################
 #
 # Pinentry local policy

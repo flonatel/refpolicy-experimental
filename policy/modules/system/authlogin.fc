@@ -43,4 +43,8 @@ ifdef(`distro_gentoo', `
 /var/run/pam_mount(/.*)?	gen_context(system_u:object_r:pam_var_run_t,s0)
 /var/run/pam_ssh(/.*)?		gen_context(system_u:object_r:var_auth_t,s0)
 /var/run/sepermit(/.*)? 	gen_context(system_u:object_r:pam_var_run_t,s0)
+ifdef(`distro_debian', `
+/var/lib/sudo(/.*)?		gen_context(system_u:object_r:pam_var_run_t,s0)
+', `
 /var/run/sudo(/.*)?		gen_context(system_u:object_r:pam_var_run_t,s0)
+')

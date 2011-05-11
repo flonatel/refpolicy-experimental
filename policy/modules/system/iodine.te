@@ -10,6 +10,7 @@ logging_send_syslog_msg(iodine_t)
 kernel_search_network_sysctl(iodine_t)
 kernel_read_network_state(iodine_t)
 kernel_request_load_module(iodine_t)
+kernel_read_system_state(iodine_t)
 files_read_etc_files(iodine_t)
 corecmd_exec_shell(iodine_t)
 allow iodine_t self:capability { setgid setuid net_bind_service net_admin net_raw sys_chroot };

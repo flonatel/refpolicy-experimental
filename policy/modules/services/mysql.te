@@ -242,4 +242,3 @@ files_read_usr_files(mysqlmanagerd_t)
 miscfiles_read_localization(mysqlmanagerd_t)
 
 userdom_getattr_user_home_dirs(mysqlmanagerd_t)
-

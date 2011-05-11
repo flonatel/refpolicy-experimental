@@ -116,6 +116,24 @@ interface(`xserver_restricted_role',`
 
 ########################################
 ## <summary>
+##	Allow domain to send sigchld to xdm_t
+##	and environment.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`xdm_sigchld',`
+	gen_require(`
+		type xdm_t;
+	')
+	allow $1 xdm_t:process sigchld;
+')
+
+########################################
+## <summary>
 ##	Rules required for using the X Windows server
 ##	and environment.
 ## </summary>
@@ -729,6 +747,7 @@ interface(`xserver_stream_connect_xdm',`
 
 	files_search_tmp($1)
 	stream_connect_pattern($1, xdm_tmp_t, xdm_tmp_t, xdm_t)
+	stream_connect_pattern($1, xdm_var_run_t, xdm_var_run_t, xdm_t)
 ')
 
 ########################################

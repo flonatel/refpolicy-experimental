@@ -1,3 +1,33 @@
+refpolicy (2:0.2.20100524-9) unstable; urgency=low
+
+  * Make gnome.pp not be autoloaded and revert some of the gnome stuff from the
+    previous version.  Getting gnome (gconfd) policy to work correctly is too
+    hard for Squeeze.
+  * Allow user_t to talk to xdm_var_run_t sockets so switch user can work.
+  * Allow mailman_mail_t to read /dev/urandom and usr_t files
+  * Allow xenconsoled_t capability sys_tty_config and create unix_dgram_socket
+  * Allow iodine_t to read /proc/filesystems
+  * Allow jabber_t to write it's fifos, process set/getsched, connect to
+    generic tcp ports, and bind to udp ports.
+  * Label /var/lib/sudo as pam_var_run_t
+  * Allow sshd_t to read gitosis files.
+  * Made the gitosis label apply to /srv/gitosis.
+  * Allow webalizer to read usr_t files for geoip database.
+  * Allow user_t and staff_t consolekit_dbus_chat() access so they can
+    determine their session status - necessary to login in KDE sometimes.
+  * Label ~/.gnupg/gpg.conf as user_home_t and allow user_t to list directories
+    of type gpg_secret_t so gpg-agent can start.
+  * Allow gpg_agent_t to launch a user session and send sigchld to xdm_t
+  * Allow user_ssh_agent_t to send sigchld to xdm_t and allow it to run the
+    gpg agent.
+  * Add new paths for chromium-browser to support the version in unstable,
+    needed for backports.
+  * Allow user_mail_t to transition to postfix_master_t for postalias, confined
+    by roles.  Uses domain_system_change_exemption() for user_mail_t via
+    postfix_domtrans_master() which isn't ideal.
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 11 May 2011 11:58:46 +1000
+
 refpolicy (2:0.2.20100524-8) unstable; urgency=low
 
   * Add tunable user_manage_dos_files which defaults to true

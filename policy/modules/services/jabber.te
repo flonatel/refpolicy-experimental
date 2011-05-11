@@ -29,10 +29,11 @@ files_pid_file(jabberd_var_run_t)
 
 allow jabberd_t self:capability dac_override;
 dontaudit jabberd_t self:capability sys_tty_config;
-allow jabberd_t self:process signal_perms;
-allow jabberd_t self:fifo_file read_fifo_file_perms;
+allow jabberd_t self:process { signal_perms getsched setsched };
+allow jabberd_t self:fifo_file rw_fifo_file_perms;
 allow jabberd_t self:tcp_socket create_stream_socket_perms;
 allow jabberd_t self:udp_socket create_socket_perms;
+corenet_udp_bind_generic_node(jabberd_t)
 
 manage_files_pattern(jabberd_t, jabberd_var_lib_t, jabberd_var_lib_t)
 files_var_lib_filetrans(jabberd_t, jabberd_var_lib_t, file)
@@ -56,6 +57,7 @@ corenet_udp_sendrecv_generic_node(jabberd_t)
 corenet_tcp_sendrecv_all_ports(jabberd_t)
 corenet_udp_sendrecv_all_ports(jabberd_t)
 corenet_tcp_bind_generic_node(jabberd_t)
+corenet_tcp_connect_generic_port(jabberd_t)
 corenet_tcp_bind_jabber_client_port(jabberd_t)
 corenet_tcp_bind_jabber_interserver_port(jabberd_t)
 corenet_sendrecv_jabber_client_server_packets(jabberd_t)

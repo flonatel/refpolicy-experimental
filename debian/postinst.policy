@@ -90,7 +90,6 @@ my %map = (
            'finger'          => [ 'finger', '*fingerd' ],
            'ftp'             => [ 'ftp', '*ftpd' ],
            'gitosis'         => [ 'gitosis' ],
-           'gnome'           => [ 'libgconf2-4' ],
            'gpg'             => [ 'gnupg' ],
            'hddtemp'         => [ 'hddtemp' ],
            'hwclock'         => [ 'util-linux' ],

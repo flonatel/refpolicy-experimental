@@ -347,6 +347,10 @@ optional_policy(`
 	xserver_domtrans_xauth(sshd_t)
 ')
 
+optional_policy(`
+	gitosis_read_lib_files(sshd_t)
+')
+
 ifdef(`TODO',`
 tunable_policy(`ssh_sysadm_login',`
 	# Relabel and access ptys created by sshd

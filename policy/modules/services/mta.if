@@ -106,6 +106,8 @@ template(`mta_base_mail_template',`
 
 	optional_policy(`
 		postfix_domtrans_user_mail_handler($1_mail_t)
+		# for postalias - role stops unpriv user from doing it
+		postfix_domtrans_master($1_mail_t)
 	')
 
 	optional_policy(`

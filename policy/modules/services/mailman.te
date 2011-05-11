@@ -62,6 +62,8 @@ optional_policy(`
 # Mailman mail local policy
 #
 
+dev_read_urand(mailman_mail_t)
+files_read_usr_files(mailman_mail_t)
 allow mailman_mail_t self:unix_dgram_socket create_socket_perms;
 allow mailman_mail_t self:process { signal signull };
 allow mailman_mail_t self:capability { kill dac_override setuid setgid sys_tty_config };
@@ -127,3 +129,4 @@ optional_policy(`
 optional_policy(`
 	su_exec(mailman_queue_t)
 ')
+
