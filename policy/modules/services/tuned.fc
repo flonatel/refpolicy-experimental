@@ -6,3 +6,6 @@
 /var/log/tuned\.log		--	gen_context(system_u:object_r:tuned_log_t,s0)
 
 /var/run/tuned\.pid		--	gen_context(system_u:object_r:tuned_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/tuned\.pid		--	gen_context(system_u:object_r:tuned_var_run_t,s0)
+')

@@ -4,3 +4,6 @@
 
 /var/lib/ntop(/.*)?		gen_context(system_u:object_r:ntop_var_lib_t,s0)
 /var/run/ntop\.pid	--	gen_context(system_u:object_r:ntop_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/ntop\.pid	--	gen_context(system_u:object_r:ntop_var_run_t,s0)
+')

@@ -9,4 +9,10 @@
 /var/log/dnsmasq\.log			gen_context(system_u:object_r:dnsmasq_var_log_t,s0)
 
 /var/run/dnsmasq\.pid		--	gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/dnsmasq\.pid		--	gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
+')
 /var/run/libvirt/network(/.*)?		gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/libvirt/network(/.*)?		gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
+')

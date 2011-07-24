@@ -67,4 +67,10 @@ ifdef(`distro_gentoo',`
 /var/log/vnetlib.*		--	gen_context(system_u:object_r:vmware_log_t,s0)
 
 /var/run/vmnat.* 		-s	gen_context(system_u:object_r:vmware_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/vmnat.* 		-s	gen_context(system_u:object_r:vmware_var_run_t,s0)
+')
 /var/run/vmware.* 			gen_context(system_u:object_r:vmware_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/vmware.* 			gen_context(system_u:object_r:vmware_var_run_t,s0)
+')

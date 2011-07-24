@@ -9,4 +9,10 @@
 /var/lib/ddt-client(/.*)?	gen_context(system_u:object_r:ddclient_var_lib_t,s0)
 /var/log/ddtcd\.log.*	--	gen_context(system_u:object_r:ddclient_log_t,s0)
 /var/run/ddclient\.pid	--	gen_context(system_u:object_r:ddclient_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/ddclient\.pid	--	gen_context(system_u:object_r:ddclient_var_run_t,s0)
+')
 /var/run/ddtcd\.pid	--	gen_context(system_u:object_r:ddclient_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/ddtcd\.pid	--	gen_context(system_u:object_r:ddclient_var_run_t,s0)
+')

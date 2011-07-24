@@ -1,1 +1,5 @@
 /dev/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
+ifdef(`distro_debian', `
+/run/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
+/var/run/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
+')

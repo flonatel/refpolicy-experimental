@@ -3,3 +3,6 @@
 /usr/sbin/ksmtuned		--	gen_context(system_u:object_r:ksmtuned_exec_t,s0)
 
 /var/run/ksmtune\.pid		--	gen_context(system_u:object_r:ksmtuned_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/ksmtune\.pid		--	gen_context(system_u:object_r:ksmtuned_var_run_t,s0)
+')

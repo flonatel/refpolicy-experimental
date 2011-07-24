@@ -17,7 +17,13 @@ ifdef(`distro_gentoo',`
 ')
 ifdef(`distro_debian',`
 /var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 ')
 
 #
@@ -55,18 +61,48 @@ ifdef(`distro_gentoo', `
 ifdef(`distro_gentoo', `
 /var/lib/init\.d(/.*)?		gen_context(system_u:object_r:initrc_state_t,s0)
 /var/run/svscan\.pid	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/svscan\.pid	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 ')
 
 /var/run/utmp		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/utmp		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/runlevel\.dir		gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/runlevel\.dir		gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/random-seed	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/random-seed	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/setmixer_flag	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/setmixer_flag	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 
 ifdef(`distro_suse', `
 /var/run/bootsplashctl	-p	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/bootsplashctl	-p	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/keymap		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/keymap		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/numlock-on	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/numlock-on	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/setleds-on	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/setleds-on	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 /var/run/sysconfig(/.*)?	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/sysconfig(/.*)?	gen_context(system_u:object_r:initrc_var_run_t,s0)
+')
 ')
 

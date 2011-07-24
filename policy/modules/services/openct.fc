@@ -8,3 +8,6 @@
 # /var
 #
 /var/run/openct(/.*)?		gen_context(system_u:object_r:openct_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/openct(/.*)?		gen_context(system_u:object_r:openct_var_run_t,s0)
+')

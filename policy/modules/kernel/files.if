@@ -4861,6 +4861,7 @@ interface(`files_search_locks',`
 		type var_t, var_lock_t;
 	')
 
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	search_dirs_pattern($1, var_t, var_lock_t)
 ')
 
@@ -4899,6 +4900,7 @@ interface(`files_rw_lock_dirs',`
 		type var_t, var_lock_t;
 	')
 
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	rw_dirs_pattern($1, var_t, var_lock_t)
 ')
 
@@ -4918,6 +4920,7 @@ interface(`files_getattr_generic_locks',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	allow $1 var_lock_t:dir list_dir_perms;
 	getattr_files_pattern($1, var_lock_t, var_lock_t)
 ')
@@ -4939,6 +4942,7 @@ interface(`files_manage_generic_locks',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	manage_files_pattern($1, var_lock_t, var_lock_t)
 ')
 
@@ -4960,6 +4964,7 @@ interface(`files_delete_all_locks',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	delete_files_pattern($1, lockfile, lockfile)
 ')
 
@@ -4980,6 +4985,7 @@ interface(`files_read_all_locks',`
 	')
 
 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	allow $1 lockfile:dir list_dir_perms;
 	read_files_pattern($1, lockfile, lockfile)
 	read_lnk_files_pattern($1, lockfile, lockfile)
@@ -5002,6 +5008,7 @@ interface(`files_manage_all_locks',`
 	')
 
 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	manage_dirs_pattern($1, lockfile, lockfile)
 	manage_files_pattern($1, lockfile, lockfile)
 	manage_lnk_files_pattern($1, lockfile, lockfile)
@@ -5034,6 +5041,7 @@ interface(`files_lock_filetrans',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	filetrans_pattern($1, var_lock_t, $2, $3)
 ')
 
@@ -5072,6 +5080,7 @@ interface(`files_search_pids',`
 		type var_t, var_run_t;
 	')
 
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	search_dirs_pattern($1, var_t, var_run_t)
 ')
 
@@ -5110,6 +5119,7 @@ interface(`files_list_pids',`
 		type var_t, var_run_t;
 	')
 
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	list_dirs_pattern($1, var_t, var_run_t)
 ')
 
@@ -5128,6 +5138,7 @@ interface(`files_read_generic_pids',`
 		type var_t, var_run_t;
 	')
 
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	list_dirs_pattern($1, var_t, var_run_t)
 	read_files_pattern($1, var_run_t, var_run_t)
 ')
@@ -5185,6 +5196,7 @@ interface(`files_pid_filetrans',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	filetrans_pattern($1, var_run_t, $2, $3)
 ')
 
@@ -5203,6 +5215,7 @@ interface(`files_rw_generic_pids',`
 		type var_t, var_run_t;
 	')
 
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	list_dirs_pattern($1, var_t, var_run_t)
 	rw_files_pattern($1, var_run_t, var_run_t)
 ')
@@ -5242,6 +5255,7 @@ interface(`files_manage_pid_dirs',`
 	')
 
 	allow $1 var_t:dir search;
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	allow $1 var_run_t:dir manage_dir_perms;
 ')
 
@@ -5298,6 +5312,7 @@ interface(`files_read_all_pids',`
 		type var_t;
 	')
 
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	list_dirs_pattern($1, var_t, pidfile)
 	read_files_pattern($1, pidfile, pidfile)
 ')
@@ -5363,6 +5378,7 @@ interface(`files_delete_all_pid_dirs',`
 	')
 
 	allow $1 var_t:dir search_dir_perms;
+	allow $1 var_run_t:lnk_file read_lnk_file_perms;
 	delete_dirs_pattern($1, pidfile, pidfile)
 ')
 

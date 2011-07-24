@@ -21,7 +21,13 @@
 /var/lib/courier(/.*)?				gen_context(system_u:object_r:courier_var_lib_t,s0)
 
 /var/run/courier(/.*)?			--	gen_context(system_u:object_r:courier_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/courier(/.*)?			--	gen_context(system_u:object_r:courier_var_run_t,s0)
+')
 /var/run/courier(/.*)?			-s	gen_context(system_u:object_r:courier_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/courier(/.*)?			-s	gen_context(system_u:object_r:courier_var_run_t,s0)
+')
 
 /var/spool/authdaemon(/.*)?			gen_context(system_u:object_r:courier_spool_t,s0)
 /var/spool/courier(/.*)?			gen_context(system_u:object_r:courier_spool_t,s0)

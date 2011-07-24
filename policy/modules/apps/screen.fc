@@ -12,3 +12,6 @@ HOME_DIR/\.screenrc		--	gen_context(system_u:object_r:screen_home_t,s0)
 # /var
 #
 /var/run/screen(/.*)?			gen_context(system_u:object_r:screen_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/screen(/.*)?			gen_context(system_u:object_r:screen_var_run_t,s0)
+')

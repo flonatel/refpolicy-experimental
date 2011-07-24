@@ -56,13 +56,37 @@ ifdef(`distro_redhat',`
 ')
 
 /var/run/audit_events	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/audit_events	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+')
 /var/run/audispd_events	-s	gen_context(system_u:object_r:audisp_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/audispd_events	-s	gen_context(system_u:object_r:audisp_var_run_t,s0)
+')
 /var/run/auditd\.pid	--	gen_context(system_u:object_r:auditd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/auditd\.pid	--	gen_context(system_u:object_r:auditd_var_run_t,s0)
+')
 /var/run/auditd_sock	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/auditd_sock	-s	gen_context(system_u:object_r:auditd_var_run_t,s0)
+')
 /var/run/klogd\.pid	--	gen_context(system_u:object_r:klogd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/klogd\.pid	--	gen_context(system_u:object_r:klogd_var_run_t,s0)
+')
 /var/run/log		-s	gen_context(system_u:object_r:devlog_t,s0)
+ifdef(`distro_debian', `
+/run/log		-s	gen_context(system_u:object_r:devlog_t,s0)
+')
 /var/run/metalog\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/metalog\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+')
 /var/run/syslogd\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/syslogd\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+')
 
 /var/spool/bacula/log(/.*)? 	gen_context(system_u:object_r:var_log_t,s0)
 /var/spool/postfix/pid	-d	gen_context(system_u:object_r:var_run_t,s0)

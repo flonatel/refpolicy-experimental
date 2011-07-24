@@ -4,3 +4,6 @@ HOME_DIR/\.kismet(/.*)?			gen_context(system_u:object_r:kismet_home_t,s0)
 /var/lib/kismet(/.*)?			gen_context(system_u:object_r:kismet_var_lib_t,s0)
 /var/log/kismet(/.*)?			gen_context(system_u:object_r:kismet_log_t,s0)
 /var/run/kismet_server.pid	--	gen_context(system_u:object_r:kismet_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/kismet_server.pid	--	gen_context(system_u:object_r:kismet_var_run_t,s0)
+')

@@ -6,6 +6,10 @@
 /usr/sbin/qdiskd			--	gen_context(system_u:object_r:qdiskd_exec_t,s0)
 
 /var/lock/fence_manual\.lock		--	gen_context(system_u:object_r:fenced_lock_t,s0)
+ifdef(`distro_debian', `
+/var/run/lock/fence_manual\.lock		--	gen_context(system_u:object_r:fenced_lock_t,s0)
+/run/lock/fence_manual\.lock		--	gen_context(system_u:object_r:fenced_lock_t,s0)
+')
 
 /var/lib/qdiskd(/.*)?				gen_context(system_u:object_r:qdiskd_var_lib_t,s0)
 
@@ -15,8 +19,26 @@
 /var/log/cluster/qdiskd\.log.*		--	gen_context(system_u:object_r:qdiskd_var_log_t,s0)
 
 /var/run/cluster/fenced_override	--	gen_context(system_u:object_r:fenced_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/cluster/fenced_override	--	gen_context(system_u:object_r:fenced_var_run_t,s0)
+')
 /var/run/dlm_controld\.pid		--	gen_context(system_u:object_r:dlm_controld_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/dlm_controld\.pid		--	gen_context(system_u:object_r:dlm_controld_var_run_t,s0)
+')
 /var/run/fenced\.pid			--	gen_context(system_u:object_r:fenced_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/fenced\.pid			--	gen_context(system_u:object_r:fenced_var_run_t,s0)
+')
 /var/run/gfs_controld\.pid		--	gen_context(system_u:object_r:gfs_controld_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/gfs_controld\.pid		--	gen_context(system_u:object_r:gfs_controld_var_run_t,s0)
+')
 /var/run/groupd\.pid			--	gen_context(system_u:object_r:groupd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/groupd\.pid			--	gen_context(system_u:object_r:groupd_var_run_t,s0)
+')
 /var/run/qdiskd\.pid			--	gen_context(system_u:object_r:qdiskd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/qdiskd\.pid			--	gen_context(system_u:object_r:qdiskd_var_run_t,s0)
+')

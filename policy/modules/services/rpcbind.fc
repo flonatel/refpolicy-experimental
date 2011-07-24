@@ -5,5 +5,14 @@
 /var/lib/rpcbind(/.*)?		gen_context(system_u:object_r:rpcbind_var_lib_t,s0)
 
 /var/run/rpc.statd\.pid	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/rpc.statd\.pid	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+')
 /var/run/rpcbind\.lock	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/rpcbind\.lock	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+')
 /var/run/rpcbind\.sock	-s	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/rpcbind\.sock	-s	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+')

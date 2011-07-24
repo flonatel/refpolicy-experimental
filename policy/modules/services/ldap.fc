@@ -12,6 +12,18 @@ ifdef(`distro_debian',`
 /var/lib/ldap/replog(/.*)?	gen_context(system_u:object_r:slapd_replog_t,s0)
 
 /var/run/ldapi		-s	gen_context(system_u:object_r:slapd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/ldapi		-s	gen_context(system_u:object_r:slapd_var_run_t,s0)
+')
 /var/run/openldap(/.*)?		gen_context(system_u:object_r:slapd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/openldap(/.*)?		gen_context(system_u:object_r:slapd_var_run_t,s0)
+')
 /var/run/slapd\.args	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/slapd\.args	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
+')
 /var/run/slapd\.pid	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/slapd\.pid	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
+')

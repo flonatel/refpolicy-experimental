@@ -14,9 +14,21 @@
 /var/log/acpid.*	--	gen_context(system_u:object_r:apmd_log_t,s0)
 
 /var/run/\.?acpid\.socket -s	gen_context(system_u:object_r:apmd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/\.?acpid\.socket -s	gen_context(system_u:object_r:apmd_var_run_t,s0)
+')
 /var/run/apmd\.pid	--	gen_context(system_u:object_r:apmd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/apmd\.pid	--	gen_context(system_u:object_r:apmd_var_run_t,s0)
+')
 /var/run/powersaved\.pid --	gen_context(system_u:object_r:apmd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/powersaved\.pid --	gen_context(system_u:object_r:apmd_var_run_t,s0)
+')
 /var/run/powersave_socket -s	gen_context(system_u:object_r:apmd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/powersave_socket -s	gen_context(system_u:object_r:apmd_var_run_t,s0)
+')
 
 ifdef(`distro_suse',`
 /var/lib/acpi(/.*)?		gen_context(system_u:object_r:apmd_var_lib_t,s0)

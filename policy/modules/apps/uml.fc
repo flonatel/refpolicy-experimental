@@ -12,3 +12,6 @@ HOME_DIR/\.uml(/.*)?		gen_context(system_u:object_r:uml_rw_t,s0)
 # /var
 #
 /var/run/uml-utilities(/.*)?	gen_context(system_u:object_r:uml_switch_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/uml-utilities(/.*)?	gen_context(system_u:object_r:uml_switch_var_run_t,s0)
+')

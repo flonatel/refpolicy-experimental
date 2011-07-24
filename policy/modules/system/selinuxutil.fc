@@ -46,3 +46,6 @@
 # /var/run
 #
 /var/run/restorecond\.pid	--	gen_context(system_u:object_r:restorecond_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/restorecond\.pid	--	gen_context(system_u:object_r:restorecond_var_run_t,s0)
+')

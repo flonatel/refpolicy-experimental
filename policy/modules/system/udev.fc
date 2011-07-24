@@ -14,6 +14,9 @@
 ifdef(`distro_debian', `
 /lib/udev/create_static_nodes -- gen_context(system_u:object_r:udev_exec_t,s0)
 /var/run/xen-hotplug -d gen_context(system_u:object_r:udev_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/xen-hotplug -d gen_context(system_u:object_r:udev_var_run_t,s0)
+')
 ', `
 /sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
 ')
@@ -27,3 +30,6 @@ ifdef(`distro_debian', `
 /usr/bin/udevinfo --	gen_context(system_u:object_r:udev_exec_t,s0)
 
 /var/run/PackageKit/udev(/.*)? gen_context(system_u:object_r:udev_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/PackageKit/udev(/.*)? gen_context(system_u:object_r:udev_var_run_t,s0)
+')

@@ -6,3 +6,6 @@
 /var/lib/dhcp(3)?/dhcpd\.leases.* --	gen_context(system_u:object_r:dhcpd_state_t,s0)
 
 /var/run/dhcpd\.pid		--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
+ifdef(`distro_debian', `
+/run/dhcpd\.pid		--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
+')

@@ -1,3 +1,12 @@
+refpolicy (2:0.2.20100524-10) unstable; urgency=low
+
+  * Label gpgsm as gpg_exec_t
+  * Add policy for /run etc, thanks to Martin Orr <martin@martinorr.name> for
+    working on this, even though we can't use subst now.
+    Closes: #629066, #628039, #626720
+
+ -- Russell Coker <russell@coker.com.au>  Sun, 24 Jul 2011 15:50:23 +1000
+
 refpolicy (2:0.2.20100524-9) unstable; urgency=low
 
   * Make gnome.pp not be autoloaded and revert some of the gnome stuff from the
