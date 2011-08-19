@@ -54,6 +54,7 @@ typealias gpg_pinentry_t alias { user_gpg_pinentry_t staff_gpg_pinentry_t sysadm
 typealias gpg_pinentry_t alias { auditadm_gpg_pinentry_t secadm_gpg_pinentry_t };
 application_domain(gpg_pinentry_t, pinentry_exec_t)
 ubac_constrained(gpg_pinentry_t)
+files_read_var_lib_files(gpg_pinentry_t)
 
 type gpg_pinentry_tmp_t;
 files_tmp_file(gpg_pinentry_tmp_t)
@@ -223,6 +224,7 @@ manage_dirs_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
 manage_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
 manage_sock_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
 files_tmp_filetrans(gpg_agent_t, gpg_agent_tmp_t, { file sock_file dir })
+filetrans_pattern(gpg_agent_t, gpg_secret_t, gpg_agent_tmp_t, sock_file)
 files_read_etc_files(gpg_agent_t)
 kernel_read_crypto_sysctls(gpg_agent_t)
 

@@ -29,6 +29,7 @@ allow perdition_t self:tcp_socket create_stream_socket_perms;
 allow perdition_t self:udp_socket create_socket_perms;
 
 allow perdition_t perdition_etc_t:file read_file_perms;
+allow perdition_t perdition_etc_t:dir r_dir_perms;
 files_search_etc(perdition_t)
 
 manage_files_pattern(perdition_t, perdition_var_run_t, perdition_var_run_t)
@@ -48,6 +49,7 @@ corenet_tcp_sendrecv_all_ports(perdition_t)
 corenet_udp_sendrecv_all_ports(perdition_t)
 corenet_tcp_bind_generic_node(perdition_t)
 corenet_tcp_bind_pop_port(perdition_t)
+corenet_tcp_connect_pop_port(perdition_t)
 corenet_sendrecv_pop_server_packets(perdition_t)
 
 dev_read_sysfs(perdition_t)
@@ -74,4 +76,8 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(perdition_t)
+')
+optional_policy(`
+	mysql_tcp_connect(perdition_t)
+	mysql_stream_connect(perdition_t)
 ')

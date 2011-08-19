@@ -1,3 +1,23 @@
+refpolicy (2:0.2.20100524-11) unstable; urgency=low
+
+  * Allow snmpd to setuid and setgid.
+  * Allow nagios services to connect to mysql servers via tcp and read /etc
+    files for mysql.
+  * Allow nagios_mail_plugin_t to read usr files.
+  * Allow postfix_postqueue_t to use a fd from nagios_mail_plugin_t.
+  * Allow crond_t the sys_resource capability to set resource limits for
+    children.
+  * Allow user_t to manage httpd_user_content_t, also allow httpd_t
+    the same access to httpd_user_content_t sym-links as to files.
+  * Allow gpg_agent_t to create sock_files under ~/.gnupg
+    Allow gpg_pinentry_t to read var_lib_t files for fonts.conf
+  * Allow perdition to authenticate with mysql, read directories of type
+    perdition_etc_t, connect to the pop ports
+  * Allow nagios_checkdisk_plugin_t to getattr all mountpoint dirs, so it
+    can check the root directory of a filesystem.
+
+ -- Russell Coker <russell@coker.com.au>  Fri, 19 Aug 2011 16:36:17 +1000
+
 refpolicy (2:0.2.20100524-10) unstable; urgency=low
 
   * Label gpgsm as gpg_exec_t

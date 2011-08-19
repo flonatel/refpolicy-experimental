@@ -317,6 +317,8 @@ logging_send_syslog_msg(nagios_mail_plugin_t)
 
 sysnet_read_config(nagios_mail_plugin_t)
 
+files_read_usr_files(nagios_mail_plugin_t)
+
 optional_policy(`
 	mta_send_mail(nagios_mail_plugin_t)
 ')
@@ -331,7 +333,7 @@ optional_policy(`
 
 optional_policy(`
 	postfix_stream_connect_master(nagios_mail_plugin_t)
-	posftix_exec_postqueue(nagios_mail_plugin_t)
+	posftix_run_postqueue(nagios_mail_plugin_t)
 	postfix_list_spool(nagios_mail_plugin_t)
 	postfix_read_spool_files(nagios_mail_plugin_t)
 ')
@@ -347,6 +349,7 @@ allow nagios_checkdisk_plugin_t self:capability { sys_admin sys_rawio };
 files_read_etc_runtime_files(nagios_checkdisk_plugin_t)
 
 fs_getattr_all_fs(nagios_checkdisk_plugin_t)
+files_getattr_all_mountpoints(nagios_checkdisk_plugin_t)
 
 storage_raw_read_fixed_disk(nagios_checkdisk_plugin_t)
 
@@ -377,6 +380,8 @@ optional_policy(`
 ')
 
 optional_policy(`
+	mysql_read_config(nagios_services_plugin_t)
+	mysql_tcp_connect(nagios_services_plugin_t)
 	mysql_stream_connect(nagios_services_plugin_t)
 ')
 

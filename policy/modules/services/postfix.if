@@ -456,7 +456,7 @@ interface(`postfix_domtrans_postqueue',`
 
 #######################################
 ## <summary>
-##	Execute the master postqueue in the caller domain.
+##	Allow the master postqueue to use a fifo of the caller and send sigchld
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -464,12 +464,14 @@ interface(`postfix_domtrans_postqueue',`
 ##	</summary>
 ## </param>
 #
-interface(`posftix_exec_postqueue',`
+interface(`posftix_run_postqueue',`
 	gen_require(`
-		type postfix_postqueue_exec_t;
+		type postfix_postqueue_t;
 	')
 
-	can_exec($1, postfix_postqueue_exec_t)
+	allow postfix_postqueue_t $1:fd use;
+	allow postfix_postqueue_t $1:fifo_file rw_file_perms;
+	allow postfix_postqueue_t $1:process sigchld;
 ')
 
 ########################################
