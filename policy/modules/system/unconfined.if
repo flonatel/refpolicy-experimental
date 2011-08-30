@@ -347,6 +347,7 @@ interface(`in_unconfined_r',`
 	role unconfined_r types $1;
 	allow $1 unconfined_t:process sigchld;
 	allow $1 unconfined_t:fd use;
+	allow $1 unconfined_t:fifo_file { read write getattr };
 ')
 
 ########################################

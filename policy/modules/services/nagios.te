@@ -193,6 +193,7 @@ read_files_pattern(nrpe_t, nagios_etc_t, nagios_etc_t)
 files_search_etc(nrpe_t)
 
 manage_files_pattern(nrpe_t, nrpe_var_run_t, nrpe_var_run_t)
+manage_files_pattern(nrpe_t, nagios_var_run_t, nagios_var_run_t)
 files_pid_filetrans(nrpe_t, nrpe_var_run_t, file)
 
 type nrpe_tmp_t;

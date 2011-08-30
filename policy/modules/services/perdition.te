@@ -22,7 +22,8 @@ files_pid_file(perdition_var_run_t)
 #
 
 allow perdition_t self:netlink_route_socket create_netlink_socket_perms;
-allow perdition_t self:capability { setgid setuid };
+allow perdition_t self:capability { chown fowner setgid setuid };
+dev_read_urand(perdition_t)
 dontaudit perdition_t self:capability sys_tty_config;
 allow perdition_t self:process signal_perms;
 allow perdition_t self:tcp_socket create_stream_socket_perms;
@@ -49,6 +50,7 @@ corenet_tcp_sendrecv_all_ports(perdition_t)
 corenet_udp_sendrecv_all_ports(perdition_t)
 corenet_tcp_bind_generic_node(perdition_t)
 corenet_tcp_bind_pop_port(perdition_t)
+corenet_tcp_bind_sieve_port(perdition_t)
 corenet_tcp_connect_pop_port(perdition_t)
 corenet_sendrecv_pop_server_packets(perdition_t)
 

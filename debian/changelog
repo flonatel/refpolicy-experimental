@@ -1,3 +1,14 @@
+refpolicy (2:0.2.20100524-12) unstable; urgency=low
+
+  * Allow perdition to bind to sieve port, read /dev/urandom, and capabilities
+    chown and fowner.
+  * Allow nrpe_t to manage nagios_var_run_t files.
+  * Change the in_unconfined_r() interface so that postfix_postqueue_t can
+    read and write unconfined_t fifos.
+  * Allow quota_t to load kernel modules.
+
+ -- Russell Coker <russell@coker.com.au>  Tue, 30 Aug 2011 23:10:50 +1000
+
 refpolicy (2:0.2.20100524-11) unstable; urgency=low
 
   * Allow snmpd to setuid and setgid.
