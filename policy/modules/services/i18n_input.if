@@ -11,5 +11,5 @@
 ## </param>
 #
 interface(`i18n_use',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')

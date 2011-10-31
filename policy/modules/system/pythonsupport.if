@@ -35,6 +35,34 @@ interface(`pythonsupport_domtrans',`
 
 ########################################
 ## <summary>
+##      Role access for python.
+## </summary>
+## <param name="role">
+##      <summary>
+##      Role allowed access.
+##      </summary>
+## </param>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`python_role',`
+        gen_require(`
+                type pythoncompile_t, pythoncompile_exec_t;
+        ')
+
+        domtrans_pattern($2, pythoncompile_exec_t, pythoncompile_t)
+        role $1 types pythoncompile_t;
+
+        allow $2 pythoncompile_t:process { signal_perms };
+        ps_process_pattern($2, pythoncompile_t)
+')
+
+########################################
+## <summary>
 ##	Read compiled python modules
 ## </summary>
 ## <param name="domain">

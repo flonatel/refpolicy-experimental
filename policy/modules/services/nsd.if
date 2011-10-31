@@ -11,7 +11,7 @@
 ## </param>
 #
 interface(`nsd_udp_chat',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -25,5 +25,5 @@ interface(`nsd_udp_chat',`
 ## </param>
 #
 interface(`nsd_tcp_connect',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')

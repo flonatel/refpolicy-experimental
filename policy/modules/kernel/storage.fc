@@ -12,6 +12,7 @@
 /dev/cdu.*		-b	gen_context(system_u:object_r:removable_device_t,s0)
 /dev/cm20.*		-b	gen_context(system_u:object_r:removable_device_t,s0)
 /dev/dasd[^/]*		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+/dev/dasd[^/]*		-c	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 /dev/dm-[0-9]+		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 /dev/drbd[^/]*		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 /dev/etherd/.+		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
@@ -20,6 +21,7 @@
 /dev/gscd		-b	gen_context(system_u:object_r:removable_device_t,s0)
 /dev/hitcd		-b	gen_context(system_u:object_r:removable_device_t,s0)
 /dev/ht[0-1]		-b	gen_context(system_u:object_r:tape_device_t,s0)
+/dev/hwcdrom		-b	gen_context(system_u:object_r:removable_device_t,s0)
 /dev/initrd		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 /dev/jsfd		-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 /dev/jsflash		-c	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
@@ -76,3 +78,6 @@ ifdef(`distro_redhat', `
 /dev/scramdisk/.*	-b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
 
 /dev/usb/rio500		-c	gen_context(system_u:object_r:removable_device_t,s0)
+
+/lib/udev/devices/loop.* -b	gen_context(system_u:object_r:fixed_disk_device_t,mls_systemhigh)
+/lib/udev/devices/fuse	-c	gen_context(system_u:object_r:fuse_device_t,s0)

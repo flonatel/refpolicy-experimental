@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -15,9 +15,27 @@ interface(`rpm_domtrans',`
 		type rpm_t, rpm_exec_t;
 	')
 
-	files_search_usr($1)
 	corecmd_search_bin($1)
 	domtrans_pattern($1, rpm_exec_t, rpm_t)
+')
+
+########################################
+## <summary>
+##	Execute debuginfo_install programs in the rpm domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`rpm_debuginfo_domtrans',`
+	gen_require(`
+		type rpm_t, debuginfo_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, debuginfo_exec_t, rpm_t)
 ')
 
 ########################################
@@ -26,7 +44,7 @@ interface(`rpm_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -48,7 +66,7 @@ interface(`rpm_domtrans_script',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
@@ -64,8 +82,7 @@ interface(`rpm_run',`
 	')
 
 	rpm_domtrans($1)
-	role $2 types rpm_t;
-	role $2 types rpm_script_t;
+	role $2 types { rpm_t rpm_script_t };
 	seutil_run_loadpolicy(rpm_script_t, $2)
 	seutil_run_semanage(rpm_script_t, $2)
 	seutil_run_setfiles(rpm_script_t, $2)
@@ -114,7 +131,7 @@ interface(`rpm_signull',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -132,7 +149,7 @@ interface(`rpm_use_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -150,7 +167,7 @@ interface(`rpm_read_pipes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -190,7 +207,7 @@ interface(`rpm_dbus_chat',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -231,7 +248,7 @@ interface(`rpm_script_dbus_chat',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -240,27 +257,28 @@ interface(`rpm_search_log',`
 		type rpm_log_t;
 	')
 
+	logging_search_logs($1)
 	allow $1 rpm_log_t:dir search_dir_perms;
 ')
 
 #####################################
 ## <summary>
-##      Allow the specified domain to append
-##      to rpm log files.
+##	Allow the specified domain to append
+##	to rpm log files.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`rpm_append_log',`
-        gen_require(`
-                type rpm_log_t;
-        ')
+	gen_require(`
+		type rpm_log_t;
+	')
 
-        logging_search_logs($1)
-        append_files_pattern($1, rpm_log_t, rpm_log_t)
+	logging_search_logs($1)
+	append_files_pattern($1, rpm_log_t, rpm_log_t)
 ')
 
 ########################################
@@ -269,7 +287,7 @@ interface(`rpm_append_log',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -288,7 +306,7 @@ interface(`rpm_manage_log',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -322,22 +340,22 @@ interface(`rpm_manage_script_tmp_files',`
 
 #####################################
 ## <summary>
-##      Allow the specified domain to append
-##      to rpm tmp files.
+##	Allow the specified domain to append
+##	to rpm tmp files.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`rpm_append_tmp_files',`
-        gen_require(`
-                type rpm_tmp_t;
-        ')
+	gen_require(`
+		type rpm_tmp_t;
+	')
 
-        files_search_tmp($1)
-        append_files_pattern($1, rpm_tmp_t, rpm_tmp_t)
+	files_search_tmp($1)
+	append_files_pattern($1, rpm_tmp_t, rpm_tmp_t)
 ')
 
 ########################################
@@ -375,6 +393,7 @@ interface(`rpm_read_script_tmp_files',`
 		type rpm_script_tmp_t;
 	')
 
+	files_search_tmp($1)
 	read_files_pattern($1, rpm_script_tmp_t, rpm_script_tmp_t)
 	read_lnk_files_pattern($1, rpm_script_tmp_t, rpm_script_tmp_t)
 ')
@@ -427,7 +446,7 @@ interface(`rpm_manage_cache',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -457,6 +476,7 @@ interface(`rpm_delete_db',`
 		type rpm_var_lib_t;
 	')
 
+	files_search_var_lib($1)
 	delete_files_pattern($1, rpm_var_lib_t, rpm_var_lib_t)
 ')
 
@@ -466,7 +486,7 @@ interface(`rpm_delete_db',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -482,7 +502,7 @@ interface(`rpm_manage_db',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to create, read, 
+##	Do not audit attempts to create, read,
 ##	write, and delete the RPM package database.
 ## </summary>
 ## <param name="domain">
@@ -503,56 +523,56 @@ interface(`rpm_dontaudit_manage_db',`
 
 #####################################
 ## <summary>
-##      Read rpm pid files.
+##	Read rpm pid files.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`rpm_read_pid_files',`
-        gen_require(`
-                type rpm_var_run_t;
-        ')
+	gen_require(`
+		type rpm_var_run_t;
+	')
 
-	read_files_pattern($1,rpm_var_run_t,rpm_var_run_t)
+	read_files_pattern($1, rpm_var_run_t, rpm_var_run_t)
 	files_search_pids($1)
 ')
 
 #####################################
 ## <summary>
-##      Create, read, write, and delete rpm pid files.
+##	Create, read, write, and delete rpm pid files.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`rpm_manage_pid_files',`
-        gen_require(`
-                type rpm_var_run_t;
-        ')
+	gen_require(`
+		type rpm_var_run_t;
+	')
 
-        manage_files_pattern($1,rpm_var_run_t,rpm_var_run_t)
+	manage_files_pattern($1, rpm_var_run_t, rpm_var_run_t)
 	files_search_pids($1)
 ')
 
 ######################################
 ## <summary>
-##      Create files in /var/run with the rpm pid file type.
+##	Create files in /var/run with the rpm pid file type.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`rpm_pid_filetrans',`
-        gen_require(`
-                type rpm_var_run_t;
-        ')
+	gen_require(`
+		type rpm_var_run_t;
+	')
 
-        files_pid_filetrans($1, rpm_var_run_t, file)
+	files_pid_filetrans($1, rpm_var_run_t, file)
 ')

@@ -1,5 +1,4 @@
-
-policy_module(prelude, 1.2.0)
+policy_module(prelude, 1.3.0)
 
 ########################################
 #
@@ -73,9 +72,10 @@ manage_dirs_pattern(prelude_t, prelude_var_lib_t, prelude_var_lib_t)
 manage_files_pattern(prelude_t, prelude_var_lib_t, prelude_var_lib_t)
 files_search_var_lib(prelude_t)
 
+manage_dirs_pattern(prelude_t, prelude_var_run_t, prelude_var_run_t)
 manage_files_pattern(prelude_t, prelude_var_run_t, prelude_var_run_t)
 manage_sock_files_pattern(prelude_t, prelude_var_run_t, prelude_var_run_t)
-files_pid_filetrans(prelude_t, prelude_var_run_t, file)
+files_pid_filetrans(prelude_t, prelude_var_run_t, { dir file })
 
 kernel_read_system_state(prelude_t)
 kernel_read_sysctl(prelude_t)
@@ -98,7 +98,6 @@ dev_read_urand(prelude_t)
 files_read_etc_files(prelude_t)
 files_read_etc_runtime_files(prelude_t)
 files_read_usr_files(prelude_t)
-files_search_tmp(prelude_t)
 files_search_tmp(prelude_t)
 
 fs_rw_anon_inodefs_files(prelude_t)

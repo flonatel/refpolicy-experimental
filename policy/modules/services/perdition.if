@@ -6,10 +6,10 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
 interface(`perdition_tcp_connect',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')

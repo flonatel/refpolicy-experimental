@@ -43,7 +43,7 @@
 #
 
 
-# bindresvport in glibc starts searching for reserved ports at 600
+# bindresvport in glibc starts searching for reserved ports at 512
 
 
 #
@@ -55,8 +55,7 @@
 # network_packet(packet_name)
 #
 
-
-policy_module(corenetwork, 1.14.0)
+policy_module(corenetwork, 1.16.0)
 
 ########################################
 #
@@ -64,6 +63,7 @@ policy_module(corenetwork, 1.14.0)
 #
 
 attribute client_packet_type;
+attribute ipsec_spd_type;
 attribute netif_type;
 attribute node_type;
 attribute packet_type;
@@ -112,7 +112,7 @@ sid port gen_context(system_u:object_r:port_t,s0)
 type reserved_port_t, port_type, reserved_port_type;
 
 #
-# hi_reserved_port_t is the type of INET port numbers between 600-1023.
+# hi_reserved_port_t is the type of INET port numbers between 512-1023.
 #
 type hi_reserved_port_t, port_type, reserved_port_type, rpc_port_type;
 
@@ -186,12 +186,19 @@ type amavisd_send_server_packet_t, packet_type, server_packet_type;
 portcon tcp 10025 gen_context(system_u:object_r:amavisd_send_port_t,s0)
 
 
+type amqp_port_t, port_type;
+type amqp_client_packet_t, packet_type, client_packet_type;
+type amqp_server_packet_t, packet_type, server_packet_type;
+portcon udp 5671-5672 gen_context(system_u:object_r:amqp_port_t,s0)
+portcon tcp 5671-5672 gen_context(system_u:object_r:amqp_port_t,s0)
+
+
 type aol_port_t, port_type;
 type aol_client_packet_t, packet_type, client_packet_type;
 type aol_server_packet_t, packet_type, server_packet_type;
 portcon udp 5190-5193 gen_context(system_u:object_r:aol_port_t,s0)
 portcon tcp 5190-5193 gen_context(system_u:object_r:aol_port_t,s0)
- 
+
 
 type apcupsd_port_t, port_type;
 type apcupsd_client_packet_t, packet_type, client_packet_type;
@@ -236,6 +243,12 @@ typeattribute bgp_port_t reserved_port_type;
 portcon udp 179 gen_context(system_u:object_r:bgp_port_t,s0)
 portcon tcp 2605 gen_context(system_u:object_r:bgp_port_t,s0)
 portcon udp 2605 gen_context(system_u:object_r:bgp_port_t,s0)
+
+
+type boinc_port_t, port_type;
+type boinc_client_packet_t, packet_type, client_packet_type;
+type boinc_server_packet_t, packet_type, server_packet_type;
+portcon tcp 31416 gen_context(system_u:object_r:boinc_port_t,s0)
 
 type biff_port_t, port_type, reserved_port_type; 
 type certmaster_port_t, port_type;
@@ -284,6 +297,7 @@ type comsat_port_t, port_type;
 type comsat_client_packet_t, packet_type, client_packet_type;
 type comsat_server_packet_t, packet_type, server_packet_type;
 typeattribute comsat_port_t reserved_port_type;
+typeattribute comsat_port_t rpc_port_type;
 
 portcon udp 512 gen_context(system_u:object_r:comsat_port_t,s0)
 
@@ -302,6 +316,13 @@ portcon tcp 6767 gen_context(system_u:object_r:cyphesis_port_t,s0)
 portcon tcp 6769 gen_context(system_u:object_r:cyphesis_port_t,s0)
 portcon tcp 6780-6799 gen_context(system_u:object_r:cyphesis_port_t,s0)
 portcon udp 32771 gen_context(system_u:object_r:cyphesis_port_t,s0)
+
+
+type daap_port_t, port_type;
+type daap_client_packet_t, packet_type, client_packet_type;
+type daap_server_packet_t, packet_type, server_packet_type;
+portcon tcp 3689 gen_context(system_u:object_r:daap_port_t,s0)
+portcon udp 3689 gen_context(system_u:object_r:daap_port_t,s0)
 
 
 type dbskkd_port_t, port_type;
@@ -334,9 +355,11 @@ typeattribute dhcpc_port_t reserved_port_type;
 
 portcon tcp 68 gen_context(system_u:object_r:dhcpc_port_t,s0)
 typeattribute dhcpc_port_t reserved_port_type;
+typeattribute dhcpc_port_t rpc_port_type;
 
 portcon udp 546 gen_context(system_u:object_r:dhcpc_port_t,s0)
 typeattribute dhcpc_port_t reserved_port_type;
+typeattribute dhcpc_port_t rpc_port_type;
 
 portcon tcp 546 gen_context(system_u:object_r:dhcpc_port_t,s0)
 
@@ -348,15 +371,19 @@ typeattribute dhcpd_port_t reserved_port_type;
 
 portcon udp 67 gen_context(system_u:object_r:dhcpd_port_t,s0)
 typeattribute dhcpd_port_t reserved_port_type;
+typeattribute dhcpd_port_t rpc_port_type;
 
 portcon udp 547 gen_context(system_u:object_r:dhcpd_port_t,s0)
 typeattribute dhcpd_port_t reserved_port_type;
+typeattribute dhcpd_port_t rpc_port_type;
 
 portcon tcp 547 gen_context(system_u:object_r:dhcpd_port_t,s0)
 typeattribute dhcpd_port_t reserved_port_type;
+typeattribute dhcpd_port_t rpc_port_type;
 
 portcon udp 548 gen_context(system_u:object_r:dhcpd_port_t,s0)
 typeattribute dhcpd_port_t reserved_port_type;
+typeattribute dhcpd_port_t rpc_port_type;
 
 portcon tcp 548 gen_context(system_u:object_r:dhcpd_port_t,s0)
 typeattribute dhcpd_port_t reserved_port_type;
@@ -483,6 +510,18 @@ type gpsd_server_packet_t, packet_type, server_packet_type;
 portcon tcp 2947 gen_context(system_u:object_r:gpsd_port_t,s0)
 
 
+type hadoop_datanode_port_t, port_type;
+type hadoop_datanode_client_packet_t, packet_type, client_packet_type;
+type hadoop_datanode_server_packet_t, packet_type, server_packet_type;
+portcon tcp 50010 gen_context(system_u:object_r:hadoop_datanode_port_t,s0)
+
+
+type hadoop_namenode_port_t, port_type;
+type hadoop_namenode_client_packet_t, packet_type, client_packet_type;
+type hadoop_namenode_server_packet_t, packet_type, server_packet_type;
+portcon tcp 8020 gen_context(system_u:object_r:hadoop_namenode_port_t,s0)
+
+
 type hddtemp_port_t, port_type;
 type hddtemp_client_packet_t, packet_type, client_packet_type;
 type hddtemp_server_packet_t, packet_type, server_packet_type;
@@ -540,7 +579,6 @@ portcon tcp 8443 gen_context(system_u:object_r:http_port_t,s0)
 type http_cache_port_t, port_type;
 type http_cache_client_packet_t, packet_type, client_packet_type;
 type http_cache_server_packet_t, packet_type, server_packet_type;
-portcon tcp 3128 gen_context(system_u:object_r:http_cache_port_t,s0)
 portcon udp 3130 gen_context(system_u:object_r:http_cache_port_t,s0)
 portcon tcp 8080 gen_context(system_u:object_r:http_cache_port_t,s0)
 portcon tcp 8118 gen_context(system_u:object_r:http_cache_port_t,s0)
@@ -600,12 +638,15 @@ typeattribute inetd_child_port_t reserved_port_type;
 
 portcon udp 37 gen_context(system_u:object_r:inetd_child_port_t,s0)
 typeattribute inetd_child_port_t reserved_port_type;
+typeattribute inetd_child_port_t rpc_port_type;
 
 portcon tcp 512 gen_context(system_u:object_r:inetd_child_port_t,s0)
 typeattribute inetd_child_port_t reserved_port_type;
+typeattribute inetd_child_port_t rpc_port_type;
 
 portcon tcp 543 gen_context(system_u:object_r:inetd_child_port_t,s0)
 typeattribute inetd_child_port_t reserved_port_type;
+typeattribute inetd_child_port_t rpc_port_type;
 
 portcon tcp 544 gen_context(system_u:object_r:inetd_child_port_t,s0)
 typeattribute inetd_child_port_t reserved_port_type;
@@ -771,9 +812,11 @@ type ktalkd_port_t, port_type;
 type ktalkd_client_packet_t, packet_type, client_packet_type;
 type ktalkd_server_packet_t, packet_type, server_packet_type;
 typeattribute ktalkd_port_t reserved_port_type;
+typeattribute ktalkd_port_t rpc_port_type;
 
 portcon udp 517 gen_context(system_u:object_r:ktalkd_port_t,s0)
 typeattribute ktalkd_port_t reserved_port_type;
+typeattribute ktalkd_port_t rpc_port_type;
 
 portcon udp 518 gen_context(system_u:object_r:ktalkd_port_t,s0)
 
@@ -842,6 +885,12 @@ type monopd_server_packet_t, packet_type, server_packet_type;
 portcon tcp 1234 gen_context(system_u:object_r:monopd_port_t,s0)
 
 
+type mpd_port_t, port_type;
+type mpd_client_packet_t, packet_type, client_packet_type;
+type mpd_server_packet_t, packet_type, server_packet_type;
+portcon tcp 6600 gen_context(system_u:object_r:mpd_port_t,s0)
+
+
 type msnp_port_t, port_type;
 type msnp_client_packet_t, packet_type, client_packet_type;
 type msnp_server_packet_t, packet_type, server_packet_type;
@@ -852,10 +901,8 @@ portcon udp 1863 gen_context(system_u:object_r:msnp_port_t,s0)
 type mssql_port_t, port_type;
 type mssql_client_packet_t, packet_type, client_packet_type;
 type mssql_server_packet_t, packet_type, server_packet_type;
-portcon tcp 1433 gen_context(system_u:object_r:mssql_port_t,s0)
-portcon tcp 1434 gen_context(system_u:object_r:mssql_port_t,s0)
-portcon udp 1433 gen_context(system_u:object_r:mssql_port_t,s0)
-portcon udp 1434 gen_context(system_u:object_r:mssql_port_t,s0)
+portcon tcp 1433-1434 gen_context(system_u:object_r:mssql_port_t,s0)
+portcon udp 1433-1434 gen_context(system_u:object_r:mssql_port_t,s0)
 
 
 type munin_port_t, port_type;
@@ -870,7 +917,7 @@ type mysqld_client_packet_t, packet_type, client_packet_type;
 type mysqld_server_packet_t, packet_type, server_packet_type;
 portcon tcp 1186 gen_context(system_u:object_r:mysqld_port_t,s0)
 portcon tcp 3306 gen_context(system_u:object_r:mysqld_port_t,s0)
-portcon tcp 63132-63163 gen_context(system_u:object_r:mysqld_port_t,s0)
+portcon tcp 63132-63164 gen_context(system_u:object_r:mysqld_port_t,s0)
 
 
 type mysqlmanagerd_port_t, port_type;
@@ -915,10 +962,8 @@ portcon udp 138 gen_context(system_u:object_r:nmbd_port_t,s0)
 type ntop_port_t, port_type;
 type ntop_client_packet_t, packet_type, client_packet_type;
 type ntop_server_packet_t, packet_type, server_packet_type;
-portcon tcp 3000 gen_context(system_u:object_r:ntop_port_t,s0)
-portcon udp 3000 gen_context(system_u:object_r:ntop_port_t,s0)
-portcon tcp 3001 gen_context(system_u:object_r:ntop_port_t,s0)
-portcon udp 3001 gen_context(system_u:object_r:ntop_port_t,s0)
+portcon tcp 3000-3001 gen_context(system_u:object_r:ntop_port_t,s0)
+portcon udp 3000-3001 gen_context(system_u:object_r:ntop_port_t,s0)
 
 
 type ntp_port_t, port_type;
@@ -927,6 +972,17 @@ type ntp_server_packet_t, packet_type, server_packet_type;
 typeattribute ntp_port_t reserved_port_type;
 
 portcon udp 123 gen_context(system_u:object_r:ntp_port_t,s0)
+
+
+type oracledb_port_t, port_type;
+type oracledb_client_packet_t, packet_type, client_packet_type;
+type oracledb_server_packet_t, packet_type, server_packet_type;
+portcon tcp 1521 gen_context(system_u:object_r:oracledb_port_t,s0)
+portcon udp 1521 gen_context(system_u:object_r:oracledb_port_t,s0)
+portcon tcp 2483 gen_context(system_u:object_r:oracledb_port_t,s0)
+portcon udp 2483 gen_context(system_u:object_r:oracledb_port_t,s0)
+portcon tcp 2484 gen_context(system_u:object_r:oracledb_port_t,s0)
+portcon udp 2484 gen_context(system_u:object_r:oracledb_port_t,s0)
 
 
 type ocsp_port_t, port_type;
@@ -1032,10 +1088,18 @@ portcon tcp 4690 gen_context(system_u:object_r:prelude_port_t,s0)
 portcon udp 4690 gen_context(system_u:object_r:prelude_port_t,s0)
 
 
+type presence_port_t, port_type;
+type presence_client_packet_t, packet_type, client_packet_type;
+type presence_server_packet_t, packet_type, server_packet_type;
+portcon tcp 5298-5299 gen_context(system_u:object_r:presence_port_t,s0)
+portcon udp 5298-5299 gen_context(system_u:object_r:presence_port_t,s0)
+
+
 type printer_port_t, port_type;
 type printer_client_packet_t, packet_type, client_packet_type;
 type printer_server_packet_t, packet_type, server_packet_type;
 typeattribute printer_port_t reserved_port_type;
+typeattribute printer_port_t rpc_port_type;
 
 portcon tcp 515 gen_context(system_u:object_r:printer_port_t,s0)
 
@@ -1114,6 +1178,7 @@ type rlogind_port_t, port_type;
 type rlogind_client_packet_t, packet_type, client_packet_type;
 type rlogind_server_packet_t, packet_type, server_packet_type;
 typeattribute rlogind_port_t reserved_port_type;
+typeattribute rlogind_port_t rpc_port_type;
 
 portcon tcp 513 gen_context(system_u:object_r:rlogind_port_t,s0)
 
@@ -1131,12 +1196,15 @@ type router_port_t, port_type;
 type router_client_packet_t, packet_type, client_packet_type;
 type router_server_packet_t, packet_type, server_packet_type;
 typeattribute router_port_t reserved_port_type;
+typeattribute router_port_t rpc_port_type;
 
 portcon udp 520 gen_context(system_u:object_r:router_port_t,s0)
 typeattribute router_port_t reserved_port_type;
+typeattribute router_port_t rpc_port_type;
 
 portcon udp 521 gen_context(system_u:object_r:router_port_t,s0)
 typeattribute router_port_t reserved_port_type;
+typeattribute router_port_t rpc_port_type;
 
 portcon tcp 521 gen_context(system_u:object_r:router_port_t,s0)
 
@@ -1145,6 +1213,7 @@ type rsh_port_t, port_type;
 type rsh_client_packet_t, packet_type, client_packet_type;
 type rsh_server_packet_t, packet_type, server_packet_type;
 typeattribute rsh_port_t reserved_port_type;
+typeattribute rsh_port_t rpc_port_type;
 
 portcon tcp 514 gen_context(system_u:object_r:rsh_port_t,s0)
 
@@ -1166,6 +1235,7 @@ type rwho_port_t, port_type;
 type rwho_client_packet_t, packet_type, client_packet_type;
 type rwho_server_packet_t, packet_type, server_packet_type;
 typeattribute rwho_port_t reserved_port_type;
+typeattribute rwho_port_t rpc_port_type;
 
 portcon udp 513 gen_context(system_u:object_r:rwho_port_t,s0)
 
@@ -1192,6 +1262,13 @@ portcon tcp 5061 gen_context(system_u:object_r:sip_port_t,s0)
 portcon udp 5061 gen_context(system_u:object_r:sip_port_t,s0)
 
 
+type sixxsconfig_port_t, port_type;
+type sixxsconfig_client_packet_t, packet_type, client_packet_type;
+type sixxsconfig_server_packet_t, packet_type, server_packet_type;
+portcon tcp 3874 gen_context(system_u:object_r:sixxsconfig_port_t,s0)
+portcon udp 3874 gen_context(system_u:object_r:sixxsconfig_port_t,s0)
+
+
 type smbd_port_t, port_type;
 type smbd_client_packet_t, packet_type, client_packet_type;
 type smbd_server_packet_t, packet_type, server_packet_type;
@@ -1213,6 +1290,7 @@ typeattribute smtp_port_t reserved_port_type;
 
 portcon tcp 465 gen_context(system_u:object_r:smtp_port_t,s0)
 typeattribute smtp_port_t reserved_port_type;
+typeattribute smtp_port_t rpc_port_type;
 
 portcon tcp 587 gen_context(system_u:object_r:smtp_port_t,s0)
 
@@ -1285,8 +1363,15 @@ type syslogd_port_t, port_type;
 type syslogd_client_packet_t, packet_type, client_packet_type;
 type syslogd_server_packet_t, packet_type, server_packet_type;
 typeattribute syslogd_port_t reserved_port_type;
+typeattribute syslogd_port_t rpc_port_type;
 
 portcon udp 514 gen_context(system_u:object_r:syslogd_port_t,s0)
+
+
+type tcs_port_t, port_type;
+type tcs_client_packet_t, packet_type, client_packet_type;
+type tcs_server_packet_t, packet_type, server_packet_type;
+portcon tcp 30003 gen_context(system_u:object_r:tcs_port_t,s0)
 
 
 type telnetd_port_t, port_type;
@@ -1337,6 +1422,7 @@ type uucpd_port_t, port_type;
 type uucpd_client_packet_t, packet_type, client_packet_type;
 type uucpd_server_packet_t, packet_type, server_packet_type;
 typeattribute uucpd_port_t reserved_port_type;
+typeattribute uucpd_port_t rpc_port_type;
 
 portcon tcp 540 gen_context(system_u:object_r:uucpd_port_t,s0)
 
@@ -1344,8 +1430,7 @@ portcon tcp 540 gen_context(system_u:object_r:uucpd_port_t,s0)
 type varnishd_port_t, port_type;
 type varnishd_client_packet_t, packet_type, client_packet_type;
 type varnishd_server_packet_t, packet_type, server_packet_type;
-portcon tcp 6081 gen_context(system_u:object_r:varnishd_port_t,s0)
-portcon tcp 6082 gen_context(system_u:object_r:varnishd_port_t,s0)
+portcon tcp 6081-6082 gen_context(system_u:object_r:varnishd_port_t,s0)
 
 
 type virt_port_t, port_type;
@@ -1417,6 +1502,47 @@ type xserver_server_packet_t, packet_type, server_packet_type;
 portcon tcp 6000-6020 gen_context(system_u:object_r:xserver_port_t,s0)
 
 
+type zarafa_port_t, port_type;
+type zarafa_client_packet_t, packet_type, client_packet_type;
+type zarafa_server_packet_t, packet_type, server_packet_type;
+typeattribute zarafa_port_t reserved_port_type;
+
+portcon tcp 236 gen_context(system_u:object_r:zarafa_port_t,s0)
+typeattribute zarafa_port_t reserved_port_type;
+
+portcon tcp 237 gen_context(system_u:object_r:zarafa_port_t,s0)
+
+
+type zabbix_port_t, port_type;
+type zabbix_client_packet_t, packet_type, client_packet_type;
+type zabbix_server_packet_t, packet_type, server_packet_type;
+portcon tcp 10051 gen_context(system_u:object_r:zabbix_port_t,s0)
+
+
+type zabbix_agent_port_t, port_type;
+type zabbix_agent_client_packet_t, packet_type, client_packet_type;
+type zabbix_agent_server_packet_t, packet_type, server_packet_type;
+portcon tcp 10050 gen_context(system_u:object_r:zabbix_agent_port_t,s0)
+
+
+type zookeeper_client_port_t, port_type;
+type zookeeper_client_client_packet_t, packet_type, client_packet_type;
+type zookeeper_client_server_packet_t, packet_type, server_packet_type;
+portcon tcp 2181 gen_context(system_u:object_r:zookeeper_client_port_t,s0)
+
+
+type zookeeper_election_port_t, port_type;
+type zookeeper_election_client_packet_t, packet_type, client_packet_type;
+type zookeeper_election_server_packet_t, packet_type, server_packet_type;
+portcon tcp 3888 gen_context(system_u:object_r:zookeeper_election_port_t,s0)
+
+
+type zookeeper_leader_port_t, port_type;
+type zookeeper_leader_client_packet_t, packet_type, client_packet_type;
+type zookeeper_leader_server_packet_t, packet_type, server_packet_type;
+portcon tcp 2888 gen_context(system_u:object_r:zookeeper_leader_port_t,s0)
+
+
 type zebra_port_t, port_type;
 type zebra_client_packet_t, packet_type, client_packet_type;
 type zebra_server_packet_t, packet_type, server_packet_type;
@@ -1432,13 +1558,13 @@ type zope_server_packet_t, packet_type, server_packet_type;
 portcon tcp 8021 gen_context(system_u:object_r:zope_port_t,s0)
 
 
-# Defaults for reserved ports.  Earlier portcon entries take precedence;
+# Defaults for reserved ports.	Earlier portcon entries take precedence;
 # these entries just cover any remaining reserved ports not otherwise declared.
 
-portcon tcp 600-1023 gen_context(system_u:object_r:hi_reserved_port_t, s0)
-portcon udp 600-1023 gen_context(system_u:object_r:hi_reserved_port_t, s0)
-portcon tcp 1-599 gen_context(system_u:object_r:reserved_port_t, s0)
-portcon udp 1-599 gen_context(system_u:object_r:reserved_port_t, s0)
+portcon tcp 512-1023 gen_context(system_u:object_r:hi_reserved_port_t, s0)
+portcon udp 512-1023 gen_context(system_u:object_r:hi_reserved_port_t, s0)
+portcon tcp 1-511 gen_context(system_u:object_r:reserved_port_t, s0)
+portcon udp 1-511 gen_context(system_u:object_r:reserved_port_t, s0)
 
 ########################################
 #
@@ -1497,5 +1623,5 @@ allow corenet_unconfined_type port_type:tcp_socket { send_msg recv_msg name_conn
 allow corenet_unconfined_type port_type:udp_socket { send_msg recv_msg };
 
 # Bind to any network address.
-allow corenet_unconfined_type port_type:{ tcp_socket udp_socket } name_bind;
+allow corenet_unconfined_type port_type:{ tcp_socket udp_socket rawip_socket } name_bind;
 allow corenet_unconfined_type node_type:{ tcp_socket udp_socket rawip_socket } node_bind;

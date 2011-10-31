@@ -30,7 +30,7 @@ interface(`snmp_stream_connect',`
 ## </param>
 #
 interface(`snmp_tcp_connect',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -44,7 +44,7 @@ interface(`snmp_tcp_connect',`
 ## </param>
 #
 interface(`snmp_udp_chat',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################

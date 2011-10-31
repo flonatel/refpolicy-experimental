@@ -130,7 +130,7 @@ interface(`kernel_setsched',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process sending the signal.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -148,7 +148,7 @@ interface(`kernel_sigchld',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process sending the signal.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -166,7 +166,7 @@ interface(`kernel_kill',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process sending the signal.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -203,7 +203,7 @@ interface(`kernel_share_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process using the descriptors.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -222,7 +222,7 @@ interface(`kernel_use_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of process not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -299,7 +299,7 @@ interface(`kernel_dgram_send',`
 ## </param>
 #
 interface(`kernel_tcp_recvfrom',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -313,7 +313,7 @@ interface(`kernel_tcp_recvfrom',`
 ## </param>
 #
 interface(`kernel_udp_send',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -327,7 +327,7 @@ interface(`kernel_udp_send',`
 ## </param>
 #
 interface(`kernel_udp_recvfrom',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -336,7 +336,7 @@ interface(`kernel_udp_recvfrom',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type to allow to load kernel modules.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -378,7 +378,7 @@ interface(`kernel_search_key',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -414,7 +414,7 @@ interface(`kernel_link_key',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -432,7 +432,7 @@ interface(`kernel_dontaudit_link_key',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type allowed to read the ring buffer.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -442,6 +442,7 @@ interface(`kernel_read_ring_buffer',`
 		type kernel_t;
 	')
 
+	allow $1 self:capability2 syslog;
 	allow $1 kernel_t:system syslog_read;
 ')
 
@@ -451,7 +452,7 @@ interface(`kernel_read_ring_buffer',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -479,7 +480,16 @@ interface(`kernel_change_ring_buffer_level',`
 		type kernel_t;
 	')
 
+	allow $1 self:capability2 syslog;
 	allow $1 kernel_t:system syslog_console;
+
+	ifdef(`distro_rhel4',`
+		allow $1 self:capability sys_admin;
+	')
+
+	ifdef(`distro_rhel5',`
+		allow $1 self:capability sys_admin;
+	')
 ')
 
 ########################################
@@ -488,7 +498,7 @@ interface(`kernel_change_ring_buffer_level',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type clearing the buffer.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -498,7 +508,16 @@ interface(`kernel_clear_ring_buffer',`
 		type kernel_t;
 	')
 
+	allow $1 self:capability2 syslog;
 	allow $1 kernel_t:system syslog_mod;
+
+	ifdef(`distro_rhel4',`
+		allow $1 self:capability sys_admin;
+	')
+
+	ifdef(`distro_rhel5',`
+		allow $1 self:capability sys_admin;
+	')
 ')
 
 ########################################
@@ -530,6 +549,24 @@ interface(`kernel_request_load_module',`
 	')
 
 	allow $1 kernel_t:system module_request;
+')
+
+########################################
+## <summary>
+##	Do not audit requests to the kernel to load a module.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_request_load_module',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	dontaudit $1 kernel_t:system module_request;
 ')
 
 ########################################
@@ -574,7 +611,7 @@ interface(`kernel_getattr_debugfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain mounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -592,7 +629,7 @@ interface(`kernel_mount_debugfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain unmounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -610,7 +647,7 @@ interface(`kernel_unmount_debugfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain remounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -646,7 +683,7 @@ interface(`kernel_search_debugfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -680,11 +717,49 @@ interface(`kernel_read_debugfs',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to write kernel debugging filesystem dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_write_debugfs_dirs',`
+	gen_require(`
+		type debugfs_t;
+	')
+
+	dontaudit $1 debugfs_t:dir write;
+')
+
+########################################
+## <summary>
+##	Manage information from the debugging filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_manage_debugfs',`
+	gen_require(`
+		type debugfs_t;
+	')
+
+	manage_files_pattern($1, debugfs_t, debugfs_t)
+	read_lnk_files_pattern($1, debugfs_t, debugfs_t)
+	list_dirs_pattern($1, debugfs_t, debugfs_t)
+')
+
+########################################
+## <summary>
 ##	Mount a kernel VM filesystem.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain mounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -702,7 +777,7 @@ interface(`kernel_mount_kvmfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain unmounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -730,6 +805,25 @@ interface(`kernel_getattr_proc',`
 	')
 
 	allow $1 proc_t:filesystem getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to set the
+##	attributes of directories in /proc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_setattr_proc_dirs',`
+	gen_require(`
+		type proc_t;
+	')
+
+	dontaudit $1 proc_t:dir setattr;
 ')
 
 ########################################
@@ -785,6 +879,25 @@ interface(`kernel_dontaudit_list_proc',`
 	')
 
 	dontaudit $1 proc_t:dir list_dir_perms;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to write the
+##	directories in /proc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_write_proc_dirs',`
+	gen_require(`
+		type proc_t;
+	')
+
+	dontaudit $1 proc_t:dir write;
 ')
 
 ########################################
@@ -904,7 +1017,7 @@ interface(`kernel_write_proc_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -923,7 +1036,7 @@ interface(`kernel_dontaudit_read_system_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -961,7 +1074,7 @@ interface(`kernel_rw_afs_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading software raid state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -982,7 +1095,7 @@ interface(`kernel_read_software_raid_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading software raid state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1002,7 +1115,7 @@ interface(`kernel_rw_software_raid_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type getting the attibutes.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1023,7 +1136,7 @@ interface(`kernel_getattr_core_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1065,7 +1178,7 @@ interface(`kernel_read_core_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the messages.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1087,7 +1200,7 @@ interface(`kernel_read_messages',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type getting the attributes.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1106,7 +1219,7 @@ interface(`kernel_getattr_message_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1125,7 +1238,7 @@ interface(`kernel_dontaudit_getattr_message_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ##
@@ -1144,7 +1257,7 @@ interface(`kernel_dontaudit_search_network_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1196,7 +1309,7 @@ interface(`kernel_read_network_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1216,7 +1329,7 @@ interface(`kernel_read_network_state_symlinks',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1236,7 +1349,7 @@ interface(`kernel_search_xen_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ##
@@ -1255,7 +1368,7 @@ interface(`kernel_dontaudit_search_xen_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1277,7 +1390,7 @@ interface(`kernel_read_xen_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type reading the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1298,7 +1411,7 @@ interface(`kernel_read_xen_state_symlinks',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type writing the state.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1317,7 +1430,7 @@ interface(`kernel_write_xen_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1356,7 +1469,7 @@ interface(`kernel_dontaudit_list_all_proc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ##
@@ -1375,7 +1488,7 @@ interface(`kernel_dontaudit_search_sysctl',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type to allow to read sysctl directories.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ##
@@ -1395,7 +1508,7 @@ interface(`kernel_read_sysctl',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type to allow to read the device sysctls.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -1517,7 +1630,7 @@ interface(`kernel_search_network_sysctl',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2034,7 +2147,7 @@ interface(`kernel_kill_unlabeled',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain mounting the filesystem.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -2046,6 +2159,23 @@ interface(`kernel_mount_unlabeled',`
 	allow $1 unlabeled_t:filesystem mount;
 ')
 
+########################################
+## <summary>
+##	Unmount a kernel unlabeled filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_unmount_unlabeled',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:filesystem unmount;
+')
 
 ########################################
 ## <summary>
@@ -2195,12 +2325,30 @@ interface(`kernel_rw_unlabeled_dirs',`
 
 ########################################
 ## <summary>
+##	Read and write unlabeled files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_rw_unlabeled_files',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:file rw_file_perms;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts by caller to get the
 ##	attributes of an unlabeled file.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2238,7 +2386,7 @@ interface(`kernel_dontaudit_read_unlabeled_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2257,7 +2405,7 @@ interface(`kernel_dontaudit_getattr_unlabeled_symlinks',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2276,7 +2424,7 @@ interface(`kernel_dontaudit_getattr_unlabeled_pipes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2295,7 +2443,7 @@ interface(`kernel_dontaudit_getattr_unlabeled_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2332,7 +2480,7 @@ interface(`kernel_rw_unlabeled_blk_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type not to audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2775,16 +2923,24 @@ interface(`kernel_relabelfrom_unlabeled_database',`
 	gen_require(`
 		type unlabeled_t;
 		class db_database { setattr relabelfrom };
+		class db_schema { setattr relabelfrom };
 		class db_table { setattr relabelfrom };
+		class db_sequence { setattr relabelfrom };
+		class db_view { setattr relabelfrom };
 		class db_procedure { setattr relabelfrom };
+		class db_language { setattr relabelfrom };
 		class db_column { setattr relabelfrom };
 		class db_tuple { update relabelfrom };
 		class db_blob { setattr relabelfrom };
 	')
 
 	allow $1 unlabeled_t:db_database { setattr relabelfrom };
+	allow $1 unlabeled_t:db_schema { setattr relabelfrom };
 	allow $1 unlabeled_t:db_table { setattr relabelfrom };
+	allow $1 unlabeled_t:db_sequence { setattr relabelfrom };
+	allow $1 unlabeled_t:db_view { setattr relabelfrom };
 	allow $1 unlabeled_t:db_procedure { setattr relabelfrom };
+	allow $1 unlabeled_t:db_language { setattr relabelfrom };
 	allow $1 unlabeled_t:db_column { setattr relabelfrom };
 	allow $1 unlabeled_t:db_tuple { update relabelfrom };
 	allow $1 unlabeled_t:db_blob { setattr relabelfrom };

@@ -26,12 +26,12 @@ interface(`podsleuth_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the podsleuth domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 #

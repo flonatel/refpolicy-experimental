@@ -46,12 +46,12 @@ interface(`policykit_domtrans_auth',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the load_policy domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 #
@@ -89,12 +89,12 @@ interface(`policykit_domtrans_grant',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the load_policy domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>

@@ -50,7 +50,7 @@ interface(`ldap_read_config',`
 ## </param>
 #
 interface(`ldap_use',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################

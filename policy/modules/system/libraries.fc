@@ -6,6 +6,8 @@ ifdef(`distro_debian',`
 /emul/ia32-linux/usr(/.*)?/lib(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
 /emul/ia32-linux/lib(/.*)?			gen_context(system_u:object_r:lib_t,s0)
 /emul/ia32-linux/lib(/.*)?/ld-[^/]*\.so(\.[^/]*)* -- gen_context(system_u:object_r:ld_so_t,s0)
+/lib64				-d		gen_context(system_u:object_r:lib_t,s0)
+/lib64/.*					gen_context(system_u:object_r:lib_t,s0)
 ')
 
 ifdef(`distro_gentoo',`
@@ -101,6 +103,7 @@ ifdef(`distro_gentoo',`
 ')
 
 ifdef(`distro_redhat',`
+/opt/Adobe.*/libcurl\.so 		-- 	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /opt/Adobe(/.*?)/nppdf\.so 		-- 	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /opt/Adobe/Reader.?/Reader/intellinux/plug_ins/.*\.api -- gen_context(system_u:object_r:textrel_shlib_t,s0)
 /opt/Adobe/Reader.?/Reader/intellinux/SPPlugins/.*\.ap[il] -- gen_context(system_u:object_r:lib_t,s0)
@@ -214,8 +217,6 @@ HOME_DIR/.*/plugins/nppdf\.so.* --	gen_context(system_u:object_r:textrel_shlib_t
 /usr/lib/libFLAC\.so.*			--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/libfglrx_gamma\.so.* 		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/mozilla/plugins/nppdf\.so 	-- 	gen_context(system_u:object_r:textrel_shlib_t,s0)
-/usr/lib/maxima/[^/]+/binary-gcl/maxima	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
-/usr/lib64/maxima/[^/]+/binary-gcl/maxima --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/mozilla/plugins/libvlcplugin\.so --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/nx/libXcomp\.so.*		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/nx/libjpeg\.so.* 		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
@@ -224,6 +225,7 @@ HOME_DIR/.*/plugins/nppdf\.so.* --	gen_context(system_u:object_r:textrel_shlib_t
 
 /usr/lib(64)?/libstdc\+\+\.so\.2\.7\.2\.8 --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/libg\+\+\.so\.2\.7\.2\.8	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+/usr/lib(64)?/libgpac\.so.* 		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/libglide3\.so.* 		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/libglide3-v[0-9]*\.so.* 	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/helix/plugins/[^/]*\.so --	gen_context(system_u:object_r:textrel_shlib_t,s0)
@@ -263,6 +265,7 @@ HOME_DIR/.*/plugins/nppdf\.so.* --	gen_context(system_u:object_r:textrel_shlib_t
 /usr/lib(64)?/ladspa/sc3_1427\.so	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/ladspa/sc4_1882\.so	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/ladspa/se4_1883\.so	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+/usr/lib(64)?/sane/libsane-epkowa\.so.* --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib(64)?/ocaml/stublibs/dllnums\.so --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 
 # Livna.org packages: xmms-mp3, ffmpeg, xvidcore, xine-lib, gsm, lame
@@ -320,11 +323,6 @@ HOME_DIR/.mozilla/plugins/nprhapengine\.so.* --	gen_context(system_u:object_r:te
 /usr/lib/acroread/(.*/)?ADMPlugin\.apl	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
 /usr/lib/.*/program(/.*)?\.so			gen_context(system_u:object_r:lib_t,s0)
 /usr/lib64/.*/program(/.*)?\.so			gen_context(system_u:object_r:lib_t,s0)
-/usr/lib(64)?/pgsql/.*\.so.*		--	gen_context(system_u:object_r:lib_t,s0)
-/usr/lib(64)?/pgsql/test/regress/.*\.so.* --	gen_context(system_u:object_r:lib_t,s0)
-
-/usr/share/hplip/prnt/plugins(/.*)?		gen_context(system_u:object_r:lib_t,s0)
-/usr/share/squeezeboxserver/CPAN/arch/.+\.so --	gen_context(system_u:object_r:textrel_shlib_t,s0)
 ') dnl end distro_redhat
 
 #

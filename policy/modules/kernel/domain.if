@@ -402,7 +402,7 @@ interface(`domain_use_interactive_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -470,6 +470,26 @@ interface(`domain_signal_all_domains',`
 	')
 
 	allow $1 domain:process signal;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to send general
+##	signals to all domains.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`domain_dontaudit_signal_all_domains',`
+	gen_require(`
+		attribute domain;
+	')
+
+	dontaudit $1 domain:process signal;
 ')
 
 ########################################
@@ -630,7 +650,8 @@ interface(`domain_getattr_all_domains',`
 
 ########################################
 ## <summary>
-##	Get the attributes of all domains of all domains.
+##	Do not audit attempts to get the attributes
+##	of all domains.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -727,7 +748,7 @@ interface(`domain_ptrace_all_domains',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -755,7 +776,7 @@ interface(`domain_dontaudit_ptrace_all_domains',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -774,7 +795,7 @@ interface(`domain_dontaudit_ptrace_confined_domains',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -799,7 +820,7 @@ interface(`domain_dontaudit_read_all_domains_state',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -836,7 +857,7 @@ interface(`domain_getsession_all_domains',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -882,6 +903,24 @@ interface(`domain_getsched_all_domains',`
 	')
 
 	allow $1 domain:process getsched;
+')
+
+########################################
+## <summary>
+##	Get the capability information of all domains.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_getcap_all_domains',`
+	gen_require(`
+		attribute domain;
+	')
+
+	allow $1 domain:process getcap;
 ')
 
 ########################################
@@ -949,7 +988,7 @@ interface(`domain_dontaudit_getattr_all_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -968,7 +1007,7 @@ interface(`domain_dontaudit_getattr_all_tcp_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -987,7 +1026,7 @@ interface(`domain_dontaudit_getattr_all_udp_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1006,7 +1045,7 @@ interface(`domain_dontaudit_rw_all_udp_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1025,7 +1064,7 @@ interface(`domain_dontaudit_getattr_all_key_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1044,7 +1083,7 @@ interface(`domain_dontaudit_getattr_all_packet_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1063,7 +1102,7 @@ interface(`domain_dontaudit_getattr_all_raw_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1082,7 +1121,7 @@ interface(`domain_dontaudit_rw_all_key_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1120,7 +1159,7 @@ interface(`domain_getattr_all_stream_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1168,7 +1207,7 @@ interface(`domain_getattr_all_pipes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1187,7 +1226,7 @@ interface(`domain_dontaudit_getattr_all_pipes',`
 ## </summary>
 ## <param name="type">
 ##	<summary>
-##	Type of subject to be allowed this.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1217,6 +1256,25 @@ interface(`domain_getattr_all_entry_files',`
 
 	allow $1 entry_type:lnk_file read_lnk_file_perms;
 	allow $1 entry_type:file getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes
+##	of all entry point files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`domain_dontaudit_getattr_all_entry_files',`
+	gen_require(`
+		attribute entry_type;
+	')
+
+	dontaudit $1 entry_type:file getattr_file_perms;
 ')
 
 ########################################
@@ -1341,7 +1399,7 @@ interface(`domain_mmap_all_entry_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -1361,25 +1419,53 @@ interface(`domain_entry_file_spec_domtrans',`
 
 ########################################
 ## <summary>
-##	Ability to mmap a low area of the address space,
-##	as configured by /proc/sys/kernel/mmap_min_addr.
+##	Ability to mmap a low area of the address
+##	space conditionally, as configured by
+##	/proc/sys/kernel/mmap_min_addr.
 ##	Preventing such mappings helps protect against
 ##	exploiting null deref bugs in the kernel.
 ## </summary>
 ## <param name="domain">
-##	<summary>
-##	Domain allowed to mmap low memory.
-##	</summary>
+## <summary>
+##	Domain allowed access.
+## </summary>
 ## </param>
 #
 interface(`domain_mmap_low',`
 	gen_require(`
 		attribute mmap_low_domain_type;
+		bool mmap_low_allowed;
 	')
 
-	allow $1 self:memprotect mmap_zero;
+	typeattribute $1 mmap_low_domain_type;
+
+	if ( mmap_low_allowed ) {
+		allow $1 self:memprotect mmap_zero;
+	}
+')
+
+########################################
+## <summary>
+##	Ability to mmap a low area of the address
+##	space unconditionally, as configured
+##	by /proc/sys/kernel/mmap_min_addr.
+##	Preventing such mappings helps protect against
+##	exploiting null deref bugs in the kernel.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed access.
+## </summary>
+## </param>
+#
+interface(`domain_mmap_low_uncond',`
+	gen_require(`
+		attribute mmap_low_domain_type;
+	')
 
 	typeattribute $1 mmap_low_domain_type;
+
+	allow $1 self:memprotect mmap_zero;
 ')
 
 ########################################

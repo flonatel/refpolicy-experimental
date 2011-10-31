@@ -64,7 +64,7 @@ interface(`spamassassin_exec',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -101,7 +101,7 @@ interface(`spamassassin_exec_spamd',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -138,7 +138,7 @@ interface(`spamassassin_exec_client',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -195,7 +195,7 @@ interface(`spamassassin_manage_lib_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #

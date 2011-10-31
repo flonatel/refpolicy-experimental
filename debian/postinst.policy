@@ -68,7 +68,6 @@ my %map = (
            'apache'          => [ 'apache*', 'cvsweb' ],
            'apm'             => [ 'acpid' ],
            'asterisk'        => [ 'asterisk' ],
-           'audioentropy'    => [ 'randomsound' ],
            'automount'       => [ 'autofs*' ],
            'avahi'           => [ 'avahi-*' ],
            'bind'            => [ 'bind9' ],

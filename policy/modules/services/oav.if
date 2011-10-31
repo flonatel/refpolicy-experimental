@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -26,12 +26,12 @@ interface(`oav_domtrans_update',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the oav_update domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>

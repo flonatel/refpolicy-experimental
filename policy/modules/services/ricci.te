@@ -1,4 +1,3 @@
-
 policy_module(ricci, 1.7.0)
 
 ########################################
@@ -241,10 +240,6 @@ optional_policy(`
 
 optional_policy(`
 	oddjob_system_entry(ricci_modcluster_t, ricci_modcluster_exec_t)
-')
-
-optional_policy(`
-	rgmanager_stream_connect(ricci_modclusterd_t)
 ')
 
 optional_policy(`

@@ -28,7 +28,7 @@ interface(`amavis_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -56,7 +56,7 @@ interface(`amavis_read_spool_files',`
 	')
 
 	files_search_spool($1)
-	allow $1 amavis_spool_t:file read_file_perms;
+	read_files_pattern($1, amavis_spool_t, amavis_spool_t)
 ')
 
 ########################################
@@ -183,7 +183,7 @@ interface(`amavis_setattr_pid_files',`
 		type amavis_var_run_t;
 	')
 
-	allow $1 amavis_var_run_t:file setattr;
+	allow $1 amavis_var_run_t:file setattr_file_perms;
 	files_search_pids($1)
 ')
 
@@ -208,7 +208,7 @@ interface(`amavis_create_pid_files',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate 
+##	All of the rules required to administrate
 ##	an amavis environment
 ## </summary>
 ## <param name="domain">

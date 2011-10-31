@@ -131,7 +131,7 @@ interface(`corecmd_search_bin',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -163,11 +163,11 @@ interface(`corecmd_list_bin',`
 
 ########################################
 ## <summary>
-##	Do not auidt attempts to write bin directories.
+##	Do not audit attempts to write bin directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -232,6 +232,24 @@ interface(`corecmd_read_bin_files',`
 	')
 
 	read_files_pattern($1, bin_t, bin_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to write bin files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`corecmd_dontaudit_write_bin_files',`
+	gen_require(`
+		type bin_t;
+	')
+
+	dontaudit $1 bin_t:file write;
 ')
 
 ########################################
@@ -410,7 +428,7 @@ interface(`corecmd_mmap_bin_files',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -453,7 +471,7 @@ interface(`corecmd_bin_spec_domtrans',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -713,7 +731,7 @@ interface(`corecmd_mmap_sbin_files',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -754,7 +772,7 @@ interface(`corecmd_sbin_domtrans',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -861,7 +879,7 @@ interface(`corecmd_exec_ls',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -896,7 +914,7 @@ interface(`corecmd_shell_spec_domtrans',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -931,6 +949,7 @@ interface(`corecmd_exec_chroot',`
 
 	read_lnk_files_pattern($1, bin_t, bin_t)
 	can_exec($1, chroot_exec_t)
+	allow $1 self:capability sys_chroot;
 ')
 
 ########################################
@@ -1001,7 +1020,7 @@ interface(`corecmd_exec_all_executables',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #

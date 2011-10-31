@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -29,5 +29,5 @@ interface(`finger_domtrans',`
 ## </param>
 #
 interface(`finger_tcp_connect',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')

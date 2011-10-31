@@ -1,5 +1,4 @@
-
-policy_module(lvm, 1.12.0)
+policy_module(lvm, 1.13.0)
 
 ########################################
 #
@@ -180,6 +179,7 @@ allow lvm_t self:file rw_file_perms;
 allow lvm_t self:fifo_file manage_fifo_file_perms;
 allow lvm_t self:unix_dgram_socket create_socket_perms;
 allow lvm_t self:netlink_kobject_uevent_socket create_socket_perms;
+allow lvm_t self:sem create_sem_perms;
 
 allow lvm_t self:unix_stream_socket { connectto create_stream_socket_perms };
 allow lvm_t clvmd_t:unix_stream_socket { connectto rw_socket_perms };
@@ -217,8 +217,8 @@ filetrans_pattern(lvm_t, lvm_etc_t, lvm_metadata_t, file)
 files_etc_filetrans(lvm_t, lvm_metadata_t, file)
 files_search_mnt(lvm_t)
 
+kernel_get_sysvipc_info(lvm_t)
 kernel_read_system_state(lvm_t)
-kernel_read_kernel_sysctls(lvm_t)
 # Read system variables in /proc/sys
 kernel_read_kernel_sysctls(lvm_t)
 # it has no reason to need this
@@ -282,9 +282,9 @@ storage_relabel_fixed_disk(lvm_t)
 storage_dontaudit_read_removable_device(lvm_t)
 # LVM creates block devices in /dev/mapper or /dev/<vg>
 # depending on its version
-# LVM(2) needs to create directores (/dev/mapper, /dev/<vg>)
+# LVM(2) needs to create directories (/dev/mapper, /dev/<vg>)
 # and links from /dev/<vg> to /dev/mapper/<vg>-<lv>
-# cjp: need create interface here for fixed disk create
+# cjp: needs to create an interface here for fixed disk create
 storage_dev_filetrans_fixed_disk(lvm_t)
 # Access raw devices and old /dev/lvm (c 109,0).  Is this needed?
 storage_manage_fixed_disk(lvm_t)

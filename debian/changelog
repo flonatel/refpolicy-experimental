@@ -1,3 +1,23 @@
+refpolicy (2:2.20110726-1) unstable; urgency=low
+
+  * New upstream policy
+  * Built for Wheezy, made it depend on all Wheezy versions.  It won't work
+    on Squeeze and can't be easily backported.
+  * Label /dev/xconsole as xconsole_device_t
+  * Allow syslogd_t capability sys_nice and process:{ getsched setsched }
+  * Allow xconsole_device_t to be associated with device_t filesystems
+  * This version is a bit rough, you can boot unstable in enforcing mode and
+    login via ssh but I won't guarantee any more.
+
+ -- Russell Coker <russell@coker.com.au>  Mon, 31 Oct 2011 21:54:20 +1100
+
+refpolicy (2:0.2.20100524-13) unstable; urgency=low
+
+  * Labeled awffull as webalizer_exec_t.
+  * Removed nx.pp from unstable as it doesn't build with latest utils.
+
+ -- Russell Coker <russell@coker.com.au>  Thu, 15 Sep 2011 11:53:02 +1000
+
 refpolicy (2:0.2.20100524-12) unstable; urgency=low
 
   * Allow perdition to bind to sieve port, read /dev/urandom, and capabilities

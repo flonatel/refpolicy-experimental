@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -26,12 +26,12 @@ interface(`sysnet_domtrans_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the clock domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -69,7 +69,7 @@ interface(`sysnet_run_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the SIGCHLD.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -87,7 +87,7 @@ interface(`sysnet_dontaudit_use_dhcpc_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the SIGCHLD.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -105,7 +105,7 @@ interface(`sysnet_sigchld_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the SIGKILL.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -124,7 +124,7 @@ interface(`sysnet_kill_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the SIGSTOP.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -142,7 +142,7 @@ interface(`sysnet_sigstop_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the null signal.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -160,7 +160,7 @@ interface(`sysnet_signull_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain sending the signal.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -200,7 +200,7 @@ interface(`sysnet_dbus_chat_dhcpc',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -215,11 +215,31 @@ interface(`sysnet_rw_dhcp_config',`
 
 ########################################
 ## <summary>
+##	Search the DHCP client state
+##	directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`sysnet_search_dhcpc_state',`
+	gen_require(`
+		type dhcpc_state_t;
+	')
+
+	files_search_var_lib($1)
+	allow $1 dhcpc_state_t:dir search_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Read dhcp client state files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The domain allowed access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -376,7 +396,7 @@ interface(`sysnet_create_config',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -394,7 +414,7 @@ interface(`sysnet_etc_filetrans_config',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -417,7 +437,7 @@ interface(`sysnet_manage_config',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -436,7 +456,7 @@ interface(`sysnet_read_dhcpc_pid',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -454,7 +474,7 @@ interface(`sysnet_delete_dhcpc_pid',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -475,12 +495,12 @@ interface(`sysnet_domtrans_ifconfig',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the ifconfig domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -666,7 +686,7 @@ interface(`sysnet_dns_name_resolve',`
 interface(`sysnet_use_ldap',`
 	gen_require(`
 		type net_conf_t;
-	')		
+	')
 
 	allow $1 self:tcp_socket create_socket_perms;
 
@@ -694,7 +714,7 @@ interface(`sysnet_use_ldap',`
 interface(`sysnet_use_portmap',`
 	gen_require(`
 		type net_conf_t;
-	')		
+	')
 
 	allow $1 self:tcp_socket create_socket_perms;
 	allow $1 self:udp_socket create_socket_perms;

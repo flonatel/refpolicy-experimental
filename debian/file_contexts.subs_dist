@@ -1,0 +1,5 @@
+/run		/var/run
+/run/lock	/var/lock
+/var/run/lock	/var/lock
+/run/shm	/dev/shm
+/var/run/shm	/dev/shm

@@ -213,6 +213,7 @@ debian/stamp/install/selinux-policy-mls:
               rm -f $(TMPTOP)/usr/share/selinux/mls/$$module.pp;    \
         done
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/mls/
+	$(install_file)      debian/file_contexts.subs_dist  $(TMPTOP)/etc/selinux/mls/contexts/files/
 	$(install_file)      VERSION               $(DOCDIR)/
 	$(install_file)      README                $(DOCDIR)/
 	$(install_file)      debian/README.Debian  $(DOCDIR)/
@@ -249,6 +250,7 @@ debian/stamp/install/selinux-policy-default:
              rm -f $(TMPTOP)/usr/share/selinux/default/$$module.pp;     \
         done
 	$(install_file)      debian/setrans.conf  $(TMPTOP)/etc/selinux/default/
+	$(install_file)      debian/file_contexts.subs_dist  $(TMPTOP)/etc/selinux/default/contexts/files/
 	$(install_file)      VERSION              $(DOCDIR)/
 	$(install_file)      README               $(DOCDIR)/
 	$(install_file)      debian/README.Debian $(DOCDIR)/

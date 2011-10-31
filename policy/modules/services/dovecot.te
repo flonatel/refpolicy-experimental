@@ -1,5 +1,4 @@
-
-policy_module(dovecot, 1.12.0)
+policy_module(dovecot, 1.13.0)
 
 ########################################
 #
@@ -114,6 +113,7 @@ corenet_tcp_sendrecv_all_ports(dovecot_t)
 corenet_tcp_bind_generic_node(dovecot_t)
 corenet_tcp_bind_mail_port(dovecot_t)
 corenet_tcp_bind_pop_port(dovecot_t)
+corenet_tcp_bind_sieve_port(dovecot_t)
 corenet_tcp_connect_all_ports(dovecot_t)
 corenet_tcp_connect_postgresql_port(dovecot_t)
 corenet_sendrecv_pop_server_packets(dovecot_t)
@@ -145,7 +145,7 @@ auth_use_nsswitch(dovecot_t)
 
 logging_send_syslog_msg(dovecot_t)
 
-miscfiles_read_certs(dovecot_t)
+miscfiles_read_generic_certs(dovecot_t)
 miscfiles_read_localization(dovecot_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dovecot_t)

@@ -73,11 +73,66 @@ interface(`dev_node',`
 
 ########################################
 ## <summary>
+##	Associate the specified file type with device filesystem.
+## </summary>
+## <param name="file_type">
+##	<summary>
+##	The type of the file to be associated.
+##	</summary>
+## </param>
+#
+interface(`dev_associate',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:filesystem associate;
+	fs_associate_tmpfs($1)	#For backwards compatibility
+')
+
+########################################
+## <summary>
+##	Get attributes of device filesystems.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_getattr_fs',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:filesystem getattr;
+')
+
+########################################
+## <summary>
+##	Mount a filesystem on /dev
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allow access.
+##	</summary>
+## </param>
+#
+interface(`dev_mounton',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:dir mounton;
+')
+
+########################################
+## <summary>
 ##	Allow full relabeling (to and from) of all device nodes.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to relabel.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -104,7 +159,7 @@ interface(`dev_relabel_all_dev_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to list device nodes.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -141,7 +196,7 @@ interface(`dev_setattr_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit listing of device nodes.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -159,7 +214,7 @@ interface(`dev_dontaudit_list_all_dev_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to add entries.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -177,7 +232,7 @@ interface(`dev_add_entry_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to add entries.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -195,7 +250,7 @@ interface(`dev_remove_entry_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to create the directory.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -214,7 +269,7 @@ interface(`dev_create_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to create the directory.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -232,7 +287,7 @@ interface(`dev_delete_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to relabel.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -250,7 +305,7 @@ interface(`dev_manage_generic_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to relabel.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -278,6 +333,24 @@ interface(`dev_dontaudit_getattr_generic_files',`
 	')
 
 	dontaudit $1 device_t:file getattr;
+')
+
+########################################
+## <summary>
+##	Read generic files in /dev.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dev_read_generic_files',`
+	gen_require(`
+		type device_t;
+	')
+
+	read_files_pattern($1, device_t, device_t)
 ')
 
 ########################################
@@ -322,7 +395,7 @@ interface(`dev_delete_generic_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed to create the files.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -340,7 +413,7 @@ interface(`dev_manage_generic_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -350,6 +423,24 @@ interface(`dev_dontaudit_getattr_generic_pipes',`
 	')
 
 	dontaudit $1 device_t:fifo_file getattr;
+')
+
+########################################
+## <summary>
+##	Write generic socket files in /dev.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dev_write_generic_sockets',`
+	gen_require(`
+		type device_t;
+	')
+
+	write_sock_files_pattern($1, device_t, device_t)
 ')
 
 ########################################
@@ -376,7 +467,7 @@ interface(`dev_getattr_generic_blk_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -394,7 +485,7 @@ interface(`dev_dontaudit_getattr_generic_blk_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -466,7 +557,7 @@ interface(`dev_getattr_generic_chr_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -484,7 +575,7 @@ interface(`dev_dontaudit_getattr_generic_chr_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -494,6 +585,24 @@ interface(`dev_dontaudit_setattr_generic_chr_files',`
 	')
 
 	dontaudit $1 device_t:chr_file setattr;
+')
+
+########################################
+## <summary>
+##	Read generic character device files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_generic_chr_files',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:chr_file read_chr_file_perms;
 ')
 
 ########################################
@@ -512,6 +621,42 @@ interface(`dev_rw_generic_chr_files',`
 	')
 
 	allow $1 device_t:chr_file rw_chr_file_perms;
+')
+
+########################################
+## <summary>
+##	Read and write generic block device files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_rw_generic_blk_files',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:blk_file rw_chr_file_perms;
+')
+
+########################################
+## <summary>
+##	Dontaudit attempts to read/write generic character device files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to dontaudit access.
+##	</summary>
+## </param>
+#
+interface(`dev_dontaudit_rw_generic_chr_files',`
+	gen_require(`
+		type device_t;
+	')
+
+	dontaudit $1 device_t:chr_file rw_chr_file_perms;
 ')
 
 ########################################
@@ -552,6 +697,24 @@ interface(`dev_delete_generic_chr_files',`
 
 ########################################
 ## <summary>
+##	Relabel from generic character device files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_relabelfrom_generic_chr_files',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:chr_file relabelfrom;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to set the attributes
 ##	of symbolic links in device directories (/dev).
 ## </summary>
@@ -567,6 +730,24 @@ interface(`dev_dontaudit_setattr_generic_symlinks',`
 	')
 
 	dontaudit $1 device_t:lnk_file setattr;
+')
+
+########################################
+## <summary>
+##	Read symbolic links in device directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_generic_symlinks',`
+	gen_require(`
+		type device_t;
+	')
+
+	allow $1 device_t:lnk_file read_lnk_file_perms;
 ')
 
 ########################################
@@ -703,7 +884,7 @@ interface(`dev_manage_all_dev_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -780,7 +961,7 @@ interface(`dev_filetrans',`
 
 	filetrans_pattern($1, device_t, $2, $3)
 
-	fs_associate_tmpfs($2)
+	dev_associate($2)
 	files_associate_tmp($2)
 ')
 
@@ -837,7 +1018,7 @@ interface(`dev_getattr_all_blk_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -875,7 +1056,7 @@ interface(`dev_getattr_all_chr_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1372,6 +1553,24 @@ interface(`dev_rw_autofs',`
 
 ########################################
 ## <summary>
+##	Relabel the autofs device node.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_relabel_autofs_dev',`
+	gen_require(`
+		type autofs_device_t;
+	')
+
+	allow $1 autofs_device_t:chr_file relabel_chr_file_perms;
+')
+
+########################################
+## <summary>
 ##	Read and write the PCMCIA card manager device.
 ## </summary>
 ## <param name="domain">
@@ -1545,6 +1744,24 @@ interface(`dev_rw_cpu_microcode',`
 
 ########################################
 ## <summary>
+##	Read the kernel crash device
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_crash',`
+	gen_require(`
+		type device_t, crash_device_t;
+	')
+
+	read_chr_files_pattern($1, device_t, crash_device_t)
+')
+
+########################################
+## <summary>
 ##	Read and write the the hardware SSL accelerator.
 ## </summary>
 ## <param name="domain">
@@ -1657,7 +1874,7 @@ interface(`dev_rw_dri',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to dontaudit access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1859,7 +2076,7 @@ interface(`dev_read_framebuffer',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1923,6 +2140,24 @@ interface(`dev_read_kmsg',`
 	')
 
 	read_chr_files_pattern($1, device_t, kmsg_device_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to read the kernel messages
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dev_dontaudit_read_kmsg',`
+	gen_require(`
+		type kmsg_device_t;
+	')
+
+	dontaudit $1 kmsg_device_t:chr_file read;
 ')
 
 ########################################
@@ -2144,6 +2379,24 @@ interface(`dev_filetrans_lirc',`
 
 ########################################
 ## <summary>
+##	Get the attributes of the lvm comtrol device.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_getattr_lvm_control',`
+	gen_require(`
+		type device_t, lvm_control_t;
+	')
+
+	getattr_chr_files_pattern($1, device_t, lvm_control_t)
+')
+
+########################################
+## <summary>
 ##	Read the lvm comtrol device.
 ## </summary>
 ## <param name="domain">
@@ -2184,7 +2437,7 @@ interface(`dev_rw_lvm_control',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2220,7 +2473,7 @@ interface(`dev_delete_lvm_control_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2358,7 +2611,7 @@ interface(`dev_getattr_misc_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2395,7 +2648,7 @@ interface(`dev_setattr_misc_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2650,7 +2903,7 @@ interface(`dev_getattr_mtrr_dev',`
 ## </param>
 #
 interface(`dev_read_mtrr',`
-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
+	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
 	dev_rw_mtrr($1)
 ')
 
@@ -2679,7 +2932,7 @@ interface(`dev_read_mtrr',`
 ## </param>
 #
 interface(`dev_write_mtrr',`
-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
+	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
 	dev_rw_mtrr($1)
 ')
 
@@ -2699,6 +2952,7 @@ interface(`dev_dontaudit_write_mtrr',`
 		type mtrr_device_t;
 	')
 
+	dontaudit $1 mtrr_device_t:file write;
 	dontaudit $1 mtrr_device_t:chr_file write;
 ')
 
@@ -2872,7 +3126,7 @@ interface(`dev_create_null_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3108,7 +3362,7 @@ interface(`dev_read_rand',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3127,7 +3381,7 @@ interface(`dev_dontaudit_read_rand',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3491,7 +3745,7 @@ interface(`dev_getattr_smartcard_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3542,11 +3796,29 @@ interface(`dev_manage_smartcard',`
 
 ########################################
 ## <summary>
+##	Associate a file to a sysfs filesystem.
+## </summary>
+## <param name="file_type">
+##	<summary>
+##	The type of the file to be associated to sysfs.
+##	</summary>
+## </param>
+#
+interface(`dev_associate_sysfs',`
+	gen_require(`
+		type sysfs_t;
+	')
+
+	allow $1 sysfs_t:filesystem associate;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of sysfs directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3564,7 +3836,7 @@ interface(`dev_getattr_sysfs_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3582,7 +3854,7 @@ interface(`dev_search_sysfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3600,7 +3872,7 @@ interface(`dev_dontaudit_search_sysfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3618,7 +3890,7 @@ interface(`dev_list_sysfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3629,6 +3901,43 @@ interface(`dev_write_sysfs_dirs',`
 	')
 
 	allow $1 sysfs_t:dir write;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to write in a sysfs directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`dev_dontaudit_write_sysfs_dirs',`
+	gen_require(`
+		type sysfs_t;
+	')
+
+	dontaudit $1 sysfs_t:dir write;
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete sysfs
+##	directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_manage_sysfs_dirs',`
+	gen_require(`
+		type sysfs_t;
+	')
+
+	manage_dirs_pattern($1, sysfs_t, sysfs_t)
 ')
 
 ########################################
@@ -3667,7 +3976,7 @@ interface(`dev_read_sysfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type modifying hardware state information.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3680,6 +3989,24 @@ interface(`dev_rw_sysfs',`
 	read_lnk_files_pattern($1, sysfs_t, sysfs_t)
 
 	list_dirs_pattern($1, sysfs_t, sysfs_t)
+')
+
+########################################
+## <summary>
+##	Read and write the TPM device.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_rw_tpm',`
+	gen_require(`
+		type device_t, tpm_device_t;
+	')
+
+	rw_chr_files_pattern($1, device_t, tpm_device_t)
 ')
 
 ########################################
@@ -3835,11 +4162,47 @@ interface(`dev_rw_generic_usb_dev',`
 
 ########################################
 ## <summary>
+##	Read USB monitor devices.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_usbmon_dev',`
+	gen_require(`
+		type device_t, usbmon_device_t;
+	')
+
+	read_chr_files_pattern($1, device_t, usbmon_device_t)
+')
+
+########################################
+## <summary>
+##	Write USB monitor devices.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_write_usbmon_dev',`
+	gen_require(`
+		type device_t, usbmon_device_t;
+	')
+
+	write_chr_files_pattern($1, device_t, usbmon_device_t)
+')
+
+########################################
+## <summary>
 ##	Mount a usbfs filesystem.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3912,7 +4275,7 @@ interface(`dev_dontaudit_getattr_usbfs_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3930,7 +4293,7 @@ interface(`dev_search_usbfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type getting the list.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3971,7 +4334,7 @@ interface(`dev_setattr_usbfs_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -3991,7 +4354,7 @@ interface(`dev_read_usbfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type modifying the options.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -4135,6 +4498,24 @@ interface(`dev_write_video_dev',`
 
 ########################################
 ## <summary>
+##	Allow read/write the vhost net device
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_rw_vhost',`
+	gen_require(`
+		type device_t, vhost_device_t;
+	')
+
+	rw_chr_files_pattern($1, device_t, vhost_device_t)
+')
+
+########################################
+## <summary>
 ##	Read and write VMWare devices.
 ## </summary>
 ## <param name="domain">
@@ -4168,6 +4549,24 @@ interface(`dev_rwx_vmware',`
 
 	dev_rw_vmware($1)
 	allow $1 vmware_device_t:chr_file execute;
+')
+
+########################################
+## <summary>
+##	Read from watchdog devices.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_watchdog',`
+	gen_require(`
+		type device_t, watchdog_device_t;
+	')
+
+	read_chr_files_pattern($1, device_t, watchdog_device_t)
 ')
 
 ########################################

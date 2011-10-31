@@ -428,13 +428,6 @@ cdrecord = module
 cpufreqselector = module
 
 # Layer: apps
-# Module: ethereal
-#
-# Ethereal packet capture tool.
-# 
-ethereal = module
-
-# Layer: apps
 # Module: evolution
 #
 # Evolution email client
@@ -798,13 +791,6 @@ arpwatch = module
 # Asterisk IP telephony server
 # 
 asterisk = module
-
-# Layer: services
-# Module: audioentropy
-#
-# Generate entropy from audio input
-# 
-audioentropy = module
 
 # Layer: services
 # Module: automount
@@ -1371,7 +1357,7 @@ ntp = module
 #
 # NX remote desktop
 # 
-nx = module
+# nx = module
 
 # Layer: services
 # Module: oav

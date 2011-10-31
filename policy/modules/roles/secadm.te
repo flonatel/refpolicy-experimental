@@ -1,5 +1,4 @@
-
-policy_module(secadm, 2.1.0)
+policy_module(secadm, 2.3.0)
 
 ########################################
 #
@@ -31,7 +30,7 @@ mls_file_upgrade(secadm_t)
 mls_file_downgrade(secadm_t)
 
 auth_role(secadm_r, secadm_t)
-auth_relabel_all_files_except_shadow(secadm_t)
+auth_relabel_all_files_except_auth_files(secadm_t)
 auth_relabel_shadow(secadm_t)
 
 init_exec(secadm_t)
@@ -72,3 +71,6 @@ optional_policy(`
 	sysadm_role_change(secadm_r)
 ')
 
+optional_policy(`
+	vlock_run(secadm_t, secadm_r)
+')

@@ -1,5 +1,4 @@
-
-policy_module(clamav, 1.8.0)
+policy_module(clamav, 1.9.0)
 
 ## <desc>
 ## <p>
@@ -110,7 +109,6 @@ manage_files_pattern(clamd_t, clamd_var_log_t, clamd_var_log_t)
 logging_log_filetrans(clamd_t, clamd_var_log_t, { dir file })
 
 # pid file
-manage_dirs_pattern(clamd_t, clamd_var_log_t, clamd_var_log_t)
 manage_files_pattern(clamd_t, clamd_var_run_t, clamd_var_run_t)
 manage_sock_files_pattern(clamd_t, clamd_var_run_t, clamd_var_run_t)
 files_pid_filetrans(clamd_t, clamd_var_run_t, { file dir })
@@ -172,6 +170,12 @@ optional_policy(`
 
 optional_policy(`
 	exim_read_spool_files(clamd_t)
+')
+
+tunable_policy(`clamd_use_jit',`
+	allow clamd_t self:process execmem;
+', `
+	dontaudit clamd_t self:process execmem;
 ')
 
 ########################################
@@ -238,6 +242,12 @@ optional_policy(`
 	cron_system_entry(freshclam_t, freshclam_exec_t)
 ')
 
+tunable_policy(`clamd_use_jit',`
+	allow freshclam_t self:process execmem;
+', `
+	dontaudit freshclam_t self:process execmem;
+')
+
 ########################################
 #
 # clamscam local policy
@@ -286,14 +296,6 @@ miscfiles_read_public_files(clamscan_t)
 clamav_stream_connect(clamscan_t)
 
 mta_send_mail(clamscan_t)
-
-tunable_policy(`clamd_use_jit',`
-	allow clamd_t self:process execmem;
-	allow freshclam_t self:process execmem;
-', `
-	dontaudit clamd_t self:process execmem;
-	dontaudit freshclam_t self:process execmem;
-')
 
 optional_policy(`
 	amavis_read_spool_files(clamscan_t)

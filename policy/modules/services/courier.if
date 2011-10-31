@@ -38,10 +38,12 @@ template(`courier_domain_template',`
 	read_files_pattern(courier_$1_t, courier_etc_t, courier_etc_t)
 	allow courier_$1_t courier_etc_t:dir list_dir_perms;
 
+	manage_dirs_pattern(courier_$1_t, courier_var_run_t, courier_var_run_t)
 	manage_files_pattern(courier_$1_t, courier_var_run_t, courier_var_run_t)
 	manage_lnk_files_pattern(courier_$1_t, courier_var_run_t, courier_var_run_t)
 	manage_sock_files_pattern(courier_$1_t, courier_var_run_t, courier_var_run_t)
 	files_search_pids(courier_$1_t)
+	files_pid_filetrans(courier_$1_t, courier_var_run_t, dir)
 
 	kernel_read_system_state(courier_$1_t)
 	kernel_read_kernel_sysctls(courier_$1_t)
@@ -90,7 +92,7 @@ template(`courier_domain_template',`
 ## </summary>
 ## <param name="prefix">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -128,7 +130,7 @@ interface(`courier_authdaemon_client',`
 ## </summary>
 ## <param name="prefix">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -220,7 +222,7 @@ interface(`courier_read_spool',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #

@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -26,12 +26,12 @@ interface(`hostname_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the hostname domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 #

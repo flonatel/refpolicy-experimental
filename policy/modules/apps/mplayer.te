@@ -1,5 +1,4 @@
-
-policy_module(mplayer, 2.1.0)
+policy_module(mplayer, 2.3.0)
 
 ########################################
 #
@@ -33,7 +32,6 @@ files_config_file(mplayer_etc_t)
 type mplayer_home_t;
 typealias mplayer_home_t alias { user_mplayer_home_t staff_mplayer_home_t sysadm_mplayer_home_t };
 typealias mplayer_home_t alias { auditadm_mplayer_home_t secadm_mplayer_home_t };
-files_poly_member(mplayer_home_t)
 userdom_user_home_content(mplayer_home_t)
 
 type mplayer_tmpfs_t;
@@ -153,11 +151,14 @@ tunable_policy(`use_samba_home_dirs',`
 allow mplayer_t self:process { signal_perms getsched };
 allow mplayer_t self:fifo_file rw_fifo_file_perms;
 allow mplayer_t self:sem create_sem_perms;
+allow mplayer_t self:netlink_route_socket create_netlink_socket_perms;
+allow mplayer_t self:tcp_socket create_socket_perms;
+allow mplayer_t self:unix_dgram_socket sendto;
 
 manage_dirs_pattern(mplayer_t, mplayer_home_t, mplayer_home_t)
 manage_files_pattern(mplayer_t, mplayer_home_t, mplayer_home_t)
 manage_lnk_files_pattern(mplayer_t, mplayer_home_t, mplayer_home_t)
-userdom_search_user_home_dirs(mplayer_t)
+userdom_user_home_dir_filetrans(mplayer_t, mplayer_home_t, dir)
 
 manage_files_pattern(mplayer_t, mplayer_tmpfs_t, mplayer_tmpfs_t)
 manage_lnk_files_pattern(mplayer_t, mplayer_tmpfs_t, mplayer_tmpfs_t)
@@ -178,19 +179,32 @@ kernel_read_system_state(mplayer_t)
 # Sysctl on kernel version 
 kernel_read_kernel_sysctls(mplayer_t)
 
+corenet_all_recvfrom_netlabel(mplayer_t)
+corenet_all_recvfrom_unlabeled(mplayer_t)
+corenet_tcp_sendrecv_generic_if(mplayer_t)
+corenet_tcp_sendrecv_generic_node(mplayer_t)
+corenet_tcp_bind_generic_node(mplayer_t)
+corenet_tcp_connect_pulseaudio_port(mplayer_t)
+corenet_sendrecv_pulseaudio_client_packets(mplayer_t)
+
 # Run bash/sed (??) 
 corecmd_exec_bin(mplayer_t)
 corecmd_exec_shell(mplayer_t)
 
+dev_read_rand(mplayer_t)
+dev_read_urand(mplayer_t)
 # Required for win32 binary loader 
 dev_rwx_zero(mplayer_t)
 # Access to DVD/CD/V4L
 dev_read_video_dev(mplayer_t)
+dev_write_video_dev(mplayer_t)
 # Audio, alsa.conf
 dev_read_sound_mixer(mplayer_t)
 dev_write_sound_mixer(mplayer_t)
 # RTC clock 
 dev_read_realtime_clock(mplayer_t)
+
+domain_use_interactive_fds(mplayer_t)
 
 # Access to DVD/CD/V4L
 storage_raw_read_removable_device(mplayer_t)
@@ -221,6 +235,7 @@ userdom_read_user_tmp_files(mplayer_t)
 userdom_read_user_tmp_symlinks(mplayer_t)
 userdom_read_user_home_content_files(mplayer_t)
 userdom_read_user_home_content_symlinks(mplayer_t)
+userdom_write_user_tmp_sockets(mplayer_t)
 
 xserver_user_x_domain_template(mplayer, mplayer_t, mplayer_tmpfs_t)
 
@@ -291,4 +306,9 @@ optional_policy(`
 
 optional_policy(`
 	nscd_socket_use(mplayer_t)
+')
+
+optional_policy(`
+	pulseaudio_exec(mplayer_t)
+	pulseaudio_stream_connect(mplayer_t)
 ')

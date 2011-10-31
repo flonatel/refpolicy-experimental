@@ -10,9 +10,6 @@ type pythoncompile_exec_t;
 domain_type(pythoncompile_t)
 domain_entry_file(pythoncompile_t, pythoncompile_exec_t)
 
-role system_r types pythoncompile_t;
-role sysadm_r types pythoncompile_t;
-
 type python_compiled_t;
 files_type(python_compiled_t)
 

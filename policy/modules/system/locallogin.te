@@ -1,5 +1,4 @@
-
-policy_module(locallogin, 1.10.0)
+policy_module(locallogin, 1.11.0)
 
 ########################################
 #
@@ -142,6 +141,11 @@ ifdef(`distro_ubuntu',`
 	')
 ')
 
+tunable_policy(`console_login',`
+	# Able to relabel /dev/console to user tty types.
+	term_relabel_console(local_login_t)
+')
+
 tunable_policy(`use_nfs_home_dirs',`
 	fs_read_nfs_files(local_login_t)
 	fs_read_nfs_symlinks(local_login_t)
@@ -181,7 +185,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	unconfined_domain(local_login_t)
+	unconfined_shell_domtrans(local_login_t)
 ')
 
 optional_policy(`
@@ -194,13 +198,14 @@ optional_policy(`
 ')
 
 #################################
-# 
+#
 # Sulogin local policy
 #
 
+allow sulogin_t self:capability dac_override;
 allow sulogin_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow sulogin_t self:fd use;
-allow sulogin_t self:fifo_file rw_file_perms;
+allow sulogin_t self:fifo_file rw_fifo_file_perms;
 allow sulogin_t self:unix_dgram_socket create_socket_perms;
 allow sulogin_t self:unix_stream_socket create_stream_socket_perms;
 allow sulogin_t self:unix_dgram_socket sendto;

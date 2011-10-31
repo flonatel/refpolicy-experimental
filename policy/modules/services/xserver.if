@@ -30,7 +30,6 @@ interface(`xserver_restricted_role',`
 	allow xserver_t $2:fd use;
 	allow xserver_t $2:shm rw_shm_perms;
 
-	domtrans_pattern($2, xserver_exec_t, xserver_t)
 	allow xserver_t $2:process signal;
 
 	allow xserver_t $2:shm rw_shm_perms;
@@ -96,6 +95,7 @@ interface(`xserver_restricted_role',`
 	miscfiles_read_fonts($2)
 
 	xserver_common_x_domain_template(user, $2)
+	xserver_domtrans($2)
 	xserver_unconfined($2)
 	xserver_xsession_entry_type($2)
 	xserver_dontaudit_write_log($2)
@@ -298,7 +298,7 @@ interface(`xserver_non_drawing_client',`
 ## </param>
 #
 interface(`xserver_user_client',`
-	refpolicywarn(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
+	refpolicyerr(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
 	gen_require(`
 		type xdm_t, xdm_tmp_t;
 		type xauth_home_t, iceauth_home_t, xserver_t, xserver_tmpfs_t;
@@ -553,7 +553,7 @@ interface(`xserver_use_user_fonts',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -595,7 +595,7 @@ interface(`xserver_user_home_dir_filetrans_user_xauth',`
 ## </param>
 #
 interface(`xserver_use_all_users_fonts',`
-	refpolicywarn(`$0() has been deprecated, please use xserver_use_user_fonts.')
+	refpolicyerr(`$0() has been deprecated, please use xserver_use_user_fonts.')
 	xserver_use_user_fonts($1)
 ')
 
@@ -883,7 +883,7 @@ interface(`xserver_xsession_entry_type',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -926,7 +926,7 @@ interface(`xserver_getattr_log',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -940,12 +940,11 @@ interface(`xserver_dontaudit_write_log',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to write the X server
-##	log files.
+##	Delete X server log files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -966,7 +965,7 @@ interface(`xserver_delete_log',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -987,7 +986,7 @@ interface(`xserver_read_xkb_libs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1006,7 +1005,7 @@ interface(`xserver_read_xdm_tmp_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1025,7 +1024,7 @@ interface(`xserver_dontaudit_read_xdm_tmp_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1044,7 +1043,7 @@ interface(`xserver_rw_xdm_tmp_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1058,11 +1057,12 @@ interface(`xserver_manage_xdm_tmp_files',`
 
 ########################################
 ## <summary>
-##	dontaudit getattr xdm temporary named sockets.
+##	Do not audit attempts to get the attributes of
+##	xdm temporary named sockets.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1080,7 +1080,7 @@ interface(`xserver_dontaudit_getattr_xdm_tmp_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -1099,7 +1099,7 @@ interface(`xserver_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1117,7 +1117,7 @@ interface(`xserver_signal',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1155,7 +1155,7 @@ interface(`xserver_rw_shm',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1174,7 +1174,7 @@ interface(`xserver_dontaudit_rw_tcp_sockets',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1212,7 +1212,7 @@ interface(`xserver_stream_connect',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #

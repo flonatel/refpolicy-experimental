@@ -1,5 +1,4 @@
-
-policy_module(awstats, 1.2.0)
+policy_module(awstats, 1.4.0)
 
 ########################################
 #
@@ -49,6 +48,7 @@ dev_read_urand(awstats_t)
 files_read_etc_files(awstats_t)
 # e.g. /usr/share/awstats/lang/awstats-en.txt
 files_read_usr_files(awstats_t)
+files_dontaudit_search_all_mountpoints(awstats_t)
 
 fs_list_inotifyfs(awstats_t)
 
@@ -69,6 +69,10 @@ optional_policy(`
 optional_policy(`
 	# dontaudit searching nscd pid directory
 	nscd_dontaudit_search_pid(awstats_t)
+')
+
+optional_policy(`
+	squid_read_log(awstats_t)
 ')
 
 ########################################

@@ -1,5 +1,20 @@
-/dev/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
+/cgroup			-d	gen_context(system_u:object_r:cgroup_t,s0)
 ifdef(`distro_debian', `
 /run/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
 /var/run/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
 ')
+/cgroup/.*			<<none>>
+
+/dev/hugepages		-d	gen_context(system_u:object_r:hugetlbfs_t,s0)
+/dev/hugepages(/.*)?		<<none>>
+/dev/shm		-d	gen_context(system_u:object_r:tmpfs_t,s0)
+/dev/shm/.*			<<none>>
+
+/lib/udev/devices/hugepages -d	gen_context(system_u:object_r:hugetlbfs_t,s0)
+/lib/udev/devices/hugepages/.*	<<none>>
+/lib/udev/devices/shm	-d	gen_context(system_u:object_r:tmpfs_t,s0)
+/lib/udev/devices/shm/.*	<<none>>
+
+# for systemd systems:
+/sys/fs/cgroup		-d	gen_context(system_u:object_r:cgroup_t,s0)
+/sys/fs/cgroup/.*		<<none>>

@@ -330,7 +330,7 @@ interface(`fs_rw_anon_inodefs_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -559,7 +559,7 @@ interface(`fs_register_binary_executable_type',`
 
 ########################################
 ## <summary>
-##	Mount a cgroup filesystem.
+##	Mount cgroup filesystems.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -577,8 +577,7 @@ interface(`fs_mount_cgroup', `
 
 ########################################
 ## <summary>
-##	Remount a cgroup filesystem  This allows
-##	some mount options to be changed.
+##	Remount cgroup filesystems.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -596,7 +595,7 @@ interface(`fs_remount_cgroup', `
 
 ########################################
 ## <summary>
-##	Unmount a cgroup file system.
+##	Unmount cgroup filesystems.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -614,41 +613,215 @@ interface(`fs_unmount_cgroup', `
 
 ########################################
 ## <summary>
-##	Get the attributes of a cgroup filesystem.
+##	Get attributes of cgroup filesystems.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-## <rolecap/>
 #
 interface(`fs_getattr_cgroup',`
 	gen_require(`
-		type cifs_t;
+		type cgroup_t;
 	')
 
-	allow $1 cifs_t:filesystem getattr;
+	allow $1 cgroup_t:filesystem getattr;
 ')
 
 ########################################
 ## <summary>
-##      list dirs on cgroup
-##      file systems.
+##	Search cgroup directories.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_search_cgroup_dirs',`
+	gen_require(`
+		type cgroup_t;
+
+	')
+
+	search_dirs_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	list cgroup directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`fs_list_cgroup_dirs', `
-        gen_require(`
-                type cgroup_t;
+	gen_require(`
+		type cgroup_t;
+	')
 
-        ')
+	list_dirs_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
 
-        list_dirs_pattern($1, cgroup_t, cgroup_t)
+########################################
+## <summary>
+##	Delete cgroup directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_delete_cgroup_dirs', `
+	gen_require(`
+		type cgroup_t;
+	')
+
+	delete_dirs_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Manage cgroup directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_manage_cgroup_dirs',`
+	gen_require(`
+		type cgroup_t;
+
+	')
+
+	manage_dirs_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Read cgroup files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_read_cgroup_files',`
+	gen_require(`
+		type cgroup_t;
+
+	')
+
+	read_files_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Write cgroup files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_write_cgroup_files', `
+	gen_require(`
+		type cgroup_t;
+	')
+
+	write_files_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Read and write cgroup files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_rw_cgroup_files',`
+	gen_require(`
+		type cgroup_t;
+
+	')
+
+	rw_files_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to open,
+##	get attributes, read and write
+##	cgroup files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_rw_cgroup_files',`
+	gen_require(`
+		type cgroup_t;
+	')
+
+	dontaudit $1 cgroup_t:file rw_file_perms;
+')
+
+########################################
+## <summary>
+##	Manage cgroup files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_manage_cgroup_files',`
+	gen_require(`
+		type cgroup_t;
+
+	')
+
+	manage_files_pattern($1, cgroup_t, cgroup_t)
+	dev_search_sysfs($1)
+')
+
+########################################
+## <summary>
+##	Mount on cgroup directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_mounton_cgroup', `
+	gen_require(`
+		type cgroup_t;
+	')
+
+	allow $1 cgroup_t:dir mounton;
 ')
 
 ########################################
@@ -668,105 +841,6 @@ interface(`fs_dontaudit_list_cifs_dirs',`
 	')
 
 	dontaudit $1 cifs_t:dir list_dir_perms;
-')
-
-########################################
-## <summary>
-##	Manage dirs on cgroup file systems.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_manage_cgroup_dirs',`
-	gen_require(`
-		type cgroup_t;
-
-	')
-
-	manage_dirs_pattern($1, cgroup_t, cgroup_t)
-')
-
-########################################
-## <summary>
-##	Set attributes of files on cgroup
-##	file systems.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_setattr_cgroup_files',`
-	gen_require(`
-		type cgroup_t;
-
-	')
-
-	setattr_files_pattern($1, cgroup_t, cgroup_t)
-')
-
-########################################
-## <summary>
-##	Read files on cgroup
-##	file systems.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_read_cgroup_files',`
-	gen_require(`
-		type cgroup_t;
-
-	')
-
-	read_files_pattern($1, cgroup_t, cgroup_t)
-')
-
-########################################
-## <summary>
-##	Write files on cgroup
-##	file systems.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_write_cgroup_files', `
-	gen_require(`
-		type cgroup_t;
-
-	')
-
-	write_files_pattern($1, cgroup_t, cgroup_t)
-')
-
-########################################
-## <summary>
-##	Read and write files on cgroup
-##	file systems.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_rw_cgroup_files',`
-	gen_require(`
-		type cgroup_t;
-
-	')
-
-	rw_files_pattern($1, cgroup_t, cgroup_t)
 ')
 
 ########################################
@@ -978,6 +1052,25 @@ interface(`fs_list_noxattr_fs',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to list all
+##	noxattrfs directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_list_noxattr_fs',`
+	gen_require(`
+		attribute noxattrfs;
+	')
+
+	dontaudit $1 noxattrfs:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete all noxattrfs directories.
 ## </summary>
 ## <param name="domain">
@@ -1014,11 +1107,30 @@ interface(`fs_read_noxattr_fs_files',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to read all
+##	noxattrfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_read_noxattr_fs_files',`
+	gen_require(`
+		attribute noxattrfs;
+	')
+
+	dontaudit $1 noxattrfs:file read_file_perms;
+')
+
+########################################
+## <summary>
 ##	Dont audit attempts to write to noxattrfs files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1068,6 +1180,32 @@ interface(`fs_read_noxattr_fs_symlinks',`
 
 ########################################
 ## <summary>
+##	Relabel all objets from filesystems that
+##	do not support extended attributes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_relabelfrom_noxattr_fs',`
+	gen_require(`
+		attribute noxattrfs;
+	')
+
+	allow $1 noxattrfs:dir list_dir_perms;
+	relabelfrom_dirs_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_lnk_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_fifo_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_sock_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_blk_files_pattern($1, noxattrfs, noxattrfs)
+	relabelfrom_chr_files_pattern($1, noxattrfs, noxattrfs)
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to read
 ##	files on a CIFS or SMB filesystem.
 ## </summary>
@@ -1112,7 +1250,7 @@ interface(`fs_append_cifs_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -1251,7 +1389,7 @@ interface(`fs_manage_cifs_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1386,7 +1524,7 @@ interface(`fs_manage_cifs_named_sockets',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -1559,6 +1697,24 @@ interface(`fs_search_dos',`
 
 ########################################
 ## <summary>
+##	List dirs DOS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_list_dos',`
+	gen_require(`
+		type dosfs_t;
+	')
+
+	list_dirs_pattern($1, dosfs_t, dosfs_t)
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete dirs
 ##	on a DOS filesystem.
 ## </summary>
@@ -1632,6 +1788,7 @@ interface(`fs_manage_dos_files',`
 ##	</summary>
 ## </param>
 #
+# eventpollfs was changed to task SID 20060628
 interface(`fs_read_eventpollfs',`
 	refpolicywarn(`$0($*) has been deprecated.')
 ')
@@ -1670,6 +1827,24 @@ interface(`fs_unmount_fusefs',`
 	')
 
 	allow $1 fusefs_t:filesystem unmount;
+')
+
+########################################
+## <summary>
+##	Mounton a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_mounton_fusefs',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	allow $1 fusefs_t:dir mounton;
 ')
 
 ########################################
@@ -1772,6 +1947,25 @@ interface(`fs_read_fusefs_files',`
 
 ########################################
 ## <summary>
+##	Execute files on a FUSEFS filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`fs_exec_fusefs_files',`
+	gen_require(`
+		type fusefs_t;
+	')
+
+	exec_files_pattern($1, fusefs_t, fusefs_t)
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete files
 ##	on a FUSEFS filesystem.
 ## </summary>
@@ -1827,6 +2021,61 @@ interface(`fs_read_fusefs_symlinks',`
 
 	allow $1 fusefs_t:dir list_dir_perms;
 	read_lnk_files_pattern($1, fusefs_t, fusefs_t)
+')
+
+########################################
+## <summary>
+##	Get the attributes of an hugetlbfs
+##	filesystem.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_getattr_hugetlbfs',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	allow $1 hugetlbfs_t:filesystem getattr;
+')
+
+########################################
+## <summary>
+##	List hugetlbfs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_list_hugetlbfs',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	allow $1 hugetlbfs_t:dir list_dir_perms;
+')
+
+########################################
+## <summary>
+##	Manage hugetlbfs dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_manage_hugetlbfs_dirs',`
+	gen_require(`
+		type hugetlbfs_t;
+	')
+
+	manage_dirs_pattern($1, hugetlbfs_t, hugetlbfs_t)
 ')
 
 ########################################
@@ -1907,7 +2156,7 @@ interface(`fs_list_inotifyfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2320,7 +2569,7 @@ interface(`fs_append_nfs_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -2377,7 +2626,7 @@ interface(`fs_read_nfs_symlinks',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2537,6 +2786,24 @@ interface(`fs_dontaudit_read_removable_files',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to write removable storage files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain not to audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_write_removable_files',`
+	gen_require(`
+		type removable_t;
+	')
+
+	dontaudit $1 removable_t:file write_file_perms;
+')
+
+########################################
+## <summary>
 ##	Read removable storage symbolic links.
 ## </summary>
 ## <param name="domain">
@@ -2551,6 +2818,25 @@ interface(`fs_read_removable_symlinks',`
 	')
 
 	read_lnk_files_pattern($1, removable_t, removable_t)
+')
+
+######################################
+## <summary>
+##	Read block nodes on removable filesystems.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_read_removable_blk_files',`
+	gen_require(`
+		type removable_t;
+	')
+
+	allow $1 removable_t:dir list_dir_perms;
+	read_blk_files_pattern($1, removable_t, removable_t)
 ')
 
 ########################################
@@ -2745,7 +3031,7 @@ interface(`fs_dontaudit_manage_nfs_files',`
 #########################################
 ## <summary>
 ##	Create, read, write, and delete symbolic links
-##	on a CIFS or SMB network filesystem.
+##	on a NFS network filesystem.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -2826,7 +3112,7 @@ interface(`fs_manage_nfs_named_sockets',`
 ## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -3105,7 +3391,7 @@ interface(`fs_search_ramfs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3142,7 +3428,7 @@ interface(`fs_manage_ramfs_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3160,7 +3446,7 @@ interface(`fs_dontaudit_read_ramfs_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3216,7 +3502,7 @@ interface(`fs_write_ramfs_pipes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3585,7 +3871,7 @@ interface(`fs_getattr_tmpfs_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -3687,6 +3973,25 @@ interface(`fs_manage_tmpfs_dirs',`
 	')
 
 	allow $1 tmpfs_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to write
+##	tmpfs directories
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_write_tmpfs_dirs',`
+	gen_require(`
+		type tmpfs_t;
+	')
+
+	dontaudit $1 tmpfs_t:dir write;
 ')
 
 ########################################
@@ -3873,7 +4178,7 @@ interface(`fs_rw_tmpfs_chr_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -4267,7 +4572,7 @@ interface(`fs_dontaudit_getattr_all_fs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain getting quotas.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -4286,7 +4591,7 @@ interface(`fs_get_all_fs_quotas',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain setting quotas.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -4393,6 +4698,25 @@ interface(`fs_getattr_all_files',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to get the attributes
+##	of all files with a filesystem type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_getattr_all_files',`
+	gen_require(`
+		attribute filesystem_type;
+	')
+
+	dontaudit $1 filesystem_type:file getattr;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of all symbolic links with
 ##	a filesystem type.
 ## </summary>
@@ -4412,6 +4736,25 @@ interface(`fs_getattr_all_symlinks',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to get the attributes
+##	of all symbolic links with a filesystem type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_getattr_all_symlinks',`
+	gen_require(`
+		attribute filesystem_type;
+	')
+
+	dontaudit $1 filesystem_type:lnk_file getattr;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of all named pipes with
 ##	a filesystem type.
 ## </summary>
@@ -4427,6 +4770,25 @@ interface(`fs_getattr_all_pipes',`
 	')
 
 	getattr_fifo_files_pattern($1, filesystem_type, filesystem_type)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes
+##	of all named pipes with a filesystem type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`fs_dontaudit_getattr_all_pipes',`
+	gen_require(`
+		attribute filesystem_type;
+	')
+
+	dontaudit $1 filesystem_type:fifo_file getattr;
 ')
 
 ########################################
@@ -4451,68 +4813,11 @@ interface(`fs_getattr_all_sockets',`
 ########################################
 ## <summary>
 ##	Do not audit attempts to get the attributes
-##	of all files with a filesystem type.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_dontaudit_getattr_all_files',`
-	gen_require(`
-		attribute filesystem_type;
-	')
-
-	dontaudit $1 filesystem_type:file getattr;
-')
-
-########################################
-## <summary>
-##	Do not audit attempts to get the attributes
-##	of all symbolic links with a filesystem type.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_dontaudit_getattr_all_symlinks',`
-	gen_require(`
-		attribute filesystem_type;
-	')
-
-	dontaudit $1 filesystem_type:lnk_file getattr;
-')
-
-########################################
-## <summary>
-##	Do not audit attempts to get the attributes
-##	of all named pipes with a filesystem type.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_dontaudit_getattr_all_pipes',`
-	gen_require(`
-		attribute filesystem_type;
-	')
-
-	dontaudit $1 filesystem_type:fifo_file getattr;
-')
-
-########################################
-## <summary>
-##	Do not audit attempts to get the attributes
 ##	of all named sockets with a filesystem type.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -4522,6 +4827,44 @@ interface(`fs_dontaudit_getattr_all_sockets',`
 	')
 
 	dontaudit $1 filesystem_type:sock_file getattr;
+')
+
+########################################
+## <summary>
+##	Get the attributes of all block device nodes with
+##	a filesystem type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_getattr_all_blk_files',`
+	gen_require(`
+		attribute filesystem_type;
+	')
+
+	getattr_blk_files_pattern($1, filesystem_type, filesystem_type)
+')
+
+########################################
+## <summary>
+##	Get the attributes of all character device nodes with
+##	a filesystem type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_getattr_all_chr_files',`
+	gen_require(`
+		attribute filesystem_type;
+	')
+
+	getattr_chr_files_pattern($1, filesystem_type, filesystem_type)
 ')
 
 ########################################
@@ -4540,30 +4883,4 @@ interface(`fs_unconfined',`
 	')
 
 	typeattribute $1 filesystem_unconfined_type;
-')
-
-########################################
-## <summary>
-##	Relabel all objets from filesystems that
-##	do not support extended attributes.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_relabelfrom_noxattr_fs',`
-	gen_require(`
-		attribute noxattrfs;
-	')
-
-	allow $1 noxattrfs:dir list_dir_perms;
-	relabelfrom_dirs_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_files_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_lnk_files_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_fifo_files_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_sock_files_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_blk_files_pattern($1, noxattrfs, noxattrfs)
-	relabelfrom_chr_files_pattern($1, noxattrfs, noxattrfs)
 ')

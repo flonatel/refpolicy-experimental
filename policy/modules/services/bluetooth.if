@@ -64,7 +64,7 @@ interface(`bluetooth_stream_connect',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -121,12 +121,12 @@ interface(`bluetooth_dbus_chat',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
 interface(`bluetooth_domtrans_helper',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -136,12 +136,12 @@ interface(`bluetooth_domtrans_helper',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the bluetooth_helper domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <param name="terminal">
@@ -152,7 +152,7 @@ interface(`bluetooth_domtrans_helper',`
 ## <rolecap/>
 #
 interface(`bluetooth_run_helper',`
-	refpolicywarn(`$0($*) has been deprecated.')
+	refpolicyerr(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -161,7 +161,7 @@ interface(`bluetooth_run_helper',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
