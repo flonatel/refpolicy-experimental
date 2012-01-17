@@ -3,7 +3,6 @@
 /usr/libexec/devkit-power-daemon --	gen_context(system_u:object_r:devicekit_power_exec_t,s0)
 /usr/libexec/udisks-daemon	--	gen_context(system_u:object_r:devicekit_disk_exec_t,s0)
 /usr/lib/udisks/udisks-daemon	--	gen_context(system_u:object_r:devicekit_disk_exec_t,s0)
-/usr/lib/udisks/.*		--	gen_context(system_u:object_r:bin_t,s0)
 ifdef(`distro_debian',`
 /usr/lib/upower/upowerd		--	gen_context(system_u:object_r:devicekit_power_exec_t,s0)
 ', `
@@ -15,18 +14,6 @@ ifdef(`distro_debian',`
 /var/lib/udisks(/.*)?			gen_context(system_u:object_r:devicekit_var_lib_t,s0)
 
 /var/run/devkit(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/devkit(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-')
 /var/run/DeviceKit-disks(/.*)?		gen_context(system_u:object_r:devicekit_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/DeviceKit-disks(/.*)?		gen_context(system_u:object_r:devicekit_var_run_t,s0)
-')
 /var/run/udisks(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/udisks(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-')
 /var/run/upower(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/upower(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
-')

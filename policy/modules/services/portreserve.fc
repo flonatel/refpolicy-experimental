@@ -5,6 +5,3 @@
 /sbin/portreserve		--	gen_context(system_u:object_r:portreserve_exec_t,s0)
 
 /var/run/portreserve(/.*)? 		gen_context(system_u:object_r:portreserve_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/portreserve(/.*)? 		gen_context(system_u:object_r:portreserve_var_run_t,s0)
-')

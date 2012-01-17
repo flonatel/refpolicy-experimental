@@ -10,6 +10,3 @@
 #
 /var/lib/sasl2(/.*)?		gen_context(system_u:object_r:saslauthd_var_run_t,s0)
 /var/run/saslauthd(/.*)?	gen_context(system_u:object_r:saslauthd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/saslauthd(/.*)?	gen_context(system_u:object_r:saslauthd_var_run_t,s0)
-')

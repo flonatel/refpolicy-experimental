@@ -9,17 +9,8 @@
 /usr/sbin/clamav-milter		--	gen_context(system_u:object_r:clamd_exec_t,s0)
 
 /var/run/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_run_t,s0)
-')
 /var/run/clamd\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/clamd\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
-')
 /var/run/clamav\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/clamav\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
-')
 /var/spool/postfix/clamav(/.*)?		gen_context(system_u:object_r:clamd_var_run_t,s0)
 
 /var/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
@@ -28,9 +19,6 @@ ifdef(`distro_debian', `
 /var/log/clamav/freshclam.*	--	gen_context(system_u:object_r:freshclam_var_log_t,s0)
 /var/log/clamd.*			gen_context(system_u:object_r:clamd_var_log_t,s0)
 /var/run/amavis(d)?/clamd\.pid	--	gen_context(system_u:object_r:clamd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/amavis(d)?/clamd\.pid	--	gen_context(system_u:object_r:clamd_var_run_t,s0)
-')
 /var/spool/amavisd/clamd\.sock	-s	gen_context(system_u:object_r:clamd_var_run_t,s0)
 
 /etc/amavis\.conf		--	gen_context(system_u:object_r:clamd_etc_t,s0)
@@ -46,9 +34,6 @@ ifdef(`distro_debian',`
 /var/lib/amavis(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
 /var/log/amavisd\.log		--	gen_context(system_u:object_r:clamd_var_lib_t,s0)
 /var/run/amavis(d)?(/.*)?		gen_context(system_u:object_r:clamd_var_lib_t,s0)
-ifdef(`distro_debian', `
-/run/amavis(d)?(/.*)?		gen_context(system_u:object_r:clamd_var_lib_t,s0)
-')
 /var/spool/amavisd(/.*)?		gen_context(system_u:object_r:clamd_spool_t,s0)
 /var/virusmails(/.*)?			gen_context(system_u:object_r:clamd_spool_t,s0)
 /var/spool/MailScanner(/.*)?		gen_context(system_u:object_r:clamd_var_run_t,s0)

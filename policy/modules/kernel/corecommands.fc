@@ -135,7 +135,6 @@ ifdef(`distro_debian',`
 /lib/udev/scsi_id		--	gen_context(system_u:object_r:bin_t,s0)
 /lib/upstart(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 
-
 /lib64/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:bin_t,s0)
 /lib64/udev/[^/]*		--	gen_context(system_u:object_r:bin_t,s0)
 
@@ -185,9 +184,9 @@ ifdef(`distro_gentoo',`
 /usr/(.*/)?Bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 /usr/(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
-/usr/bin/tcsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
 /usr/bin/scponly		--	gen_context(system_u:object_r:shell_exec_t,s0)
+/usr/bin/tcsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
 
 /usr/lib(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 
@@ -202,9 +201,6 @@ ifdef(`distro_gentoo',`
 /usr/lib(64)?/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/apt/methods.+	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/ConsoleKit/scripts(/.*)?	gen_context(system_u:object_r:bin_t,s0)
-ifdef(`distro_debian', `
-/usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
-')
 /usr/lib(64)?/ConsoleKit/run-session.d(/.*)? gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/courier(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/cups(/.*)? 		gen_context(system_u:object_r:bin_t,s0)
@@ -299,6 +295,13 @@ ifdef(`distro_debian', `
 /usr/share/vhostmd/scripts(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 
 /usr/X11R6/lib(64)?/X11/xkb/xkbcomp --	gen_context(system_u:object_r:bin_t,s0)
+
+ifdef(`distro_debian',`
+/usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/gnome-vfs-2.0/gnome-vfs-daemon -- gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/udisks/.*		--	gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/dovecot/.+             --      gen_context(system_u:object_r:bin_t,s0)
+')
 
 ifdef(`distro_gentoo', `
 /usr/.*-.*-linux-gnu/gcc-bin/.*(/.*)?	gen_context(system_u:object_r:bin_t,s0)

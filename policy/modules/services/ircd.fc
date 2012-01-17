@@ -5,6 +5,3 @@
 /var/lib/dancer-ircd(/.*)?	gen_context(system_u:object_r:ircd_var_lib_t,s0)
 /var/log/(dancer-)?ircd(/.*)?	gen_context(system_u:object_r:ircd_log_t,s0)
 /var/run/dancer-ircd(/.*)?	gen_context(system_u:object_r:ircd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/dancer-ircd(/.*)?	gen_context(system_u:object_r:ircd_var_run_t,s0)
-')

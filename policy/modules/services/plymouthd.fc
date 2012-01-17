@@ -4,7 +4,4 @@
 
 /var/lib/plymouth(/.*)?			gen_context(system_u:object_r:plymouthd_var_lib_t,s0)
 /var/run/plymouth(/.*)?			gen_context(system_u:object_r:plymouthd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/plymouth(/.*)?			gen_context(system_u:object_r:plymouthd_var_run_t,s0)
-')
 /var/spool/plymouth(/.*)?		gen_context(system_u:object_r:plymouthd_spool_t,s0)

@@ -10,6 +10,3 @@
 /var/log/tor(/.*)?		gen_context(system_u:object_r:tor_var_log_t,s0)
 
 /var/run/tor(/.*)?		gen_context(system_u:object_r:tor_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/tor(/.*)?		gen_context(system_u:object_r:tor_var_run_t,s0)
-')

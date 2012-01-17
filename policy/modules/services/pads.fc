@@ -8,6 +8,3 @@
 /usr/bin/pads		--	gen_context(system_u:object_r:pads_exec_t, s0)
 
 /var/run/pads.pid	--	gen_context(system_u:object_r:pads_var_run_t, s0)
-ifdef(`distro_debian', `
-/run/pads.pid	--	gen_context(system_u:object_r:pads_var_run_t, s0)
-')

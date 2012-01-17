@@ -40,7 +40,7 @@ ifdef(`enable_mcs',`
 
 allow inetd_t self:capability { setuid setgid };
 dontaudit inetd_t self:capability sys_tty_config;
-allow inetd_t self:process { setsched setexec };
+allow inetd_t self:process { setrlimit setsched setexec };
 allow inetd_t self:fifo_file rw_fifo_file_perms;
 allow inetd_t self:tcp_socket create_stream_socket_perms;
 allow inetd_t self:udp_socket create_socket_perms;

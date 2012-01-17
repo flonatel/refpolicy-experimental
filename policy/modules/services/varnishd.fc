@@ -14,14 +14,5 @@
 /var/log/varnish(/.*)?			gen_context(system_u:object_r:varnishlog_log_t,s0)
 
 /var/run/varnish\.pid		--	gen_context(system_u:object_r:varnishd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/varnish\.pid		--	gen_context(system_u:object_r:varnishd_var_run_t,s0)
-')
 /var/run/varnishlog\.pid	--	gen_context(system_u:object_r:varnishlog_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/varnishlog\.pid	--	gen_context(system_u:object_r:varnishlog_var_run_t,s0)
-')
 /var/run/varnishncsa\.pid	--	gen_context(system_u:object_r:varnishlog_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/varnishncsa\.pid	--	gen_context(system_u:object_r:varnishlog_var_run_t,s0)
-')

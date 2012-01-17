@@ -7,9 +7,5 @@
 /var/spool/uucppublic(/.*)?	gen_context(system_u:object_r:uucpd_spool_t,s0)
 
 /var/lock/uucp(/.*)?		gen_context(system_u:object_r:uucpd_lock_t,s0)
-ifdef(`distro_debian', `
-/var/run/lock/uucp(/.*)?		gen_context(system_u:object_r:uucpd_lock_t,s0)
-/run/lock/uucp(/.*)?		gen_context(system_u:object_r:uucpd_lock_t,s0)
-')
 
 /var/log/uucp(/.*)?		gen_context(system_u:object_r:uucpd_log_t,s0)

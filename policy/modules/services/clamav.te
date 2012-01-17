@@ -174,8 +174,10 @@ optional_policy(`
 
 tunable_policy(`clamd_use_jit',`
 	allow clamd_t self:process execmem;
+	allow freshclam_t self:process execmem;
 ', `
 	dontaudit clamd_t self:process execmem;
+	dontaudit freshclam_t self:process execmem;
 ')
 
 ########################################

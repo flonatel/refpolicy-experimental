@@ -18,14 +18,5 @@
 /var/log/zebra(/.*)?		gen_context(system_u:object_r:zebra_log_t,s0)
 
 /var/run/\.zebra	-s	gen_context(system_u:object_r:zebra_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/\.zebra	-s	gen_context(system_u:object_r:zebra_var_run_t,s0)
-')
 /var/run/\.zserv	-s	gen_context(system_u:object_r:zebra_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/\.zserv	-s	gen_context(system_u:object_r:zebra_var_run_t,s0)
-')
 /var/run/quagga(/.*)?		gen_context(system_u:object_r:zebra_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/quagga(/.*)?		gen_context(system_u:object_r:zebra_var_run_t,s0)
-')

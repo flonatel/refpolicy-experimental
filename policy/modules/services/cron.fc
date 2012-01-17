@@ -13,29 +13,11 @@
 /usr/sbin/fcron			--	gen_context(system_u:object_r:crond_exec_t,s0)
 
 /var/run/anacron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/anacron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 /var/run/atd\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/atd\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 /var/run/crond?\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/crond?\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 /var/run/crond\.reboot		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/crond\.reboot		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 /var/run/fcron\.fifo		-s	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/fcron\.fifo		-s	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 /var/run/fcron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/fcron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
-')
 
 ifdef(`distro_debian', `
 /var/spool/cron/atspool        -d      gen_context(system_u:object_r:cron_spool_t,s0)

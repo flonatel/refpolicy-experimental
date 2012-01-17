@@ -7,6 +7,3 @@
 /var/log/cluster/aisexec\.log		--	gen_context(system_u:object_r:aisexec_var_log_t,s0)
 
 /var/run/aisexec\.pid			--	gen_context(system_u:object_r:aisexec_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/aisexec\.pid			--	gen_context(system_u:object_r:aisexec_var_run_t,s0)
-')

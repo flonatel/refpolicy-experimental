@@ -5,14 +5,5 @@
 /var/db/dkim(/.*)?			gen_context(system_u:object_r:dkim_milter_private_key_t,s0)
 
 /var/run/dkim-filter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
-ifdef(`distro_debian', `
-/run/dkim-filter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
-')
 /var/run/dkim-milter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
-ifdef(`distro_debian', `
-/run/dkim-milter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
-')
 /var/run/dkim-milter\.pid	--	gen_context(system_u:object_r:dkim_milter_data_t,s0)
-ifdef(`distro_debian', `
-/run/dkim-milter\.pid	--	gen_context(system_u:object_r:dkim_milter_data_t,s0)
-')

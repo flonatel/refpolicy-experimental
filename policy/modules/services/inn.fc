@@ -62,12 +62,6 @@
 /var/log/news(/.*)?			gen_context(system_u:object_r:innd_log_t,s0)
 
 /var/run/innd(/.*)?			gen_context(system_u:object_r:innd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/innd(/.*)?			gen_context(system_u:object_r:innd_var_run_t,s0)
-')
 /var/run/news(/.*)?	 		gen_context(system_u:object_r:innd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/news(/.*)?	 		gen_context(system_u:object_r:innd_var_run_t,s0)
-')
 
 /var/spool/news(/.*)?			gen_context(system_u:object_r:news_spool_t,s0)

@@ -98,3 +98,7 @@ mta_send_mail(spamass_milter_t)
 optional_policy(`
 	spamassassin_domtrans_client(spamass_milter_t)
 ')
+
+optional_policy(`
+	postfix_search_spool(spamass_milter_t)
+')

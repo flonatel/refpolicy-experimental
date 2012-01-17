@@ -7,6 +7,3 @@
 /var/lib/chrony(/.*)?			gen_context(system_u:object_r:chronyd_var_lib_t,s0)
 /var/log/chrony(/.*)?			gen_context(system_u:object_r:chronyd_var_log_t,s0)
 /var/run/chronyd\.pid		--	gen_context(system_u:object_r:chronyd_var_run_t,s0)
-ifdef(`distro_debian', `
-/run/chronyd\.pid		--	gen_context(system_u:object_r:chronyd_var_run_t,s0)
-')
