@@ -1,3 +1,12 @@
+refpolicy (2:2.20110726-3) unstable; urgency=low
+
+  * Label /run/mdadm/map .
+    Closes: #643490
+  * Stop conflicting with ancient "selinux" package.
+    Closes: #576598
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 25 Jan 2012 23:52:15 +1100
+
 refpolicy (2:2.20110726-2) unstable; urgency=low
 
   * Merged all the patches from 2:0.2.20100524-13.
@@ -9,7 +18,7 @@ refpolicy (2:2.20110726-2) unstable; urgency=low
   * Remove the hack for /run etc that was introduced in 2:0.2.20100524-10
   * Correctly label nrpe.cfg as nrpe_etc_t
 
- -- Russell Coker <russell@coker.com.au>  Wed, 18 Jan 2012 05:21:35 +1100
+ -- Russell Coker <russell@coker.com.au>  Wed, 02 Nov 2011 12:57:17 +1100
 
 refpolicy (2:2.20110726-1) unstable; urgency=low
 

@@ -15,7 +15,7 @@ Architecture: all
 Depends: policycoreutils (>= 2.1.0), libpam-modules (>= 0.77-0.se5),
           python, libselinux1 (>= 2.0.35), libsepol1 (>=2.1.0)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1),
-            selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1),
+            procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1),
             selinux-policy-refpolicy-strict, selinux-policy-refpolicy-targeted
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
@@ -33,7 +33,7 @@ Priority: extra
 Depends: policycoreutils (>= 2.1.0), libpam-modules (>= 0.77-0.se5),
           python, libselinux1 (>= 2.0.35), libsepol1 (>=2.1.0)
 Conflicts: cron (<< 3.0pl1-87.2sel), fcron (<< 2.9.3-3), logrotate (<< 3.7.1-1),
-           selinux, procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1),
+           procps (<< 1:3.1.15-1), sysvinit (<< 2.86.ds1-1.se1),
            selinux-policy-refpolicy-strict, selinux-policy-refpolicy-targeted
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
