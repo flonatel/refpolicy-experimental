@@ -1,10 +1,18 @@
 
-policy_module(tftp,1.4.0)
+policy_module(tftp,1.6.0)
 
 ########################################
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+## Allow tftp to modify public files
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(tftp_anon_write,false)
 
 type tftpd_t;
 type tftpd_exec_t;
@@ -16,6 +24,9 @@ files_pid_file(tftpd_var_run_t)
 type tftpdir_t;
 files_type(tftpdir_t)
 
+type tftpdir_rw_t;
+files_type(tftpdir_rw_t)
+
 ########################################
 #
 # Local policy
@@ -26,11 +37,16 @@ allow tftpd_t self:tcp_socket create_stream_socket_perms;
 allow tftpd_t self:udp_socket create_socket_perms;
 allow tftpd_t self:unix_dgram_socket create_socket_perms;
 allow tftpd_t self:unix_stream_socket create_stream_socket_perms;
+allow tftpd_t self:netlink_route_socket r_netlink_socket_perms;
 dontaudit tftpd_t self:capability sys_tty_config;
 
 allow tftpd_t tftpdir_t:dir { getattr read search };
 allow tftpd_t tftpdir_t:file { read getattr };
 allow tftpd_t tftpdir_t:lnk_file { getattr read };
+
+manage_dirs_pattern(tftpd_t, tftpdir_rw_t, tftpdir_rw_t)
+manage_files_pattern(tftpd_t, tftpdir_rw_t, tftpdir_rw_t)
+manage_lnk_files_pattern(tftpd_t, tftpdir_rw_t, tftpdir_rw_t)
 
 manage_files_pattern(tftpd_t,tftpd_var_run_t,tftpd_var_run_t)
 files_pid_filetrans(tftpd_t,tftpd_var_run_t,file)
@@ -39,7 +55,8 @@ kernel_read_kernel_sysctls(tftpd_t)
 kernel_list_proc(tftpd_t)
 kernel_read_proc_symlinks(tftpd_t)
 
-corenet_non_ipsec_sendrecv(tftpd_t)
+corenet_all_recvfrom_unlabeled(tftpd_t)
+corenet_all_recvfrom_netlabel(tftpd_t)
 corenet_tcp_sendrecv_all_if(tftpd_t)
 corenet_udp_sendrecv_all_if(tftpd_t)
 corenet_tcp_sendrecv_all_nodes(tftpd_t)
@@ -69,6 +86,7 @@ libs_use_shared_libs(tftpd_t)
 logging_send_syslog_msg(tftpd_t)
 
 miscfiles_read_localization(tftpd_t)
+miscfiles_read_public_files(tftpd_t)
 
 sysnet_read_config(tftpd_t)
 sysnet_use_ldap(tftpd_t)
@@ -77,11 +95,9 @@ userdom_dontaudit_use_unpriv_user_fds(tftpd_t)
 userdom_dontaudit_use_sysadm_ttys(tftpd_t)
 userdom_dontaudit_search_sysadm_home_dirs(tftpd_t)
 
-ifdef(`targeted_policy', `
-        term_dontaudit_use_unallocated_ttys(tftpd_t)
-        term_dontaudit_use_generic_ptys(tftpd_t)
-        files_dontaudit_read_root_files(tftpd_t)
-')
+tunable_policy(`tftp_anon_write',`
+	miscfiles_manage_public_files(tftpd_t)
+') 
 
 optional_policy(`
 	inetd_udp_service_domain(tftpd_t,tftpd_exec_t)

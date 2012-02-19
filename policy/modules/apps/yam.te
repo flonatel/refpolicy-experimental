@@ -1,5 +1,5 @@
 
-policy_module(yam,1.0.0)
+policy_module(yam,1.2.0)
 
 ########################################
 #
@@ -8,8 +8,7 @@ policy_module(yam,1.0.0)
 
 type yam_t alias yam_crond_t;
 type yam_exec_t;
-domain_type(yam_t)
-domain_entry_file(yam_t,yam_exec_t)
+application_domain(yam_t,yam_exec_t)
 
 type yam_content_t;
 files_mountpoint(yam_content_t)
@@ -60,7 +59,8 @@ corecmd_exec_bin(yam_t)
 
 # Rsync and lftp need to network.  They also set files attributes to
 # match whats on the remote server.
-corenet_non_ipsec_sendrecv(yam_t)
+corenet_all_recvfrom_unlabeled(yam_t)
+corenet_all_recvfrom_netlabel(yam_t)
 corenet_tcp_sendrecv_generic_if(yam_t)
 corenet_tcp_sendrecv_all_nodes(yam_t)
 corenet_tcp_sendrecv_all_ports(yam_t)

@@ -96,6 +96,9 @@ $(base_pkg): $(base_mod) $(base_fc) $(users_extra) $(tmpdir)/seusers
 	@test -d $(builddir) || mkdir -p $(builddir)
 	$(verbose) $(SEMOD_PKG) -o $@ -m $(base_mod) -f $(base_fc) -u $(users_extra) -s $(tmpdir)/seusers
 
+ifneq "$(UNK_PERMS)" ""
+$(base_mod): CHECKMODULE += -U $(UNK_PERMS)
+endif
 $(base_mod): $(base_conf)
 	@echo "Compiling $(NAME) base module"
 	$(verbose) $(CHECKMODULE) $^ -o $@
@@ -144,6 +147,7 @@ $(tmpdir)/all_interfaces.conf: $(m4support) $(all_interfaces)
 
 $(tmpdir)/rolemap.conf: M4PARAM += -D self_contained_policy
 $(tmpdir)/rolemap.conf: $(rolemap)
+	$(verbose) echo "" > $@
 	$(call parse-rolemap,base,$@)
 
 $(tmpdir)/all_te_files.conf: M4PARAM += -D self_contained_policy

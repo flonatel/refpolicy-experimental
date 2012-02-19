@@ -45,9 +45,10 @@ interface(`domain_type',`
 	# start with basic domain
 	domain_base_type($1)
 
-	ifdef(`targeted_policy',`
-		unconfined_use_fds($1)
-		unconfined_sigchld($1)
+	ifdef(`distro_redhat',`
+		optional_policy(`
+			unconfined_use_fds($1)
+		')
 	')
 
 	# send init a sigchld and signull
@@ -64,6 +65,7 @@ interface(`domain_type',`
 	')
 
 	optional_policy(`
+		selinux_dontaudit_getattr_fs($1)
 		selinux_dontaudit_read_fs($1)
 	')
 
@@ -95,7 +97,7 @@ interface(`domain_entry_file',`
 	')
 
 	allow $1 $2:file entrypoint;
-	allow $1 $2:file rx_file_perms;
+	allow $1 $2:file { mmap_file_perms ioctl lock };
 
 	typeattribute $2 entry_type;
 
@@ -1229,6 +1231,49 @@ interface(`domain_entry_file_spec_domtrans',`
 
 ########################################
 ## <summary>
+##	Ability to mmap a low area of the address space,
+##      as configured by /proc/sys/kernel/mmap_min_addr.
+##      Preventing such mappings helps protect against
+##      exploiting null deref bugs in the kernel.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to mmap low memory.
+##	</summary>
+## </param>
+#
+interface(`domain_mmap_low',`
+	gen_require(`
+		attribute mmap_low_domain_type;
+	')
+
+	allow $1 self:memprotect mmap_zero;
+
+	typeattribute $1 mmap_low_domain_type;
+')
+
+########################################
+## <summary>
+##	Allow specified type to receive labeled
+##	networking packets from all domains, over
+##	all protocols (TCP, UDP, etc)
+## </summary>
+## <param name="type">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_all_recvfrom_all_domains',`
+	gen_require(`
+		attribute domain;
+ 	')
+
+	corenet_all_recvfrom_labeled($1,domain)
+')
+
+########################################
+## <summary>
 ##	Unconfined access to domains.
 ## </summary>
 ## <param name="domain">
@@ -1240,17 +1285,16 @@ interface(`domain_entry_file_spec_domtrans',`
 interface(`domain_unconfined',`
 	gen_require(`
 		attribute set_curr_context;
-		attribute can_change_process_identity;
-		attribute can_change_process_role;
 		attribute can_change_object_identity;
 		attribute unconfined_domain_type;
+		attribute process_uncond_exempt;
 	')
 
 	typeattribute $1 unconfined_domain_type;
 
 	# pass constraints
-	typeattribute $1 can_change_process_identity;
-	typeattribute $1 can_change_process_role;
 	typeattribute $1 can_change_object_identity;
 	typeattribute $1 set_curr_context;
+	typeattribute $1 process_uncond_exempt;
 ')
+

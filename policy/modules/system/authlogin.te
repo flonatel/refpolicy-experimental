@@ -1,5 +1,5 @@
 
-policy_module(authlogin,1.6.1)
+policy_module(authlogin,1.9.0)
 
 ########################################
 #
@@ -11,7 +11,7 @@ attribute can_write_shadow_passwords;
 attribute can_relabelto_shadow_passwords;
 
 type chkpwd_exec_t;
-corecmd_executable_file(chkpwd_exec_t)
+application_executable_file(chkpwd_exec_t)
 
 type faillog_t;
 logging_log_file(faillog_t)
@@ -20,7 +20,7 @@ type lastlog_t;
 logging_log_file(lastlog_t)
 
 type login_exec_t;
-corecmd_executable_file(login_exec_t)
+application_executable_file(login_exec_t)
 
 type pam_console_t;
 type pam_console_exec_t;
@@ -49,11 +49,15 @@ neverallow ~can_read_shadow_passwords shadow_t:file read;
 neverallow ~can_write_shadow_passwords shadow_t:file { create write };
 neverallow ~can_relabelto_shadow_passwords shadow_t:file relabelto;
 
-type utempter_t;
-domain_type(utempter_t)
+type updpwd_t;
+type updpwd_exec_t;
+domain_type(updpwd_t)
+domain_entry_file(updpwd_t,updpwd_exec_t)
+role system_r types updpwd_t;
 
+type utempter_t;
 type utempter_exec_t;
-domain_entry_file(utempter_t,utempter_exec_t)
+application_domain(utempter_t,utempter_exec_t)
 
 #
 # var_auth_t is the type of /var/lib/auth, usually
@@ -96,9 +100,13 @@ allow pam_t pam_tmp_t:dir manage_dir_perms;
 allow pam_t pam_tmp_t:file manage_file_perms;
 files_tmp_filetrans(pam_t, pam_tmp_t, { file dir })
 
+auth_use_nsswitch(pam_t)
+
 kernel_read_system_state(pam_t)
 
 fs_search_auto_mountpoints(pam_t)
+
+miscfiles_read_localization(pam_t)
 
 term_use_all_user_ttys(pam_t)
 term_use_all_user_ptys(pam_t)
@@ -116,14 +124,6 @@ userdom_use_unpriv_users_fds(pam_t)
 
 optional_policy(`
 	locallogin_use_fds(pam_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(pam_t)
-')
-
-optional_policy(`
-	nscd_socket_use(pam_t)
 ')
 
 ########################################
@@ -151,6 +151,8 @@ dev_getattr_apm_bios_dev(pam_console_t)
 dev_setattr_apm_bios_dev(pam_console_t)
 dev_getattr_dri_dev(pam_console_t)
 dev_setattr_dri_dev(pam_console_t)
+dev_getattr_input_dev(pam_console_t)
+dev_setattr_input_dev(pam_console_t)
 dev_getattr_framebuffer_dev(pam_console_t)
 dev_setattr_framebuffer_dev(pam_console_t)
 dev_getattr_generic_usb_dev(pam_console_t)
@@ -161,6 +163,8 @@ dev_getattr_mouse_dev(pam_console_t)
 dev_setattr_mouse_dev(pam_console_t)
 dev_getattr_power_mgmt_dev(pam_console_t)
 dev_setattr_power_mgmt_dev(pam_console_t)
+dev_getattr_printer_dev(pam_console_t)
+dev_setattr_printer_dev(pam_console_t)
 dev_getattr_scanner_dev(pam_console_t)
 dev_setattr_scanner_dev(pam_console_t)
 dev_getattr_sound_dev(pam_console_t)
@@ -171,8 +175,8 @@ dev_getattr_xserver_misc_dev(pam_console_t)
 dev_setattr_xserver_misc_dev(pam_console_t)
 dev_read_urand(pam_console_t)
 
-mls_file_read_up(pam_console_t)
-mls_file_write_down(pam_console_t)
+mls_file_read_all_levels(pam_console_t)
+mls_file_write_all_levels(pam_console_t)
 
 storage_getattr_fixed_disk_dev(pam_console_t)
 storage_setattr_fixed_disk_dev(pam_console_t)
@@ -202,6 +206,7 @@ files_read_etc_runtime_files(pam_console_t)
 
 fs_list_auto_mountpoints(pam_console_t)
 fs_list_noxattr_fs(pam_console_t)
+fs_getattr_all_fs(pam_console_t)
 
 init_use_fds(pam_console_t)
 init_use_script_ptys(pam_console_t)
@@ -217,12 +222,6 @@ miscfiles_read_certs(pam_console_t)
 seutil_read_file_contexts(pam_console_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pam_console_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(pam_console_t)
-	term_dontaudit_use_generic_ptys(pam_console_t)
-	files_dontaudit_read_root_files(pam_console_t)
-')
 
 optional_policy(`
 	gpm_getattr_gpmctl(pam_console_t)
@@ -244,7 +243,7 @@ optional_policy(`
 
 optional_policy(`
 	xserver_read_xdm_pid(pam_console_t)
-	xserver_use_xdm_fds(pam_t)
+	xserver_dontaudit_write_log(pam_console_t)
 ')
 
 ########################################
@@ -264,6 +263,34 @@ term_dontaudit_use_generic_ptys(system_chkpwd_t)
 userdom_dontaudit_use_unpriv_users_ttys(system_chkpwd_t)
 userdom_dontaudit_use_unpriv_users_ptys(system_chkpwd_t)
 userdom_dontaudit_use_sysadm_terms(system_chkpwd_t)
+
+########################################
+#
+# updpwd local policy
+#
+
+allow updpwd_t self:process setfscreate;
+allow updpwd_t self:fifo_file { read write };
+allow updpwd_t self:unix_stream_socket create_stream_socket_perms;
+allow updpwd_t self:unix_dgram_socket create_socket_perms;
+
+kernel_read_system_state(updpwd_t)
+
+files_manage_etc_files(updpwd_t)
+
+term_dontaudit_use_console(updpwd_t)
+term_dontaudit_use_console(updpwd_t)
+term_dontaudit_use_unallocated_ttys(updpwd_t)
+
+auth_manage_shadow(updpwd_t)
+auth_use_nsswitch(updpwd_t)
+
+libs_use_ld_so(updpwd_t)
+libs_use_shared_libs(updpwd_t)
+
+logging_send_syslog_msg(updpwd_t)
+
+miscfiles_read_localization(updpwd_t)
 
 ########################################
 #
@@ -299,6 +326,11 @@ userdom_write_unpriv_users_tmp_files(utempter_t)
 
 optional_policy(`
 	nscd_socket_use(utempter_t)
+')
+
+optional_policy(`
+	# Allow utemper to write to /tmp/.xses-*
+	unconfined_write_tmp_files(utempter_t)
 ')
 
 optional_policy(`

@@ -1,5 +1,5 @@
 
-policy_module(dcc,1.2.0)
+policy_module(dcc,1.5.0)
 
 ########################################
 #
@@ -8,8 +8,7 @@ policy_module(dcc,1.2.0)
 
 type cdcc_t;
 type cdcc_exec_t;
-domain_type(cdcc_t)
-domain_entry_file(cdcc_t,cdcc_exec_t)
+application_domain(cdcc_t,cdcc_exec_t)
 role system_r types cdcc_t;
 
 type cdcc_tmp_t;
@@ -17,8 +16,7 @@ files_tmp_file(cdcc_tmp_t)
 
 type dcc_client_t;
 type dcc_client_exec_t;
-domain_type(dcc_client_t)
-domain_entry_file(dcc_client_t,dcc_client_exec_t)
+application_domain(dcc_client_t,dcc_client_exec_t)
 role system_r types dcc_client_t;
 
 type dcc_client_map_t;
@@ -29,8 +27,7 @@ files_tmp_file(dcc_client_tmp_t)
 
 type dcc_dbclean_t;
 type dcc_dbclean_exec_t;
-domain_type(dcc_dbclean_t)
-domain_entry_file(dcc_dbclean_t,dcc_dbclean_exec_t)
+application_domain(dcc_dbclean_t,dcc_dbclean_exec_t)
 role system_r types dcc_dbclean_t;
 
 type dcc_dbclean_tmp_t;
@@ -99,7 +96,8 @@ allow cdcc_t dcc_var_t:dir list_dir_perms;
 read_files_pattern(cdcc_t,dcc_var_t,dcc_var_t)
 read_lnk_files_pattern(cdcc_t,dcc_var_t,dcc_var_t)
 
-corenet_non_ipsec_sendrecv(cdcc_t)
+corenet_all_recvfrom_unlabeled(cdcc_t)
+corenet_all_recvfrom_netlabel(cdcc_t)
 corenet_udp_sendrecv_generic_if(cdcc_t)
 corenet_udp_sendrecv_all_nodes(cdcc_t)
 corenet_udp_sendrecv_all_ports(cdcc_t)
@@ -141,7 +139,8 @@ allow dcc_client_t dcc_var_t:dir list_dir_perms;
 read_files_pattern(dcc_client_t,dcc_var_t,dcc_var_t)
 read_lnk_files_pattern(dcc_client_t,dcc_var_t,dcc_var_t)
 
-corenet_non_ipsec_sendrecv(dcc_client_t)
+corenet_all_recvfrom_unlabeled(dcc_client_t)
+corenet_all_recvfrom_netlabel(dcc_client_t)
 corenet_udp_sendrecv_generic_if(dcc_client_t)
 corenet_udp_sendrecv_all_nodes(dcc_client_t)
 corenet_udp_sendrecv_all_ports(dcc_client_t)
@@ -183,7 +182,8 @@ manage_lnk_files_pattern(dcc_dbclean_t,dcc_var_t,dcc_var_t)
 
 kernel_read_system_state(dcc_dbclean_t)
 
-corenet_non_ipsec_sendrecv(dcc_dbclean_t)
+corenet_all_recvfrom_unlabeled(dcc_dbclean_t)
+corenet_all_recvfrom_netlabel(dcc_dbclean_t)
 corenet_udp_sendrecv_generic_if(dcc_dbclean_t)
 corenet_udp_sendrecv_all_nodes(dcc_dbclean_t)
 corenet_udp_sendrecv_all_ports(dcc_dbclean_t)
@@ -243,7 +243,8 @@ files_pid_filetrans(dccd_t,dccd_var_run_t,file)
 kernel_read_system_state(dccd_t)
 kernel_read_kernel_sysctls(dccd_t)
 
-corenet_non_ipsec_sendrecv(dccd_t)
+corenet_all_recvfrom_unlabeled(dccd_t)
+corenet_all_recvfrom_netlabel(dccd_t)
 corenet_udp_sendrecv_generic_if(dccd_t)
 corenet_udp_sendrecv_all_nodes(dccd_t)
 corenet_udp_sendrecv_all_ports(dccd_t)
@@ -273,12 +274,6 @@ sysnet_dns_name_resolve(dccd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dccd_t)
 userdom_dontaudit_search_sysadm_home_dirs(dccd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(dccd_t)
-	term_dontaudit_use_generic_ptys(dccd_t)
-	files_dontaudit_read_root_files(dccd_t)
-')
 
 optional_policy(`
 	nscd_socket_use(dccd_t)
@@ -324,7 +319,8 @@ files_pid_filetrans(dccifd_t,dccifd_var_run_t,file)
 kernel_read_system_state(dccifd_t)
 kernel_read_kernel_sysctls(dccifd_t)
 
-corenet_non_ipsec_sendrecv(dccifd_t)
+corenet_all_recvfrom_unlabeled(dccifd_t)
+corenet_all_recvfrom_netlabel(dccifd_t)
 corenet_udp_sendrecv_generic_if(dccifd_t)
 corenet_udp_sendrecv_all_nodes(dccifd_t)
 corenet_udp_sendrecv_all_ports(dccifd_t)
@@ -351,12 +347,6 @@ sysnet_dns_name_resolve(dccifd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dccifd_t)
 userdom_dontaudit_search_sysadm_home_dirs(dccifd_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(dccifd_t)
-	term_dontaudit_use_generic_ptys(dccifd_t)
-	files_dontaudit_read_root_files(dccifd_t)
-')
 
 optional_policy(`
 	nscd_socket_use(dccifd_t)
@@ -401,7 +391,8 @@ files_pid_filetrans(dccm_t,dccm_var_run_t,file)
 kernel_read_system_state(dccm_t)
 kernel_read_kernel_sysctls(dccm_t)
 
-corenet_non_ipsec_sendrecv(dccm_t)
+corenet_all_recvfrom_unlabeled(dccm_t)
+corenet_all_recvfrom_netlabel(dccm_t)
 corenet_udp_sendrecv_generic_if(dccm_t)
 corenet_udp_sendrecv_all_nodes(dccm_t)
 corenet_udp_sendrecv_all_ports(dccm_t)
@@ -428,12 +419,6 @@ sysnet_dns_name_resolve(dccm_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dccm_t)
 userdom_dontaudit_search_sysadm_home_dirs(dccm_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(dccm_t)
-	term_dontaudit_use_generic_ptys(dccm_t)
-	files_dontaudit_read_root_files(dccm_t)
-')
 
 optional_policy(`
 	nscd_socket_use(dccm_t)

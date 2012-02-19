@@ -1,22 +1,20 @@
 
-policy_module(mozilla,1.2.0)
+policy_module(mozilla,1.5.0)
 
 ########################################
 #
 # Declarations
 #
 
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Control mozilla content access
 ## </p>
 ## </desc>
 gen_tunable(mozilla_read_content,false)
-')
 
 type mozilla_conf_t;
 files_config_file(mozilla_conf_t)
 
 type mozilla_exec_t;
-corecmd_executable_file(mozilla_exec_t)
+application_executable_file(mozilla_exec_t)

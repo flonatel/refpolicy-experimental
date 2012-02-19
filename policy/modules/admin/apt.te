@@ -1,5 +1,5 @@
 
-policy_module(apt,1.1.0)
+policy_module(apt,1.3.0)
 
 ########################################
 #
@@ -72,7 +72,8 @@ kernel_read_kernel_sysctls(apt_t)
 corecmd_exec_bin(apt_t)
 corecmd_exec_shell(apt_t)
 
-corenet_non_ipsec_sendrecv(apt_t)
+corenet_all_recvfrom_unlabeled(apt_t)
+corenet_all_recvfrom_netlabel(apt_t)
 corenet_tcp_sendrecv_all_if(apt_t)
 corenet_udp_sendrecv_all_if(apt_t)
 corenet_tcp_sendrecv_all_nodes(apt_t)
@@ -112,10 +113,6 @@ seutil_use_newrole_fds(apt_t)
 
 sysnet_read_config(apt_t)
 
-ifdef(`targeted_policy',`
-	unconfined_domain(apt_t)
-')
-
 # with boolean, for cron-apt and such?
 #optional_policy(`
 #	cron_system_entry(apt_t,apt_exec_t)
@@ -135,4 +132,8 @@ optional_policy(`
 optional_policy(`
 	rpm_read_db(apt_t)
 	rpm_domtrans(apt_t)
+')
+
+optional_policy(`
+	unconfined_domain(apt_t)
 ')

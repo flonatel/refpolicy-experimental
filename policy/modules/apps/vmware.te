@@ -1,5 +1,5 @@
 
-policy_module(vmware,1.1.0)
+policy_module(vmware,1.4.0)
 
 ########################################
 #
@@ -45,7 +45,8 @@ kernel_read_kernel_sysctls(vmware_host_t)
 kernel_list_proc(vmware_host_t)
 kernel_read_proc_symlinks(vmware_host_t)
 
-corenet_non_ipsec_sendrecv(vmware_host_t)
+corenet_all_recvfrom_unlabeled(vmware_host_t)
+corenet_all_recvfrom_netlabel(vmware_host_t)
 corenet_tcp_sendrecv_generic_if(vmware_host_t)
 corenet_udp_sendrecv_generic_if(vmware_host_t)
 corenet_raw_sendrecv_generic_if(vmware_host_t)
@@ -55,6 +56,8 @@ corenet_raw_sendrecv_all_nodes(vmware_host_t)
 corenet_tcp_sendrecv_all_ports(vmware_host_t)
 corenet_udp_sendrecv_all_ports(vmware_host_t)
 corenet_raw_bind_all_nodes(vmware_host_t)
+corenet_tcp_bind_all_nodes(vmware_host_t)
+corenet_udp_bind_all_nodes(vmware_host_t)
 corenet_tcp_connect_all_ports(vmware_host_t)
 corenet_sendrecv_all_client_packets(vmware_host_t)
 corenet_sendrecv_all_server_packets(vmware_host_t)
@@ -85,12 +88,6 @@ sysnet_dns_name_resolve(vmware_host_t)
 
 userdom_dontaudit_use_unpriv_user_fds(vmware_host_t)
 userdom_dontaudit_search_sysadm_home_dirs(vmware_host_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(vmware_host_t)
-	term_dontaudit_use_generic_ptys(vmware_host_t)
-	files_dontaudit_read_root_files(vmware_host_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(vmware_host_t)

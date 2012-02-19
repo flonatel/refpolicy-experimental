@@ -1,5 +1,5 @@
 
-policy_module(portslave,1.2.0)
+policy_module(portslave,1.4.0)
 
 ########################################
 #
@@ -55,7 +55,8 @@ kernel_read_kernel_sysctls(portslave_t)
 corecmd_exec_bin(portslave_t)
 corecmd_exec_shell(portslave_t)
 
-corenet_non_ipsec_sendrecv(portslave_t)
+corenet_all_recvfrom_unlabeled(portslave_t)
+corenet_all_recvfrom_netlabel(portslave_t)
 corenet_tcp_sendrecv_generic_if(portslave_t)
 corenet_udp_sendrecv_generic_if(portslave_t)
 corenet_tcp_sendrecv_all_nodes(portslave_t)
@@ -110,12 +111,6 @@ ppp_manage_pid_files(portslave_t)
 ppp_pid_filetrans(portslave_t)
 
 ssh_exec(portslave_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(portslave_t)
-	term_dontaudit_use_generic_ptys(portslave_t)
-	files_dontaudit_read_root_files(portslave_t)
-')
 
 optional_policy(`
 	inetd_tcp_service_domain(portslave_t,portslave_exec_t)

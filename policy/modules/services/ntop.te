@@ -1,5 +1,5 @@
 
-policy_module(ntop,1.2.0)
+policy_module(ntop,1.5.0)
 
 ########################################
 #
@@ -9,6 +9,7 @@ policy_module(ntop,1.2.0)
 type ntop_t;
 type ntop_exec_t;
 init_daemon_domain(ntop_t,ntop_exec_t)
+application_domain(ntop_t,ntop_exec_t)
 
 type ntop_etc_t;
 files_config_file(ntop_etc_t)
@@ -61,7 +62,8 @@ kernel_read_kernel_sysctls(ntop_t)
 kernel_list_proc(ntop_t)
 kernel_read_proc_symlinks(ntop_t)
 
-corenet_non_ipsec_sendrecv(ntop_t)
+corenet_all_recvfrom_unlabeled(ntop_t)
+corenet_all_recvfrom_netlabel(ntop_t)
 corenet_tcp_sendrecv_generic_if(ntop_t)
 corenet_udp_sendrecv_generic_if(ntop_t)
 corenet_raw_sendrecv_generic_if(ntop_t)
@@ -91,12 +93,6 @@ sysnet_read_config(ntop_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ntop_t)
 userdom_dontaudit_search_sysadm_home_dirs(ntop_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(ntop_t)
-	term_dontaudit_use_generic_ptys(ntop_t)
-	files_dontaudit_read_root_files(ntop_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(ntop_t)

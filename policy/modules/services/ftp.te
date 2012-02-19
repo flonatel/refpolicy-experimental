@@ -1,5 +1,5 @@
 
-policy_module(ftp,1.5.0)
+policy_module(ftp,1.7.0)
 
 ########################################
 #
@@ -8,8 +8,9 @@ policy_module(ftp,1.5.0)
 
 ## <desc>
 ## <p>
-## Allow ftp servers to modify public files
-## used for public file transfer services.
+## Allow ftp servers to upload files,  used for public file
+## transfer services. Directories must be labeled
+## public_content_rw_t.
 ## </p>
 ## </desc>
 gen_tunable(allow_ftpd_anon_write,false)
@@ -128,7 +129,8 @@ dev_read_urand(ftpd_t)
 
 corecmd_exec_bin(ftpd_t)
 
-corenet_non_ipsec_sendrecv(ftpd_t)
+corenet_all_recvfrom_unlabeled(ftpd_t)
+corenet_all_recvfrom_netlabel(ftpd_t)
 corenet_tcp_sendrecv_all_if(ftpd_t)
 corenet_udp_sendrecv_all_if(ftpd_t)
 corenet_tcp_sendrecv_all_nodes(ftpd_t)
@@ -180,13 +182,6 @@ sysnet_use_ldap(ftpd_t)
 userdom_dontaudit_search_sysadm_home_dirs(ftpd_t)
 userdom_dontaudit_use_unpriv_user_fds(ftpd_t)
 
-ifdef(`targeted_policy',`
-	files_dontaudit_read_root_files(ftpd_t)
-
-	term_dontaudit_use_generic_ptys(ftpd_t)
-	term_dontaudit_use_unallocated_ttys(ftpd_t)
-')
-
 tunable_policy(`allow_ftpd_anon_write',`
 	miscfiles_manage_public_files(ftpd_t)
 ')
@@ -223,10 +218,6 @@ tunable_policy(`ftp_home_dir',`
 	userdom_manage_all_users_home_content_dirs(ftpd_t)
 	userdom_manage_all_users_home_content_files(ftpd_t)
 	userdom_manage_all_users_home_content_symlinks(ftpd_t)
-
-	ifdef(`targeted_policy',`
-		userdom_generic_user_home_dir_filetrans_generic_user_home_content(ftpd_t,{ dir file lnk_file sock_file fifo_file })
-	')
 ')
 
 tunable_policy(`ftp_home_dir && use_nfs_home_dirs',`
@@ -299,7 +290,3 @@ files_read_etc_files(ftpdctl_t)
 
 libs_use_ld_so(ftpdctl_t)
 libs_use_shared_libs(ftpdctl_t)
-
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(ftpdctl_t)
-')

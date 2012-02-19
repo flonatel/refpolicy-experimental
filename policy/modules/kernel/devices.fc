@@ -3,6 +3,7 @@
 /dev/.*				gen_context(system_u:object_r:device_t,s0)
 
 /dev/.*mouse.*		-c	gen_context(system_u:object_r:mouse_device_t,s0)
+/dev/admmidi.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/adsp.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/(misc/)?agpgart	-c	gen_context(system_u:object_r:agp_device_t,s0)
 /dev/aload.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
@@ -12,6 +13,8 @@
 /dev/atibm		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/audio.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/beep		-c	gen_context(system_u:object_r:sound_device_t,s0)
+/dev/dmfm		-c	gen_context(system_u:object_r:sound_device_t,s0)
+/dev/dmmidi.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/dsp.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/efirtc		-c	gen_context(system_u:object_r:clock_device_t,s0)
 /dev/em8300.*		-c	gen_context(system_u:object_r:v4l_device_t,s0)
@@ -19,7 +22,9 @@
 /dev/evtchn		-c	gen_context(system_u:object_r:xen_device_t,s0)
 /dev/fb[0-9]*		-c	gen_context(system_u:object_r:framebuf_device_t,s0)
 /dev/full		-c	gen_context(system_u:object_r:null_device_t,s0)
+/dev/fw.*		-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/hiddev.*		-c	gen_context(system_u:object_r:usb_device_t,s0)
+/dev/hidraw.*		-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/hpet		-c	gen_context(system_u:object_r:clock_device_t,s0)
 /dev/hw_random		-c	gen_context(system_u:object_r:random_device_t,s0)
 /dev/hwrng		-c	gen_context(system_u:object_r:random_device_t,s0)
@@ -28,6 +33,7 @@
 /dev/js.*		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/kmem		-c	gen_context(system_u:object_r:memory_device_t,mls_systemhigh)
 /dev/kmsg		-c	gen_context(system_u:object_r:kmsg_device_t,mls_systemhigh)
+/dev/lircm		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/logibm		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/lp.*		-c	gen_context(system_u:object_r:printer_device_t,s0)
 /dev/mcelog		-c	gen_context(system_u:object_r:kmsg_device_t,mls_systemhigh)
@@ -52,7 +58,7 @@
 /dev/radio.*		-c	gen_context(system_u:object_r:v4l_device_t,s0)
 /dev/random		-c	gen_context(system_u:object_r:random_device_t,s0)
 /dev/raw1394.*		-c	gen_context(system_u:object_r:v4l_device_t,s0)
-/dev/(misc/)?rtc	-c	gen_context(system_u:object_r:clock_device_t,s0)
+/dev/(misc/)?rtc[0-9]*	-c	gen_context(system_u:object_r:clock_device_t,s0)
 /dev/sequencer		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/sequencer2		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/smpte.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
@@ -63,7 +69,9 @@
 /dev/sonypi		-c	gen_context(system_u:object_r:v4l_device_t,s0)
 /dev/tlk[0-3]		-c	gen_context(system_u:object_r:v4l_device_t,s0)
 /dev/urandom		-c	gen_context(system_u:object_r:urandom_device_t,s0)
+/dev/usbmon[0-9]+	-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/usbdev.*		-c	gen_context(system_u:object_r:usb_device_t,s0)
+/dev/usb[0-9]+		-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/usblp.*		-c	gen_context(system_u:object_r:printer_device_t,s0)
 ifdef(`distro_suse', `
 /dev/usbscanner		-c	gen_context(system_u:object_r:scanner_device_t,s0)
@@ -81,6 +89,8 @@ ifdef(`distro_suse', `
 
 /dev/bus/usb/.*/[0-9]+	-c	gen_context(system_u:object_r:usb_device_t,s0)
 
+/dev/cmx.*		-c	gen_context(system_u:object_r:smartcard_device_t,s0)
+
 /dev/cpu/.*		-c	gen_context(system_u:object_r:cpu_device_t,s0)
 /dev/cpu/mtrr		-c	gen_context(system_u:object_r:mtrr_device_t,s0)
 
@@ -92,6 +102,7 @@ ifdef(`distro_suse', `
 /dev/input/event.*	-c	gen_context(system_u:object_r:event_device_t,s0)
 /dev/input/mice		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/input/js.*		-c	gen_context(system_u:object_r:mouse_device_t,s0)
+/dev/input/uinput	-c	gen_context(system_u:object_r:event_device_t,s0)
 
 /dev/mapper/control	-c	gen_context(system_u:object_r:lvm_control_t,s0)
 
@@ -107,10 +118,9 @@ ifdef(`distro_suse', `
 /dev/xen/blktap.*	-c	gen_context(system_u:object_r:xen_device_t,s0)
 /dev/xen/evtchn		-c	gen_context(system_u:object_r:xen_device_t,s0)
 
-ifdef(`distro_debian',`
-# used by udev init script as temporary mount point
-/lib/udev/devices	-d		gen_context(system_u:object_r:device_t,s0)
-')
+/etc/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
+
+/lib/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
 
 ifdef(`distro_gentoo',`
 # used by init scripts to initally populate udev /dev

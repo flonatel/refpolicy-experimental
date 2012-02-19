@@ -1,12 +1,11 @@
 
-policy_module(xserver,1.4.1)
+policy_module(xserver,1.7.0)
 
 ########################################
 #
 # Declarations
 #
 
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Allows clients to write to the X server shared
@@ -14,7 +13,6 @@ ifdef(`strict_policy',`
 ## </p>
 ## </desc>
 gen_tunable(allow_write_xshm,false)
-')
 
 ## <desc>
 ## <p>
@@ -29,10 +27,10 @@ attribute fonts_config_type;
 attribute xauth_home_type;
 
 type iceauth_exec_t;
-corecmd_executable_file(iceauth_exec_t)
+application_executable_file(iceauth_exec_t)
 
 type xauth_exec_t;
-corecmd_executable_file(xauth_exec_t)
+application_executable_file(xauth_exec_t)
 
 # this is not actually a device, its a pipe
 type xconsole_device_t;
@@ -103,7 +101,6 @@ allow xdm_t self:fifo_file rw_fifo_file_perms;
 allow xdm_t self:shm create_shm_perms;
 allow xdm_t self:sem create_sem_perms;
 allow xdm_t self:unix_stream_socket { connectto create_stream_socket_perms };
-allow xdm_t self:netlink_route_socket r_netlink_socket_perms;
 allow xdm_t self:unix_dgram_socket create_socket_perms;
 allow xdm_t self:tcp_socket create_stream_socket_perms;
 allow xdm_t self:udp_socket create_socket_perms;
@@ -147,8 +144,8 @@ files_pid_filetrans(xdm_t,xdm_var_run_t,{ dir file fifo_file })
 allow xdm_t xdm_xserver_t:process signal;
 allow xdm_t xdm_xserver_t:unix_stream_socket connectto;
 
-allow xdm_t xdm_xserver_tmp_t:sock_file rw_file_perms;
-allow xdm_t xdm_xserver_tmp_t:dir { setattr r_dir_perms };
+allow xdm_t xdm_xserver_tmp_t:sock_file rw_sock_file_perms;
+allow xdm_t xdm_xserver_tmp_t:dir { setattr list_dir_perms };
 
 # transition to the xdm xserver
 domtrans_pattern(xdm_t, xserver_exec_t, xdm_xserver_t)
@@ -177,7 +174,8 @@ kernel_read_network_state(xdm_t)
 corecmd_exec_shell(xdm_t)
 corecmd_exec_bin(xdm_t)
 
-corenet_non_ipsec_sendrecv(xdm_t)
+corenet_all_recvfrom_unlabeled(xdm_t)
+corenet_all_recvfrom_netlabel(xdm_t)
 corenet_tcp_sendrecv_generic_if(xdm_t)
 corenet_udp_sendrecv_generic_if(xdm_t)
 corenet_tcp_sendrecv_all_nodes(xdm_t)
@@ -275,20 +273,6 @@ userdom_signal_all_users(xdm_t)
 
 xserver_rw_session_template(xdm,xdm_t,xdm_tmpfs_t)
 
-ifdef(`targeted_policy',`
-	unconfined_domain(xdm_t)
-	unconfined_domtrans(xdm_t)
-	userdom_generic_user_home_dir_filetrans_generic_user_home_content(xdm_t, {file dir })
-
-	ifndef(`distro_redhat',`
-		allow xdm_t self:process { execheap execmem };
-	')
-
-	ifdef(`distro_rhel4',`
-		allow xdm_t self:process { execheap execmem };
-	')
-')
-
 tunable_policy(`use_nfs_home_dirs',`
 	fs_manage_nfs_dirs(xdm_t)
 	fs_manage_nfs_files(xdm_t)
@@ -351,15 +335,24 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nscd_socket_use(xdm_t)
-')
-
-optional_policy(`
 	seutil_sigchld_newrole(xdm_t)
 ')
 
 optional_policy(`
 	udev_read_db(xdm_t)
+')
+
+optional_policy(`
+	unconfined_domain(xdm_t)
+	unconfined_domtrans(xdm_t)
+
+	ifndef(`distro_redhat',`
+		allow xdm_t self:process { execheap execmem };
+	')
+
+	ifdef(`distro_rhel4',`
+		allow xdm_t self:process { execheap execmem };
+	')
 ')
 
 optional_policy(`
@@ -426,7 +419,16 @@ tunable_policy(`use_samba_home_dirs',`
 	fs_manage_cifs_symlinks(xdm_xserver_t)
 ')
 
-ifdef(`targeted_policy',`
+optional_policy(`
+	resmgr_stream_connect(xdm_t)
+')
+
+optional_policy(`
+	rhgb_rw_shm(xdm_xserver_t)
+	rhgb_rw_tmpfs_files(xdm_xserver_t)
+')
+
+optional_policy(`
 	unconfined_domain_noaudit(xdm_xserver_t)
 	unconfined_domtrans(xdm_xserver_t)
 
@@ -437,15 +439,6 @@ ifdef(`targeted_policy',`
 	ifdef(`distro_rhel4',`
 		allow xdm_xserver_t self:process { execheap execmem };
 	')
-')
-
-optional_policy(`
-	resmgr_stream_connect(xdm_t)
-')
-
-optional_policy(`
-	rhgb_rw_shm(xdm_xserver_t)
-	rhgb_rw_tmpfs_files(xdm_xserver_t)
 ')
 
 ifdef(`TODO',`

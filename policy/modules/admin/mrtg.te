@@ -1,5 +1,5 @@
 
-policy_module(mrtg,1.1.0)
+policy_module(mrtg,1.3.0)
 
 ########################################
 #
@@ -63,7 +63,8 @@ kernel_read_kernel_sysctls(mrtg_t)
 corecmd_exec_bin(mrtg_t)
 corecmd_exec_shell(mrtg_t)
 
-corenet_non_ipsec_sendrecv(mrtg_t)
+corenet_all_recvfrom_unlabeled(mrtg_t)
+corenet_all_recvfrom_netlabel(mrtg_t)
 corenet_tcp_sendrecv_generic_if(mrtg_t)
 corenet_udp_sendrecv_generic_if(mrtg_t)
 corenet_tcp_sendrecv_all_nodes(mrtg_t)
@@ -123,12 +124,6 @@ ifdef(`enable_mls',`
 ifdef(`distro_redhat',`
 	allow mrtg_t mrtg_lock_t:file manage_file_perms;
 	filetrans_pattern(mrtg_t,mrtg_etc_t,mrtg_lock_t,file)
-')
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(mrtg_t)
-	term_dontaudit_use_generic_ptys(mrtg_t)
-	files_dontaudit_read_root_files(mrtg_t)
 ')
 
 optional_policy(`

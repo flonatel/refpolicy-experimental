@@ -1,5 +1,5 @@
 
-policy_module(logrotate,1.4.0)
+policy_module(logrotate,1.7.0)
 
 ########################################
 #
@@ -72,14 +72,15 @@ dev_read_urand(logrotate_t)
 fs_search_auto_mountpoints(logrotate_t)
 fs_getattr_xattr_fs(logrotate_t)
 
-mls_file_read_up(logrotate_t)
-mls_file_write_down(logrotate_t)
+mls_file_read_all_levels(logrotate_t)
+mls_file_write_all_levels(logrotate_t)
 mls_file_upgrade(logrotate_t)
 
 selinux_get_fs_mount(logrotate_t)
 selinux_get_enforce_mode(logrotate_t)
 
 auth_manage_login_records(logrotate_t)
+auth_use_nsswitch(logrotate_t)
 
 # Run helper programs.
 corecmd_exec_bin(logrotate_t)
@@ -114,8 +115,6 @@ miscfiles_read_localization(logrotate_t)
 
 seutil_dontaudit_read_config(logrotate_t)
 
-sysnet_read_config(logrotate_t)
-
 userdom_dontaudit_search_sysadm_home_dirs(logrotate_t)
 userdom_use_unpriv_users_fds(logrotate_t)
 
@@ -128,10 +127,9 @@ ifdef(`distro_debian', `
 	allow logrotate_t logrotate_tmp_t:file { relabelfrom relabelto };
 	# for savelog
 	can_exec(logrotate_t, logrotate_exec_t)
-')
 
-ifdef(`targeted_policy',`
-	unconfined_domain(logrotate_t)
+	# for syslogd-listfiles
+	logging_read_syslog_config(logrotate_t)
 ')
 
 optional_policy(`
@@ -181,14 +179,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nis_use_ypbind(logrotate_t)
-')
-
-optional_policy(`
-	nscd_socket_use(logrotate_t)
-')
-
-optional_policy(`
 	slrnpull_manage_spool(logrotate_t)
 ')
 
@@ -196,15 +186,3 @@ optional_policy(`
 	# cjp: why?
 	squid_domtrans(logrotate_t)
 ')
-
-ifdef(`TODO',`
-# it should not require this
-allow logrotate_t {staff_home_dir_t sysadm_home_dir_t}:dir { getattr read search };
-
-# for /var/backups on Debian
-ifdef(`backup.te', `
-rw_dir_create_file(logrotate_t, backup_store_t)
-')
-
-allow logrotate_t syslogd_exec_t:file r_file_perms;
-') dnl end TODO

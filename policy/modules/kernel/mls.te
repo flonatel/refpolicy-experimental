@@ -1,5 +1,5 @@
 
-policy_module(mls,1.5.0)
+policy_module(mls,1.6.0)
 
 ########################################
 #
@@ -18,6 +18,7 @@ attribute mlsnetread;
 attribute mlsnetreadtoclr;
 attribute mlsnetwrite;
 attribute mlsnetwritetoclr;
+attribute mlsnetwriteranged;
 attribute mlsnetupgrade;
 attribute mlsnetdowngrade;
 attribute mlsnetrecvall;
@@ -42,6 +43,14 @@ attribute mlsxwinwriteproperty;
 attribute mlsxwinreadcolormap;
 attribute mlsxwinwritecolormap;
 attribute mlsxwinwritexinput;
+
+attribute mlsdbread;
+attribute mlsdbreadtoclr;
+attribute mlsdbwrite;
+attribute mlsdbwritetoclr;
+attribute mlsdbwriteinrange;
+attribute mlsdbupgrade;
+attribute mlsdbdowngrade;
 
 attribute mlstrustedobject;
 

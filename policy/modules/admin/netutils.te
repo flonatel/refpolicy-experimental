@@ -1,19 +1,17 @@
 
-policy_module(netutils,1.4.1)
+policy_module(netutils,1.6.0)
 
 ########################################
 #
 # Declarations
 #
 
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Control users use of ping and traceroute
 ## </p>
 ## </desc>
 gen_tunable(user_ping,false)
-')
 
 type netutils_t;
 type netutils_exec_t;
@@ -53,7 +51,8 @@ files_tmp_filetrans(netutils_t, netutils_tmp_t, { file dir })
 
 kernel_search_proc(netutils_t)
 
-corenet_non_ipsec_sendrecv(netutils_t)
+corenet_all_recvfrom_unlabeled(netutils_t)
+corenet_all_recvfrom_netlabel(netutils_t)
 corenet_tcp_sendrecv_all_if(netutils_t)
 corenet_raw_sendrecv_all_if(netutils_t)
 corenet_udp_sendrecv_all_if(netutils_t)
@@ -90,11 +89,6 @@ sysnet_read_config(netutils_t)
 
 userdom_use_all_users_fds(netutils_t)
 
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(netutils_t)
-	term_use_unallocated_ttys(netutils_t)
-')
-
 optional_policy(`
 	nis_use_ypbind(netutils_t)
 ')
@@ -114,7 +108,8 @@ allow ping_t self:tcp_socket create_socket_perms;
 allow ping_t self:rawip_socket { create ioctl read write bind getopt setopt };
 allow ping_t self:packet_socket { create ioctl read write bind getopt setopt };
 
-corenet_non_ipsec_sendrecv(ping_t)
+corenet_all_recvfrom_unlabeled(ping_t)
+corenet_all_recvfrom_netlabel(ping_t)
 corenet_tcp_sendrecv_all_if(ping_t)
 corenet_raw_sendrecv_all_if(ping_t)
 corenet_raw_sendrecv_all_nodes(ping_t)
@@ -142,16 +137,9 @@ ifdef(`hide_broken_symptoms',`
 	init_dontaudit_use_fds(ping_t)
 ')
 
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(ping_t)
-	term_use_generic_ptys(ping_t)
+tunable_policy(`user_ping',`
 	term_use_all_user_ttys(ping_t)
 	term_use_all_user_ptys(ping_t)
-',`
-	tunable_policy(`user_ping',`
-		term_use_all_user_ttys(ping_t)
-		term_use_all_user_ptys(ping_t)
-	')
 ')
 
 optional_policy(`
@@ -184,7 +172,8 @@ allow traceroute_t self:udp_socket create_socket_perms;
 kernel_read_system_state(traceroute_t)
 kernel_read_network_state(traceroute_t)
 
-corenet_non_ipsec_sendrecv(traceroute_t)
+corenet_all_recvfrom_unlabeled(traceroute_t)
+corenet_all_recvfrom_netlabel(traceroute_t)
 corenet_tcp_sendrecv_all_if(traceroute_t)
 corenet_udp_sendrecv_all_if(traceroute_t)
 corenet_raw_sendrecv_all_if(traceroute_t)
@@ -225,14 +214,9 @@ files_read_usr_files(traceroute_t)
 
 sysnet_read_config(traceroute_t)
 
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(traceroute_t)
-	term_use_generic_ptys(traceroute_t)
-',`
-	tunable_policy(`user_ping',`
-		term_use_all_user_ttys(traceroute_t)
-		term_use_all_user_ptys(traceroute_t)
-	')
+tunable_policy(`user_ping',`
+	term_use_all_user_ttys(traceroute_t)
+	term_use_all_user_ptys(traceroute_t)
 ')
 
 optional_policy(`

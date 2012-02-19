@@ -1,5 +1,5 @@
 
-policy_module(snort,1.2.0)
+policy_module(snort,1.4.0)
 
 ########################################
 #
@@ -55,7 +55,8 @@ kernel_list_proc(snort_t)
 kernel_read_proc_symlinks(snort_t)
 kernel_dontaudit_read_system_state(snort_t)
 
-corenet_non_ipsec_sendrecv(snort_t)
+corenet_all_recvfrom_unlabeled(snort_t)
+corenet_all_recvfrom_netlabel(snort_t)
 corenet_tcp_sendrecv_generic_if(snort_t)
 corenet_udp_sendrecv_generic_if(snort_t)
 corenet_raw_sendrecv_generic_if(snort_t)
@@ -86,12 +87,6 @@ sysnet_read_config(snort_t)
 
 userdom_dontaudit_use_unpriv_user_fds(snort_t)
 userdom_dontaudit_search_sysadm_home_dirs(snort_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(snort_t)
-	term_dontaudit_use_generic_ptys(snort_t)
-	files_dontaudit_read_root_files(snort_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(snort_t)

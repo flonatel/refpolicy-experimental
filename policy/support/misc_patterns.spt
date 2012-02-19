@@ -15,7 +15,7 @@ define(`spec_domtrans_pattern',`
 	domain_transition_pattern($1,$2,$3)
 
 	allow $3 $1:fd use;
-	allow $3 $1:fifo_file rw_file_perms;
+	allow $3 $1:fifo_file rw_fifo_file_perms;
 	allow $3 $1:process sigchld;
 ')
 
@@ -34,7 +34,7 @@ define(`domtrans_pattern',`
 	domain_auto_transition_pattern($1,$2,$3)
 
 	allow $3 $1:fd use;
-	allow $3 $1:fifo_file rw_file_perms;
+	allow $3 $1:fifo_file rw_fifo_file_perms;
 	allow $3 $1:process sigchld;
 ')
 
@@ -42,6 +42,7 @@ define(`domtrans_pattern',`
 # Other process permissions
 #
 define(`send_audit_msgs_pattern',`
+	refpolicywarn(`$0($*) has been deprecated, please use logging_send_audit_msgs($1) instead.')
 	allow $1 self:capability audit_write;
 	allow $1 self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
 ')

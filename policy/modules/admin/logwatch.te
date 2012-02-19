@@ -1,5 +1,5 @@
 
-policy_module(logwatch,1.4.1)
+policy_module(logwatch,1.7.0)
 
 #################################
 #
@@ -8,8 +8,7 @@ policy_module(logwatch,1.4.1)
 
 type logwatch_t;
 type logwatch_exec_t;
-domain_type(logwatch_t)
-domain_entry_file(logwatch_t,logwatch_exec_t)
+application_domain(logwatch_t,logwatch_exec_t)
 role system_r types logwatch_t;
 
 type logwatch_cache_t;
@@ -30,7 +29,6 @@ allow logwatch_t self:capability { dac_override dac_read_search setgid };
 allow logwatch_t self:process signal;
 allow logwatch_t self:fifo_file rw_file_perms;
 allow logwatch_t self:unix_stream_socket create_stream_socket_perms;
-allow logwatch_t self:netlink_route_socket r_netlink_socket_perms; 
 
 manage_dirs_pattern(logwatch_t,logwatch_cache_t,logwatch_cache_t)
 manage_files_pattern(logwatch_t,logwatch_cache_t,logwatch_cache_t)
@@ -50,7 +48,7 @@ corecmd_exec_bin(logwatch_t)
 corecmd_exec_shell(logwatch_t)
 
 dev_read_urand(logwatch_t)
-dev_search_sysfs(logwatch_t)
+dev_read_sysfs(logwatch_t)
 
 # Read /proc/PID directories for all domains.
 domain_read_all_domains_state(logwatch_t)
@@ -63,6 +61,8 @@ files_search_spool(logwatch_t)
 files_search_mnt(logwatch_t)
 files_dontaudit_search_home(logwatch_t)
 files_dontaudit_search_boot(logwatch_t)
+# Execs df and if file system mounted with a context avc raised
+files_dontaudit_search_all_dirs(logwatch_t)
 
 fs_getattr_all_fs(logwatch_t)
 fs_dontaudit_list_auto_mountpoints(logwatch_t)
@@ -71,6 +71,9 @@ term_dontaudit_getattr_pty_dirs(logwatch_t)
 term_dontaudit_list_ptys(logwatch_t)
 
 auth_dontaudit_read_shadow(logwatch_t)
+
+init_read_utmp(logwatch_t)
+init_dontaudit_write_utmp(logwatch_t)
 
 libs_use_ld_so(logwatch_t)
 libs_use_shared_libs(logwatch_t)
@@ -95,6 +98,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	auth_use_nsswitch(logwatch_t)
+')
+
+optional_policy(`
 	avahi_dontaudit_search_pid(logwatch_t)
 ')
 
@@ -113,14 +120,6 @@ optional_policy(`
 
 optional_policy(`
 	mta_getattr_spool(logwatch_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(logwatch_t)
-')
-
-optional_policy(`
-	nscd_socket_use(logwatch_t)
 ')
 
 optional_policy(`

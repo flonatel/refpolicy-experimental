@@ -1,5 +1,5 @@
 
-policy_module(kernel,1.6.1)
+policy_module(kernel,1.9.0)
 
 ########################################
 #
@@ -25,6 +25,9 @@ role system_r;
 role sysadm_r;
 role staff_r;
 role user_r;
+
+# here until order dependence is fixed:
+role unconfined_r;
 
 ifdef(`enable_mls',`
 	role secadm_r;
@@ -67,6 +70,9 @@ files_mountpoint(proc_t)
 fs_type(proc_t)
 genfscon proc / gen_context(system_u:object_r:proc_t,s0)
 genfscon proc /sysvipc gen_context(system_u:object_r:proc_t,s0)
+
+type proc_afs_t, proc_type;
+genfscon proc /fs/openafs gen_context(system_u:object_r:proc_afs_t,s0)
 
 # kernel message interface
 type proc_kmsg_t, proc_type;
@@ -153,7 +159,6 @@ sid icmp_socket		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
 sid igmp_packet		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
 sid init		gen_context(system_u:object_r:unlabeled_t,s0)
 sid kmod		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
-sid netmsg		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
 sid policy		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
 sid scmp_packet		gen_context(system_u:object_r:unlabeled_t,mls_systemhigh)
 sid sysctl_modprobe 	gen_context(system_u:object_r:unlabeled_t,s0)
@@ -180,25 +185,26 @@ allow kernel_t self:unix_dgram_socket create_socket_perms;
 allow kernel_t self:unix_stream_socket create_stream_socket_perms;
 allow kernel_t self:unix_dgram_socket sendto;
 allow kernel_t self:unix_stream_socket connectto;
-allow kernel_t self:fifo_file rw_file_perms;
-allow kernel_t self:sock_file r_file_perms;
+allow kernel_t self:fifo_file rw_fifo_file_perms;
+allow kernel_t self:sock_file read_sock_file_perms;
 allow kernel_t self:fd use;
 
-allow kernel_t proc_t:dir r_dir_perms;
-allow kernel_t proc_t:{ lnk_file file } r_file_perms;
+allow kernel_t proc_t:dir list_dir_perms;
+allow kernel_t proc_t:file read_file_perms;
+allow kernel_t proc_t:lnk_file read_lnk_file_perms;
 
-allow kernel_t proc_net_t:dir r_dir_perms;
-allow kernel_t proc_net_t:file r_file_perms;
+allow kernel_t proc_net_t:dir list_dir_perms;
+allow kernel_t proc_net_t:file read_file_perms;
 
-allow kernel_t proc_mdstat_t:file r_file_perms;
+allow kernel_t proc_mdstat_t:file read_file_perms;
 
 allow kernel_t proc_kcore_t:file getattr;
 
 allow kernel_t proc_kmsg_t:file getattr;
 
-allow kernel_t sysctl_kernel_t:dir r_dir_perms;
-allow kernel_t sysctl_kernel_t:file r_file_perms;
-allow kernel_t sysctl_t:dir r_dir_perms;
+allow kernel_t sysctl_kernel_t:dir list_dir_perms;
+allow kernel_t sysctl_kernel_t:file read_file_perms;
+allow kernel_t sysctl_t:dir list_dir_perms;
 
 # Other possible mount points for the root fs are in files
 allow kernel_t unlabeled_t:dir mounton;
@@ -206,7 +212,8 @@ allow kernel_t unlabeled_t:dir mounton;
 # connections with invalidated labels:
 allow kernel_t unlabeled_t:packet send;
 
-corenet_non_ipsec_sendrecv(kernel_t)
+corenet_all_recvfrom_unlabeled(kernel_t)
+corenet_all_recvfrom_netlabel(kernel_t)
 # Kernel-generated traffic e.g., ICMP replies:
 corenet_raw_sendrecv_all_if(kernel_t)
 corenet_raw_sendrecv_all_nodes(kernel_t)
@@ -250,10 +257,6 @@ mls_process_write_down(kernel_t)
 ifdef(`distro_redhat',`
 	# Bugzilla 222337
 	fs_rw_tmpfs_chr_files(kernel_t)
-')
-
-ifdef(`targeted_policy',`
-	unconfined_domain(kernel_t)
 ')
 
 tunable_policy(`read_default_t',`
@@ -336,14 +339,14 @@ optional_policy(`
 	seutil_read_bin_policy(kernel_t)
 ')
 
+optional_policy(`
+	unconfined_domain(kernel_t)
+')
+
 ########################################
 #
 # Unlabeled process local policy
 #
-
-ifdef(`targeted_policy',`
-	allow unlabeled_t self:filesystem associate;
-')
 
 optional_policy(`
 	# If you load a new policy that removes active domains, processes can

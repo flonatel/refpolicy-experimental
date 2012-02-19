@@ -1,5 +1,5 @@
 
-policy_module(perdition,1.2.0)
+policy_module(perdition,1.4.0)
 
 ########################################
 #
@@ -37,7 +37,8 @@ kernel_read_kernel_sysctls(perdition_t)
 kernel_list_proc(perdition_t)
 kernel_read_proc_symlinks(perdition_t)
 
-corenet_non_ipsec_sendrecv(perdition_t)
+corenet_all_recvfrom_unlabeled(perdition_t)
+corenet_all_recvfrom_netlabel(perdition_t)
 corenet_tcp_sendrecv_generic_if(perdition_t)
 corenet_udp_sendrecv_generic_if(perdition_t)
 corenet_tcp_sendrecv_all_nodes(perdition_t)
@@ -68,12 +69,6 @@ sysnet_read_config(perdition_t)
 
 userdom_dontaudit_use_unpriv_user_fds(perdition_t)
 userdom_dontaudit_search_sysadm_home_dirs(perdition_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(perdition_t)
-	term_dontaudit_use_generic_ptys(perdition_t)
-	files_dontaudit_read_root_files(perdition_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(perdition_t)

@@ -1,5 +1,5 @@
 
-policy_module(modutils,1.3.1)
+policy_module(modutils,1.6.0)
 
 gen_require(`
 	bool secure_mode_insmod;
@@ -20,9 +20,8 @@ files_type(modules_dep_t)
 
 type insmod_t;
 type insmod_exec_t;
-domain_type(insmod_t)
-domain_entry_file(insmod_t,insmod_exec_t)
-mls_file_write_down(insmod_t)
+application_domain(insmod_t,insmod_exec_t)
+mls_file_write_all_levels(insmod_t)
 role system_r types insmod_t;
 
 type depmod_t;
@@ -50,7 +49,7 @@ allow insmod_t self:udp_socket create_socket_perms;
 allow insmod_t self:rawip_socket create_socket_perms; 
 
 # Read module config and dependency information
-allow insmod_t { modules_conf_t modules_dep_t }:file r_file_perms;
+allow insmod_t { modules_conf_t modules_dep_t }:file read_file_perms;
 
 can_exec(insmod_t, insmod_exec_t)
 
@@ -116,11 +115,6 @@ seutil_read_file_contexts(insmod_t)
 if( ! secure_mode_insmod ) {
 	kernel_domtrans_to(insmod_t,insmod_exec_t)
 }
-
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(insmod_t)
-	term_use_generic_ptys(insmod_t)
-')
 
 optional_policy(`
 	hotplug_search_config(insmod_t)
@@ -211,9 +205,9 @@ files_list_home(depmod_t)
 userdom_read_staff_home_content_files(depmod_t)
 userdom_read_sysadm_home_content_files(depmod_t)
 
-ifdef(`targeted_policy', `
-	term_use_unallocated_ttys(depmod_t)
-	term_use_generic_ptys(depmod_t)
+optional_policy(`
+	# Read System.map from home directories.
+	unconfined_read_home_content_files(depmod_t)
 ')
 
 optional_policy(`
@@ -287,9 +281,4 @@ ifdef(`distro_gentoo',`
 	optional_policy(`
 		consoletype_exec(update_modules_t)
 	')
-')
-
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(update_modules_t)
-	term_use_unallocated_ttys(update_modules_t)
 ')

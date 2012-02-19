@@ -1,7 +1,6 @@
 #
 # HOME_DIR
 #
-ifdef(`strict_policy',`
 HOME_DIR/\.fonts\.conf	--	gen_context(system_u:object_r:ROLE_fonts_config_t,s0)
 HOME_DIR/\.fonts(/.*)?		gen_context(system_u:object_r:ROLE_fonts_t,s0)
 HOME_DIR/\.fonts/auto(/.*)?	gen_context(system_u:object_r:ROLE_fonts_cache_t,s0)
@@ -9,7 +8,6 @@ HOME_DIR/\.fonts\.cache-.* --	gen_context(system_u:object_r:ROLE_fonts_cache_t,s
 HOME_DIR/\.ICEauthority.* --	gen_context(system_u:object_r:ROLE_iceauth_home_t,s0)
 HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:ROLE_xauth_home_t,s0)
 HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:ROLE_xauth_home_t,s0)
-')
 
 #
 # /dev
@@ -34,6 +32,11 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:ROLE_xauth_home_t,s0)
 /etc/X11/wdm/Xstartup.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
 /etc/X11/Xsession[^/]*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
 
+ifdef(`distro_redhat',`
+/etc/gdm/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+/etc/gdm/PreSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+')
+
 #
 # /opt
 #
@@ -46,19 +49,16 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:ROLE_xauth_home_t,s0)
 
 /tmp/\.ICE-unix		-d	gen_context(system_u:object_r:xdm_tmp_t,s0)
 /tmp/\.ICE-unix/.*	-s	<<none>>
+/tmp/\.X0-lock		--	gen_context(system_u:object_r:xdm_xserver_tmp_t,s0)
 /tmp/\.X11-unix		-d	gen_context(system_u:object_r:xdm_tmp_t,s0)
 /tmp/\.X11-unix/.*	-s	<<none>>
-
-ifdef(`strict_policy',`
-/tmp/\.X0-lock		--	gen_context(system_u:object_r:xdm_xserver_tmp_t,s0)
-')
 
 #
 # /usr
 #
 
 /usr/(s)?bin/gdm-binary	--	gen_context(system_u:object_r:xdm_exec_t,s0)
-/usr/bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
+/usr/(s)?bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
 /usr/bin/gpe-dm		--	gen_context(system_u:object_r:xdm_exec_t,s0)
 /usr/bin/iceauth		--	gen_context(system_u:object_r:iceauth_exec_t,s0)
 /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)

@@ -1,5 +1,5 @@
 
-policy_module(samba,1.5.0)
+policy_module(samba,1.7.0)
 
 #################################
 #
@@ -8,18 +8,49 @@ policy_module(samba,1.5.0)
 
 ## <desc>
 ## <p>
-## Allow samba to modify public files
-## used for public file transfer services.
+## Allow samba to modify public files used for public file
+## transfer services.  Files/Directories must be labeled
+## public_content_rw_t.
 ## </p>
 ## </desc>
 gen_tunable(allow_smbd_anon_write,false)
 
 ## <desc>
 ## <p>
-## Allow samba to export user home directories.
+## Allow samba to act as the domain controller, add users,
+## groups and change passwords.
+## 
+## </p>
+## </desc>
+gen_tunable(samba_domain_controller,false)
+
+## <desc>
+## <p>
+## Allow samba to share users home directories.
 ## </p>
 ## </desc>
 gen_tunable(samba_enable_home_dirs,false)
+
+## <desc>
+## <p>
+## Allow samba to share any file/directory read only.
+## </p>
+## </desc>
+gen_tunable(samba_export_all_ro,false)
+
+## <desc>
+## <p>
+## Allow samba to share any file/directory read/write.
+## </p>
+## </desc>
+gen_tunable(samba_export_all_rw,false)
+
+## <desc>
+## <p>
+## Allow samba to run unconfined scripts
+## </p>
+## </desc>
+gen_tunable(samba_run_unconfined,false)
 
 ## <desc>
 ## <p>
@@ -133,6 +164,8 @@ manage_lnk_files_pattern(samba_net_t,samba_var_t,samba_var_t)
 
 kernel_read_proc_symlinks(samba_net_t)
 
+corenet_all_recvfrom_unlabeled(samba_net_t)
+corenet_all_recvfrom_netlabel(samba_net_t)
 corenet_tcp_sendrecv_all_if(samba_net_t)
 corenet_udp_sendrecv_all_if(samba_net_t)
 corenet_raw_sendrecv_all_if(samba_net_t)
@@ -141,7 +174,6 @@ corenet_udp_sendrecv_all_nodes(samba_net_t)
 corenet_raw_sendrecv_all_nodes(samba_net_t)
 corenet_tcp_sendrecv_all_ports(samba_net_t)
 corenet_udp_sendrecv_all_ports(samba_net_t)
-corenet_non_ipsec_sendrecv(samba_net_t)
 corenet_tcp_bind_all_nodes(samba_net_t)
 corenet_udp_bind_all_nodes(samba_net_t)
 corenet_tcp_connect_smbd_port(samba_net_t)
@@ -152,6 +184,8 @@ domain_use_interactive_fds(samba_net_t)
 
 files_read_etc_files(samba_net_t)
 
+auth_use_nsswitch(samba_net_t)
+
 libs_use_ld_so(samba_net_t)
 libs_use_shared_libs(samba_net_t)
 
@@ -159,22 +193,10 @@ logging_send_syslog_msg(samba_net_t)
 
 miscfiles_read_localization(samba_net_t) 
 
-sysnet_read_config(samba_net_t)
-sysnet_use_ldap(samba_net_t)
-
 userdom_dontaudit_search_sysadm_home_dirs(samba_net_t)
-
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(samba_net_t)
-	term_use_unallocated_ttys(samba_net_t)
-')
 
 optional_policy(`
 	kerberos_use(samba_net_t)
-')
-
-optional_policy(`
-	nscd_socket_use(samba_net_t)
 ')
 
 ########################################
@@ -196,13 +218,11 @@ allow smbd_t self:tcp_socket create_stream_socket_perms;
 allow smbd_t self:udp_socket create_socket_perms;
 allow smbd_t self:unix_dgram_socket { create_socket_perms sendto };
 allow smbd_t self:unix_stream_socket { create_stream_socket_perms connectto };
-allow smbd_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow smbd_t samba_etc_t:file { rw_file_perms setattr };
 
 create_dirs_pattern(smbd_t,samba_log_t,samba_log_t)
 create_files_pattern(smbd_t,samba_log_t,samba_log_t)
-append_files_pattern(smbd_t,samba_log_t,samba_log_t)
 allow smbd_t samba_log_t:dir setattr;
 dontaudit smbd_t samba_log_t:dir remove_name;
 
@@ -241,6 +261,11 @@ kernel_read_kernel_sysctls(smbd_t)
 kernel_read_software_raid_state(smbd_t)
 kernel_read_system_state(smbd_t)
 
+corecmd_exec_shell(smbd_t)
+corecmd_exec_bin(smbd_t)
+
+corenet_all_recvfrom_unlabeled(smbd_t)
+corenet_all_recvfrom_netlabel(smbd_t)
 corenet_tcp_sendrecv_all_if(smbd_t)
 corenet_udp_sendrecv_all_if(smbd_t)
 corenet_raw_sendrecv_all_if(smbd_t)
@@ -249,7 +274,6 @@ corenet_udp_sendrecv_all_nodes(smbd_t)
 corenet_raw_sendrecv_all_nodes(smbd_t)
 corenet_tcp_sendrecv_all_ports(smbd_t)
 corenet_udp_sendrecv_all_ports(smbd_t)
-corenet_non_ipsec_sendrecv(smbd_t)
 corenet_tcp_bind_all_nodes(smbd_t)
 corenet_udp_bind_all_nodes(smbd_t)
 corenet_tcp_bind_smbd_port(smbd_t)
@@ -265,11 +289,13 @@ fs_getattr_all_fs(smbd_t)
 fs_get_xattr_fs_quotas(smbd_t)
 fs_search_auto_mountpoints(smbd_t)
 fs_getattr_rpc_dirs(smbd_t)
+fs_list_inotifyfs(smbd_t)
 
 auth_use_nsswitch(smbd_t)
 auth_domtrans_chk_passwd(smbd_t)
 
 domain_use_interactive_fds(smbd_t)
+domain_dontaudit_list_all_domains_state(smbd_t)
 
 files_list_var_lib(smbd_t)
 files_read_etc_files(smbd_t)
@@ -290,8 +316,6 @@ logging_send_syslog_msg(smbd_t)
 miscfiles_read_localization(smbd_t)
 miscfiles_read_public_files(smbd_t)
 
-sysnet_read_config(smbd_t)
-
 userdom_dontaudit_search_sysadm_home_dirs(smbd_t)
 userdom_dontaudit_use_unpriv_user_fds(smbd_t)
 userdom_use_unpriv_users_fds(smbd_t)
@@ -302,15 +326,15 @@ ifdef(`hide_broken_symptoms', `
 	fs_dontaudit_getattr_tmpfs_dirs(smbd_t)
 ')
 
-ifdef(`targeted_policy', `
-	files_dontaudit_read_root_files(smbd_t)
-	term_dontaudit_use_generic_ptys(smbd_t)
-	term_dontaudit_use_unallocated_ttys(smbd_t)
-')
-
 tunable_policy(`allow_smbd_anon_write',`
 	miscfiles_manage_public_files(smbd_t)
 ') 
+
+tunable_policy(`samba_domain_controller',`
+	usermanage_domtrans_passwd(smbd_t)
+	usermanage_domtrans_useradd(smbd_t)
+	usermanage_domtrans_groupadd(smbd_t)
+')
 
 # Support Samba sharing of NFS mount points
 tunable_policy(`samba_share_nfs',`
@@ -339,6 +363,21 @@ optional_policy(`
 	udev_read_db(smbd_t)
 ')
 
+tunable_policy(`samba_export_all_ro',`
+	fs_read_noxattr_fs_files(smbd_t) 
+	auth_read_all_files_except_shadow(smbd_t)
+	fs_read_noxattr_fs_files(nmbd_t) 
+	auth_read_all_files_except_shadow(nmbd_t)
+')
+
+tunable_policy(`samba_export_all_rw',`
+	fs_read_noxattr_fs_files(smbd_t) 
+	auth_manage_all_files_except_shadow(smbd_t)
+	fs_read_noxattr_fs_files(nmbd_t) 
+	auth_manage_all_files_except_shadow(nmbd_t)
+	userdom_generic_user_home_dir_filetrans_generic_user_home_content(nmbd_t, { file dir })
+')
+
 ########################################
 #
 # nmbd Local policy
@@ -363,8 +402,10 @@ files_pid_filetrans(nmbd_t,nmbd_var_run_t,file)
 
 read_files_pattern(nmbd_t,samba_etc_t,samba_etc_t)
 
-create_dirs_pattern(nmbd_t,samba_log_t,samba_log_t)
+manage_dirs_pattern(nmbd_t,samba_log_t,samba_log_t)
 append_files_pattern(nmbd_t,samba_log_t,samba_log_t)
+allow nmbd_t samba_log_t:file unlink;
+
 read_files_pattern(nmbd_t,samba_log_t,samba_log_t)
 create_files_pattern(nmbd_t,samba_log_t,samba_log_t)
 allow nmbd_t samba_log_t:dir setattr;
@@ -380,7 +421,8 @@ kernel_read_network_state(nmbd_t)
 kernel_read_software_raid_state(nmbd_t)
 kernel_read_system_state(nmbd_t)
 
-corenet_non_ipsec_sendrecv(nmbd_t)
+corenet_all_recvfrom_unlabeled(nmbd_t)
+corenet_all_recvfrom_netlabel(nmbd_t)
 corenet_tcp_sendrecv_all_if(nmbd_t)
 corenet_udp_sendrecv_all_if(nmbd_t)
 corenet_tcp_sendrecv_all_nodes(nmbd_t)
@@ -391,6 +433,7 @@ corenet_udp_bind_all_nodes(nmbd_t)
 corenet_udp_bind_nmbd_port(nmbd_t)
 corenet_sendrecv_nmbd_server_packets(nmbd_t)
 corenet_sendrecv_nmbd_client_packets(nmbd_t)
+corenet_tcp_connect_smbd_port(nmbd_t)
 
 dev_read_sysfs(nmbd_t)
 dev_getattr_mtrr_dev(nmbd_t)
@@ -402,6 +445,9 @@ domain_use_interactive_fds(nmbd_t)
 
 files_read_usr_files(nmbd_t)
 files_read_etc_files(nmbd_t)
+files_list_var_lib(nmbd_t)
+
+auth_use_nsswitch(nmbd_t)
 
 libs_use_ld_so(nmbd_t)
 libs_use_shared_libs(nmbd_t)
@@ -411,21 +457,9 @@ logging_send_syslog_msg(nmbd_t)
 
 miscfiles_read_localization(nmbd_t)
 
-sysnet_read_config(nmbd_t)
-
 userdom_dontaudit_search_sysadm_home_dirs(nmbd_t)
 userdom_dontaudit_use_unpriv_user_fds(nmbd_t)
 userdom_use_unpriv_users_fds(nmbd_t)
-
-ifdef(`targeted_policy', `
-	files_dontaudit_read_root_files(nmbd_t)
-	term_dontaudit_use_generic_ptys(nmbd_t)
-	term_dontaudit_use_unallocated_ttys(nmbd_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(nmbd_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(nmbd_t)
@@ -457,12 +491,14 @@ allow smbmount_t samba_log_t:file manage_file_perms;
 
 allow smbmount_t samba_secrets_t:file manage_file_perms;
 
-allow smbmount_t samba_var_t:dir rw_dir_perms;
 manage_files_pattern(smbmount_t,samba_var_t,samba_var_t)
 manage_lnk_files_pattern(smbmount_t,samba_var_t,samba_var_t)
+files_list_var_lib(smbmount_t)
 
 kernel_read_system_state(smbmount_t)
 
+corenet_all_recvfrom_unlabeled(smbmount_t)
+corenet_all_recvfrom_netlabel(smbmount_t)
 corenet_tcp_sendrecv_all_if(smbmount_t)
 corenet_raw_sendrecv_all_if(smbmount_t)
 corenet_udp_sendrecv_all_if(smbmount_t)
@@ -471,7 +507,6 @@ corenet_raw_sendrecv_all_nodes(smbmount_t)
 corenet_udp_sendrecv_all_nodes(smbmount_t)
 corenet_tcp_sendrecv_all_ports(smbmount_t)
 corenet_udp_sendrecv_all_ports(smbmount_t)
-corenet_non_ipsec_sendrecv(smbmount_t)
 corenet_tcp_bind_all_nodes(smbmount_t)
 corenet_udp_bind_all_nodes(smbmount_t)
 corenet_tcp_connect_all_ports(smbmount_t)
@@ -487,7 +522,6 @@ storage_raw_read_fixed_disk(smbmount_t)
 storage_raw_write_fixed_disk(smbmount_t)
 
 term_list_ptys(smbmount_t)
-term_use_controlling_term(smbmount_t)
 
 corecmd_list_bin(smbmount_t)
 
@@ -496,6 +530,8 @@ files_mounton_mnt(smbmount_t)
 files_manage_etc_runtime_files(smbmount_t)
 files_etc_filetrans_etc_runtime(smbmount_t,file)
 files_read_etc_files(smbmount_t)
+
+auth_use_nsswitch(smbmount_t)
 
 miscfiles_read_localization(smbmount_t)
 
@@ -508,22 +544,7 @@ locallogin_use_fds(smbmount_t)
 
 logging_search_logs(smbmount_t)
 
-sysnet_read_config(smbmount_t)
-
 userdom_use_all_users_fds(smbmount_t)
-userdom_use_sysadm_ttys(smbmount_t)
-
-optional_policy(`
-	cups_read_rw_config(smbd_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(smbmount_t)
-')
-
-optional_policy(`
-	nscd_socket_use(smbmount_t)
-')
 
 ########################################
 #
@@ -534,10 +555,8 @@ allow swat_t self:capability { setuid setgid };
 allow swat_t self:process signal_perms;
 allow swat_t self:fifo_file rw_file_perms;
 allow swat_t self:netlink_tcpdiag_socket r_netlink_socket_perms;
-allow swat_t self:netlink_audit_socket create;
 allow swat_t self:tcp_socket create_stream_socket_perms;
 allow swat_t self:udp_socket create_socket_perms;
-allow swat_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow swat_t nmbd_exec_t:file { execute read };
 
@@ -566,7 +585,8 @@ kernel_read_network_state(swat_t)
 
 corecmd_search_bin(swat_t)
 
-corenet_non_ipsec_sendrecv(swat_t)
+corenet_all_recvfrom_unlabeled(swat_t)
+corenet_all_recvfrom_netlabel(swat_t)
 corenet_tcp_sendrecv_generic_if(swat_t)
 corenet_udp_sendrecv_generic_if(swat_t)
 corenet_raw_sendrecv_generic_if(swat_t)
@@ -588,6 +608,7 @@ files_read_usr_files(swat_t)
 fs_getattr_xattr_fs(swat_t)
 
 auth_domtrans_chk_passwd(swat_t)
+auth_use_nsswitch(swat_t)
 
 libs_use_ld_so(swat_t)
 libs_use_shared_libs(swat_t)
@@ -596,8 +617,6 @@ logging_send_syslog_msg(swat_t)
 logging_search_logs(swat_t)
 
 miscfiles_read_localization(swat_t)
-
-sysnet_read_config(swat_t)
 
 optional_policy(`
 	cups_read_rw_config(swat_t)
@@ -612,27 +631,24 @@ optional_policy(`
 	kerberos_use(swat_t)
 ')
 
-optional_policy(`
-	nis_use_ypbind(swat_t)
-')
-
-optional_policy(`
-	nscd_socket_use(swat_t)
-')
-
 ########################################
 #
 # Winbind local policy
 #
 
+
+allow winbind_t self:capability { dac_override ipc_lock setuid };
 dontaudit winbind_t self:capability sys_tty_config;
 allow winbind_t self:process signal_perms;
 allow winbind_t self:fifo_file { read write };
 allow winbind_t self:unix_dgram_socket create_socket_perms;
 allow winbind_t self:unix_stream_socket create_stream_socket_perms;
-allow winbind_t self:netlink_route_socket r_netlink_socket_perms;
 allow winbind_t self:tcp_socket create_stream_socket_perms;
 allow winbind_t self:udp_socket create_socket_perms;
+
+allow winbind_t nmbd_t:process { signal signull };
+
+allow winbind_t nmbd_var_run_t:file read_file_perms;
 
 allow winbind_t samba_etc_t:dir list_dir_perms;
 read_files_pattern(winbind_t,samba_etc_t,samba_etc_t)
@@ -645,8 +661,12 @@ manage_dirs_pattern(winbind_t,samba_log_t,samba_log_t)
 manage_files_pattern(winbind_t,samba_log_t,samba_log_t)
 manage_lnk_files_pattern(winbind_t,samba_log_t,samba_log_t)
 
+manage_dirs_pattern(winbind_t,samba_var_t,samba_var_t)
 manage_files_pattern(winbind_t,samba_var_t,samba_var_t)
 manage_lnk_files_pattern(winbind_t,samba_var_t,samba_var_t)
+files_list_var_lib(winbind_t)
+
+rw_files_pattern(winbind_t,smbd_tmp_t,smbd_tmp_t)
 
 allow winbind_t winbind_log_t:file manage_file_perms;
 logging_log_filetrans(winbind_t,winbind_log_t,file)
@@ -663,6 +683,8 @@ kernel_read_kernel_sysctls(winbind_t)
 kernel_list_proc(winbind_t)
 kernel_read_proc_symlinks(winbind_t)
 
+corenet_all_recvfrom_unlabeled(winbind_t)
+corenet_all_recvfrom_netlabel(winbind_t)
 corenet_tcp_sendrecv_all_if(winbind_t)
 corenet_udp_sendrecv_all_if(winbind_t)
 corenet_raw_sendrecv_all_if(winbind_t)
@@ -671,7 +693,6 @@ corenet_udp_sendrecv_all_nodes(winbind_t)
 corenet_raw_sendrecv_all_nodes(winbind_t)
 corenet_tcp_sendrecv_all_ports(winbind_t)
 corenet_udp_sendrecv_all_ports(winbind_t)
-corenet_non_ipsec_sendrecv(winbind_t)
 corenet_tcp_bind_all_nodes(winbind_t)
 corenet_udp_bind_all_nodes(winbind_t)
 corenet_tcp_connect_smbd_port(winbind_t)
@@ -683,6 +704,7 @@ fs_getattr_all_fs(winbind_t)
 fs_search_auto_mountpoints(winbind_t)
 
 auth_domtrans_chk_passwd(winbind_t)
+auth_use_nsswitch(winbind_t)
 
 domain_use_interactive_fds(winbind_t)
 
@@ -695,25 +717,12 @@ logging_send_syslog_msg(winbind_t)
 
 miscfiles_read_localization(winbind_t)
 
-sysnet_read_config(winbind_t)
-sysnet_dns_name_resolve(winbind_t)
-
 userdom_dontaudit_use_unpriv_user_fds(winbind_t)
 userdom_dontaudit_search_sysadm_home_dirs(winbind_t)
 userdom_priveleged_home_dir_manager(winbind_t)
 
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(winbind_t)
-	term_dontaudit_use_generic_ptys(winbind_t)
-	files_dontaudit_read_root_files(winbind_t)
-')
-
 optional_policy(`
 	kerberos_use(winbind_t)
-')
-
-optional_policy(`
-	nscd_socket_use(winbind_t)
 ')
 
 optional_policy(`
@@ -737,12 +746,15 @@ read_files_pattern(winbind_helper_t,samba_etc_t,samba_etc_t)
 read_lnk_files_pattern(winbind_helper_t,samba_etc_t,samba_etc_t)
 
 allow winbind_helper_t samba_var_t:dir search;
+files_list_var_lib(winbind_helper_t)
 
 stream_connect_pattern(winbind_helper_t,winbind_var_run_t,winbind_var_run_t,winbind_t)
 
 term_list_ptys(winbind_helper_t)
 
 domain_use_interactive_fds(winbind_helper_t)
+
+auth_use_nsswitch(winbind_helper_t)
 
 libs_use_ld_so(winbind_helper_t)
 libs_use_shared_libs(winbind_helper_t)
@@ -751,16 +763,30 @@ logging_send_syslog_msg(winbind_helper_t)
 
 miscfiles_read_localization(winbind_helper_t) 
 
-ifdef(`targeted_policy',`
-	term_use_generic_ptys(winbind_helper_t)
-	term_use_unallocated_ttys(winbind_helper_t)
-')
-
-optional_policy(`
-	nscd_socket_use(winbind_helper_t)
-')
-
 optional_policy(`
 	squid_read_log(winbind_helper_t)
 	squid_append_log(winbind_helper_t)
+')
+
+########################################
+#
+# samba_unconfined_script_t local policy
+#
+
+optional_policy(`
+	type samba_unconfined_script_t;
+	type samba_unconfined_script_exec_t;
+	domain_type(samba_unconfined_script_t)
+	domain_entry_file(samba_unconfined_script_t,samba_unconfined_script_exec_t)
+	corecmd_shell_entry_type(samba_unconfined_script_t)
+	role system_r types samba_unconfined_script_t;
+
+	allow smbd_t samba_unconfined_script_exec_t:dir search_dir_perms;
+	allow smbd_t samba_unconfined_script_exec_t:file ioctl;
+
+	unconfined_domain(samba_unconfined_script_t)
+
+	tunable_policy(`samba_run_unconfined',`
+		domtrans_pattern(smbd_t, samba_unconfined_script_exec_t, samba_unconfined_script_t)
+	')
 ')

@@ -1,5 +1,5 @@
 
-policy_module(rsync,1.4.0)
+policy_module(rsync,1.6.0)
 
 ########################################
 #
@@ -8,8 +8,16 @@ policy_module(rsync,1.4.0)
 
 ## <desc>
 ## <p>
+## Allow rsync to export any files/directories read only.
+## </p>
+## </desc>
+gen_tunable(rsync_export_all_ro,false)
+
+## <desc>
+## <p>
 ## Allow rsync to modify public files
-## used for public file transfer services.
+## used for public file transfer services.  Files/Directories must be
+## labeled public_content_rw_t.
 ## </p>
 ## </desc>
 gen_tunable(allow_rsync_anon_write,false)
@@ -17,6 +25,7 @@ gen_tunable(allow_rsync_anon_write,false)
 type rsync_t;
 type rsync_exec_t;
 init_daemon_domain(rsync_t,rsync_exec_t)
+application_executable_file(rsync_exec_t)
 role system_r types rsync_t;
 
 type rsync_data_t;
@@ -61,7 +70,8 @@ kernel_read_kernel_sysctls(rsync_t)
 kernel_read_system_state(rsync_t)
 kernel_read_network_state(rsync_t)
 
-corenet_non_ipsec_sendrecv(rsync_t)
+corenet_all_recvfrom_unlabeled(rsync_t)
+corenet_all_recvfrom_netlabel(rsync_t)
 corenet_tcp_sendrecv_all_if(rsync_t)
 corenet_udp_sendrecv_all_if(rsync_t)
 corenet_tcp_sendrecv_all_nodes(rsync_t)
@@ -79,6 +89,8 @@ fs_getattr_xattr_fs(rsync_t)
 files_read_etc_files(rsync_t)
 files_search_home(rsync_t)
 
+auth_use_nsswitch(rsync_t)
+
 libs_use_ld_so(rsync_t)
 libs_use_shared_libs(rsync_t)
 
@@ -87,8 +99,6 @@ logging_dontaudit_search_logs(rsync_t)
 
 miscfiles_read_localization(rsync_t)
 miscfiles_read_public_files(rsync_t)
-
-sysnet_read_config(rsync_t)
 
 tunable_policy(`allow_rsync_anon_write',`
 	miscfiles_manage_public_files(rsync_t)
@@ -106,10 +116,8 @@ optional_policy(`
 	inetd_service_domain(rsync_t,rsync_exec_t)
 ')
 
-optional_policy(`
-	nis_use_ypbind(rsync_t)
-')
-
-optional_policy(`
-	nscd_socket_use(rsync_t)
+tunable_policy(`rsync_export_all_ro',`
+	allow rsync_t self:capability dac_override;
+	fs_read_noxattr_fs_files(rsync_t) 
+	auth_read_all_files_except_shadow(rsync_t)
 ')

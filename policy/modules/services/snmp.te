@@ -1,5 +1,5 @@
 
-policy_module(snmp,1.4.0)
+policy_module(snmp,1.6.0)
 
 ########################################
 #
@@ -8,9 +8,6 @@ policy_module(snmp,1.4.0)
 type snmpd_t;
 type snmpd_exec_t;
 init_daemon_domain(snmpd_t,snmpd_exec_t)
-
-type snmpd_etc_t;
-files_config_file(snmpd_etc_t)
 
 type snmpd_log_t;
 logging_log_file(snmpd_log_t)
@@ -26,14 +23,12 @@ files_type(snmpd_var_lib_t)
 # Local policy
 #
 allow snmpd_t self:capability { dac_override kill net_admin sys_nice sys_tty_config };
-dontaudit snmpd_t self:capability sys_tty_config;
+dontaudit snmpd_t self:capability { sys_module sys_tty_config };
 allow snmpd_t self:fifo_file rw_fifo_file_perms;
 allow snmpd_t self:unix_dgram_socket create_socket_perms;
 allow snmpd_t self:unix_stream_socket create_stream_socket_perms;
 allow snmpd_t self:tcp_socket create_stream_socket_perms;
 allow snmpd_t self:udp_socket connected_stream_socket_perms;
-
-allow snmpd_t snmpd_etc_t:file { getattr read };
 
 allow snmpd_t snmpd_log_t:file manage_file_perms;
 logging_log_filetrans(snmpd_t,snmpd_log_t,file)
@@ -58,7 +53,8 @@ kernel_read_network_state(snmpd_t)
 corecmd_exec_bin(snmpd_t)
 corecmd_exec_shell(snmpd_t)
 
-corenet_non_ipsec_sendrecv(snmpd_t)
+corenet_all_recvfrom_unlabeled(snmpd_t)
+corenet_all_recvfrom_netlabel(snmpd_t)
 corenet_tcp_sendrecv_all_if(snmpd_t)
 corenet_udp_sendrecv_all_if(snmpd_t)
 corenet_tcp_sendrecv_all_nodes(snmpd_t)
@@ -119,14 +115,12 @@ ifdef(`distro_redhat', `
 	')
 ')
 
-ifdef(`targeted_policy', `
-	term_dontaudit_use_unallocated_ttys(snmpd_t)
-	term_dontaudit_use_generic_ptys(snmpd_t)
-	files_dontaudit_read_root_files(snmpd_t)
+optional_policy(`
+	amanda_dontaudit_read_dumpdates(snmpd_t)
 ')
 
 optional_policy(`
-	amanda_dontaudit_read_dumpdates(snmpd_t)
+	auth_use_nsswitch(snmpd_t)
 ')
 
 optional_policy(`
@@ -134,11 +128,8 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nis_use_ypbind(snmpd_t)
-')
-
-optional_policy(`
-	nscd_socket_use(snmpd_t)
+	mta_read_config(snmpd_t)
+	mta_search_queue(snmpd_t)
 ')
 
 optional_policy(`
@@ -146,7 +137,15 @@ optional_policy(`
 ')
 
 optional_policy(`
+	sendmail_read_log(snmpd_t)
+')
+
+optional_policy(`
 	seutil_sigchld_newrole(snmpd_t)
+')
+
+optional_policy(`
+	squid_read_config(snmpd_t)
 ')
 
 optional_policy(`

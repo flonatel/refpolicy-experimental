@@ -1,5 +1,5 @@
 
-policy_module(rdisc,1.3.0)
+policy_module(rdisc,1.5.0)
 
 ########################################
 #
@@ -26,7 +26,8 @@ kernel_list_proc(rdisc_t)
 kernel_read_proc_symlinks(rdisc_t)
 kernel_read_kernel_sysctls(rdisc_t)
 
-corenet_non_ipsec_sendrecv(rdisc_t)
+corenet_all_recvfrom_unlabeled(rdisc_t)
+corenet_all_recvfrom_netlabel(rdisc_t)
 corenet_udp_sendrecv_generic_if(rdisc_t)
 corenet_raw_sendrecv_generic_if(rdisc_t)
 corenet_udp_sendrecv_all_nodes(rdisc_t)
@@ -49,12 +50,6 @@ logging_send_syslog_msg(rdisc_t)
 sysnet_read_config(rdisc_t)
 
 userdom_dontaudit_use_unpriv_user_fds(rdisc_t)
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(rdisc_t)
-	term_dontaudit_use_generic_ptys(rdisc_t)
-	files_dontaudit_read_root_files(rdisc_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(rdisc_t)

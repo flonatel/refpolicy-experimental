@@ -1,5 +1,5 @@
 
-policy_module(pcscd,1.1.0)
+policy_module(pcscd,1.3.0)
 
 ########################################
 #
@@ -21,6 +21,7 @@ files_pid_file(pcscd_var_run_t)
 #
 
 allow pcscd_t self:capability { dac_override dac_read_search };
+allow pcscd_t self:process signal;
 allow pcscd_t self:fifo_file { read write };
 allow pcscd_t self:unix_stream_socket create_stream_socket_perms;
 allow pcscd_t self:unix_dgram_socket create_socket_perms;
@@ -30,10 +31,11 @@ manage_files_pattern(pcscd_t,pcscd_var_run_t,pcscd_var_run_t)
 manage_sock_files_pattern(pcscd_t,pcscd_var_run_t,pcscd_var_run_t)
 files_pid_filetrans(pcscd_t,pcscd_var_run_t, { file sock_file })
 
+corenet_all_recvfrom_unlabeled(pcscd_t)
+corenet_all_recvfrom_netlabel(pcscd_t)
 corenet_tcp_sendrecv_all_if(pcscd_t)
 corenet_tcp_sendrecv_all_nodes(pcscd_t)
 corenet_tcp_sendrecv_all_ports(pcscd_t)
-corenet_non_ipsec_sendrecv(pcscd_t)
 corenet_tcp_connect_http_port(pcscd_t)
 
 dev_rw_generic_usb_dev(pcscd_t)
@@ -56,9 +58,10 @@ miscfiles_read_localization(pcscd_t)
 
 sysnet_dns_name_resolve(pcscd_t)
 
-ifdef(`targeted_policy',`
-	term_dontaudit_use_generic_ptys(pcscd_t)
-	term_dontaudit_use_unallocated_ttys(pcscd_t)
+optional_policy(`
+	openct_stream_connect(pcscd_t)
+	openct_read_pid_files(pcscd_t)
+	openct_signull(pcscd_t)
 ')
 
 optional_policy(`

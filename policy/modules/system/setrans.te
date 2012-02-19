@@ -1,5 +1,5 @@
 
-policy_module(setrans,1.3.0)
+policy_module(setrans,1.4.0)
 
 ########################################
 #
@@ -52,14 +52,12 @@ domain_getsession_all_domains(setrans_t)
 
 files_read_etc_runtime_files(setrans_t)
 
-mls_file_read_up(setrans_t)
-mls_file_write_down(setrans_t)
+mls_file_read_all_levels(setrans_t)
+mls_file_write_all_levels(setrans_t)
 mls_net_receive_all_levels(setrans_t)
-mls_rangetrans_target(setrans_t)
 mls_socket_write_all_levels(setrans_t)
 mls_process_read_up(setrans_t)
 mls_socket_read_all_levels(setrans_t)
-mls_fd_use_all_levels(setrans_t)
 
 selinux_compute_access_vector(setrans_t)
 

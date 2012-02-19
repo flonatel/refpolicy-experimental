@@ -1,5 +1,5 @@
 
-policy_module(mysql,1.4.0)
+policy_module(mysql,1.6.0)
 
 ########################################
 #
@@ -61,7 +61,8 @@ files_pid_filetrans(mysqld_t,mysqld_var_run_t,file)
 kernel_read_system_state(mysqld_t)
 kernel_read_kernel_sysctls(mysqld_t)
 
-corenet_non_ipsec_sendrecv(mysqld_t)
+corenet_all_recvfrom_unlabeled(mysqld_t)
+corenet_all_recvfrom_netlabel(mysqld_t)
 corenet_tcp_sendrecv_all_if(mysqld_t)
 corenet_udp_sendrecv_all_if(mysqld_t)
 corenet_tcp_sendrecv_all_nodes(mysqld_t)
@@ -105,12 +106,6 @@ userdom_read_sysadm_home_content_files(mysqld_t)
 ifdef(`distro_redhat',`
 	# because Fedora has the sock_file in the database directory
 	type_transition mysqld_t mysqld_db_t:sock_file mysqld_var_run_t;
-')
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(mysqld_t)
-	term_dontaudit_use_generic_ptys(mysqld_t)
-	files_dontaudit_read_root_files(mysqld_t)
 ')
 
 optional_policy(`

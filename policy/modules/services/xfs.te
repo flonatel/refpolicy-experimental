@@ -1,5 +1,5 @@
 
-policy_module(xfs,1.2.0)
+policy_module(xfs,1.3.0)
 
 ########################################
 #
@@ -26,6 +26,7 @@ dontaudit xfs_t self:capability sys_tty_config;
 allow xfs_t self:process { signal_perms setpgid };
 allow xfs_t self:unix_stream_socket create_stream_socket_perms;
 allow xfs_t self:unix_dgram_socket create_socket_perms;
+allow xfs_t self:tcp_socket create_stream_socket_perms;
 
 manage_dirs_pattern(xfs_t,xfs_tmp_t,xfs_tmp_t)
 manage_sock_files_pattern(xfs_t,xfs_tmp_t,xfs_tmp_t)
@@ -36,6 +37,15 @@ files_pid_filetrans(xfs_t,xfs_var_run_t,file)
 
 kernel_read_kernel_sysctls(xfs_t)
 kernel_read_system_state(xfs_t)
+
+corenet_all_recvfrom_unlabeled(xfs_t)
+corenet_all_recvfrom_netlabel(xfs_t)
+corenet_tcp_sendrecv_generic_if(xfs_t)
+corenet_tcp_sendrecv_all_nodes(xfs_t)
+corenet_tcp_sendrecv_all_ports(xfs_t)
+corenet_tcp_bind_all_nodes(xfs_t)
+corenet_tcp_bind_xfs_port(xfs_t)
+corenet_sendrecv_xfs_server_packets(xfs_t)
 
 corecmd_list_bin(xfs_t)
 
@@ -70,12 +80,6 @@ xfs_exec(xfs_t)
 ifdef(`distro_debian',`
 	# for /tmp/.font-unix/fs7100
 	init_script_tmp_filetrans(xfs_t,xfs_tmp_t,sock_file)
-')
-
-ifdef(`targeted_policy',`
-	term_dontaudit_use_unallocated_ttys(xfs_t)
-	term_dontaudit_use_generic_ptys(xfs_t)
-	files_dontaudit_read_root_files(xfs_t)
 ')
 
 optional_policy(`

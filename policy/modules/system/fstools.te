@@ -1,5 +1,5 @@
 
-policy_module(fstools,1.6.0)
+policy_module(fstools,1.9.0)
 
 ########################################
 #
@@ -29,8 +29,8 @@ files_type(swapfile_t)
 allow fsadm_t self:capability { ipc_lock sys_rawio sys_admin sys_resource sys_tty_config dac_override dac_read_search };
 allow fsadm_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execmem execheap };
 allow fsadm_t self:fd use;
-allow fsadm_t self:fifo_file rw_file_perms;
-allow fsadm_t self:sock_file r_file_perms;
+allow fsadm_t self:fifo_file rw_fifo_file_perms;
+allow fsadm_t self:sock_file read_sock_file_perms;
 allow fsadm_t self:unix_dgram_socket create_socket_perms;
 allow fsadm_t self:unix_stream_socket create_stream_socket_perms;
 allow fsadm_t self:unix_dgram_socket sendto;
@@ -69,6 +69,7 @@ files_getattr_boot_dirs(fsadm_t)
 
 dev_getattr_all_chr_files(fsadm_t)
 dev_dontaudit_getattr_all_blk_files(fsadm_t)
+dev_dontaudit_getattr_generic_files(fsadm_t)
 # mkreiserfs and other programs need this for UUID
 dev_read_rand(fsadm_t)
 dev_read_urand(fsadm_t)
@@ -96,8 +97,8 @@ fs_search_tmpfs(fsadm_t)
 fs_getattr_tmpfs_dirs(fsadm_t)
 fs_read_tmpfs_symlinks(fsadm_t)
 
-mls_file_read_up(fsadm_t)
-mls_file_write_down(fsadm_t)
+mls_file_read_all_levels(fsadm_t)
+mls_file_write_all_levels(fsadm_t)
 
 storage_raw_read_fixed_disk(fsadm_t)
 storage_raw_write_fixed_disk(fsadm_t)
@@ -153,11 +154,6 @@ seutil_read_config(fsadm_t)
 
 userdom_use_unpriv_users_fds(fsadm_t)
 
-ifdef(`targeted_policy',`
-	term_use_unallocated_ttys(fsadm_t)
-	term_use_generic_ptys(fsadm_t)
-')
-
 tunable_policy(`read_default_t',`
 	files_list_default(fsadm_t)
 	files_read_default_files(fsadm_t)
@@ -183,4 +179,8 @@ optional_policy(`
 optional_policy(`
 	fs_dontaudit_write_ramfs_pipes(fsadm_t)
 	rhgb_stub(fsadm_t)
+')
+
+optional_policy(`
+	xen_append_log(fsadm_t)
 ')

@@ -93,8 +93,10 @@ mlsconstrain { file lnk_file fifo_file dir chr_file blk_file sock_file } { write
 	 ( t1 == mlsfilewrite ) or
 	 ( t2 == mlstrustedobject ));
 
+# Directory "write" ops
 mlsconstrain dir { add_name remove_name reparent rmdir }
-	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	(( l1 eq l2 ) or
+	 (( t1 == mlsfilewriteinrange ) and ( l1 dom l2 ) and ( l1 domby h2 )) or
 	 (( t1 == mlsfilewritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
 	 ( t1 == mlsfilewrite ) or
 	 ( t2 == mlstrustedobject ));
@@ -165,6 +167,18 @@ mlsconstrain filesystem { mount remount unmount relabelfrom quotamod }
 mlsconstrain { socket tcp_socket udp_socket rawip_socket netlink_socket packet_socket key_socket unix_stream_socket unix_dgram_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket } relabelto
 	( h1 dom h2 );
 
+# the socket "read+write" ops
+# (Socket FDs are generally bidirectional, equivalent to open(..., O_RDWR),
+# require equal levels for unprivileged subjects, or read *and* write overrides)
+mlsconstrain { socket tcp_socket udp_socket rawip_socket netlink_socket packet_socket key_socket unix_stream_socket unix_dgram_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket } { accept connect }
+	(( l1 eq l2 ) or
+	 (((( t1 == mlsnetreadtoclr ) and ( h1 dom l2 )) or
+	   ( t1 == mlsnetread )) and
+	  ((( t1 == mlsnetwriteranged ) and ( l1 dom l2 ) and ( l1 domby h2 )) or
+	   (( t1 == mlsnetwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	   ( t1 == mlsnetwrite ))));
+
+
 # the socket "read" ops (note the check is dominance of the low level)
 mlsconstrain { socket tcp_socket udp_socket rawip_socket netlink_socket packet_socket key_socket unix_stream_socket unix_dgram_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket } { read getattr listen accept getopt recv_msg }
 	(( l1 dom l2 ) or
@@ -178,7 +192,8 @@ mlsconstrain { netlink_route_socket netlink_firewall_socket netlink_tcpdiag_sock
 
 # the socket "write" ops
 mlsconstrain { socket tcp_socket udp_socket rawip_socket netlink_socket packet_socket key_socket unix_stream_socket unix_dgram_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket } { write setattr relabelfrom connect setopt shutdown }
-	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	(( l1 eq l2 ) or 
+	 (( t1 == mlsnetwriteranged ) and ( l1 dom l2 ) and ( l1 domby h2 )) or
 	 (( t1 == mlsnetwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
 	 ( t1 == mlsnetwrite ));
 
@@ -274,7 +289,8 @@ mlsconstrain { node netif } { tcp_recv udp_recv rawip_recv }
 
 # the netif/node "write" ops (implicit single level socket doing the write)
 mlsconstrain { netif node } { tcp_send udp_send rawip_send }
-	(( l1 dom l2 ) and ( l1 domby h2 ));
+	(( l1 eq l2 ) or
+	(( t1 == mlsnetwriteranged ) and ( l1 dom l2 ) and ( l1 domby h2 )));
 
 # these access vectors have no MLS restrictions
 # node enforce_dest
@@ -581,7 +597,8 @@ mlsconstrain association { recvfrom }
 	 ( t2 == unlabeled_t ));
 
 mlsconstrain association { sendto }
-	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	(( l1 eq l2 ) or
+	 (( t1 == mlsnetwriteranged ) and ( l1 dom l2 ) and ( l1 domby h2 )) or
 	 ( t2 == unlabeled_t ));
 
 mlsconstrain association { polmatch }
@@ -598,5 +615,97 @@ mlsconstrain context translate
 
 mlsconstrain context contains
 	( h1 dom h2 );
+
+#
+# MLS policy for database classes
+#
+
+# make sure these database classes are "single level"
+mlsconstrain { db_database db_table db_procedure db_column db_blob } { create relabelto }
+	( l2 eq h2 );
+mlsconstrain { db_tuple } { insert relabelto }
+	( l2 eq h2 );
+
+# new database labels must be dominated by the relabeling subjects clearance
+mlsconstrain { db_database db_table db_procedure db_column db_tuple db_blob } { relabelto }
+	( h1 dom h2 );
+
+# the database "read" ops (note the check is dominance of the low level)
+mlsconstrain { db_database } { getattr access get_param }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_table db_column } { getattr use select }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_procedure } { getattr execute }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_blob } { getattr read }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_tuple } { use select }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+# the "single level" file "write" ops
+mlsconstrain { db_database } { create drop setattr relabelfrom install_module load_module set_param }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_table } { create drop setattr relabelfrom update insert delete lock }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_column } { create drop setattr relabelfrom update insert }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_blob } { create drop setattr relabelfrom write import export }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_tuple } { relabelfrom update insert delete }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+# the database upgrade/downgrade rule
+mlsvalidatetrans { db_database db_table db_procedure db_column db_tuple db_blob }
+	((( l1 eq l2 ) or
+	  (( t3 == mlsdbupgrade ) and ( l1 domby l2 )) or
+	  (( t3 == mlsdbdowngrade ) and ( l1 dom l2 )) or
+	  (( t3 == mlsdbdowngrade ) and ( l1 incomp l2 ))) and
+	 (( l1 eq h2 ) or
+	  (( t3 == mlsdbupgrade ) and ( h1 domby h2 )) or
+	  (( t3 == mlsdbdowngrade ) and ( h1 dom h2 )) or
+	  (( t3 == mlsdbdowngrade ) and ( h1 incomp h2 ))));
 
 ') dnl end enable_mls

@@ -13,6 +13,7 @@
 interface(`dbus_stub',`
 	gen_require(`
 		type system_dbusd_t;
+		class dbus all_dbus_perms;
 	')
 ')
 
@@ -49,6 +50,10 @@ interface(`dbus_stub',`
 ## </param>
 #
 template(`dbus_per_role_template',`
+	gen_require(`
+		type system_dbusd_exec_t, system_dbusd_t, dbusd_etc_t;
+		class dbus { send_msg acquire_svc };
+	')
 
 	##############################
 	#
@@ -70,6 +75,7 @@ template(`dbus_per_role_template',`
 	#
 
 	allow $1_dbusd_t self:process { getattr sigkill signal };
+	dontaudit $1_dbusd_t self:process ptrace;
 	allow $1_dbusd_t self:file { getattr read write };
 	allow $1_dbusd_t self:fifo_file rw_fifo_file_perms;
 	allow $1_dbusd_t self:dbus { send_msg acquire_svc };
@@ -77,8 +83,6 @@ template(`dbus_per_role_template',`
 	allow $1_dbusd_t self:unix_dgram_socket create_socket_perms;
 	allow $1_dbusd_t self:tcp_socket create_stream_socket_perms;
 	allow $1_dbusd_t self:netlink_selinux_socket create_socket_perms;
-
-	send_audit_msgs_pattern($1_dbusd_t)
 
 	# For connecting to the bus
 	allow $2 $1_dbusd_t:unix_stream_socket connectto;
@@ -100,6 +104,13 @@ template(`dbus_per_role_template',`
 	domtrans_pattern($2, system_dbusd_exec_t, $1_dbusd_t)
 	allow $2 $1_dbusd_t:process { sigkill signal };
 
+	# cjp: this seems very broken
+	corecmd_bin_domtrans($1_dbusd_t, $2)
+	allow $1_dbusd_t $2:process sigkill;
+	allow $2 $1_dbusd_t:fd use;
+	allow $2 $1_dbusd_t:fifo_file rw_fifo_file_perms;
+	allow $2 $1_dbusd_t:process sigchld;
+
 	kernel_read_system_state($1_dbusd_t)
 	kernel_read_kernel_sysctls($1_dbusd_t)
 
@@ -109,7 +120,8 @@ template(`dbus_per_role_template',`
 	corecmd_read_bin_pipes($1_dbusd_t)
 	corecmd_read_bin_sockets($1_dbusd_t)
 
-	corenet_non_ipsec_sendrecv($1_dbusd_t)
+	corenet_all_recvfrom_unlabeled($1_dbusd_t)
+	corenet_all_recvfrom_netlabel($1_dbusd_t)
 	corenet_tcp_sendrecv_all_if($1_dbusd_t)
 	corenet_tcp_sendrecv_all_nodes($1_dbusd_t)
 	corenet_tcp_sendrecv_all_ports($1_dbusd_t)
@@ -136,10 +148,12 @@ template(`dbus_per_role_template',`
 	selinux_compute_user_contexts($1_dbusd_t)
 
 	auth_read_pam_console_data($1_dbusd_t)
+	auth_use_nsswitch($1_dbusd_t)
 
 	libs_use_ld_so($1_dbusd_t)
 	libs_use_shared_libs($1_dbusd_t)
 
+	logging_send_audit_msgs($1_dbusd_t)
 	logging_send_syslog_msg($1_dbusd_t)
 
 	miscfiles_read_localization($1_dbusd_t)
@@ -147,7 +161,11 @@ template(`dbus_per_role_template',`
 	seutil_read_config($1_dbusd_t)
 	seutil_read_default_contexts($1_dbusd_t)
 
-	sysnet_read_config($1_dbusd_t)
+	userdom_read_user_home_content_files($1, $1_dbusd_t)
+
+	ifdef(`hide_broken_symptoms', `
+		dontaudit $2 $1_dbusd_t:netlink_selinux_socket { read write };
+	')
 
 	tunable_policy(`read_default_t',`
 		files_list_default($1_dbusd_t)
@@ -159,10 +177,6 @@ template(`dbus_per_role_template',`
 
 	optional_policy(`
 		hal_dbus_chat($1_dbusd_t)
-	')
-
-	optional_policy(`
-		nscd_socket_use($1_dbusd_t)
 	')
 
 	optional_policy(`
@@ -191,19 +205,24 @@ template(`dbus_per_role_template',`
 template(`dbus_system_bus_client_template',`
 	gen_require(`
 		type system_dbusd_t, system_dbusd_t;
-		type system_dbusd_var_run_t;
+		type system_dbusd_var_run_t, system_dbusd_var_lib_t;
 		class dbus send_msg;
 	')
 
-	type $1_dbusd_system_t;
-	type_change $2 system_dbusd_t:dbus $1_dbusd_system_t;
+#	type $1_dbusd_system_t;
+#	type_change $2 system_dbusd_t:dbus $1_dbusd_system_t;
 
 	# SE-DBus specific permissions
-	allow $1_dbusd_system_t { system_dbusd_t self }:dbus send_msg;
+#	allow $1_dbusd_system_t { system_dbusd_t self }:dbus send_msg;
+	allow $2 { system_dbusd_t self }:dbus send_msg;
+
+	read_files_pattern($2, system_dbusd_var_lib_t, system_dbusd_var_lib_t)
+	files_search_var_lib($2)
 
 	# For connecting to the bus
 	files_search_pids($2)
 	stream_connect_pattern($2,system_dbusd_var_run_t,system_dbusd_var_run_t,system_dbusd_t)
+	dbus_read_config($2)
 ')
 
 #######################################
@@ -235,11 +254,12 @@ template(`dbus_user_bus_client_template',`
 		class dbus send_msg;
 	')
 
-	type $2_dbusd_$1_t;
-	type_change $3 $1_dbusd_t:dbus $2_dbusd_$1_t;
+#	type $2_dbusd_$1_t;
+#	type_change $3 $1_dbusd_t:dbus $2_dbusd_$1_t;
 
 	# SE-DBus specific permissions
-	allow $2_dbusd_$1_t { $1_dbusd_t self }:dbus send_msg;
+#	allow $2_dbusd_$1_t { $1_dbusd_t self }:dbus send_msg;
+	allow $3 { $1_dbusd_t self }:dbus send_msg;
 
 	# For connecting to the bus
 	allow $3 $1_dbusd_t:unix_stream_socket connectto;
@@ -270,7 +290,6 @@ template(`dbus_send_user_bus',`
 	allow $2 $1_dbusd_t:dbus send_msg;
 ')
 
-
 ########################################
 ## <summary>
 ##	Read dbus configuration.
@@ -286,6 +305,7 @@ interface(`dbus_read_config',`
 		type dbusd_etc_t;
 	')
 
+	allow $1 dbusd_etc_t:dir list_dir_perms;
 	allow $1 dbusd_etc_t:file read_file_perms;
 ')
 
