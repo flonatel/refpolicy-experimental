@@ -1,5 +1,5 @@
 
-policy_module(readahead, 1.6.0)
+policy_module(readahead, 1.8.0)
 
 ########################################
 #
@@ -8,8 +8,8 @@ policy_module(readahead, 1.6.0)
 
 type readahead_t;
 type readahead_exec_t;
-init_daemon_domain(readahead_t,readahead_exec_t)
-application_domain(readahead_t,readahead_exec_t)
+init_daemon_domain(readahead_t, readahead_exec_t)
+application_domain(readahead_t, readahead_exec_t)
 
 type readahead_etc_rw_t;
 files_pid_file(readahead_etc_rw_t)
@@ -22,14 +22,14 @@ files_pid_file(readahead_var_run_t)
 # Local policy
 #
 
-allow readahead_t self:capability { dac_override dac_read_search };
+allow readahead_t self:capability { fowner dac_override dac_read_search };
 dontaudit readahead_t self:capability sys_tty_config;
 allow readahead_t self:process signal_perms;
 
-manage_files_pattern(readahead_t,readahead_etc_rw_t,readahead_etc_rw_t)
+manage_files_pattern(readahead_t, readahead_etc_rw_t, readahead_etc_rw_t)
 
-manage_files_pattern(readahead_t,readahead_var_run_t,readahead_var_run_t)
-files_pid_filetrans(readahead_t,readahead_var_run_t,file)
+manage_files_pattern(readahead_t, readahead_var_run_t, readahead_var_run_t)
+files_pid_filetrans(readahead_t, readahead_var_run_t, file)
 
 kernel_read_kernel_sysctls(readahead_t)
 kernel_read_system_state(readahead_t)
@@ -59,6 +59,7 @@ fs_dontaudit_search_ramfs(readahead_t)
 fs_dontaudit_read_ramfs_pipes(readahead_t)
 fs_dontaudit_read_ramfs_files(readahead_t)
 fs_read_tmpfs_symlinks(readahead_t)
+fs_list_inotifyfs(readahead_t)
 
 mls_file_read_all_levels(readahead_t)
 
@@ -70,17 +71,13 @@ init_use_fds(readahead_t)
 init_use_script_ptys(readahead_t)
 init_getattr_initctl(readahead_t)
 
-libs_use_ld_so(readahead_t)
-libs_use_shared_libs(readahead_t)
-
 logging_send_syslog_msg(readahead_t)
 logging_dontaudit_search_audit_config(readahead_t)
 
 miscfiles_read_localization(readahead_t)
 
 userdom_dontaudit_use_unpriv_user_fds(readahead_t)
-
-sysadm_dontaudit_search_home_dirs(readahead_t)
+userdom_dontaudit_search_user_home_dirs(readahead_t)
 
 optional_policy(`
 	cron_system_entry(readahead_t, readahead_exec_t)

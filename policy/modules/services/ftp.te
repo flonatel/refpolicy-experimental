@@ -1,5 +1,5 @@
 
-policy_module(ftp, 1.8.0)
+policy_module(ftp, 1.10.2)
 
 ########################################
 #
@@ -13,7 +13,7 @@ policy_module(ftp, 1.8.0)
 ## public_content_rw_t.
 ## </p>
 ## </desc>
-gen_tunable(allow_ftpd_anon_write,false)
+gen_tunable(allow_ftpd_anon_write, false)
 
 ## <desc>
 ## <p>
@@ -21,7 +21,7 @@ gen_tunable(allow_ftpd_anon_write,false)
 ## read/write all files on the system, governed by DAC.
 ## </p>
 ## </desc>
-gen_tunable(allow_ftpd_full_access,false)
+gen_tunable(allow_ftpd_full_access, false)
 
 ## <desc>
 ## <p>
@@ -29,7 +29,7 @@ gen_tunable(allow_ftpd_full_access,false)
 ## used for public file transfer services.
 ## </p>
 ## </desc>
-gen_tunable(allow_ftpd_use_cifs,false)
+gen_tunable(allow_ftpd_use_cifs, false)
 
 ## <desc>
 ## <p>
@@ -37,21 +37,24 @@ gen_tunable(allow_ftpd_use_cifs,false)
 ## used for public file transfer services.
 ## </p>
 ## </desc>
-gen_tunable(allow_ftpd_use_nfs,false)
+gen_tunable(allow_ftpd_use_nfs, false)
 
 ## <desc>
 ## <p>
 ## Allow ftp to read and write files in the user home directories
 ## </p>
 ## </desc>
-gen_tunable(ftp_home_dir,false)
+gen_tunable(ftp_home_dir, false)
 
 type ftpd_t;
 type ftpd_exec_t;
-init_daemon_domain(ftpd_t,ftpd_exec_t)
+init_daemon_domain(ftpd_t, ftpd_exec_t)
 
 type ftpd_etc_t;
 files_config_file(ftpd_etc_t)
+
+type ftpd_initrc_exec_t;
+init_script_file(ftpd_initrc_exec_t)
 
 type ftpd_lock_t;
 files_lock_file(ftpd_lock_t)
@@ -67,7 +70,7 @@ files_pid_file(ftpd_var_run_t)
 
 type ftpdctl_t;
 type ftpdctl_exec_t;
-init_system_domain(ftpdctl_t,ftpdctl_exec_t)
+init_system_domain(ftpdctl_t, ftpdctl_exec_t)
 
 type ftpdctl_tmp_t;
 files_tmp_file(ftpdctl_tmp_t)
@@ -93,22 +96,23 @@ allow ftpd_t self:udp_socket create_socket_perms;
 allow ftpd_t ftpd_etc_t:file read_file_perms;
 
 allow ftpd_t ftpd_lock_t:file manage_file_perms;
-files_lock_filetrans(ftpd_t,ftpd_lock_t,file)
+files_lock_filetrans(ftpd_t, ftpd_lock_t, file)
 
-manage_dirs_pattern(ftpd_t,ftpd_tmp_t,ftpd_tmp_t)
-manage_files_pattern(ftpd_t,ftpd_tmp_t,ftpd_tmp_t)
+manage_dirs_pattern(ftpd_t, ftpd_tmp_t, ftpd_tmp_t)
+manage_files_pattern(ftpd_t, ftpd_tmp_t, ftpd_tmp_t)
 files_tmp_filetrans(ftpd_t, ftpd_tmp_t, { file dir })
 
-manage_dirs_pattern(ftpd_t,ftpd_tmpfs_t,ftpd_tmpfs_t)
-manage_files_pattern(ftpd_t,ftpd_tmpfs_t,ftpd_tmpfs_t)
-manage_lnk_files_pattern(ftpd_t,ftpd_tmpfs_t,ftpd_tmpfs_t)
-manage_fifo_files_pattern(ftpd_t,ftpd_tmpfs_t,ftpd_tmpfs_t)
-manage_sock_files_pattern(ftpd_t,ftpd_tmpfs_t,ftpd_tmpfs_t)
-fs_tmpfs_filetrans(ftpd_t,ftpd_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(ftpd_t, ftpd_tmpfs_t, ftpd_tmpfs_t)
+manage_files_pattern(ftpd_t, ftpd_tmpfs_t, ftpd_tmpfs_t)
+manage_lnk_files_pattern(ftpd_t, ftpd_tmpfs_t, ftpd_tmpfs_t)
+manage_fifo_files_pattern(ftpd_t, ftpd_tmpfs_t, ftpd_tmpfs_t)
+manage_sock_files_pattern(ftpd_t, ftpd_tmpfs_t, ftpd_tmpfs_t)
+fs_tmpfs_filetrans(ftpd_t, ftpd_tmpfs_t, { dir file lnk_file sock_file fifo_file })
 
-manage_files_pattern(ftpd_t,ftpd_var_run_t,ftpd_var_run_t)
-manage_sock_files_pattern(ftpd_t,ftpd_var_run_t,ftpd_var_run_t)
-files_pid_filetrans(ftpd_t,ftpd_var_run_t,file)
+manage_dirs_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+manage_files_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+manage_sock_files_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+files_pid_filetrans(ftpd_t, ftpd_var_run_t, { file dir} )
 
 # proftpd requires the client side to bind a socket so that
 # it can stat the socket to perform access control decisions,
@@ -119,10 +123,11 @@ allow ftpd_t ftpdctl_tmp_t:sock_file { getattr unlink };
 # Create and modify /var/log/xferlog.
 allow ftpd_t xferlog_t:dir search_dir_perms;
 allow ftpd_t xferlog_t:file manage_file_perms;
-logging_log_filetrans(ftpd_t,xferlog_t,file)
+logging_log_filetrans(ftpd_t, xferlog_t, file)
 
 kernel_read_kernel_sysctls(ftpd_t)
 kernel_read_system_state(ftpd_t)
+kernel_search_network_state(ftpd_t)
 
 dev_read_sysfs(ftpd_t)
 dev_read_urand(ftpd_t)
@@ -131,13 +136,13 @@ corecmd_exec_bin(ftpd_t)
 
 corenet_all_recvfrom_unlabeled(ftpd_t)
 corenet_all_recvfrom_netlabel(ftpd_t)
-corenet_tcp_sendrecv_all_if(ftpd_t)
-corenet_udp_sendrecv_all_if(ftpd_t)
-corenet_tcp_sendrecv_all_nodes(ftpd_t)
-corenet_udp_sendrecv_all_nodes(ftpd_t)
+corenet_tcp_sendrecv_generic_if(ftpd_t)
+corenet_udp_sendrecv_generic_if(ftpd_t)
+corenet_tcp_sendrecv_generic_node(ftpd_t)
+corenet_udp_sendrecv_generic_node(ftpd_t)
 corenet_tcp_sendrecv_all_ports(ftpd_t)
 corenet_udp_sendrecv_all_ports(ftpd_t)
-corenet_tcp_bind_all_nodes(ftpd_t)
+corenet_tcp_bind_generic_node(ftpd_t)
 corenet_tcp_bind_ftp_port(ftpd_t)
 corenet_tcp_bind_ftp_data_port(ftpd_t)
 corenet_tcp_bind_generic_port(ftpd_t)
@@ -166,10 +171,9 @@ auth_rw_faillog(ftpd_t)
 
 init_rw_utmp(ftpd_t)
 
-libs_use_ld_so(ftpd_t)
-libs_use_shared_libs(ftpd_t)
-
+logging_send_audit_msgs(ftpd_t)
 logging_send_syslog_msg(ftpd_t)
+logging_set_loginuid(ftpd_t)
 
 miscfiles_read_localization(ftpd_t)
 miscfiles_read_public_files(ftpd_t)
@@ -180,8 +184,7 @@ sysnet_read_config(ftpd_t)
 sysnet_use_ldap(ftpd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ftpd_t)
-
-sysadm_dontaudit_search_home_dirs(ftpd_t)
+userdom_dontaudit_search_user_home_dirs(ftpd_t)
 
 tunable_policy(`allow_ftpd_anon_write',`
 	miscfiles_manage_public_files(ftpd_t)
@@ -215,10 +218,11 @@ tunable_policy(`ftp_home_dir',`
 
 	# allow access to /home
 	files_list_home(ftpd_t)
-	userdom_read_all_users_home_content_files(ftpd_t)
-	userdom_manage_all_users_home_content_dirs(ftpd_t)
-	userdom_manage_all_users_home_content_files(ftpd_t)
-	userdom_manage_all_users_home_content_symlinks(ftpd_t)
+	userdom_read_user_home_content_files(ftpd_t)
+	userdom_manage_user_home_content_dirs(ftpd_t)
+	userdom_manage_user_home_content_files(ftpd_t)
+	userdom_manage_user_home_content_symlinks(ftpd_t)
+	userdom_user_home_dir_filetrans_user_home_content(ftpd_t, { dir file lnk_file })
 ')
 
 tunable_policy(`ftp_home_dir && use_nfs_home_dirs',`
@@ -258,7 +262,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	inetd_tcp_service_domain(ftpd_t,ftpd_exec_t)
+	inetd_tcp_service_domain(ftpd_t, ftpd_exec_t)
 
 	optional_policy(`
 		tcpd_domtrans(tcpd_t)
@@ -279,7 +283,7 @@ optional_policy(`
 #
 
 # Allow ftpdctl to talk to ftpd over a socket connection
-stream_connect_pattern(ftpdctl_t,ftpd_var_run_t,ftpd_var_run_t,ftpd_t)
+stream_connect_pattern(ftpdctl_t, ftpd_var_run_t, ftpd_var_run_t, ftpd_t)
 
 # ftpdctl creates a socket so that the daemon can perform
 # access control decisions (see comments in ftpd_t rules above)
@@ -289,5 +293,4 @@ files_tmp_filetrans(ftpdctl_t, ftpdctl_tmp_t, sock_file)
 # Allow ftpdctl to read config files
 files_read_etc_files(ftpdctl_t)
 
-libs_use_ld_so(ftpdctl_t)
-libs_use_shared_libs(ftpdctl_t)
+userdom_use_user_terminals(ftpdctl_t)

@@ -1,5 +1,5 @@
 
-policy_module(apcupsd,1.3.0)
+policy_module(apcupsd, 1.5.3)
 
 ########################################
 #
@@ -12,6 +12,9 @@ init_daemon_domain(apcupsd_t, apcupsd_exec_t)
 
 type apcupsd_lock_t;
 files_lock_file(apcupsd_lock_t)
+
+type apcupsd_initrc_exec_t;
+init_script_file(apcupsd_initrc_exec_t)
 
 type apcupsd_log_t;
 logging_log_file(apcupsd_log_t)
@@ -37,13 +40,13 @@ allow apcupsd_t apcupsd_lock_t:file manage_file_perms;
 files_lock_filetrans(apcupsd_t,apcupsd_lock_t,file)
 
 allow apcupsd_t apcupsd_log_t:dir setattr;
-manage_files_pattern(apcupsd_t,apcupsd_log_t,apcupsd_log_t)
-logging_log_filetrans(apcupsd_t,apcupsd_log_t,{ file dir })
+manage_files_pattern(apcupsd_t, apcupsd_log_t, apcupsd_log_t)
+logging_log_filetrans(apcupsd_t, apcupsd_log_t, { file dir })
 
 manage_files_pattern(apcupsd_t, apcupsd_tmp_t, apcupsd_tmp_t)
 files_tmp_filetrans(apcupsd_t, apcupsd_tmp_t, file)
 
-manage_files_pattern(apcupsd_t,apcupsd_var_run_t,apcupsd_var_run_t)
+manage_files_pattern(apcupsd_t, apcupsd_var_run_t, apcupsd_var_run_t)
 files_pid_filetrans(apcupsd_t,apcupsd_var_run_t, file)
 
 kernel_read_system_state(apcupsd_t)
@@ -54,9 +57,9 @@ corecmd_exec_shell(apcupsd_t)
 corenet_all_recvfrom_unlabeled(apcupsd_t)
 corenet_all_recvfrom_netlabel(apcupsd_t)
 corenet_tcp_sendrecv_generic_if(apcupsd_t)
-corenet_tcp_sendrecv_all_nodes(apcupsd_t)
+corenet_tcp_sendrecv_generic_node(apcupsd_t)
 corenet_tcp_sendrecv_all_ports(apcupsd_t)
-corenet_tcp_bind_all_nodes(apcupsd_t)
+corenet_tcp_bind_generic_node(apcupsd_t)
 corenet_tcp_bind_apcupsd_port(apcupsd_t)
 corenet_sendrecv_apcupsd_server_packets(apcupsd_t)
 corenet_tcp_connect_apcupsd_port(apcupsd_t)
@@ -79,12 +82,13 @@ term_use_unallocated_ttys(apcupsd_t)
 init_rw_utmp(apcupsd_t)
 init_telinit(apcupsd_t)
 
-libs_use_ld_so(apcupsd_t)
-libs_use_shared_libs(apcupsd_t)
-
 logging_send_syslog_msg(apcupsd_t)
 
 miscfiles_read_localization(apcupsd_t)
+
+sysnet_dns_name_resolve(apcupsd_t)
+
+userdom_use_user_ttys(apcupsd_t)
 
 optional_policy(`
 	hostname_exec(apcupsd_t)
@@ -92,6 +96,7 @@ optional_policy(`
 
 optional_policy(`
 	mta_send_mail(apcupsd_t)
+	mta_system_content(apcupsd_tmp_t)
 ')
 
 ########################################
@@ -101,19 +106,19 @@ optional_policy(`
 
 optional_policy(`
 	apache_content_template(apcupsd_cgi)
-	
+
 	allow httpd_apcupsd_cgi_script_t self:tcp_socket create_stream_socket_perms;
 	allow httpd_apcupsd_cgi_script_t self:udp_socket create_socket_perms;
-	
+
 	corenet_all_recvfrom_unlabeled(httpd_apcupsd_cgi_script_t)
 	corenet_all_recvfrom_netlabel(httpd_apcupsd_cgi_script_t)
-	corenet_tcp_sendrecv_all_if(httpd_apcupsd_cgi_script_t)
-	corenet_tcp_sendrecv_all_nodes(httpd_apcupsd_cgi_script_t)
+	corenet_tcp_sendrecv_generic_if(httpd_apcupsd_cgi_script_t)
+	corenet_tcp_sendrecv_generic_node(httpd_apcupsd_cgi_script_t)
 	corenet_tcp_sendrecv_all_ports(httpd_apcupsd_cgi_script_t)
 	corenet_tcp_connect_apcupsd_port(httpd_apcupsd_cgi_script_t)
-	corenet_udp_sendrecv_all_if(httpd_apcupsd_cgi_script_t)
-	corenet_udp_sendrecv_all_nodes(httpd_apcupsd_cgi_script_t)
+	corenet_udp_sendrecv_generic_if(httpd_apcupsd_cgi_script_t)
+	corenet_udp_sendrecv_generic_node(httpd_apcupsd_cgi_script_t)
 	corenet_udp_sendrecv_all_ports(httpd_apcupsd_cgi_script_t)
-	
+
 	sysnet_dns_name_resolve(httpd_apcupsd_cgi_script_t)
 ')

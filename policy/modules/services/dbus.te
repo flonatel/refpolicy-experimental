@@ -1,5 +1,5 @@
 
-policy_module(dbus, 1.9.0)
+policy_module(dbus, 1.10.2)
 
 gen_require(`
 	class dbus all_dbus_perms;
@@ -10,12 +10,22 @@ gen_require(`
 # Delcarations
 #
 
-type dbusd_etc_t alias etc_dbusd_t;
+attribute session_bus_type;
+
+type dbusd_etc_t;
 files_type(dbusd_etc_t)
 
-type system_dbusd_t alias dbusd_t;
-type system_dbusd_exec_t;
-init_system_domain(system_dbusd_t,system_dbusd_exec_t)
+type dbusd_exec_t;
+corecmd_executable_file(dbusd_exec_t)
+
+type session_dbusd_tmp_t;
+typealias session_dbusd_tmp_t alias { user_dbusd_tmp_t staff_dbusd_tmp_t sysadm_dbusd_tmp_t };
+typealias session_dbusd_tmp_t alias { auditadm_dbusd_tmp_t secadm_dbusd_tmp_t };
+files_tmp_file(session_dbusd_tmp_t)
+ubac_constrained(session_dbusd_tmp_t)
+
+type system_dbusd_t;
+init_system_domain(system_dbusd_t, dbusd_exec_t)
 
 type system_dbusd_tmp_t;
 files_tmp_file(system_dbusd_tmp_t)
@@ -28,7 +38,7 @@ files_pid_file(system_dbusd_var_run_t)
 
 ##############################
 #
-# Local policy
+# System bus local policy
 #
 
 # dac_override: /var/run/dbus is owned by messagebus on Debian
@@ -36,7 +46,7 @@ files_pid_file(system_dbusd_var_run_t)
 allow system_dbusd_t self:capability { dac_override setgid setpcap setuid };
 dontaudit system_dbusd_t self:capability sys_tty_config;
 allow system_dbusd_t self:process { getattr signal_perms setcap };
-allow system_dbusd_t self:fifo_file { read write };
+allow system_dbusd_t self:fifo_file rw_fifo_file_perms;
 allow system_dbusd_t self:dbus { send_msg acquire_svc };
 allow system_dbusd_t self:unix_stream_socket { connectto create_stream_socket_perms connectto };
 allow system_dbusd_t self:unix_dgram_socket create_socket_perms;
@@ -44,18 +54,18 @@ allow system_dbusd_t self:unix_dgram_socket create_socket_perms;
 allow system_dbusd_t self:netlink_selinux_socket { create bind read };
 
 allow system_dbusd_t dbusd_etc_t:dir list_dir_perms;
-read_files_pattern(system_dbusd_t,dbusd_etc_t,dbusd_etc_t)
-read_lnk_files_pattern(system_dbusd_t,dbusd_etc_t,dbusd_etc_t)
+read_files_pattern(system_dbusd_t, dbusd_etc_t, dbusd_etc_t)
+read_lnk_files_pattern(system_dbusd_t, dbusd_etc_t, dbusd_etc_t)
 
-manage_dirs_pattern(system_dbusd_t,system_dbusd_tmp_t,system_dbusd_tmp_t)
-manage_files_pattern(system_dbusd_t,system_dbusd_tmp_t,system_dbusd_tmp_t)
+manage_dirs_pattern(system_dbusd_t, system_dbusd_tmp_t, system_dbusd_tmp_t)
+manage_files_pattern(system_dbusd_t, system_dbusd_tmp_t, system_dbusd_tmp_t)
 files_tmp_filetrans(system_dbusd_t, system_dbusd_tmp_t, { file dir })
 
 read_files_pattern(system_dbusd_t, system_dbusd_var_lib_t, system_dbusd_var_lib_t)
 
-manage_files_pattern(system_dbusd_t,system_dbusd_var_run_t,system_dbusd_var_run_t)
-manage_sock_files_pattern(system_dbusd_t,system_dbusd_var_run_t,system_dbusd_var_run_t)
-files_pid_filetrans(system_dbusd_t,system_dbusd_var_run_t,file)
+manage_files_pattern(system_dbusd_t, system_dbusd_var_run_t, system_dbusd_var_run_t)
+manage_sock_files_pattern(system_dbusd_t, system_dbusd_var_run_t, system_dbusd_var_run_t)
+files_pid_filetrans(system_dbusd_t, system_dbusd_var_run_t, file)
 
 kernel_read_system_state(system_dbusd_t)
 kernel_read_kernel_sysctls(system_dbusd_t)
@@ -92,9 +102,6 @@ files_read_usr_files(system_dbusd_t)
 init_use_fds(system_dbusd_t)
 init_use_script_ptys(system_dbusd_t)
 
-libs_use_ld_so(system_dbusd_t)
-libs_use_shared_libs(system_dbusd_t)
-
 logging_send_audit_msgs(system_dbusd_t)
 logging_send_syslog_msg(system_dbusd_t)
 
@@ -106,8 +113,7 @@ seutil_read_default_contexts(system_dbusd_t)
 seutil_sigchld_newrole(system_dbusd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(system_dbusd_t)
-
-sysadm_dontaudit_search_home_dirs(system_dbusd_t)
+userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
 
 tunable_policy(`read_default_t',`
 	files_list_default(system_dbusd_t)

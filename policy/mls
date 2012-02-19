@@ -299,6 +299,57 @@ mlsconstrain { netif node } { tcp_send udp_send rawip_send }
 
 
 #
+# MLS policy for the network ingress/egress controls
+#
+
+# the netif ingress/egress ops, the ingress permission is a "write" operation
+# because the subject in this particular case is the remote domain which is
+# writing data out the network interface which is acting as the object
+mlsconstrain { netif } { ingress }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetinbound ) or
+	 ( t1 == unlabeled_t ));
+mlsconstrain { netif } { egress }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetoutbound ));
+
+# the node recvfrom/sendto ops, the recvfrom permission is a "write" operation
+# because the subject in this particular case is the remote domain which is
+# writing data out the network node which is acting as the object
+mlsconstrain { node } { recvfrom }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetinbound ) or
+	 ( t1 == unlabeled_t ));
+mlsconstrain { node } { sendto }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetoutbound ));
+
+# the forward ops, the forward_in permission is a "write" operation because the
+# subject in this particular case is the remote domain which is writing data
+# to the network with a secmark label, the object in this case
+mlsconstrain { packet } { forward_in }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetinbound ) or
+	 ( t1 == unlabeled_t ));
+mlsconstrain { packet } { forward_out }
+	((( l1 dom l2 ) and ( l1 domby h2 )) or
+	 ( t1 == mlsnetoutbound ) or
+	 ( t1 == unlabeled_t ));
+
+#
+# MLS policy for the secmark and peer controls
+#
+
+# the peer/packet recv op
+mlsconstrain { peer packet } { recv }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsnetreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsnetread ));
+
+
+
+
+#
 # MLS policy for the process class
 #
 
@@ -465,6 +516,25 @@ mlsconstrain x_property { create destroy write append setattr }
 
 
 #
+# MLS policy for the x_selection class
+#
+
+# the x_selection "read" ops (implicit single level)
+mlsconstrain x_selection { read getattr }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsxwinreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsxwinreadselection ) or
+	 ( t1 == mlsxwinread ));
+
+# the x_selection "write" ops (implicit single level)
+mlsconstrain x_selection { write setattr }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsxwinwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 ( t1 == mlsxwinwriteselection ) or
+	 ( t1 == mlsxwinwrite ));
+
+
+#
 # MLS policy for the x_cursor class
 #
 
@@ -572,22 +642,13 @@ mlsconstrain x_event { send }
 # MLS policy for the x_application_data class
 #
 
-# the x_application_data "paste" ops (explicit single level)
+# the x_application_data "paste" ops
 mlsconstrain x_application_data { paste }
-	( l1 eq l2 );
-
-# the x_application_data "paste_after_confirm" ops (downgrade permitted)
-mlsconstrain x_application_data { paste_after_confirm }
 	( l1 domby l2 );
 
-
-#
-# MLS policy for the pax class
-#
-
-# these access vectors have no MLS restrictions
-# pax { pageexec emutramp mprotect randmmap randexec segmexec }
-
+# the x_application_data "paste_after_confirm" ops
+mlsconstrain x_application_data { paste_after_confirm }
+	( l1 dom l2 );
 
 
 
@@ -667,19 +728,25 @@ mlsconstrain { db_database } { getattr access get_param }
 	 ( t1 == mlsdbread ) or
 	 ( t2 == mlstrustedobject ));
 
-mlsconstrain { db_table db_column } { getattr use select }
+mlsconstrain { db_table } { getattr use select lock }
 	(( l1 dom l2 ) or
 	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
 	 ( t1 == mlsdbread ) or
 	 ( t2 == mlstrustedobject ));
 
-mlsconstrain { db_procedure } { getattr execute }
+mlsconstrain { db_column } { getattr use select }
 	(( l1 dom l2 ) or
 	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
 	 ( t1 == mlsdbread ) or
 	 ( t2 == mlstrustedobject ));
 
-mlsconstrain { db_blob } { getattr read }
+mlsconstrain { db_procedure } { getattr execute install }
+	(( l1 dom l2 ) or
+	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
+	 ( t1 == mlsdbread ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_blob } { getattr read export }
 	(( l1 dom l2 ) or
 	 (( t1 == mlsdbreadtoclr ) and ( h1 dom l2 )) or
 	 ( t1 == mlsdbread ) or
@@ -699,7 +766,7 @@ mlsconstrain { db_database } { create drop setattr relabelfrom install_module lo
 	 ( t1 == mlsdbwrite ) or
 	 ( t2 == mlstrustedobject ));
 
-mlsconstrain { db_table } { create drop setattr relabelfrom update insert delete lock }
+mlsconstrain { db_table } { create drop setattr relabelfrom update insert delete }
 	(( l1 eq l2 ) or
 	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
 	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
@@ -713,7 +780,14 @@ mlsconstrain { db_column } { create drop setattr relabelfrom update insert }
 	 ( t1 == mlsdbwrite ) or
 	 ( t2 == mlstrustedobject ));
 
-mlsconstrain { db_blob } { create drop setattr relabelfrom write import export }
+mlsconstrain { db_procedure } { create drop setattr relabelfrom }
+	(( l1 eq l2 ) or
+	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
+	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or
+	 ( t1 == mlsdbwrite ) or
+	 ( t2 == mlstrustedobject ));
+
+mlsconstrain { db_blob } { create drop setattr relabelfrom write import }
 	(( l1 eq l2 ) or
 	 (( t1 == mlsdbwritetoclr ) and ( h1 dom l2 ) and ( l1 domby l2 )) or
 	 (( t2 == mlsdbwriteinrange ) and ( l1 dom l2 ) and ( h1 domby h2 )) or

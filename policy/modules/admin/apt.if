@@ -17,7 +17,7 @@ interface(`apt_domtrans',`
 
 	files_search_usr($1)
 	corecmd_search_bin($1)
-	domtrans_pattern($1,apt_exec_t,apt_t)
+	domtrans_pattern($1, apt_exec_t, apt_t)
 ')
 
 ########################################
@@ -34,11 +34,6 @@ interface(`apt_domtrans',`
 ##	The role to allow the apt domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the apt domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`apt_run',`
@@ -48,7 +43,6 @@ interface(`apt_run',`
 
 	apt_domtrans($1)
 	role $2 types apt_t;
-	allow apt_t $3:chr_file rw_term_perms;
 	# TODO: likely have to add dpkg_run here.
 ')
 
@@ -144,8 +138,8 @@ interface(`apt_read_db',`
 
 	files_search_var_lib($1)
 	allow $1 apt_var_lib_t:dir list_dir_perms;
-	read_files_pattern($1,apt_var_lib_t,apt_var_lib_t)
-	read_lnk_files_pattern($1,apt_var_lib_t,apt_var_lib_t)
+	read_files_pattern($1, apt_var_lib_t, apt_var_lib_t)
+	read_lnk_files_pattern($1, apt_var_lib_t, apt_var_lib_t)
 ')
 
 ########################################
@@ -164,10 +158,10 @@ interface(`apt_manage_db',`
 	')
 
 	files_search_var_lib($1)
-	manage_files_pattern($1,apt_var_lib_t,apt_var_lib_t)
+	manage_files_pattern($1, apt_var_lib_t, apt_var_lib_t)
 	# cjp: shouldnt this be manage_lnk_files?
-	rw_lnk_files_pattern($1,apt_var_lib_t,apt_var_lib_t)
-	delete_lnk_files_pattern($1,apt_var_lib_t,apt_var_lib_t)
+	rw_lnk_files_pattern($1, apt_var_lib_t, apt_var_lib_t)
+	delete_lnk_files_pattern($1, apt_var_lib_t, apt_var_lib_t)
 ')
 
 ########################################

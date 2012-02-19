@@ -1,5 +1,5 @@
 
-policy_module(nis, 1.7.0)
+policy_module(nis, 1.8.2)
 
 ########################################
 #
@@ -11,7 +11,7 @@ files_type(var_yp_t)
 
 type ypbind_t;
 type ypbind_exec_t;
-init_daemon_domain(ypbind_t,ypbind_exec_t)
+init_daemon_domain(ypbind_t, ypbind_exec_t)
 
 type ypbind_tmp_t;
 files_tmp_file(ypbind_tmp_t)
@@ -21,7 +21,7 @@ files_pid_file(ypbind_var_run_t)
 
 type yppasswdd_t;
 type yppasswdd_exec_t;
-init_daemon_domain(yppasswdd_t,yppasswdd_exec_t)
+init_daemon_domain(yppasswdd_t, yppasswdd_exec_t)
 domain_obj_id_change_exemption(yppasswdd_t)
 
 type yppasswdd_var_run_t;
@@ -29,7 +29,7 @@ files_pid_file(yppasswdd_var_run_t)
 
 type ypserv_t;
 type ypserv_exec_t;
-init_daemon_domain(ypserv_t,ypserv_exec_t)
+init_daemon_domain(ypserv_t, ypserv_exec_t)
 
 type ypserv_conf_t;
 files_type(ypserv_conf_t)
@@ -42,7 +42,7 @@ files_pid_file(ypserv_var_run_t)
 
 type ypxfr_t;
 type ypxfr_exec_t;
-init_daemon_domain(ypxfr_t,ypxfr_exec_t)
+init_daemon_domain(ypxfr_t, ypxfr_exec_t)
 
 ########################################
 #
@@ -56,14 +56,14 @@ allow ypbind_t self:netlink_route_socket r_netlink_socket_perms;
 allow ypbind_t self:tcp_socket create_stream_socket_perms;
 allow ypbind_t self:udp_socket create_socket_perms;
 
-manage_dirs_pattern(ypbind_t,ypbind_tmp_t,ypbind_tmp_t)
-manage_files_pattern(ypbind_t,ypbind_tmp_t,ypbind_tmp_t)
+manage_dirs_pattern(ypbind_t, ypbind_tmp_t, ypbind_tmp_t)
+manage_files_pattern(ypbind_t, ypbind_tmp_t, ypbind_tmp_t)
 files_tmp_filetrans(ypbind_t, ypbind_tmp_t, { file dir })
 
-manage_files_pattern(ypbind_t,ypbind_var_run_t,ypbind_var_run_t)
-files_pid_filetrans(ypbind_t,ypbind_var_run_t,file)
+manage_files_pattern(ypbind_t, ypbind_var_run_t, ypbind_var_run_t)
+files_pid_filetrans(ypbind_t, ypbind_var_run_t, file)
 
-manage_files_pattern(ypbind_t,var_yp_t,var_yp_t)
+manage_files_pattern(ypbind_t, var_yp_t, var_yp_t)
 
 kernel_read_kernel_sysctls(ypbind_t)
 kernel_list_proc(ypbind_t)
@@ -71,14 +71,14 @@ kernel_read_proc_symlinks(ypbind_t)
 
 corenet_all_recvfrom_unlabeled(ypbind_t)
 corenet_all_recvfrom_netlabel(ypbind_t)
-corenet_tcp_sendrecv_all_if(ypbind_t)
-corenet_udp_sendrecv_all_if(ypbind_t)
-corenet_tcp_sendrecv_all_nodes(ypbind_t)
-corenet_udp_sendrecv_all_nodes(ypbind_t)
+corenet_tcp_sendrecv_generic_if(ypbind_t)
+corenet_udp_sendrecv_generic_if(ypbind_t)
+corenet_tcp_sendrecv_generic_node(ypbind_t)
+corenet_udp_sendrecv_generic_node(ypbind_t)
 corenet_tcp_sendrecv_all_ports(ypbind_t)
 corenet_udp_sendrecv_all_ports(ypbind_t)
-corenet_tcp_bind_all_nodes(ypbind_t)
-corenet_udp_bind_all_nodes(ypbind_t)
+corenet_tcp_bind_generic_node(ypbind_t)
+corenet_udp_bind_generic_node(ypbind_t)
 corenet_tcp_bind_generic_port(ypbind_t)
 corenet_udp_bind_generic_port(ypbind_t)
 corenet_tcp_bind_reserved_port(ypbind_t)
@@ -101,9 +101,6 @@ domain_use_interactive_fds(ypbind_t)
 files_read_etc_files(ypbind_t)
 files_list_var(ypbind_t)
 
-libs_use_ld_so(ypbind_t)
-libs_use_shared_libs(ypbind_t)
-
 logging_send_syslog_msg(ypbind_t)
 
 miscfiles_read_localization(ypbind_t)
@@ -111,8 +108,7 @@ miscfiles_read_localization(ypbind_t)
 sysnet_read_config(ypbind_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ypbind_t)
-
-sysadm_dontaudit_search_home_dirs(ypbind_t)
+userdom_dontaudit_search_user_home_dirs(ypbind_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(ypbind_t)
@@ -136,11 +132,11 @@ allow yppasswdd_t self:netlink_route_socket r_netlink_socket_perms;
 allow yppasswdd_t self:tcp_socket create_stream_socket_perms;
 allow yppasswdd_t self:udp_socket create_socket_perms;
 
-manage_files_pattern(yppasswdd_t,yppasswdd_var_run_t,yppasswdd_var_run_t)
-files_pid_filetrans(yppasswdd_t,yppasswdd_var_run_t,file)
+manage_files_pattern(yppasswdd_t, yppasswdd_var_run_t, yppasswdd_var_run_t)
+files_pid_filetrans(yppasswdd_t, yppasswdd_var_run_t, file)
 
-manage_files_pattern(yppasswdd_t,var_yp_t,var_yp_t)
-manage_lnk_files_pattern(yppasswdd_t,var_yp_t,var_yp_t)
+manage_files_pattern(yppasswdd_t, var_yp_t, var_yp_t)
+manage_lnk_files_pattern(yppasswdd_t, var_yp_t, var_yp_t)
 
 kernel_list_proc(yppasswdd_t)
 kernel_read_proc_symlinks(yppasswdd_t)
@@ -151,12 +147,12 @@ corenet_all_recvfrom_unlabeled(yppasswdd_t)
 corenet_all_recvfrom_netlabel(yppasswdd_t)
 corenet_tcp_sendrecv_generic_if(yppasswdd_t)
 corenet_udp_sendrecv_generic_if(yppasswdd_t)
-corenet_tcp_sendrecv_all_nodes(yppasswdd_t)
-corenet_udp_sendrecv_all_nodes(yppasswdd_t)
+corenet_tcp_sendrecv_generic_node(yppasswdd_t)
+corenet_udp_sendrecv_generic_node(yppasswdd_t)
 corenet_tcp_sendrecv_all_ports(yppasswdd_t)
 corenet_udp_sendrecv_all_ports(yppasswdd_t)
-corenet_tcp_bind_all_nodes(yppasswdd_t)
-corenet_udp_bind_all_nodes(yppasswdd_t)
+corenet_tcp_bind_generic_node(yppasswdd_t)
+corenet_udp_bind_generic_node(yppasswdd_t)
 corenet_tcp_bind_reserved_port(yppasswdd_t)
 corenet_udp_bind_reserved_port(yppasswdd_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(yppasswdd_t)
@@ -183,9 +179,6 @@ files_read_etc_files(yppasswdd_t)
 files_read_etc_runtime_files(yppasswdd_t)
 files_relabel_etc_files(yppasswdd_t)
 
-libs_use_ld_so(yppasswdd_t)
-libs_use_shared_libs(yppasswdd_t)
-
 logging_send_syslog_msg(yppasswdd_t)
 
 miscfiles_read_localization(yppasswdd_t)
@@ -193,19 +186,18 @@ miscfiles_read_localization(yppasswdd_t)
 sysnet_read_config(yppasswdd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(yppasswdd_t)
-
-sysadm_dontaudit_search_home_dirs(yppasswdd_t)
+userdom_dontaudit_search_user_home_dirs(yppasswdd_t)
 
 optional_policy(`
 	hostname_exec(yppasswdd_t)
 ')
 
 optional_policy(`
-        seutil_sigchld_newrole(yppasswdd_t)
+	seutil_sigchld_newrole(yppasswdd_t)
 ')
 
 optional_policy(`
-        udev_read_db(yppasswdd_t)
+	udev_read_db(yppasswdd_t)
 ')
 
 ########################################
@@ -224,14 +216,14 @@ allow ypserv_t self:udp_socket create_socket_perms;
 
 manage_files_pattern(ypserv_t,var_yp_t,var_yp_t)
 
-allow ypserv_t ypserv_conf_t:file { getattr read };
+allow ypserv_t ypserv_conf_t:file read_file_perms;
 
-manage_dirs_pattern(ypserv_t,ypserv_tmp_t,ypserv_tmp_t)
-manage_files_pattern(ypserv_t,ypserv_tmp_t,ypserv_tmp_t)
+manage_dirs_pattern(ypserv_t, ypserv_tmp_t, ypserv_tmp_t)
+manage_files_pattern(ypserv_t, ypserv_tmp_t, ypserv_tmp_t)
 files_tmp_filetrans(ypserv_t, ypserv_tmp_t, { file dir })
 
-manage_files_pattern(ypserv_t,ypserv_var_run_t,ypserv_var_run_t)
-files_pid_filetrans(ypserv_t,ypserv_var_run_t,file)
+manage_files_pattern(ypserv_t, ypserv_var_run_t, ypserv_var_run_t)
+files_pid_filetrans(ypserv_t, ypserv_var_run_t, file)
 
 kernel_read_kernel_sysctls(ypserv_t)
 kernel_list_proc(ypserv_t)
@@ -239,14 +231,14 @@ kernel_read_proc_symlinks(ypserv_t)
 
 corenet_all_recvfrom_unlabeled(ypserv_t)
 corenet_all_recvfrom_netlabel(ypserv_t)
-corenet_tcp_sendrecv_all_if(ypserv_t)
-corenet_udp_sendrecv_all_if(ypserv_t)
-corenet_tcp_sendrecv_all_nodes(ypserv_t)
-corenet_udp_sendrecv_all_nodes(ypserv_t)
+corenet_tcp_sendrecv_generic_if(ypserv_t)
+corenet_udp_sendrecv_generic_if(ypserv_t)
+corenet_tcp_sendrecv_generic_node(ypserv_t)
+corenet_udp_sendrecv_generic_node(ypserv_t)
 corenet_tcp_sendrecv_all_ports(ypserv_t)
 corenet_udp_sendrecv_all_ports(ypserv_t)
-corenet_tcp_bind_all_nodes(ypserv_t)
-corenet_udp_bind_all_nodes(ypserv_t)
+corenet_tcp_bind_generic_node(ypserv_t)
+corenet_udp_bind_generic_node(ypserv_t)
 corenet_tcp_bind_reserved_port(ypserv_t)
 corenet_udp_bind_reserved_port(ypserv_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(ypserv_t)
@@ -265,9 +257,6 @@ domain_use_interactive_fds(ypserv_t)
 files_read_var_files(ypserv_t)
 files_read_etc_files(ypserv_t)
 
-libs_use_ld_so(ypserv_t)
-libs_use_shared_libs(ypserv_t)
-
 logging_send_syslog_msg(ypserv_t)
 
 miscfiles_read_localization(ypserv_t)
@@ -277,8 +266,7 @@ nis_domtrans_ypxfr(ypserv_t)
 sysnet_read_config(ypserv_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ypserv_t)
-
-sysadm_dontaudit_search_home_dirs(ypserv_t)
+userdom_dontaudit_search_user_home_dirs(ypserv_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(ypserv_t)
@@ -304,18 +292,18 @@ manage_files_pattern(ypxfr_t, var_yp_t, var_yp_t)
 allow ypxfr_t ypserv_t:tcp_socket { read write };
 allow ypxfr_t ypserv_t:udp_socket { read write };
 
-allow ypxfr_t ypserv_conf_t:file { getattr read };
+allow ypxfr_t ypserv_conf_t:file read_file_perms;
 
 corenet_all_recvfrom_unlabeled(ypxfr_t)
 corenet_all_recvfrom_netlabel(ypxfr_t)
-corenet_tcp_sendrecv_all_if(ypxfr_t)
-corenet_udp_sendrecv_all_if(ypxfr_t)
-corenet_tcp_sendrecv_all_nodes(ypxfr_t)
-corenet_udp_sendrecv_all_nodes(ypxfr_t)
+corenet_tcp_sendrecv_generic_if(ypxfr_t)
+corenet_udp_sendrecv_generic_if(ypxfr_t)
+corenet_tcp_sendrecv_generic_node(ypxfr_t)
+corenet_udp_sendrecv_generic_node(ypxfr_t)
 corenet_tcp_sendrecv_all_ports(ypxfr_t)
 corenet_udp_sendrecv_all_ports(ypxfr_t)
-corenet_tcp_bind_all_nodes(ypxfr_t)
-corenet_udp_bind_all_nodes(ypxfr_t)
+corenet_tcp_bind_generic_node(ypxfr_t)
+corenet_udp_bind_generic_node(ypxfr_t)
 corenet_tcp_bind_reserved_port(ypxfr_t)
 corenet_udp_bind_reserved_port(ypxfr_t)
 corenet_dontaudit_tcp_bind_all_reserved_ports(ypxfr_t)
@@ -326,9 +314,6 @@ corenet_sendrecv_all_client_packets(ypxfr_t)
 
 files_read_etc_files(ypxfr_t)
 files_search_usr(ypxfr_t)
-
-libs_use_shared_libs(ypxfr_t)
-libs_use_ld_so(ypxfr_t)
 
 logging_send_syslog_msg(ypxfr_t)
 

@@ -1,5 +1,5 @@
 
-policy_module(fetchmail, 1.6.0)
+policy_module(fetchmail, 1.8.2)
 
 ########################################
 #
@@ -8,13 +8,14 @@ policy_module(fetchmail, 1.6.0)
 
 type fetchmail_t;
 type fetchmail_exec_t;
-init_daemon_domain(fetchmail_t,fetchmail_exec_t)
+init_daemon_domain(fetchmail_t, fetchmail_exec_t)
+application_executable_file(fetchmail_exec_t)
 
 type fetchmail_var_run_t;
 files_pid_file(fetchmail_var_run_t)
 
 type fetchmail_etc_t;
-files_type(fetchmail_etc_t)
+files_config_file(fetchmail_etc_t)
 
 type fetchmail_uidl_cache_t;
 files_type(fetchmail_uidl_cache_t)
@@ -35,10 +36,10 @@ allow fetchmail_t self:udp_socket create_socket_perms;
 allow fetchmail_t fetchmail_etc_t:file read_file_perms;
 
 allow fetchmail_t fetchmail_uidl_cache_t:file manage_file_perms;
-mta_spool_filetrans(fetchmail_t,fetchmail_uidl_cache_t,file)
+mta_spool_filetrans(fetchmail_t, fetchmail_uidl_cache_t, file)
 
-manage_files_pattern(fetchmail_t,fetchmail_var_run_t,fetchmail_var_run_t)
-files_pid_filetrans(fetchmail_t,fetchmail_var_run_t,file)
+manage_files_pattern(fetchmail_t, fetchmail_var_run_t, fetchmail_var_run_t)
+files_pid_filetrans(fetchmail_t, fetchmail_var_run_t, file)
 
 kernel_read_kernel_sysctls(fetchmail_t)
 kernel_list_proc(fetchmail_t)
@@ -50,8 +51,8 @@ corenet_all_recvfrom_unlabeled(fetchmail_t)
 corenet_all_recvfrom_netlabel(fetchmail_t)
 corenet_tcp_sendrecv_generic_if(fetchmail_t)
 corenet_udp_sendrecv_generic_if(fetchmail_t)
-corenet_tcp_sendrecv_all_nodes(fetchmail_t)
-corenet_udp_sendrecv_all_nodes(fetchmail_t)
+corenet_tcp_sendrecv_generic_node(fetchmail_t)
+corenet_udp_sendrecv_generic_node(fetchmail_t)
 corenet_tcp_sendrecv_dns_port(fetchmail_t)
 corenet_udp_sendrecv_dns_port(fetchmail_t)
 corenet_tcp_sendrecv_pop_port(fetchmail_t)
@@ -72,9 +73,6 @@ fs_search_auto_mountpoints(fetchmail_t)
 
 domain_use_interactive_fds(fetchmail_t)
 
-libs_use_ld_so(fetchmail_t)
-libs_use_shared_libs(fetchmail_t)
-
 logging_send_syslog_msg(fetchmail_t)
 
 miscfiles_read_localization(fetchmail_t)
@@ -83,11 +81,14 @@ miscfiles_read_certs(fetchmail_t)
 sysnet_read_config(fetchmail_t)
 
 userdom_dontaudit_use_unpriv_user_fds(fetchmail_t)
-
-sysadm_dontaudit_search_home_dirs(fetchmail_t)
+userdom_dontaudit_search_user_home_dirs(fetchmail_t)
 
 optional_policy(`
 	procmail_domtrans(fetchmail_t)
+')
+
+optional_policy(`
+	sendmail_manage_log(fetchmail_t)
 ')
 
 optional_policy(`

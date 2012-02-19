@@ -15,7 +15,7 @@ interface(`bind_domtrans_ndc',`
 		type ndc_t, ndc_exec_t;
 	')
 
-	domtrans_pattern($1,ndc_exec_t,ndc_t)
+	domtrans_pattern($1, ndc_exec_t, ndc_t)
 ')
 
 ########################################
@@ -51,11 +51,6 @@ interface(`bind_signal',`
 ##	The role to be allowed the bind domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the bind domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`bind_run_ndc',`
@@ -65,7 +60,6 @@ interface(`bind_run_ndc',`
 
 	bind_domtrans_ndc($1)
 	role $2 types ndc_t;
-	allow ndc_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -83,7 +77,7 @@ interface(`bind_domtrans',`
 		type named_t, named_exec_t;
 	')
 
-	domtrans_pattern($1,named_exec_t,named_t)
+	domtrans_pattern($1, named_exec_t, named_t)
 ')
 
 ########################################
@@ -101,7 +95,7 @@ interface(`bind_read_dnssec_keys',`
 		type named_conf_t, named_zone_t, dnssec_t;
 	')
 
-	read_files_pattern($1,{ named_conf_t named_zone_t },dnssec_t)
+	read_files_pattern($1, { named_conf_t named_zone_t }, dnssec_t)
 ')
 
 ########################################
@@ -119,7 +113,7 @@ interface(`bind_read_config',`
 		type named_conf_t;
 	')
 
-	read_files_pattern($1,named_conf_t,named_conf_t)
+	read_files_pattern($1, named_conf_t, named_conf_t)
 ')
 
 ########################################
@@ -137,7 +131,7 @@ interface(`bind_write_config',`
 		type named_conf_t;
 	')
 
-	write_files_pattern($1,named_conf_t,named_conf_t)
+	write_files_pattern($1, named_conf_t, named_conf_t)
 	allow $1 named_conf_t:file setattr;
 ')
 
@@ -157,7 +151,7 @@ interface(`bind_manage_config_dirs',`
 		type named_conf_t;
 	')
 
-	manage_dirs_pattern($1,named_conf_t,named_conf_t)
+	manage_dirs_pattern($1, named_conf_t, named_conf_t)
 ')
 
 ########################################
@@ -199,8 +193,8 @@ interface(`bind_manage_cache',`
 
 	files_search_var($1)
 	allow $1 named_zone_t:dir search_dir_perms;
-	manage_files_pattern($1,named_cache_t,named_cache_t)
-	manage_lnk_files_pattern($1,named_cache_t,named_cache_t)
+	manage_files_pattern($1, named_cache_t, named_cache_t)
+	manage_lnk_files_pattern($1, named_cache_t, named_cache_t)
 ')
 
 ########################################
@@ -238,7 +232,7 @@ interface(`bind_read_zone',`
 	')
 
 	files_search_var($1)
-	read_files_pattern($1,named_zone_t,named_zone_t)
+	read_files_pattern($1, named_zone_t, named_zone_t)
 ')
 
 ########################################
@@ -253,4 +247,59 @@ interface(`bind_read_zone',`
 #
 interface(`bind_udp_chat_named',`
 	refpolicywarn(`$0($*) has been deprecated.')
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate 
+##	an bind environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to be allowed to manage the bind domain.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`bind_admin',`
+	gen_require(`
+		type named_t, named_tmp_t, named_log_t;
+		type named_conf_t, named_var_run_t;
+		type named_cache_t, named_zone_t;
+		type dnssec_t, ndc_t;
+		type named_initrc_exec_t;
+	')
+
+	allow $1 named_t:process { ptrace signal_perms };
+	ps_process_pattern($1, named_t)
+
+	allow $1 ndc_t:process { ptrace signal_perms };
+	ps_process_pattern($1, ndc_t)
+
+	bind_run_ndc($1, $2)
+
+	domain_system_change_exemption($1)
+	role_transition $2 named_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	files_list_tmp($1)
+	admin_pattern($1, named_tmp_t)
+
+	logging_list_logs($1)
+	admin_pattern($1, named_log_t)
+
+	files_list_etc($1)
+	admin_pattern($1, named_conf_t)
+
+	admin_pattern($1, named_cache_t)
+	admin_pattern($1, named_zone_t)
+	admin_pattern($1, dnssec_t)
+
+	files_list_pids($1)
+	admin_pattern($1, named_var_run_t)
 ')

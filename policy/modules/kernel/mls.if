@@ -332,6 +332,48 @@ interface(`mls_net_write_within_range',`
 
 ########################################
 ## <summary>
+##	Make specified domain trusted to
+##	write inbound packets regardless of the
+##	network's or node's MLS range.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`mls_net_inbound_all_levels',`
+	gen_require(`
+		attribute mlsnetinbound;
+	')
+
+	typeattribute $1 mlsnetinbound;
+')
+
+########################################
+## <summary>
+##	Make specified domain trusted to
+##	write outbound packets regardless of the
+##	network's or node's MLS range.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`mls_net_outbound_all_levels',`
+	gen_require(`
+		attribute mlsnetoutbound;
+	')
+
+	typeattribute $1 mlsnetoutbound;
+')
+
+########################################
+## <summary>
 ##	Make specified domain MLS trusted
 ##	for reading from System V IPC objects
 ##	up to its clearance.
@@ -822,13 +864,13 @@ interface(`mls_context_translate_all_levels',`
 
 ########################################
 ## <summary>
-##      Make specified domain MLS trusted
-##      for reading from databases at any level.
+##	Make specified domain MLS trusted
+##	for reading from databases at any level.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
@@ -842,13 +884,13 @@ interface(`mls_db_read_all_levels',`
 
 ########################################
 ## <summary>
-##       Make specified domain MLS trusted
-##       for writing to databases at any level.
+##	Make specified domain MLS trusted
+##	for writing to databases at any level.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
@@ -862,13 +904,13 @@ interface(`mls_db_write_all_levels',`
 
 ########################################
 ## <summary>
-##      Make specified domain MLS trusted
-##      for raising the level of databases.
+##	Make specified domain MLS trusted
+##	for raising the level of databases.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
@@ -882,13 +924,13 @@ interface(`mls_db_upgrade',`
 
 ########################################
 ## <summary>
-##      Make specified domain MLS trusted
-##      for lowering the level of databases.
+##	Make specified domain MLS trusted
+##	for lowering the level of databases.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
@@ -901,42 +943,42 @@ interface(`mls_db_downgrade',`
 ')
 ########################################
 ## <summary>
-##      Make specified domain MLS trusted
-##      for sending dbus messages to 
+##	Make specified domain MLS trusted
+##	for sending dbus messages to 
 ##	all levels.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
 interface(`mls_dbus_send_all_levels',`
-       gen_require(`
-               attribute mlsdbussend;
-       ')
+	gen_require(`
+		attribute mlsdbussend;
+	')
 
        typeattribute $1 mlsdbussend;
 ')
 
 ########################################
 ## <summary>
-##      Make specified domain MLS trusted
-##      for receiving dbus messages from 
+##	Make specified domain MLS trusted
+##	for receiving dbus messages from 
 ##	all levels.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 ## <rolecap/>
 #
 interface(`mls_dbus_recv_all_levels',`
-       gen_require(`
-               attribute mlsdbusrecv;
-       ')
+	gen_require(`
+		attribute mlsdbusrecv;
+	')
 
        typeattribute $1 mlsdbusrecv;
 ')

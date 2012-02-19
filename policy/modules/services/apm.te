@@ -1,5 +1,5 @@
 
-policy_module(apm, 1.7.0)
+policy_module(apm, 1.9.1)
 
 ########################################
 #
@@ -7,13 +7,12 @@ policy_module(apm, 1.7.0)
 #
 type apmd_t;
 type apmd_exec_t;
-init_daemon_domain(apmd_t,apmd_exec_t)
+init_daemon_domain(apmd_t, apmd_exec_t)
 
 type apm_t;
 type apm_exec_t;
-application_domain(apm_t,apm_exec_t)
+application_domain(apm_t, apm_exec_t)
 role system_r types apm_t;
-
 
 type apmd_log_t;
 logging_log_file(apmd_log_t)
@@ -51,9 +50,6 @@ term_use_all_terms(apm_t)
 
 domain_use_interactive_fds(apm_t)
 
-libs_use_ld_so(apm_t)
-libs_use_shared_libs(apm_t)
-
 logging_send_syslog_msg(apm_t)
 
 ########################################
@@ -73,12 +69,12 @@ allow apmd_t self:unix_stream_socket create_stream_socket_perms;
 allow apmd_t apmd_log_t:file manage_file_perms;
 logging_log_filetrans(apmd_t,apmd_log_t,file)
 
-manage_dirs_pattern(apmd_t,apmd_tmp_t,apmd_tmp_t)
-manage_files_pattern(apmd_t,apmd_tmp_t,apmd_tmp_t)
+manage_dirs_pattern(apmd_t, apmd_tmp_t, apmd_tmp_t)
+manage_files_pattern(apmd_t, apmd_tmp_t, apmd_tmp_t)
 files_tmp_filetrans(apmd_t, apmd_tmp_t, { file dir })
 
-manage_files_pattern(apmd_t,apmd_var_run_t,apmd_var_run_t)
-manage_sock_files_pattern(apmd_t,apmd_var_run_t,apmd_var_run_t)
+manage_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
+manage_sock_files_pattern(apmd_t, apmd_var_run_t, apmd_var_run_t)
 files_pid_filetrans(apmd_t, apmd_var_run_t, { file sock_file })
 
 kernel_read_kernel_sysctls(apmd_t)
@@ -96,10 +92,10 @@ dev_dontaudit_getattr_all_blk_files(apmd_t) # Excessive?
 fs_dontaudit_list_tmpfs(apmd_t)
 fs_getattr_all_fs(apmd_t)
 fs_search_auto_mountpoints(apmd_t)
-fs_dontaudit_getattr_all_files(apmd_t); # Excessive?
-fs_dontaudit_getattr_all_symlinks(apmd_t); # Excessive?
-fs_dontaudit_getattr_all_pipes(apmd_t); # Excessive?
-fs_dontaudit_getattr_all_sockets(apmd_t); # Excessive?
+fs_dontaudit_getattr_all_files(apmd_t) # Excessive?
+fs_dontaudit_getattr_all_symlinks(apmd_t) # Excessive?
+fs_dontaudit_getattr_all_pipes(apmd_t) # Excessive?
+fs_dontaudit_getattr_all_sockets(apmd_t) # Excessive?
 
 selinux_search_fs(apmd_t)
 
@@ -124,9 +120,7 @@ init_rw_utmp(apmd_t)
 init_telinit(apmd_t)
 
 libs_exec_ld_so(apmd_t)
-libs_use_ld_so(apmd_t)
 libs_exec_lib_files(apmd_t)
-libs_use_shared_libs(apmd_t)
 
 logging_send_syslog_msg(apmd_t)
 
@@ -139,9 +133,8 @@ modutils_read_module_config(apmd_t)
 seutil_dontaudit_read_config(apmd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(apmd_t)
-userdom_dontaudit_search_all_users_home_content(apmd_t) # Excessive?
-
-sysadm_dontaudit_search_home_dirs(apmd_t)
+userdom_dontaudit_search_user_home_dirs(apmd_t)
+userdom_dontaudit_search_user_home_content(apmd_t) # Excessive?
 
 ifdef(`distro_redhat',`
 	allow apmd_t apmd_lock_t:file manage_file_perms;
@@ -168,9 +161,9 @@ ifdef(`distro_redhat',`
 ')
 
 ifdef(`distro_suse',`
-	manage_dirs_pattern(apmd_t,apmd_var_lib_t,apmd_var_lib_t)
-	manage_files_pattern(apmd_t,apmd_var_lib_t,apmd_var_lib_t)
-	files_var_lib_filetrans(apmd_t,apmd_var_lib_t,file)
+	manage_dirs_pattern(apmd_t, apmd_var_lib_t, apmd_var_lib_t)
+	manage_files_pattern(apmd_t, apmd_var_lib_t, apmd_var_lib_t)
+	files_var_lib_filetrans(apmd_t, apmd_var_lib_t, file)
 ')
 
 optional_policy(`
@@ -188,7 +181,11 @@ optional_policy(`
 ')
 
 optional_policy(`
-	dbus_stub(apmd_t)
+	dbus_system_bus_client(apmd_t)
+
+	optional_policy(`
+		consolekit_dbus_chat(apmd_t)
+	')
 
 	optional_policy(`
 		networkmanager_dbus_chat(apmd_t)
@@ -227,5 +224,5 @@ optional_policy(`
 
 # cjp: related to sleep/resume (?)
 optional_policy(`
-	xserver_domtrans_xdm_xserver(apmd_t)
+	xserver_domtrans(apmd_t)
 ')

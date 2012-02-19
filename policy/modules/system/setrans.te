@@ -1,5 +1,9 @@
 
-policy_module(setrans,1.4.0)
+policy_module(setrans, 1.5.1)
+
+gen_require(`
+	class context contains;
+')
 
 ########################################
 #
@@ -9,6 +13,9 @@ policy_module(setrans,1.4.0)
 type setrans_t;
 type setrans_exec_t;
 init_daemon_domain(setrans_t, setrans_exec_t)
+
+type setrans_initrc_exec_t;
+init_script_file(setrans_initrc_exec_t)
 
 type setrans_var_run_t;
 files_pid_file(setrans_var_run_t)
@@ -28,10 +35,11 @@ ifdef(`enable_mls',`
 #
 
 allow setrans_t self:capability sys_resource;
-allow setrans_t self:process { setrlimit setcap signal_perms };
+allow setrans_t self:process { setrlimit getcap setcap signal_perms };
 allow setrans_t self:unix_stream_socket create_stream_socket_perms;
 allow setrans_t self:unix_dgram_socket create_socket_perms;
 allow setrans_t self:netlink_selinux_socket create_socket_perms;
+allow setrans_t self:context contains;
 
 can_exec(setrans_t, setrans_exec_t)
 corecmd_search_bin(setrans_t)
@@ -65,9 +73,6 @@ term_dontaudit_use_generic_ptys(setrans_t)
 term_dontaudit_use_unallocated_ttys(setrans_t)
 
 init_dontaudit_use_script_ptys(setrans_t)
-
-libs_use_ld_so(setrans_t)
-libs_use_shared_libs(setrans_t)
 
 locallogin_dontaudit_use_fds(setrans_t)
 

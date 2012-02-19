@@ -2,18 +2,18 @@
 
 ########################################
 ## <summary>
-##      Execute clockspeed utilities in the clockspeed_cli domain.
+##	Execute clockspeed utilities in the clockspeed_cli domain.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`clockspeed_domtrans_cli',`
-        gen_require(`
-                type clockspeed_cli_t, clockspeed_cli_exec_t;
-        ')
+	gen_require(`
+		type clockspeed_cli_t, clockspeed_cli_exec_t;
+	')
 
 	domtrans_pattern($1, clockspeed_cli_exec_t, clockspeed_cli_t)
 ')
@@ -32,11 +32,6 @@ interface(`clockspeed_domtrans_cli',`
 ##	The role to be allowed the clockspeed_cli domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the clockspeed_cli domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`clockspeed_run_cli',`
@@ -46,6 +41,4 @@ interface(`clockspeed_run_cli',`
 
 	role $2 types clockspeed_cli_t;
 	clockspeed_domtrans_cli($1)
-	allow clockspeed_cli_t $3:chr_file { getattr read write ioctl };
-
 ')

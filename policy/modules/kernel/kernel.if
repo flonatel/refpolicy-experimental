@@ -57,7 +57,6 @@ interface(`kernel_ranged_domtrans_to',`
 		type kernel_t;
 	')
 
-
 	kernel_domtrans_to($1,$2)
 
 	ifdef(`enable_mcs',`
@@ -158,7 +157,7 @@ interface(`kernel_signal',`
 		type kernel_t;
 	')
 
-	allow kernel_t $1:process signal;
+	allow $1 kernel_t:process signal;
 ')
 
 ########################################
@@ -589,7 +588,7 @@ interface(`kernel_search_debugfs',`
 		type debugfs_t;
 	')
 
-	search_dirs_pattern($1,debugfs_t,debugfs_t)
+	search_dirs_pattern($1, debugfs_t, debugfs_t)
 ')
 
 ########################################
@@ -607,9 +606,9 @@ interface(`kernel_read_debugfs',`
 		type debugfs_t;
 	')
 
-	read_files_pattern($1,debugfs_t,debugfs_t)
-	read_lnk_files_pattern($1,debugfs_t,debugfs_t)
-	list_dirs_pattern($1,debugfs_t,debugfs_t)
+	read_files_pattern($1, debugfs_t, debugfs_t)
+	read_lnk_files_pattern($1, debugfs_t, debugfs_t)
+	list_dirs_pattern($1, debugfs_t, debugfs_t)
 ')
 
 ########################################
@@ -681,7 +680,7 @@ interface(`kernel_search_proc',`
 		type proc_t;
 	')
 
-	search_dirs_pattern($1,proc_t,proc_t)
+	search_dirs_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -699,7 +698,7 @@ interface(`kernel_list_proc',`
 		type proc_t;
 	')
 
-	list_dirs_pattern($1,proc_t,proc_t)
+	list_dirs_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -736,7 +735,7 @@ interface(`kernel_getattr_proc_files',`
 		type proc_t;
 	')
 
-	getattr_files_pattern($1,proc_t,proc_t)
+	getattr_files_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -754,7 +753,7 @@ interface(`kernel_read_proc_symlinks',`
 		type proc_t;
 	')
 
-	read_lnk_files_pattern($1,proc_t,proc_t)
+	read_lnk_files_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -773,10 +772,10 @@ interface(`kernel_read_system_state',`
 		type proc_t;
 	')
 
-	read_files_pattern($1,proc_t,proc_t)
-	read_lnk_files_pattern($1,proc_t,proc_t)
+	read_files_pattern($1, proc_t, proc_t)
+	read_lnk_files_pattern($1, proc_t, proc_t)
 
-	list_dirs_pattern($1,proc_t,proc_t)
+	list_dirs_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -799,7 +798,7 @@ interface(`kernel_write_proc_files',`
 		type proc_t;
 	')
 
-	write_files_pattern($1,proc_t,proc_t)
+	write_files_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -818,7 +817,7 @@ interface(`kernel_dontaudit_read_system_state',`
 		type proc_t;
 	')
 
-	dontaudit $1 proc_t:file { getattr read };
+	dontaudit $1 proc_t:file read_file_perms;
 ')
 
 ########################################
@@ -856,8 +855,8 @@ interface(`kernel_rw_afs_state',`
 		type proc_t, proc_afs_t;
 	')
 
-	list_dirs_pattern($1,proc_t,proc_t)
-	rw_files_pattern($1,proc_afs_t,proc_afs_t)
+	list_dirs_pattern($1, proc_t, proc_t)
+	rw_files_pattern($1, proc_afs_t, proc_afs_t)
 ')
 
 #######################################
@@ -876,9 +875,9 @@ interface(`kernel_read_software_raid_state',`
 		type proc_t, proc_mdstat_t;
 	')
 
-	read_files_pattern($1,proc_t,proc_mdstat_t)
+	read_files_pattern($1, proc_t, proc_mdstat_t)
 
-	list_dirs_pattern($1,proc_t,proc_t)
+	list_dirs_pattern($1, proc_t, proc_t)
 ')
 
 #######################################
@@ -896,9 +895,9 @@ interface(`kernel_rw_software_raid_state',`
 		type proc_t, proc_mdstat_t;
 	')
 
-	rw_files_pattern($1,proc_t,proc_mdstat_t)
+	rw_files_pattern($1, proc_t, proc_mdstat_t)
 
-	list_dirs_pattern($1,proc_t,proc_t)
+	list_dirs_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -916,9 +915,9 @@ interface(`kernel_getattr_core_if',`
 		type proc_t, proc_kcore_t;
 	')
 
-	getattr_files_pattern($1,proc_t,proc_kcore_t)
+	getattr_files_pattern($1, proc_t, proc_kcore_t)
 
-	list_dirs_pattern($1,proc_t,proc_t)
+	list_dirs_pattern($1, proc_t, proc_t)
 ')
 
 ########################################
@@ -957,7 +956,7 @@ interface(`kernel_read_messages',`
 		type proc_kmsg_t, proc_t;
 	')
 
-	read_files_pattern($1,proc_t,proc_kmsg_t)
+	read_files_pattern($1, proc_t, proc_kmsg_t)
 
 	typeattribute $1 can_receive_kernel_messages;
 ')
@@ -978,7 +977,7 @@ interface(`kernel_getattr_message_if',`
 		type proc_kmsg_t, proc_t;
 	')
 
-	getattr_files_pattern($1,proc_t,proc_kmsg_t)
+	getattr_files_pattern($1, proc_t, proc_kmsg_t)
 ')
 
 ########################################
@@ -1036,7 +1035,7 @@ interface(`kernel_search_network_state',`
 		type proc_net_t;
 	')
 
-	search_dirs_pattern($1,proc_t,proc_net_t)
+	search_dirs_pattern($1, proc_t, proc_net_t)
 ')
 
 ########################################
@@ -1055,10 +1054,10 @@ interface(`kernel_read_network_state',`
 		type proc_t, proc_net_t;
 	')
 
-	read_files_pattern($1,{ proc_t proc_net_t },proc_net_t)
-	read_lnk_files_pattern($1,{ proc_t proc_net_t },proc_net_t)
+	read_files_pattern($1, { proc_t proc_net_t }, proc_net_t)
+	read_lnk_files_pattern($1, { proc_t proc_net_t }, proc_net_t)
 
-	list_dirs_pattern($1,proc_t,proc_net_t)
+	list_dirs_pattern($1, proc_t, proc_net_t)
 ')
 
 ########################################
@@ -1076,9 +1075,9 @@ interface(`kernel_read_network_state_symlinks',`
 		type proc_t, proc_net_t;
 	')
 
-	read_lnk_files_pattern($1,{ proc_t proc_net_t },proc_net_t)
+	read_lnk_files_pattern($1, { proc_t proc_net_t }, proc_net_t)
 
-	list_dirs_pattern($1,proc_t,proc_net_t)
+	list_dirs_pattern($1, proc_t, proc_net_t)
 ')
 
 ########################################
@@ -1097,7 +1096,7 @@ interface(`kernel_search_xen_state',`
 		type proc_t, proc_xen_t;
 	')
 
-	search_dirs_pattern($1,proc_t,proc_xen_t)
+	search_dirs_pattern($1, proc_t, proc_xen_t)
 ')
 
 ########################################
@@ -1136,10 +1135,10 @@ interface(`kernel_read_xen_state',`
 		type proc_t, proc_xen_t;
 	')
 
-	read_files_pattern($1,{ proc_t proc_xen_t },proc_xen_t)
-	read_lnk_files_pattern($1,{ proc_t proc_xen_t },proc_xen_t)
+	read_files_pattern($1, { proc_t proc_xen_t }, proc_xen_t)
+	read_lnk_files_pattern($1, { proc_t proc_xen_t }, proc_xen_t)
 
-	list_dirs_pattern($1,proc_t,proc_xen_t)
+	list_dirs_pattern($1, proc_t, proc_xen_t)
 ')
 
 ########################################
@@ -1158,9 +1157,9 @@ interface(`kernel_read_xen_state_symlinks',`
 		type proc_t, proc_xen_t;
 	')
 
-	read_lnk_files_pattern($1,{ proc_t proc_xen_t },proc_xen_t)
+	read_lnk_files_pattern($1, { proc_t proc_xen_t }, proc_xen_t)
 
-	list_dirs_pattern($1,proc_t,proc_xen_t)
+	list_dirs_pattern($1, proc_t, proc_xen_t)
 ')
 
 ########################################
@@ -1179,7 +1178,26 @@ interface(`kernel_write_xen_state',`
 		type proc_t, proc_xen_t;
 	')
 
-	write_files_pattern($1,{ proc_t proc_xen_t },proc_xen_t)
+	write_files_pattern($1, { proc_t proc_xen_t }, proc_xen_t)
+')
+
+########################################
+## <summary>
+##	Allow attempts to list all proc directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_list_all_proc',`
+	gen_require(`
+		attribute proc_type;
+	')
+
+	allow $1 proc_type:dir list_dir_perms;
+	allow $1 proc_type:file getattr;
 ')
 
 ########################################
@@ -1198,6 +1216,7 @@ interface(`kernel_dontaudit_list_all_proc',`
 	')
 
 	dontaudit $1 proc_type:dir list_dir_perms;
+	dontaudit $1 proc_type:file getattr;
 ')
 
 ########################################
@@ -1233,10 +1252,11 @@ interface(`kernel_dontaudit_search_sysctl',`
 #
 interface(`kernel_read_sysctl',`
 	gen_require(`
-		type sysctl_t;
+		type sysctl_t, proc_t;
 	')
 
-	list_dirs_pattern($1,proc_t,sysctl_t)
+	list_dirs_pattern($1, proc_t, sysctl_t)
+	read_files_pattern($1, sysctl_t, sysctl_t)
 ')
 
 ########################################
@@ -1255,9 +1275,9 @@ interface(`kernel_read_device_sysctls',`
 		type proc_t, sysctl_t, sysctl_dev_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_dev_t },sysctl_dev_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_dev_t }, sysctl_dev_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_dev_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_dev_t)
 ')
 
 ########################################
@@ -1276,9 +1296,9 @@ interface(`kernel_rw_device_sysctls',`
 		type proc_t, sysctl_t, sysctl_dev_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_dev_t },sysctl_dev_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_dev_t }, sysctl_dev_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_dev_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_dev_t)
 ')
 
 ########################################
@@ -1296,7 +1316,7 @@ interface(`kernel_search_vm_sysctl',`
 		type proc_t, sysctl_t, sysctl_vm_t;
 	')
 
-	search_dirs_pattern($1,{ proc_t sysctl_t },sysctl_vm_t)
+	search_dirs_pattern($1, { proc_t sysctl_t }, sysctl_vm_t)
 ')
 
 ########################################
@@ -1315,9 +1335,9 @@ interface(`kernel_read_vm_sysctls',`
 		type proc_t, sysctl_t, sysctl_vm_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_vm_t },sysctl_vm_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_vm_t }, sysctl_vm_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_vm_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_vm_t)
 ')
 
 ########################################
@@ -1336,8 +1356,8 @@ interface(`kernel_rw_vm_sysctls',`
 		type proc_t, sysctl_t, sysctl_vm_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_vm_t },sysctl_vm_t)
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_vm_t)
+	rw_files_pattern($1 ,{ proc_t sysctl_t sysctl_vm_t }, sysctl_vm_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_vm_t)
 
 	# hal needs this
 	allow $1 sysctl_vm_t:dir write;
@@ -1358,7 +1378,7 @@ interface(`kernel_search_network_sysctl',`
 		type proc_t, sysctl_t, sysctl_net_t;
 	')
 
-	search_dirs_pattern($1,{ proc_t sysctl_t },sysctl_net_t)
+	search_dirs_pattern($1, { proc_t sysctl_t }, sysctl_net_t)
 ')
 
 ########################################
@@ -1395,9 +1415,9 @@ interface(`kernel_read_net_sysctls',`
 		type proc_t, sysctl_t, sysctl_net_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_net_t },sysctl_net_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_net_t }, sysctl_net_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_net_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_net_t)
 ')
 
 ########################################
@@ -1416,9 +1436,9 @@ interface(`kernel_rw_net_sysctls',`
 		type proc_t, sysctl_t, sysctl_net_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_net_t },sysctl_net_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_net_t }, sysctl_net_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_net_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_net_t)
 ')
 
 ########################################
@@ -1438,9 +1458,9 @@ interface(`kernel_read_unix_sysctls',`
 		type proc_t, sysctl_t, sysctl_net_t, sysctl_net_unix_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_net_t },sysctl_net_unix_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_net_t }, sysctl_net_unix_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_net_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_net_t)
 ')
 
 ########################################
@@ -1460,9 +1480,9 @@ interface(`kernel_rw_unix_sysctls',`
 		type proc_t, sysctl_t, sysctl_net_t, sysctl_net_unix_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_net_t },sysctl_net_unix_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_net_t }, sysctl_net_unix_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_net_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_net_t)
 ')
 
 ########################################
@@ -1481,9 +1501,9 @@ interface(`kernel_read_hotplug_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t, sysctl_hotplug_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_hotplug_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_hotplug_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1502,9 +1522,9 @@ interface(`kernel_rw_hotplug_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t, sysctl_hotplug_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_hotplug_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_hotplug_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1523,9 +1543,9 @@ interface(`kernel_read_modprobe_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t, sysctl_modprobe_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_modprobe_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_modprobe_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1544,9 +1564,9 @@ interface(`kernel_rw_modprobe_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t, sysctl_modprobe_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_modprobe_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_modprobe_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1569,6 +1589,25 @@ interface(`kernel_dontaudit_search_kernel_sysctl',`
 
 ########################################
 ## <summary>
+##	Read generic crypto sysctls.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_read_crypto_sysctls',`
+	gen_require(`
+		type proc_t, sysctl_t, sysctl_crypto_t;
+	')
+
+	read_files_pattern($1, { proc_t sysctl_t sysctl_crypto_t }, sysctl_crypto_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_crypto_t)
+')
+
+########################################
+## <summary>
 ##	Read generic kernel sysctls.
 ## </summary>
 ## <param name="domain">
@@ -1582,9 +1621,9 @@ interface(`kernel_read_kernel_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_kernel_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_kernel_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1621,9 +1660,9 @@ interface(`kernel_rw_kernel_sysctl',`
 		type proc_t, sysctl_t, sysctl_kernel_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_kernel_t },sysctl_kernel_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_kernel_t }, sysctl_kernel_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_kernel_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_kernel_t)
 ')
 
 ########################################
@@ -1642,9 +1681,9 @@ interface(`kernel_read_fs_sysctls',`
 		type proc_t, sysctl_t, sysctl_fs_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_t sysctl_fs_t },sysctl_fs_t)
+	read_files_pattern($1, { proc_t sysctl_t sysctl_fs_t }, sysctl_fs_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_fs_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_fs_t)
 ')
 
 ########################################
@@ -1663,9 +1702,9 @@ interface(`kernel_rw_fs_sysctls',`
 		type proc_t, sysctl_t, sysctl_fs_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_t sysctl_fs_t },sysctl_fs_t)
+	rw_files_pattern($1, { proc_t sysctl_t sysctl_fs_t }, sysctl_fs_t)
 
-	list_dirs_pattern($1,{ proc_t sysctl_t },sysctl_fs_t)
+	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_fs_t)
 ')
 
 ########################################
@@ -1684,9 +1723,9 @@ interface(`kernel_read_irq_sysctls',`
 		type proc_t, sysctl_irq_t;
 	')
 
-	read_files_pattern($1,{ proc_t sysctl_irq_t },sysctl_irq_t)
+	read_files_pattern($1, { proc_t sysctl_irq_t }, sysctl_irq_t)
 
-	list_dirs_pattern($1,proc_t,sysctl_irq_t)
+	list_dirs_pattern($1, proc_t, sysctl_irq_t)
 ')
 
 ########################################
@@ -1705,9 +1744,9 @@ interface(`kernel_rw_irq_sysctls',`
 		type proc_t, sysctl_irq_t;
 	')
 
-	rw_files_pattern($1,{ proc_t sysctl_irq_t },sysctl_irq_t)
+	rw_files_pattern($1, { proc_t sysctl_irq_t }, sysctl_irq_t)
 
-	list_dirs_pattern($1,proc_t,sysctl_irq_t)
+	list_dirs_pattern($1, proc_t, sysctl_irq_t)
 ')
 
 ########################################
@@ -1726,9 +1765,9 @@ interface(`kernel_read_rpc_sysctls',`
 		type proc_t, proc_net_t, sysctl_rpc_t;
 	')
 
-	read_files_pattern($1,{ proc_t proc_net_t sysctl_rpc_t },sysctl_rpc_t)
+	read_files_pattern($1, { proc_t proc_net_t sysctl_rpc_t }, sysctl_rpc_t)
 
-	list_dirs_pattern($1,{ proc_t proc_net_t },sysctl_rpc_t)
+	list_dirs_pattern($1, { proc_t proc_net_t }, sysctl_rpc_t)
 ')
 
 ########################################
@@ -1747,9 +1786,9 @@ interface(`kernel_rw_rpc_sysctls',`
 		type proc_t, proc_net_t, sysctl_rpc_t;
 	')
 
-	rw_files_pattern($1,{ proc_t proc_net_t sysctl_rpc_t },sysctl_rpc_t)
+	rw_files_pattern($1, { proc_t proc_net_t sysctl_rpc_t }, sysctl_rpc_t)
 
-	list_dirs_pattern($1,{ proc_t proc_net_t },sysctl_rpc_t)
+	list_dirs_pattern($1, { proc_t proc_net_t }, sysctl_rpc_t)
 ')
 
 ########################################
@@ -1768,6 +1807,7 @@ interface(`kernel_dontaudit_list_all_sysctls',`
 	')
 
 	dontaudit $1 sysctl_type:dir list_dir_perms;
+	dontaudit $1 sysctl_type:file getattr;
 ')
 
 ########################################
@@ -1788,9 +1828,9 @@ interface(`kernel_read_all_sysctls',`
 	')
 
 	# proc_net_t for /proc/net/rpc sysctls
-	read_files_pattern($1,{ proc_t proc_net_t sysctl_type },sysctl_type)
+	read_files_pattern($1, { proc_t proc_net_t sysctl_type }, sysctl_type)
 
-	list_dirs_pattern($1,{ proc_t proc_net_t },sysctl_type)
+	list_dirs_pattern($1, { proc_t proc_net_t }, sysctl_type)
 ')
 
 ########################################
@@ -1811,7 +1851,7 @@ interface(`kernel_rw_all_sysctls',`
 	')
 
 	# proc_net_t for /proc/net/rpc sysctls
-	rw_files_pattern($1,{ proc_t proc_net_t sysctl_type },sysctl_type)
+	rw_files_pattern($1, { proc_t proc_net_t sysctl_type }, sysctl_type)
 
 	allow $1 sysctl_type:dir list_dir_perms;
 	# why is setattr needed?
@@ -1942,10 +1982,9 @@ interface(`kernel_read_unlabeled_state',`
 	')
 
 	allow $1 unlabeled_t:dir list_dir_perms;
-	read_files_pattern($1,unlabeled_t,unlabeled_t)
-	read_lnk_files_pattern($1,unlabeled_t,unlabeled_t)
+	read_files_pattern($1, unlabeled_t, unlabeled_t)
+	read_lnk_files_pattern($1, unlabeled_t, unlabeled_t)
 ')
-
 
 ########################################
 ## <summary>
@@ -2149,7 +2188,7 @@ interface(`kernel_relabelfrom_unlabeled_dirs',`
 		type unlabeled_t;
 	')
 
-	allow $1 unlabeled_t:dir { getattr search read relabelfrom };
+	allow $1 unlabeled_t:dir { list_dir_perms relabelfrom };
 ')
 
 ########################################
@@ -2299,12 +2338,12 @@ interface(`kernel_dontaudit_sendrecv_unlabeled_association',`
 
 ########################################
 ## <summary>
-##      Receive TCP packets from an unlabeled connection.
+##	Receive TCP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive TCP packets from an unlabeled connection.
-##      </p>
+##	Receive TCP packets from an unlabeled connection.
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_tcp_recv_unlabeled() should
 ##	be used instead of this one.
@@ -2326,14 +2365,14 @@ interface(`kernel_tcp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive TCP packets from an unlabeled
+##	Do not audit attempts to receive TCP packets from an unlabeled
 ##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive TCP packets from an unlabeled
+##	Do not audit attempts to receive TCP packets from an unlabeled
 ##	connection.
-##      </p>
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_dontaudit_tcp_recv_unlabeled()
 ##	should be used instead of this one.
@@ -2355,12 +2394,12 @@ interface(`kernel_dontaudit_tcp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Receive UDP packets from an unlabeled connection.
+##	Receive UDP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive UDP packets from an unlabeled connection.
-##      </p>
+##	Receive UDP packets from an unlabeled connection.
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_udp_recv_unlabeled() should
 ##	be used instead of this one.
@@ -2382,14 +2421,14 @@ interface(`kernel_udp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive UDP packets from an unlabeled
+##	Do not audit attempts to receive UDP packets from an unlabeled
 ##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive UDP packets from an unlabeled
+##	Do not audit attempts to receive UDP packets from an unlabeled
 ##	connection.
-##      </p>
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_dontaudit_udp_recv_unlabeled()
 ##	should be used instead of this one.
@@ -2411,12 +2450,12 @@ interface(`kernel_dontaudit_udp_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Receive Raw IP packets from an unlabeled connection.
+##	Receive Raw IP packets from an unlabeled connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Receive Raw IP packets from an unlabeled connection.
-##      </p>
+##	Receive Raw IP packets from an unlabeled connection.
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_raw_recv_unlabeled() should
 ##	be used instead of this one.
@@ -2438,14 +2477,14 @@ interface(`kernel_raw_recvfrom_unlabeled',`
 
 ########################################
 ## <summary>
-##      Do not audit attempts to receive Raw IP packets from an unlabeled
+##	Do not audit attempts to receive Raw IP packets from an unlabeled
 ##	connection.
 ## </summary>
 ## <desc>
 ##	<p>
-##      Do not audit attempts to receive Raw IP packets from an unlabeled
+##	Do not audit attempts to receive Raw IP packets from an unlabeled
 ##	connection.
-##      </p>
+##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_dontaudit_raw_recv_unlabeled()
 ##	should be used instead of this one.
@@ -2502,7 +2541,7 @@ interface(`kernel_sendrecv_unlabeled_packets',`
 ## <desc>
 ##	<p>
 ##	Receive packets from an unlabeled peer, these packets do not have any
-##      peer labeling information present.
+##	peer labeling information present.
 ##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_recvfrom_unlabeled_peer() should
@@ -2530,7 +2569,7 @@ interface(`kernel_recvfrom_unlabeled_peer',`
 ## <desc>
 ##	<p>
 ##	Do not audit attempts to receive packets from an unlabeled peer,
-##      these packets do not have any peer labeling information present.
+##	these packets do not have any peer labeling information present.
 ##	</p>
 ##	<p>
 ##	The corenetwork interface corenet_dontaudit_*_recvfrom_unlabeled()
@@ -2553,12 +2592,12 @@ interface(`kernel_dontaudit_recvfrom_unlabeled_peer',`
 
 ########################################
 ## <summary>
-##      Relabel from unlabeled database objects.
+##	Relabel from unlabeled database objects.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`kernel_relabelfrom_unlabeled_database',`

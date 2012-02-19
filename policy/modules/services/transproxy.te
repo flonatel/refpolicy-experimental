@@ -1,5 +1,5 @@
 
-policy_module(transproxy, 1.5.0)
+policy_module(transproxy, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(transproxy, 1.5.0)
 
 type transproxy_t;
 type transproxy_exec_t;
-init_daemon_domain(transproxy_t,transproxy_exec_t)
+init_daemon_domain(transproxy_t, transproxy_exec_t)
 
 type transproxy_var_run_t;
 files_pid_file(transproxy_var_run_t)
@@ -23,8 +23,8 @@ dontaudit transproxy_t self:capability sys_tty_config;
 allow transproxy_t self:process signal_perms;
 allow transproxy_t self:tcp_socket create_stream_socket_perms;
 
-manage_files_pattern(transproxy_t,transproxy_var_run_t,transproxy_var_run_t)
-files_pid_filetrans(transproxy_t,transproxy_var_run_t,file)
+manage_files_pattern(transproxy_t, transproxy_var_run_t, transproxy_var_run_t)
+files_pid_filetrans(transproxy_t, transproxy_var_run_t, file)
 
 kernel_read_kernel_sysctls(transproxy_t)
 kernel_list_proc(transproxy_t)
@@ -33,9 +33,9 @@ kernel_read_proc_symlinks(transproxy_t)
 corenet_all_recvfrom_unlabeled(transproxy_t)
 corenet_all_recvfrom_netlabel(transproxy_t)
 corenet_tcp_sendrecv_generic_if(transproxy_t)
-corenet_tcp_sendrecv_all_nodes(transproxy_t)
+corenet_tcp_sendrecv_generic_node(transproxy_t)
 corenet_tcp_sendrecv_all_ports(transproxy_t)
-corenet_tcp_bind_all_nodes(transproxy_t)
+corenet_tcp_bind_generic_node(transproxy_t)
 corenet_tcp_bind_transproxy_port(transproxy_t)
 corenet_sendrecv_transproxy_server_packets(transproxy_t)
 
@@ -48,9 +48,6 @@ files_read_etc_files(transproxy_t)
 fs_getattr_all_fs(transproxy_t)
 fs_search_auto_mountpoints(transproxy_t)
 
-libs_use_ld_so(transproxy_t)
-libs_use_shared_libs(transproxy_t)
-
 logging_send_syslog_msg(transproxy_t)
 
 miscfiles_read_localization(transproxy_t)
@@ -58,8 +55,7 @@ miscfiles_read_localization(transproxy_t)
 sysnet_read_config(transproxy_t)
 
 userdom_dontaudit_use_unpriv_user_fds(transproxy_t)
-
-sysadm_dontaudit_search_home_dirs(transproxy_t)
+userdom_dontaudit_search_user_home_dirs(transproxy_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(transproxy_t)

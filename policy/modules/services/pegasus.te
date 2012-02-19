@@ -1,5 +1,5 @@
 
-policy_module(pegasus, 1.6.0)
+policy_module(pegasus, 1.7.2)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(pegasus, 1.6.0)
 
 type pegasus_t;
 type pegasus_exec_t;
-init_daemon_domain(pegasus_t,pegasus_exec_t)
+init_daemon_domain(pegasus_t, pegasus_exec_t)
 
 type pegasus_data_t;
 files_type(pegasus_data_t)
@@ -42,24 +42,24 @@ allow pegasus_t pegasus_conf_t:dir rw_dir_perms;
 allow pegasus_t pegasus_conf_t:file { read_file_perms link unlink };
 allow pegasus_t pegasus_conf_t:lnk_file read_lnk_file_perms;
 
-manage_dirs_pattern(pegasus_t,pegasus_data_t,pegasus_data_t)
-manage_files_pattern(pegasus_t,pegasus_data_t,pegasus_data_t)
-manage_lnk_files_pattern(pegasus_t,pegasus_data_t,pegasus_data_t)
-filetrans_pattern(pegasus_t,pegasus_conf_t,pegasus_data_t,{ file dir })
+manage_dirs_pattern(pegasus_t, pegasus_data_t, pegasus_data_t)
+manage_files_pattern(pegasus_t, pegasus_data_t, pegasus_data_t)
+manage_lnk_files_pattern(pegasus_t, pegasus_data_t, pegasus_data_t)
+filetrans_pattern(pegasus_t, pegasus_conf_t, pegasus_data_t, { file dir })
 
-can_exec(pegasus_t,pegasus_exec_t)
+can_exec(pegasus_t, pegasus_exec_t)
 
 allow pegasus_t pegasus_mof_t:dir list_dir_perms;
-read_files_pattern(pegasus_t,pegasus_mof_t,pegasus_mof_t)
-read_lnk_files_pattern(pegasus_t,pegasus_mof_t,pegasus_mof_t)
+read_files_pattern(pegasus_t, pegasus_mof_t, pegasus_mof_t)
+read_lnk_files_pattern(pegasus_t, pegasus_mof_t, pegasus_mof_t)
 
-manage_dirs_pattern(pegasus_t,pegasus_tmp_t,pegasus_tmp_t)
-manage_files_pattern(pegasus_t,pegasus_tmp_t,pegasus_tmp_t)
+manage_dirs_pattern(pegasus_t, pegasus_tmp_t, pegasus_tmp_t)
+manage_files_pattern(pegasus_t, pegasus_tmp_t, pegasus_tmp_t)
 files_tmp_filetrans(pegasus_t, pegasus_tmp_t, { file dir })
 
 allow pegasus_t pegasus_var_run_t:sock_file { create setattr unlink };
-manage_files_pattern(pegasus_t,pegasus_var_run_t,pegasus_var_run_t)
-files_pid_filetrans(pegasus_t,pegasus_var_run_t,file)
+manage_files_pattern(pegasus_t, pegasus_var_run_t, pegasus_var_run_t)
+files_pid_filetrans(pegasus_t, pegasus_var_run_t, file)
 
 kernel_read_kernel_sysctls(pegasus_t)
 kernel_read_fs_sysctls(pegasus_t)
@@ -69,10 +69,10 @@ kernel_read_net_sysctls(pegasus_t)
 
 corenet_all_recvfrom_unlabeled(pegasus_t)
 corenet_all_recvfrom_netlabel(pegasus_t)
-corenet_tcp_sendrecv_all_if(pegasus_t)
-corenet_tcp_sendrecv_all_nodes(pegasus_t)
+corenet_tcp_sendrecv_generic_if(pegasus_t)
+corenet_tcp_sendrecv_generic_node(pegasus_t)
 corenet_tcp_sendrecv_all_ports(pegasus_t)
-corenet_tcp_bind_all_nodes(pegasus_t)
+corenet_tcp_bind_generic_node(pegasus_t)
 corenet_tcp_bind_pegasus_http_port(pegasus_t)
 corenet_tcp_bind_pegasus_https_port(pegasus_t)
 corenet_tcp_connect_pegasus_http_port(pegasus_t)
@@ -110,9 +110,6 @@ hostname_exec(pegasus_t)
 init_rw_utmp(pegasus_t)
 init_stream_connect_script(pegasus_t)
 
-libs_use_ld_so(pegasus_t)
-libs_use_shared_libs(pegasus_t)
-
 logging_send_audit_msgs(pegasus_t)
 logging_send_syslog_msg(pegasus_t)
 
@@ -122,8 +119,7 @@ sysnet_read_config(pegasus_t)
 sysnet_domtrans_ifconfig(pegasus_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pegasus_t)
-
-sysadm_dontaudit_search_home_dirs(pegasus_t)
+userdom_dontaudit_search_user_home_dirs(pegasus_t)
 
 optional_policy(`
 	rpm_exec(pegasus_t)

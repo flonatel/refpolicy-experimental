@@ -1,5 +1,5 @@
 
-policy_module(automount, 1.9.0)
+policy_module(automount, 1.11.1)
 
 ########################################
 #
@@ -8,7 +8,10 @@ policy_module(automount, 1.9.0)
 
 type automount_t;
 type automount_exec_t;
-init_daemon_domain(automount_t,automount_exec_t)
+init_daemon_domain(automount_t, automount_exec_t)
+
+type automount_initrc_exec_t;
+init_script_file(automount_initrc_exec_t)
 
 type automount_var_run_t;
 files_pid_file(automount_var_run_t)
@@ -35,24 +38,23 @@ allow automount_t self:tcp_socket create_stream_socket_perms;
 allow automount_t self:udp_socket create_socket_perms;
 allow automount_t self:rawip_socket create_socket_perms;
 
-allow automount_t self:netlink_route_socket r_netlink_socket_perms;
-
 can_exec(automount_t, automount_exec_t)
 
 allow automount_t automount_lock_t:file manage_file_perms;
-files_lock_filetrans(automount_t,automount_lock_t,file)
+files_lock_filetrans(automount_t, automount_lock_t, file)
 
-manage_dirs_pattern(automount_t,automount_tmp_t,automount_tmp_t)
-manage_files_pattern(automount_t,automount_tmp_t,automount_tmp_t)
+manage_dirs_pattern(automount_t, automount_tmp_t, automount_tmp_t)
+manage_files_pattern(automount_t, automount_tmp_t, automount_tmp_t)
 files_tmp_filetrans(automount_t, automount_tmp_t, { file dir })
 
 # Allow automount to create and delete directories in / and /home
 allow automount_t automount_tmp_t:dir manage_dir_perms;
-files_home_filetrans(automount_t,automount_tmp_t,dir)
-files_root_filetrans(automount_t,automount_tmp_t,dir)
+files_home_filetrans(automount_t, automount_tmp_t, dir)
+files_root_filetrans(automount_t, automount_tmp_t, dir)
 
-manage_files_pattern(automount_t,automount_var_run_t,automount_var_run_t)
-files_pid_filetrans(automount_t,automount_var_run_t,file)
+manage_files_pattern(automount_t, automount_var_run_t, automount_var_run_t)
+manage_fifo_files_pattern(automount_t, automount_var_run_t, automount_var_run_t)
+files_pid_filetrans(automount_t, automount_var_run_t, { file fifo_file })
 
 kernel_read_kernel_sysctls(automount_t)
 kernel_read_irq_sysctls(automount_t)
@@ -80,12 +82,12 @@ corenet_all_recvfrom_unlabeled(automount_t)
 corenet_all_recvfrom_netlabel(automount_t)
 corenet_tcp_sendrecv_generic_if(automount_t)
 corenet_udp_sendrecv_generic_if(automount_t)
-corenet_tcp_sendrecv_all_nodes(automount_t)
-corenet_udp_sendrecv_all_nodes(automount_t)
+corenet_tcp_sendrecv_generic_node(automount_t)
+corenet_udp_sendrecv_generic_node(automount_t)
 corenet_tcp_sendrecv_all_ports(automount_t)
 corenet_udp_sendrecv_all_ports(automount_t)
-corenet_tcp_bind_all_nodes(automount_t)
-corenet_udp_bind_all_nodes(automount_t)
+corenet_tcp_bind_generic_node(automount_t)
+corenet_udp_bind_generic_node(automount_t)
 corenet_tcp_connect_portmap_port(automount_t)
 corenet_tcp_connect_all_ports(automount_t)
 corenet_dontaudit_tcp_connect_all_reserved_ports(automount_t)
@@ -126,10 +128,11 @@ fs_unmount_autofs(automount_t)
 fs_mount_autofs(automount_t)
 fs_manage_autofs_symlinks(automount_t)
 
+storage_rw_fuse(automount_t)
+
 term_dontaudit_getattr_pty_dirs(automount_t)
 
-libs_use_ld_so(automount_t)
-libs_use_shared_libs(automount_t)
+auth_use_nsswitch(automount_t)
 
 logging_send_syslog_msg(automount_t)
 logging_search_logs(automount_t)
@@ -140,13 +143,8 @@ miscfiles_read_certs(automount_t)
 # Run mount in the mount_t domain.
 mount_domtrans(automount_t)
 
-sysnet_dns_name_resolve(automount_t)
-sysnet_use_ldap(automount_t)
-sysnet_read_config(automount_t)
-
 userdom_dontaudit_use_unpriv_user_fds(automount_t)
-
-sysadm_dontaudit_search_home_dirs(automount_t)
+userdom_dontaudit_search_user_home_dirs(automount_t)
 
 optional_policy(`
 	bind_search_cache(automount_t)
@@ -163,11 +161,12 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nis_use_ypbind(automount_t)
+	rpc_search_nfs_state_data(automount_t)
 ')
 
 optional_policy(`
-	rpc_search_nfs_state_data(automount_t)
+	samba_read_config(automount_t)
+	samba_manage_var_files(automount_t)
 ')
 
 optional_policy(`

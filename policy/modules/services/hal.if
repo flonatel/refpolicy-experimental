@@ -15,7 +15,46 @@ interface(`hal_domtrans',`
 		type hald_t, hald_exec_t;
 	')
 
-	domtrans_pattern($1,hald_exec_t,hald_t)
+	domtrans_pattern($1, hald_exec_t, hald_t)
+')
+
+########################################
+## <summary>
+##	Get the attributes of a hal process.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`hal_getattr',`
+	gen_require(`
+		type hald_t;
+	')
+
+	allow $1 hald_t:process getattr;
+')
+
+########################################
+## <summary>
+##	Read hal system state
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`hal_read_state',`
+	gen_require(`
+		type hald_t;
+	')
+
+	allow $1 hald_t:dir list_dir_perms;
+	read_files_pattern($1, hald_t, hald_t)
+	read_lnk_files_pattern($1, hald_t, hald_t)
+	dontaudit $1 hald_t:process ptrace;
 ')
 
 ########################################
@@ -282,7 +321,6 @@ interface(`hal_read_pid_files',`
 	files_search_pids($1)
 	allow $1 hald_var_run_t:file read_file_perms;
 ')
-
 
 ########################################
 ## <summary>

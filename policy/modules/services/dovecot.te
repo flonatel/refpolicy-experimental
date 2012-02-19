@@ -1,5 +1,5 @@
 
-policy_module(dovecot, 1.9.0)
+policy_module(dovecot, 1.10.2)
 
 ########################################
 #
@@ -7,12 +7,12 @@ policy_module(dovecot, 1.9.0)
 #
 type dovecot_t;
 type dovecot_exec_t;
-init_daemon_domain(dovecot_t,dovecot_exec_t)
+init_daemon_domain(dovecot_t, dovecot_exec_t)
 
 type dovecot_auth_t;
 type dovecot_auth_exec_t;
 domain_type(dovecot_auth_t)
-domain_entry_file(dovecot_auth_t,dovecot_auth_exec_t)
+domain_entry_file(dovecot_auth_t, dovecot_auth_exec_t)
 role system_r types dovecot_auth_t;
 
 type dovecot_cert_t;
@@ -50,31 +50,31 @@ allow dovecot_t self:unix_stream_socket { create_stream_socket_perms connectto }
 domtrans_pattern(dovecot_t, dovecot_auth_exec_t, dovecot_auth_t)
 
 allow dovecot_t dovecot_cert_t:dir list_dir_perms;
-read_files_pattern(dovecot_t,dovecot_cert_t,dovecot_cert_t)
-read_lnk_files_pattern(dovecot_t,dovecot_cert_t,dovecot_cert_t)
+read_files_pattern(dovecot_t, dovecot_cert_t, dovecot_cert_t)
+read_lnk_files_pattern(dovecot_t, dovecot_cert_t, dovecot_cert_t)
 
 allow dovecot_t dovecot_etc_t:file read_file_perms;
 files_search_etc(dovecot_t)
 
 can_exec(dovecot_t, dovecot_exec_t)
 
-manage_dirs_pattern(dovecot_t,dovecot_spool_t,dovecot_spool_t)
-manage_files_pattern(dovecot_t,dovecot_spool_t,dovecot_spool_t)
-manage_lnk_files_pattern(dovecot_t,dovecot_spool_t,dovecot_spool_t)
+manage_dirs_pattern(dovecot_t, dovecot_spool_t, dovecot_spool_t)
+manage_files_pattern(dovecot_t, dovecot_spool_t, dovecot_spool_t)
+manage_lnk_files_pattern(dovecot_t, dovecot_spool_t, dovecot_spool_t)
 
-manage_files_pattern(dovecot_t,dovecot_var_run_t,dovecot_var_run_t)
-manage_sock_files_pattern(dovecot_t,dovecot_var_run_t,dovecot_var_run_t)
-files_pid_filetrans(dovecot_t,dovecot_var_run_t,file)
+manage_files_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
+manage_sock_files_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
+files_pid_filetrans(dovecot_t, dovecot_var_run_t, file)
 
 kernel_read_kernel_sysctls(dovecot_t)
 kernel_read_system_state(dovecot_t)
 
 corenet_all_recvfrom_unlabeled(dovecot_t)
 corenet_all_recvfrom_netlabel(dovecot_t)
-corenet_tcp_sendrecv_all_if(dovecot_t)
-corenet_tcp_sendrecv_all_nodes(dovecot_t)
+corenet_tcp_sendrecv_generic_if(dovecot_t)
+corenet_tcp_sendrecv_generic_node(dovecot_t)
 corenet_tcp_sendrecv_all_ports(dovecot_t)
-corenet_tcp_bind_all_nodes(dovecot_t)
+corenet_tcp_bind_generic_node(dovecot_t)
 corenet_tcp_bind_pop_port(dovecot_t)
 corenet_tcp_connect_all_ports(dovecot_t)
 corenet_tcp_connect_postgresql_port(dovecot_t)
@@ -104,20 +104,20 @@ init_getattr_utmp(dovecot_t)
 
 auth_use_nsswitch(dovecot_t)
 
-libs_use_ld_so(dovecot_t)
-libs_use_shared_libs(dovecot_t)
-
 logging_send_syslog_msg(dovecot_t)
 
 miscfiles_read_certs(dovecot_t)
 miscfiles_read_localization(dovecot_t)
 
 userdom_dontaudit_use_unpriv_user_fds(dovecot_t)
-userdom_priveleged_home_dir_manager(dovecot_t)
+userdom_manage_user_home_content_dirs(dovecot_t)
+userdom_manage_user_home_content_files(dovecot_t)
+userdom_manage_user_home_content_symlinks(dovecot_t)
+userdom_manage_user_home_content_pipes(dovecot_t)
+userdom_manage_user_home_content_sockets(dovecot_t)
+userdom_user_home_dir_filetrans_user_home_content(dovecot_t, { dir file lnk_file fifo_file sock_file })
 
 mta_manage_spool(dovecot_t)
-
-sysadm_dontaudit_search_home_dirs(dovecot_t)
 
 optional_policy(`
 	kerberos_use(dovecot_t)
@@ -148,10 +148,10 @@ allow dovecot_auth_t self:unix_stream_socket create_stream_socket_perms;
 
 allow dovecot_auth_t dovecot_t:unix_stream_socket { getattr accept read write ioctl };
 
-allow dovecot_auth_t dovecot_passwd_t:file { getattr read };
+allow dovecot_auth_t dovecot_passwd_t:file read_file_perms;
 
 # Allow dovecot to create and read SSL parameters file
-manage_files_pattern(dovecot_t,dovecot_var_lib_t,dovecot_var_lib_t)
+manage_files_pattern(dovecot_t, dovecot_var_lib_t, dovecot_var_lib_t)
 files_search_var_lib(dovecot_t)
 
 allow dovecot_auth_t dovecot_var_run_t:dir list_dir_perms;
@@ -172,9 +172,6 @@ files_search_tmp(dovecot_auth_t)
 files_read_var_lib_files(dovecot_t)
 
 init_rw_utmp(dovecot_auth_t)
-
-libs_use_ld_so(dovecot_auth_t)
-libs_use_shared_libs(dovecot_auth_t)
 
 miscfiles_read_localization(dovecot_auth_t)
 

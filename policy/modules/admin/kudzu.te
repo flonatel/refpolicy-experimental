@@ -1,5 +1,5 @@
 
-policy_module(kudzu, 1.6.0)
+policy_module(kudzu, 1.8.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(kudzu, 1.6.0)
 
 type kudzu_t;
 type kudzu_exec_t;
-init_system_domain(kudzu_t,kudzu_exec_t)
+init_system_domain(kudzu_t, kudzu_exec_t)
 
 type kudzu_tmp_t;
 files_tmp_file(kudzu_tmp_t)
@@ -21,22 +21,22 @@ files_pid_file(kudzu_var_run_t)
 # Local policy
 #
 
-allow kudzu_t self:capability { dac_override sys_admin sys_rawio net_admin sys_tty_config mknod };
-dontaudit kudzu_t self:capability { sys_ptrace sys_tty_config };
+allow kudzu_t self:capability { dac_override sys_admin sys_ptrace sys_rawio net_admin sys_tty_config mknod };
+dontaudit kudzu_t self:capability sys_tty_config;
 allow kudzu_t self:process { signal_perms execmem };
 allow kudzu_t self:fifo_file rw_fifo_file_perms;
 allow kudzu_t self:unix_stream_socket { connectto create_stream_socket_perms };
 allow kudzu_t self:unix_dgram_socket create_socket_perms;
 allow kudzu_t self:udp_socket { create ioctl };
 
-manage_dirs_pattern(kudzu_t,kudzu_tmp_t,kudzu_tmp_t)
-manage_files_pattern(kudzu_t,kudzu_tmp_t,kudzu_tmp_t)
-manage_chr_files_pattern(kudzu_t,kudzu_tmp_t,kudzu_tmp_t)
+manage_dirs_pattern(kudzu_t, kudzu_tmp_t, kudzu_tmp_t)
+manage_files_pattern(kudzu_t, kudzu_tmp_t, kudzu_tmp_t)
+manage_chr_files_pattern(kudzu_t, kudzu_tmp_t, kudzu_tmp_t)
 files_tmp_filetrans(kudzu_t, kudzu_tmp_t, { file dir chr_file })
 
-manage_dirs_pattern(kudzu_t,kudzu_var_run_t,kudzu_var_run_t)
-manage_files_pattern(kudzu_t,kudzu_var_run_t,kudzu_var_run_t)
-files_pid_filetrans(kudzu_t,kudzu_var_run_t,file)
+manage_dirs_pattern(kudzu_t, kudzu_var_run_t, kudzu_var_run_t)
+manage_files_pattern(kudzu_t, kudzu_var_run_t, kudzu_var_run_t)
+files_pid_filetrans(kudzu_t, kudzu_var_run_t, file)
 
 kernel_change_ring_buffer_level(kudzu_t)
 kernel_list_proc(kudzu_t)
@@ -68,6 +68,7 @@ mls_file_write_all_levels(kudzu_t)
 modutils_read_module_deps(kudzu_t)
 modutils_read_module_config(kudzu_t)
 modutils_rename_module_config(kudzu_t)
+modutils_delete_module_config(kudzu_t)
 
 storage_read_scsi_generic(kudzu_t)
 storage_read_tape(kudzu_t)
@@ -76,7 +77,6 @@ storage_raw_write_removable_device(kudzu_t)
 storage_raw_read_fixed_disk(kudzu_t)
 storage_raw_read_removable_device(kudzu_t)
 
-term_search_ptys(kudzu_t)
 term_dontaudit_use_console(kudzu_t)
 # so it can write messages to the console
 term_use_unallocated_ttys(kudzu_t)
@@ -103,12 +103,12 @@ files_dontaudit_search_isid_type_dirs(kudzu_t)
 init_use_fds(kudzu_t)
 init_use_script_ptys(kudzu_t)
 init_stream_connect_script(kudzu_t)
+init_read_state(kudzu_t)
+init_ptrace(kudzu_t)
 # kudzu will telinit to make init re-read
 # the inittab after configuring serial consoles
 init_telinit(kudzu_t)
 
-libs_use_ld_so(kudzu_t)
-libs_use_shared_libs(kudzu_t)
 # Read /usr/lib/gconv/gconv-modules.*
 libs_read_lib_files(kudzu_t)
 
@@ -122,9 +122,9 @@ modutils_domtrans_insmod(kudzu_t)
 
 sysnet_read_config(kudzu_t)
 
+userdom_use_user_terminals(kudzu_t)
 userdom_dontaudit_use_unpriv_user_fds(kudzu_t)
-
-sysadm_search_home_dirs(kudzu_t)
+userdom_search_user_home_dirs(kudzu_t)
 
 optional_policy(`
 	gpm_getattr_gpmctl(kudzu_t)
@@ -135,36 +135,14 @@ optional_policy(`
 ')
 
 optional_policy(`
-        seutil_sigchld_newrole(kudzu_t)
+	seutil_sigchld_newrole(kudzu_t)
 ')
 
 optional_policy(`
-        udev_read_db(kudzu_t)
+	udev_read_db(kudzu_t)
 ')
 
 optional_policy(`
-	# cjp: this was originally in the else block
-	# of ifdef userhelper.te, but it seems to
-	# make more sense here.  also, require
-	# blocks curently do not work in the
-	# else block of optionals
+	unconfined_domtrans(kudzu_t)
 	unconfined_domain(kudzu_t)
-')
-
-ifdef(`TODO',`
-allow kudzu_t modules_conf_t:file unlink;
-optional_policy(`
-	allow kudzu_t printconf_t:file { getattr read };
-')
-optional_policy(`
-	allow kudzu_t xserver_exec_t:file getattr;
-')
-optional_policy(`
-	allow kudzu_t rhgb_t:unix_stream_socket connectto;
-')
-optional_policy(`
-	role system_r types sysadm_userhelper_t;
-	domain_auto_trans(kudzu_t, userhelper_exec_t, sysadm_userhelper_t)
-')
-allow kudzu_t cupsd_rw_etc_t:dir list_dir_perms;
 ')

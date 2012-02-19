@@ -1,18 +1,17 @@
 
-policy_module(apache, 1.10.0)
+policy_module(apache, 2.0.2)
 
 #
 # NOTES: 
 #  This policy will work with SUEXEC enabled as part of the Apache
 #  configuration. However, the user CGI scripts will run under the
-#  system_u:system_r:httpd_$1_script_t domain where $1 is the domain of the
-#  of the creating user.
+#  system_u:system_r:httpd_user_script_t.
 #
-#  The user CGI scripts must be labeled with the httpd_$1_script_exec_t
+#  The user CGI scripts must be labeled with the httpd_user_script_exec_t
 #  type, and the directory containing the scripts should also be labeled
-#  with these types. This policy allows user_r role to perform that 
-#  relabeling. If it is desired that only sysadm_r should be able to relabel
-#  the user CGI scripts, then relabel rule for user_r should be removed.
+#  with these types. This policy allows the user role to perform that 
+#  relabeling. If it is desired that only admin role should be able to relabel
+#  the user CGI scripts, then relabel rule for user roles should be removed.
 #
 
 ########################################
@@ -27,28 +26,28 @@ policy_module(apache, 1.10.0)
 ## be labeled public_content_rw_t.
 ## </p>
 ## </desc>
-gen_tunable(allow_httpd_anon_write,false)
+gen_tunable(allow_httpd_anon_write, false)
 
 ## <desc>
 ## <p>
 ## Allow Apache to use mod_auth_pam
 ## </p>
 ## </desc>
-gen_tunable(allow_httpd_mod_auth_pam,false)
+gen_tunable(allow_httpd_mod_auth_pam, false)
 
 ## <desc>
 ## <p>
 ## Allow httpd to use built in scripting (usually php)
 ## </p>
 ## </desc>
-gen_tunable(httpd_builtin_scripting,false)
+gen_tunable(httpd_builtin_scripting, false)
 
 ## <desc>
 ## <p>
 ## Allow HTTPD scripts and modules to connect to the network using TCP.
 ## </p>
 ## </desc>
-gen_tunable(httpd_can_network_connect,false)
+gen_tunable(httpd_can_network_connect, false)
 
 ## <desc>
 ## <p>
@@ -69,7 +68,7 @@ gen_tunable(httpd_can_network_relay, false)
 ## Allow httpd cgi support
 ## </p>
 ## </desc>
-gen_tunable(httpd_enable_cgi,false)
+gen_tunable(httpd_enable_cgi, false)
 
 ## <desc>
 ## <p>
@@ -77,21 +76,21 @@ gen_tunable(httpd_enable_cgi,false)
 ## listening on the ftp port.
 ## </p>
 ## </desc>
-gen_tunable(httpd_enable_ftp_server,false)
+gen_tunable(httpd_enable_ftp_server, false)
 
 ## <desc>
 ## <p>
 ## Allow httpd to read home directories
 ## </p>
 ## </desc>
-gen_tunable(httpd_enable_homedirs,false)
+gen_tunable(httpd_enable_homedirs, false)
 
 ## <desc>
 ## <p>
 ## Allow HTTPD to run SSI executables in the same domain as system CGI scripts.
 ## </p>
 ## </desc>
-gen_tunable(httpd_ssi_exec,false)
+gen_tunable(httpd_ssi_exec, false)
 
 ## <desc>
 ## <p>
@@ -100,14 +99,14 @@ gen_tunable(httpd_ssi_exec,false)
 ## the terminal.
 ## </p>
 ## </desc>
-gen_tunable(httpd_tty_comm,false)
+gen_tunable(httpd_tty_comm, false)
 
 ## <desc>
 ## <p>
 ## Unify HTTPD handling of all content files.
 ## </p>
 ## </desc>
-gen_tunable(httpd_unified,false)
+gen_tunable(httpd_unified, false)
 
 attribute httpdcontent;
 attribute httpd_user_content_type;
@@ -123,7 +122,7 @@ attribute httpd_script_domains;
 
 type httpd_t;
 type httpd_exec_t;
-init_daemon_domain(httpd_t,httpd_exec_t)
+init_daemon_domain(httpd_t, httpd_exec_t)
 role system_r types httpd_t;
 
 # httpd_cache_t is the type given to the /var/cache/httpd
@@ -138,7 +137,7 @@ files_type(httpd_config_t)
 type httpd_helper_t;
 type httpd_helper_exec_t;
 domain_type(httpd_helper_t)
-domain_entry_file(httpd_helper_t,httpd_helper_exec_t)
+domain_entry_file(httpd_helper_t, httpd_helper_exec_t)
 role system_r types httpd_helper_t;
 
 type httpd_lock_t;
@@ -155,7 +154,7 @@ files_type(httpd_modules_t)
 type httpd_php_t;
 type httpd_php_exec_t;
 domain_type(httpd_php_t)
-domain_entry_file(httpd_php_t,httpd_php_exec_t)
+domain_entry_file(httpd_php_t, httpd_php_exec_t)
 role system_r types httpd_php_t;
 
 type httpd_php_tmp_t;
@@ -172,7 +171,7 @@ files_type(httpd_squirrelmail_t)
 type httpd_suexec_t; #, daemon;
 type httpd_suexec_exec_t;
 domain_type(httpd_suexec_t)
-domain_entry_file(httpd_suexec_t,httpd_suexec_exec_t)
+domain_entry_file(httpd_suexec_t, httpd_suexec_exec_t)
 role system_r types httpd_suexec_t;
 
 type httpd_suexec_tmp_t;
@@ -186,6 +185,30 @@ files_tmp_file(httpd_tmp_t)
 
 type httpd_tmpfs_t;
 files_tmpfs_file(httpd_tmpfs_t)
+
+apache_content_template(user)
+ubac_constrained(httpd_user_script_t)
+userdom_user_home_content(httpd_user_content_t)
+userdom_user_home_content(httpd_user_htaccess_t)
+userdom_user_home_content(httpd_user_script_exec_t)
+userdom_user_home_content(httpd_user_script_ra_t)
+userdom_user_home_content(httpd_user_script_ro_t)
+userdom_user_home_content(httpd_user_script_rw_t)
+typeattribute httpd_user_script_t httpd_script_domains;
+typealias httpd_user_content_t alias { httpd_staff_content_t httpd_sysadm_content_t };
+typealias httpd_user_content_t alias { httpd_auditadm_content_t httpd_secadm_content_t };
+typealias httpd_user_htaccess_t alias { httpd_staff_htaccess_t httpd_sysadm_htaccess_t };
+typealias httpd_user_htaccess_t alias { httpd_auditadm_htaccess_t httpd_secadm_htaccess_t };
+typealias httpd_user_script_t alias { httpd_staff_script_t httpd_sysadm_script_t };
+typealias httpd_user_script_t alias { httpd_auditadm_script_t httpd_secadm_script_t };
+typealias httpd_user_script_exec_t alias { httpd_staff_script_exec_t httpd_sysadm_script_exec_t };
+typealias httpd_user_script_exec_t alias { httpd_auditadm_script_exec_t httpd_secadm_script_exec_t };
+typealias httpd_user_script_ro_t alias { httpd_staff_script_ro_t httpd_sysadm_script_ro_t };
+typealias httpd_user_script_ro_t alias { httpd_auditadm_script_ro_t httpd_secadm_script_ro_t };
+typealias httpd_user_script_rw_t alias { httpd_staff_script_rw_t httpd_sysadm_script_rw_t };
+typealias httpd_user_script_rw_t alias { httpd_auditadm_script_rw_t httpd_secadm_script_rw_t };
+typealias httpd_user_script_ra_t alias { httpd_staff_script_ra_t httpd_sysadm_script_ra_t };
+typealias httpd_user_script_ra_t alias { httpd_auditadm_script_ra_t httpd_secadm_script_ra_t };
 
 # for apache2 memory mapped files
 type httpd_var_lib_t;
@@ -223,68 +246,68 @@ allow httpd_t self:tcp_socket create_stream_socket_perms;
 allow httpd_t self:udp_socket create_socket_perms;
 
 # Allow httpd_t to put files in /var/cache/httpd etc
-manage_dirs_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
-manage_files_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
-manage_lnk_files_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
+manage_dirs_pattern(httpd_t, httpd_cache_t, httpd_cache_t)
+manage_files_pattern(httpd_t, httpd_cache_t, httpd_cache_t)
+manage_lnk_files_pattern(httpd_t, httpd_cache_t, httpd_cache_t)
 
 # Allow the httpd_t to read the web servers config files
 allow httpd_t httpd_config_t:dir list_dir_perms;
-read_files_pattern(httpd_t,httpd_config_t,httpd_config_t)
-read_lnk_files_pattern(httpd_t,httpd_config_t,httpd_config_t)
+read_files_pattern(httpd_t, httpd_config_t, httpd_config_t)
+read_lnk_files_pattern(httpd_t, httpd_config_t, httpd_config_t)
 
 can_exec(httpd_t, httpd_exec_t)
 
 allow httpd_t httpd_lock_t:file manage_file_perms;
-files_lock_filetrans(httpd_t,httpd_lock_t,file)
+files_lock_filetrans(httpd_t, httpd_lock_t, file)
 
 allow httpd_t httpd_log_t:dir setattr;
-create_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
-append_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
-read_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
-read_lnk_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
+create_files_pattern(httpd_t, httpd_log_t, httpd_log_t)
+append_files_pattern(httpd_t, httpd_log_t, httpd_log_t)
+read_files_pattern(httpd_t, httpd_log_t, httpd_log_t)
+read_lnk_files_pattern(httpd_t, httpd_log_t, httpd_log_t)
 # cjp: need to refine create interfaces to
 # cut this back to add_name only
-logging_log_filetrans(httpd_t,httpd_log_t,file)
+logging_log_filetrans(httpd_t, httpd_log_t, file)
 
 allow httpd_t httpd_modules_t:dir list_dir_perms;
-mmap_files_pattern(httpd_t,httpd_modules_t,httpd_modules_t)
-read_files_pattern(httpd_t,httpd_modules_t,httpd_modules_t)
+mmap_files_pattern(httpd_t, httpd_modules_t, httpd_modules_t)
+read_files_pattern(httpd_t, httpd_modules_t, httpd_modules_t)
 
 apache_domtrans_rotatelogs(httpd_t)
 # Apache-httpd needs to be able to send signals to the log rotate procs.
 allow httpd_t httpd_rotatelogs_t:process signal_perms;
 
-manage_dirs_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
-manage_files_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
-manage_lnk_files_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
+manage_dirs_pattern(httpd_t, httpd_squirrelmail_t, httpd_squirrelmail_t)
+manage_files_pattern(httpd_t, httpd_squirrelmail_t, httpd_squirrelmail_t)
+manage_lnk_files_pattern(httpd_t, httpd_squirrelmail_t, httpd_squirrelmail_t)
 
-allow httpd_t httpd_suexec_exec_t:file { getattr read };
+allow httpd_t httpd_suexec_exec_t:file read_file_perms;
 
 allow httpd_t httpd_sys_content_t:dir list_dir_perms;
-read_files_pattern(httpd_t,httpd_sys_content_t,httpd_sys_content_t)
-read_lnk_files_pattern(httpd_t,httpd_sys_content_t,httpd_sys_content_t)
+read_files_pattern(httpd_t, httpd_sys_content_t, httpd_sys_content_t)
+read_lnk_files_pattern(httpd_t, httpd_sys_content_t, httpd_sys_content_t)
 
-manage_dirs_pattern(httpd_t,httpd_tmp_t,httpd_tmp_t)
-manage_files_pattern(httpd_t,httpd_tmp_t,httpd_tmp_t)
+manage_dirs_pattern(httpd_t, httpd_tmp_t, httpd_tmp_t)
+manage_files_pattern(httpd_t, httpd_tmp_t, httpd_tmp_t)
 files_tmp_filetrans(httpd_t, httpd_tmp_t, { file dir })
 
-manage_dirs_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
-manage_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
-manage_lnk_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
-manage_fifo_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
-manage_sock_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
-fs_tmpfs_filetrans(httpd_t,httpd_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
+manage_dirs_pattern(httpd_t, httpd_tmpfs_t, httpd_tmpfs_t)
+manage_files_pattern(httpd_t, httpd_tmpfs_t, httpd_tmpfs_t)
+manage_lnk_files_pattern(httpd_t, httpd_tmpfs_t, httpd_tmpfs_t)
+manage_fifo_files_pattern(httpd_t, httpd_tmpfs_t, httpd_tmpfs_t)
+manage_sock_files_pattern(httpd_t, httpd_tmpfs_t, httpd_tmpfs_t)
+fs_tmpfs_filetrans(httpd_t, httpd_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
 
-manage_files_pattern(httpd_t,httpd_var_lib_t,httpd_var_lib_t)
-files_var_lib_filetrans(httpd_t,httpd_var_lib_t,file)
+manage_files_pattern(httpd_t, httpd_var_lib_t, httpd_var_lib_t)
+files_var_lib_filetrans(httpd_t, httpd_var_lib_t, file)
 
-manage_files_pattern(httpd_t,httpd_var_run_t,httpd_var_run_t)
-manage_sock_files_pattern(httpd_t,httpd_var_run_t,httpd_var_run_t)
-files_pid_filetrans(httpd_t,httpd_var_run_t, { file sock_file })
+manage_files_pattern(httpd_t, httpd_var_run_t, httpd_var_run_t)
+manage_sock_files_pattern(httpd_t, httpd_var_run_t, httpd_var_run_t)
+files_pid_filetrans(httpd_t, httpd_var_run_t, { file sock_file })
 
-manage_dirs_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
-manage_files_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
-manage_lnk_files_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
+manage_dirs_pattern(httpd_t, squirrelmail_spool_t, squirrelmail_spool_t)
+manage_files_pattern(httpd_t, squirrelmail_spool_t, squirrelmail_spool_t)
+manage_lnk_files_pattern(httpd_t, squirrelmail_spool_t, squirrelmail_spool_t)
 
 kernel_read_kernel_sysctls(httpd_t)
 # for modules that want to access /proc/meminfo
@@ -292,13 +315,13 @@ kernel_read_system_state(httpd_t)
 
 corenet_all_recvfrom_unlabeled(httpd_t)
 corenet_all_recvfrom_netlabel(httpd_t)
-corenet_tcp_sendrecv_all_if(httpd_t)
-corenet_udp_sendrecv_all_if(httpd_t)
-corenet_tcp_sendrecv_all_nodes(httpd_t)
-corenet_udp_sendrecv_all_nodes(httpd_t)
+corenet_tcp_sendrecv_generic_if(httpd_t)
+corenet_udp_sendrecv_generic_if(httpd_t)
+corenet_tcp_sendrecv_generic_node(httpd_t)
+corenet_udp_sendrecv_generic_node(httpd_t)
 corenet_tcp_sendrecv_all_ports(httpd_t)
 corenet_udp_sendrecv_all_ports(httpd_t)
-corenet_tcp_bind_all_nodes(httpd_t)
+corenet_tcp_bind_generic_node(httpd_t)
 corenet_tcp_bind_http_port(httpd_t)
 corenet_tcp_bind_http_cache_port(httpd_t)
 corenet_sendrecv_http_server_packets(httpd_t)
@@ -336,8 +359,6 @@ files_read_var_lib_symlinks(httpd_t)
 
 fs_search_auto_mountpoints(httpd_sys_script_t)
 
-libs_use_ld_so(httpd_t)
-libs_use_shared_libs(httpd_t)
 libs_read_lib_files(httpd_t)
 
 logging_send_syslog_msg(httpd_t)
@@ -385,9 +406,9 @@ tunable_policy(`httpd_can_network_relay',`
 tunable_policy(`httpd_enable_cgi && httpd_unified && httpd_builtin_scripting',`
 	domtrans_pattern(httpd_t, httpdcontent, httpd_sys_script_t)
 
-	manage_dirs_pattern(httpd_t,httpdcontent,httpdcontent)
-	manage_files_pattern(httpd_t,httpdcontent,httpdcontent)
-	manage_lnk_files_pattern(httpd_t,httpdcontent,httpdcontent)
+	manage_dirs_pattern(httpd_t, httpdcontent, httpdcontent)
+	manage_files_pattern(httpd_t, httpdcontent, httpdcontent)
+	manage_lnk_files_pattern(httpd_t, httpdcontent, httpdcontent)
 ')
 
 tunable_policy(`httpd_enable_ftp_server',`
@@ -395,7 +416,7 @@ tunable_policy(`httpd_enable_ftp_server',`
 ')
 
 tunable_policy(`httpd_enable_homedirs',`
-	userdom_read_unpriv_users_home_content_files(httpd_t)
+	userdom_read_user_home_content_files(httpd_t)
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
@@ -420,12 +441,9 @@ tunable_policy(`httpd_ssi_exec',`
 # to run correctly without this permission, so the permission
 # are dontaudited here. 
 tunable_policy(`httpd_tty_comm',`
-	# cjp: this is redundant:
-	term_use_controlling_term(httpd_t)
-
-	sysadm_use_terms(httpd_t)
+	userdom_use_user_terminals(httpd_t)
 ',`
-	sysadm_dontaudit_use_terms(httpd_t)
+	userdom_dontaudit_use_user_terminals(httpd_t)
 ')
 
 optional_policy(`
@@ -459,8 +477,7 @@ optional_policy(`
 	mysql_rw_db_sockets(httpd_t)
 
 	tunable_policy(`httpd_can_network_connect_db',`
-		corenet_tcp_connect_mysqld_port(httpd_t)
-		corenet_sendrecv_mysqld_client_packets(httpd_t)
+		mysql_tcp_connect(httpd_t)
 	')
 ')
 
@@ -510,18 +527,13 @@ optional_policy(`
 
 domtrans_pattern(httpd_t, httpd_helper_exec_t, httpd_helper_t)
 
-allow httpd_helper_t httpd_config_t:file { getattr read };
+allow httpd_helper_t httpd_config_t:file read_file_perms;
 
-allow httpd_helper_t httpd_log_t:file append;
-
-libs_use_ld_so(httpd_helper_t)
-libs_use_shared_libs(httpd_helper_t)
+allow httpd_helper_t httpd_log_t:file append_file_perms;
 
 logging_send_syslog_msg(httpd_helper_t)
 
-tunable_policy(`httpd_tty_comm',`
-	sysadm_use_terms(httpd_helper_t)
-')
+userdom_use_user_terminals(httpd_helper_t)
 
 ########################################
 #
@@ -546,15 +558,13 @@ domtrans_pattern(httpd_t, httpd_php_exec_t, httpd_php_t)
 # allow php to read and append to apache logfiles
 allow httpd_php_t httpd_log_t:file { read_file_perms append_file_perms };
 
-manage_dirs_pattern(httpd_php_t,httpd_php_tmp_t,httpd_php_tmp_t)
-manage_files_pattern(httpd_php_t,httpd_php_tmp_t,httpd_php_tmp_t)
+manage_dirs_pattern(httpd_php_t, httpd_php_tmp_t, httpd_php_tmp_t)
+manage_files_pattern(httpd_php_t, httpd_php_tmp_t, httpd_php_tmp_t)
 files_tmp_filetrans(httpd_php_t, httpd_php_tmp_t, { file dir })
 
 fs_search_auto_mountpoints(httpd_php_t)
 
 libs_exec_lib_files(httpd_php_t)
-libs_use_ld_so(httpd_php_t)
-libs_use_shared_libs(httpd_php_t)
 
 userdom_use_unpriv_users_fds(httpd_php_t)
 
@@ -581,14 +591,14 @@ allow httpd_suexec_t self:unix_stream_socket create_stream_socket_perms;
 
 domtrans_pattern(httpd_t, httpd_suexec_exec_t, httpd_suexec_t)
 
-create_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
-append_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
-read_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
+create_files_pattern(httpd_suexec_t, httpd_log_t, httpd_log_t)
+append_files_pattern(httpd_suexec_t, httpd_log_t, httpd_log_t)
+read_files_pattern(httpd_suexec_t, httpd_log_t, httpd_log_t)
 
 allow httpd_suexec_t httpd_t:fifo_file getattr;
 
-manage_dirs_pattern(httpd_suexec_t,httpd_suexec_tmp_t,httpd_suexec_tmp_t)
-manage_files_pattern(httpd_suexec_t,httpd_suexec_tmp_t,httpd_suexec_tmp_t)
+manage_dirs_pattern(httpd_suexec_t, httpd_suexec_tmp_t, httpd_suexec_tmp_t)
+manage_files_pattern(httpd_suexec_t, httpd_suexec_tmp_t, httpd_suexec_tmp_t)
 files_tmp_filetrans(httpd_suexec_t, httpd_suexec_tmp_t, { file dir })
 
 kernel_read_kernel_sysctls(httpd_suexec_t)
@@ -610,9 +620,6 @@ files_search_home(httpd_suexec_t)
 
 auth_use_nsswitch(httpd_suexec_t)
 
-libs_use_ld_so(httpd_suexec_t)
-libs_use_shared_libs(httpd_suexec_t)
-
 logging_search_logs(httpd_suexec_t)
 logging_send_syslog_msg(httpd_suexec_t)
 
@@ -624,10 +631,10 @@ tunable_policy(`httpd_can_network_connect',`
 
 	corenet_all_recvfrom_unlabeled(httpd_suexec_t)
 	corenet_all_recvfrom_netlabel(httpd_suexec_t)
-	corenet_tcp_sendrecv_all_if(httpd_suexec_t)
-	corenet_udp_sendrecv_all_if(httpd_suexec_t)
-	corenet_tcp_sendrecv_all_nodes(httpd_suexec_t)
-	corenet_udp_sendrecv_all_nodes(httpd_suexec_t)
+	corenet_tcp_sendrecv_generic_if(httpd_suexec_t)
+	corenet_udp_sendrecv_generic_if(httpd_suexec_t)
+	corenet_tcp_sendrecv_generic_node(httpd_suexec_t)
+	corenet_udp_sendrecv_generic_node(httpd_suexec_t)
 	corenet_tcp_sendrecv_all_ports(httpd_suexec_t)
 	corenet_udp_sendrecv_all_ports(httpd_suexec_t)
 	corenet_tcp_connect_all_ports(httpd_suexec_t)
@@ -639,7 +646,7 @@ tunable_policy(`httpd_enable_cgi && httpd_unified',`
 ')
 
 tunable_policy(`httpd_enable_homedirs',`
-	userdom_read_unpriv_users_home_content_files(httpd_suexec_t)
+	userdom_read_user_home_content_files(httpd_suexec_t)
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
@@ -678,11 +685,11 @@ allow httpd_sys_script_t httpd_t:tcp_socket { read write };
 
 dontaudit httpd_sys_script_t httpd_config_t:dir search;
 
-allow httpd_sys_script_t httpd_squirrelmail_t:file { append read };
+allow httpd_sys_script_t httpd_squirrelmail_t:file { append_file_perms read_file_perms };
 
 allow httpd_sys_script_t squirrelmail_spool_t:dir list_dir_perms;
-read_files_pattern(httpd_sys_script_t,squirrelmail_spool_t,squirrelmail_spool_t)
-read_lnk_files_pattern(httpd_sys_script_t,squirrelmail_spool_t,squirrelmail_spool_t)
+read_files_pattern(httpd_sys_script_t, squirrelmail_spool_t, squirrelmail_spool_t)
+read_lnk_files_pattern(httpd_sys_script_t, squirrelmail_spool_t, squirrelmail_spool_t)
 
 kernel_read_kernel_sysctls(httpd_sys_script_t)
 
@@ -693,11 +700,11 @@ files_search_spool(httpd_sys_script_t)
 apache_domtrans_rotatelogs(httpd_sys_script_t)
 
 ifdef(`distro_redhat',`
-	allow httpd_sys_script_t httpd_log_t:file { getattr append };
+	allow httpd_sys_script_t httpd_log_t:file append_file_perms;
 ')
 
 tunable_policy(`httpd_enable_homedirs',`
-	userdom_read_unpriv_users_home_content_files(httpd_sys_script_t)
+	userdom_read_user_home_content_files(httpd_sys_script_t)
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
@@ -728,7 +735,7 @@ optional_policy(`
 # httpd_rotatelogs local policy
 #
 
-manage_files_pattern(httpd_rotatelogs_t,httpd_log_t,httpd_log_t)
+manage_files_pattern(httpd_rotatelogs_t, httpd_log_t, httpd_log_t)
 
 kernel_read_kernel_sysctls(httpd_rotatelogs_t)
 kernel_dontaudit_list_proc(httpd_rotatelogs_t)
@@ -736,9 +743,22 @@ kernel_dontaudit_read_proc_symlinks(httpd_rotatelogs_t)
 
 files_read_etc_files(httpd_rotatelogs_t)
 
-libs_use_ld_so(httpd_rotatelogs_t)
-libs_use_shared_libs(httpd_rotatelogs_t)
-
 logging_search_logs(httpd_rotatelogs_t)
 
 miscfiles_read_localization(httpd_rotatelogs_t)
+
+########################################
+#
+# User content local policy
+#
+
+tunable_policy(`httpd_enable_cgi && httpd_unified',`
+	allow httpd_user_script_t httpdcontent:file entrypoint;
+')
+
+# allow accessing files/dirs below the users home dir
+tunable_policy(`httpd_enable_homedirs',`
+	userdom_search_user_home_dirs(httpd_t)
+	userdom_search_user_home_dirs(httpd_suexec_t)
+	userdom_search_user_home_dirs(httpd_user_script_t)
+')

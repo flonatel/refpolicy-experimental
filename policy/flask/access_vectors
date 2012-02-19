@@ -157,6 +157,9 @@ inherits file
 
 class sock_file
 inherits file
+{
+	open
+}
 
 class fifo_file
 inherits file
@@ -536,6 +539,11 @@ class x_device
 	freeze
 	grab
 	manage
+	list_property
+	get_property
+	set_property
+	add
+	remove
 }
 
 class x_server
@@ -616,6 +624,7 @@ inherits socket
 	nlmsg_write
 	nlmsg_relay
 	nlmsg_readpriv
+	nlmsg_tty_audit
 }
 
 class netlink_ip6fw_socket
@@ -678,8 +687,8 @@ class packet
 	send
 	recv
 	relabelto
-	flow_in		# not currently in use
-	flow_out	# not currently in use
+	flow_in		# deprecated
+	flow_out	# deprecated
 	forward_in
 	forward_out
 }
@@ -719,14 +728,14 @@ inherits database
 	access
 	install_module
 	load_module
-	get_param
-	set_param
+	get_param	# deprecated
+	set_param	# deprecated
 }
 
 class db_table
 inherits database
 {
-	use
+	use		# deprecated
 	select
 	update
 	insert
@@ -739,12 +748,13 @@ inherits database
 {
 	execute
 	entrypoint
+	install
 }
 
 class db_column
 inherits database
 {
-	use
+	use		# deprecated
 	select
 	update
 	insert
@@ -754,7 +764,7 @@ class db_tuple
 {
 	relabelfrom
 	relabelto
-	use
+	use		# deprecated
 	select
 	update
 	insert
@@ -781,4 +791,10 @@ class x_application_data
 	paste
 	paste_after_confirm
 	copy
+}
+
+class kernel_service
+{
+	use_as_override
+	create_files_as	
 }

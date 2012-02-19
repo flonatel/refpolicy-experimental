@@ -1,5 +1,5 @@
 
-policy_module(prelink,1.5.0)
+policy_module(prelink, 1.6.0)
 
 ########################################
 #
@@ -9,7 +9,7 @@ attribute prelink_object;
 
 type prelink_t;
 type prelink_exec_t;
-init_system_domain(prelink_t,prelink_exec_t)
+init_system_domain(prelink_t, prelink_exec_t)
 domain_obj_id_change_exemption(prelink_t)
 
 type prelink_cache_t;
@@ -35,9 +35,9 @@ files_etc_filetrans(prelink_t, prelink_cache_t, file)
 files_var_lib_filetrans(prelink_t, prelink_cache_t, file)
 
 allow prelink_t prelink_log_t:dir setattr;
-create_files_pattern(prelink_t,prelink_log_t,prelink_log_t)
-append_files_pattern(prelink_t,prelink_log_t,prelink_log_t)
-read_lnk_files_pattern(prelink_t,prelink_log_t,prelink_log_t)
+create_files_pattern(prelink_t, prelink_log_t, prelink_log_t)
+append_files_pattern(prelink_t, prelink_log_t, prelink_log_t)
+read_lnk_files_pattern(prelink_t, prelink_log_t, prelink_log_t)
 logging_log_filetrans(prelink_t, prelink_log_t, file)
 
 allow prelink_t prelink_tmp_t:file { manage_file_perms execute relabelfrom };
@@ -70,16 +70,16 @@ fs_getattr_xattr_fs(prelink_t)
 
 selinux_get_enforce_mode(prelink_t)
 
-libs_use_ld_so(prelink_t)
 libs_exec_ld_so(prelink_t)
 libs_manage_ld_so(prelink_t)
 libs_relabel_ld_so(prelink_t)
-libs_use_shared_libs(prelink_t)
 libs_manage_shared_libs(prelink_t)
 libs_relabel_shared_libs(prelink_t)
 libs_delete_lib_symlinks(prelink_t)
 
 miscfiles_read_localization(prelink_t)
+
+userdom_use_user_terminals(prelink_t)
 
 optional_policy(`
 	amanda_manage_lib(prelink_t)

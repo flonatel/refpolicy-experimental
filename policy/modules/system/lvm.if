@@ -33,11 +33,6 @@ interface(`lvm_domtrans',`
 ##	The role to allow the LVM domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the LVM domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`lvm_run',`
@@ -47,7 +42,6 @@ interface(`lvm_run',`
 
 	lvm_domtrans($1)
 	role $2 types lvm_t;
-	allow lvm_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -68,7 +62,7 @@ interface(`lvm_read_config',`
 
 	files_search_etc($1)
 	allow $1 lvm_etc_t:dir list_dir_perms;
-	read_files_pattern($1,lvm_etc_t,lvm_etc_t)
+	read_files_pattern($1, lvm_etc_t, lvm_etc_t)
 ')
 
 ########################################
@@ -88,6 +82,6 @@ interface(`lvm_manage_config',`
 	')
 
 	files_search_etc($1)
-	manage_dirs_pattern($1,lvm_etc_t,lvm_etc_t)
-	manage_files_pattern($1,lvm_etc_t,lvm_etc_t)
+	manage_dirs_pattern($1, lvm_etc_t, lvm_etc_t)
+	manage_files_pattern($1, lvm_etc_t, lvm_etc_t)
 ')

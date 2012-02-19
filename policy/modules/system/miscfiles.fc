@@ -12,6 +12,10 @@ ifdef(`distro_gentoo',`
 /etc/localtime		--	gen_context(system_u:object_r:locale_t,s0)
 /etc/pki(/.*)?			gen_context(system_u:object_r:cert_t,s0)
 
+ifdef(`distro_redhat',`
+/etc/sysconfig/clock	--	gen_context(system_u:object_r:locale_t,s0)
+')
+
 #
 # /opt
 #
@@ -31,6 +35,7 @@ ifdef(`distro_gentoo',`
 /usr/lib(64)?/perl5/man(/.*)?	gen_context(system_u:object_r:man_t,s0)
 
 /usr/local/man(/.*)?		gen_context(system_u:object_r:man_t,s0)
+/usr/local/share/man(/.*)?	gen_context(system_u:object_r:man_t,s0)
 
 /usr/local/share/fonts(/.*)?	gen_context(system_u:object_r:fonts_t,s0)
 

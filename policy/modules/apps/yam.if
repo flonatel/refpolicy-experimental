@@ -16,7 +16,7 @@ interface(`yam_domtrans',`
 	')
 
 	corecmd_search_bin($1)
-	domtrans_pattern($1,yam_exec_t,yam_t)
+	domtrans_pattern($1, yam_exec_t, yam_t)
 ')
 
 ########################################
@@ -34,11 +34,6 @@ interface(`yam_domtrans',`
 ##	The role to be allowed the yam domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the yam domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`yam_run',`
@@ -48,7 +43,6 @@ interface(`yam_run',`
 
 	yam_domtrans($1)
 	role $2 types yam_t;
-	allow yam_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -67,6 +61,6 @@ interface(`yam_read_content',`
 	')
 
 	allow $1 yam_content_t:dir list_dir_perms;
-	read_files_pattern($1,yam_content_t,yam_content_t)
-	read_lnk_files_pattern($1,yam_content_t,yam_content_t)
+	read_files_pattern($1, yam_content_t, yam_content_t)
+	read_lnk_files_pattern($1, yam_content_t, yam_content_t)
 ')

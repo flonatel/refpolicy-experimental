@@ -1,5 +1,5 @@
 
-policy_module(howl, 1.6.0)
+policy_module(howl, 1.7.2)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(howl, 1.6.0)
 
 type howl_t;
 type howl_exec_t;
-init_daemon_domain(howl_t,howl_exec_t)
+init_daemon_domain(howl_t, howl_exec_t)
 
 type howl_var_run_t;
 files_pid_file(howl_var_run_t)
@@ -25,8 +25,8 @@ allow howl_t self:fifo_file rw_fifo_file_perms;
 allow howl_t self:tcp_socket create_stream_socket_perms;
 allow howl_t self:udp_socket create_socket_perms;
 
-manage_files_pattern(howl_t,howl_var_run_t,howl_var_run_t)
-files_pid_filetrans(howl_t,howl_var_run_t,file)
+manage_files_pattern(howl_t, howl_var_run_t, howl_var_run_t)
+files_pid_filetrans(howl_t, howl_var_run_t, file)
 
 kernel_read_network_state(howl_t)
 kernel_read_kernel_sysctls(howl_t)
@@ -36,14 +36,14 @@ kernel_read_proc_symlinks(howl_t)
 
 corenet_all_recvfrom_unlabeled(howl_t)
 corenet_all_recvfrom_netlabel(howl_t)
-corenet_tcp_sendrecv_all_if(howl_t)
-corenet_udp_sendrecv_all_if(howl_t)
-corenet_tcp_sendrecv_all_nodes(howl_t)
-corenet_udp_sendrecv_all_nodes(howl_t)
+corenet_tcp_sendrecv_generic_if(howl_t)
+corenet_udp_sendrecv_generic_if(howl_t)
+corenet_tcp_sendrecv_generic_node(howl_t)
+corenet_udp_sendrecv_generic_node(howl_t)
 corenet_tcp_sendrecv_all_ports(howl_t)
 corenet_udp_sendrecv_all_ports(howl_t)
-corenet_tcp_bind_all_nodes(howl_t)
-corenet_udp_bind_all_nodes(howl_t)
+corenet_tcp_bind_generic_node(howl_t)
+corenet_udp_bind_generic_node(howl_t)
 corenet_tcp_bind_howl_port(howl_t)
 corenet_udp_bind_howl_port(howl_t)
 corenet_sendrecv_howl_server_packets(howl_t)
@@ -59,9 +59,6 @@ files_read_etc_files(howl_t)
 
 init_rw_utmp(howl_t)
 
-libs_use_ld_so(howl_t)
-libs_use_shared_libs(howl_t)
-
 logging_send_syslog_msg(howl_t)
 
 miscfiles_read_localization(howl_t)
@@ -69,8 +66,7 @@ miscfiles_read_localization(howl_t)
 sysnet_read_config(howl_t)
 
 userdom_dontaudit_use_unpriv_user_fds(howl_t)
-
-sysadm_dontaudit_search_home_dirs(howl_t)
+userdom_dontaudit_search_user_home_dirs(howl_t)
 
 optional_policy(`
 	nis_use_ypbind(howl_t)

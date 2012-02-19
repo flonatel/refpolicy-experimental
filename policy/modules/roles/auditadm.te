@@ -1,5 +1,5 @@
 
-policy_module(auditadm, 1.0.0)
+policy_module(auditadm, 2.0.1)
 
 ########################################
 #
@@ -17,6 +17,8 @@ userdom_unpriv_user_template(auditadm)
 
 allow auditadm_t self:capability { dac_read_search dac_override };
 
+kernel_read_ring_buffer(auditadm_t)
+
 corecmd_exec_shell(auditadm_t)
 
 domain_kill_all_domains(auditadm_t)
@@ -25,10 +27,10 @@ logging_send_syslog_msg(auditadm_t)
 logging_read_generic_logs(auditadm_t)
 logging_manage_audit_log(auditadm_t)
 logging_manage_audit_config(auditadm_t)
-logging_run_auditctl(auditadm_t, auditadm_r, { auditadm_tty_device_t auditadm_devpts_t })
-logging_run_auditd(auditadm_t, auditadm_r, { auditadm_tty_device_t auditadm_devpts_t })
+logging_run_auditctl(auditadm_t, auditadm_r)
+logging_run_auditd(auditadm_t, auditadm_r)
 
-seutil_run_runinit(auditadm_t, auditadm_r, { auditadm_tty_device_t auditadm_devpts_t })
+seutil_run_runinit(auditadm_t, auditadm_r)
 seutil_read_bin_policy(auditadm_t)
 
 optional_policy(`
@@ -40,11 +42,22 @@ optional_policy(`
 ')
 
 optional_policy(`
-	secadm_role_change_template(auditadm)
+	screen_role_template(auditadm, auditadm_r, auditadm_t)
 ')
 
 optional_policy(`
-	sysadm_role_change_template(auditadm)
-	sysadm_dontaudit_read_home_content_files(auditadm_t)
+	secadm_role_change(auditadm_r)
+')
+
+optional_policy(`
+	su_role_template(auditadm, auditadm_r, auditadm_t)
+')
+
+optional_policy(`
+	sudo_role_template(auditadm, auditadm_r, auditadm_t)
+')
+
+optional_policy(`
+	sysadm_role_change(auditadm_r)
 ')
 

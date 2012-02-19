@@ -1,5 +1,5 @@
 
-policy_module(ddcprobe,1.1.0)
+policy_module(ddcprobe, 1.2.0)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(ddcprobe,1.1.0)
 
 type ddcprobe_t;
 type ddcprobe_exec_t;
-application_domain(ddcprobe_t,ddcprobe_exec_t)
+application_domain(ddcprobe_t, ddcprobe_exec_t)
 role system_r types ddcprobe_t;
 
 ########################################
@@ -40,13 +40,12 @@ term_use_all_user_ttys(ddcprobe_t)
 term_use_all_user_ptys(ddcprobe_t)
 
 libs_read_lib_files(ddcprobe_t)
-libs_use_ld_so(ddcprobe_t)
-libs_use_shared_libs(ddcprobe_t)
 
 miscfiles_read_localization(ddcprobe_t)
 
 modutils_read_module_deps(ddcprobe_t)
 
+userdom_use_user_terminals(ddcprobe_t)
 userdom_use_all_users_fds(ddcprobe_t)
 
 #reh why? this does not seem even necessary to function properly

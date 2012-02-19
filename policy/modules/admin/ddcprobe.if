@@ -15,7 +15,7 @@ interface(`ddcprobe_domtrans',`
 		type ddcprobe_t, ddcprobe_exec_t;
 	')
 
-	domtrans_pattern($1,ddcprobe_exec_t,ddcprobe_t)
+	domtrans_pattern($1, ddcprobe_exec_t, ddcprobe_t)
 ')
 
 ########################################
@@ -33,11 +33,6 @@ interface(`ddcprobe_domtrans',`
 ##	Role to be authenticated for ddcprobe domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the clock domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`ddcprobe_run',`
@@ -47,5 +42,4 @@ interface(`ddcprobe_run',`
 
 	ddcprobe_domtrans($1)
 	role $2 types ddcprobe_t;
-	allow ddcprobe_t $3:chr_file rw_term_perms;
 ')

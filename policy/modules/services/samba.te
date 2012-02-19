@@ -1,5 +1,5 @@
 
-policy_module(samba, 1.9.0)
+policy_module(samba, 1.11.2)
 
 #################################
 #
@@ -13,7 +13,14 @@ policy_module(samba, 1.9.0)
 ## public_content_rw_t.
 ## </p>
 ## </desc>
-gen_tunable(allow_smbd_anon_write,false)
+gen_tunable(allow_smbd_anon_write, false)
+
+## <desc>
+## <p>
+## Allow samba to create new home directories (e.g. via PAM)
+## </p>
+## </desc>
+gen_tunable(samba_create_home_dirs, false)
 
 ## <desc>
 ## <p>
@@ -22,46 +29,46 @@ gen_tunable(allow_smbd_anon_write,false)
 ## 
 ## </p>
 ## </desc>
-gen_tunable(samba_domain_controller,false)
+gen_tunable(samba_domain_controller, false)
 
 ## <desc>
 ## <p>
 ## Allow samba to share users home directories.
 ## </p>
 ## </desc>
-gen_tunable(samba_enable_home_dirs,false)
+gen_tunable(samba_enable_home_dirs, false)
 
 ## <desc>
 ## <p>
 ## Allow samba to share any file/directory read only.
 ## </p>
 ## </desc>
-gen_tunable(samba_export_all_ro,false)
+gen_tunable(samba_export_all_ro, false)
 
 ## <desc>
 ## <p>
 ## Allow samba to share any file/directory read/write.
 ## </p>
 ## </desc>
-gen_tunable(samba_export_all_rw,false)
+gen_tunable(samba_export_all_rw, false)
 
 ## <desc>
 ## <p>
 ## Allow samba to run unconfined scripts
 ## </p>
 ## </desc>
-gen_tunable(samba_run_unconfined,false)
+gen_tunable(samba_run_unconfined, false)
 
 ## <desc>
 ## <p>
 ## Allow samba to export NFS volumes.
 ## </p>
 ## </desc>
-gen_tunable(samba_share_nfs,false)
+gen_tunable(samba_share_nfs, false)
 
 type nmbd_t;
 type nmbd_exec_t;
-init_daemon_domain(nmbd_t,nmbd_exec_t)
+init_daemon_domain(nmbd_t, nmbd_exec_t)
 
 type nmbd_var_run_t;
 files_pid_file(nmbd_var_run_t)
@@ -77,7 +84,7 @@ domain_type(samba_net_t)
 role system_r types samba_net_t;
 
 type samba_net_exec_t;
-domain_entry_file(samba_net_t,samba_net_exec_t)
+domain_entry_file(samba_net_t, samba_net_exec_t)
 
 type samba_net_tmp_t;
 files_tmp_file(samba_net_tmp_t)
@@ -93,7 +100,7 @@ files_type(samba_var_t)
 
 type smbd_t;
 type smbd_exec_t;
-init_daemon_domain(smbd_t,smbd_exec_t)
+init_daemon_domain(smbd_t, smbd_exec_t)
 
 type smbd_tmp_t;
 files_tmp_file(smbd_tmp_t)
@@ -105,12 +112,12 @@ type smbmount_t;
 domain_type(smbmount_t)
 
 type smbmount_exec_t;
-domain_entry_file(smbmount_t,smbmount_exec_t)
+domain_entry_file(smbmount_t, smbmount_exec_t)
 
 type swat_t;
 type swat_exec_t;
 domain_type(swat_t)
-domain_entry_file(swat_t,swat_exec_t)
+domain_entry_file(swat_t, swat_exec_t)
 role system_r types swat_t;
 
 type swat_tmp_t;
@@ -121,14 +128,14 @@ files_pid_file(swat_var_run_t)
 
 type winbind_t;
 type winbind_exec_t;
-init_daemon_domain(winbind_t,winbind_exec_t)
+init_daemon_domain(winbind_t, winbind_exec_t)
 
 type winbind_helper_t;
 domain_type(winbind_helper_t)
 role system_r types winbind_helper_t;
 
 type winbind_helper_exec_t;
-domain_entry_file(winbind_helper_t,winbind_helper_exec_t)
+domain_entry_file(winbind_helper_t, winbind_helper_exec_t)
 
 type winbind_log_t;
 logging_log_file(winbind_log_t)
@@ -151,31 +158,31 @@ allow samba_net_t self:tcp_socket create_socket_perms;
 
 allow samba_net_t samba_etc_t:file read_file_perms;
 
-manage_files_pattern(samba_net_t,samba_etc_t,samba_secrets_t)
-filetrans_pattern(samba_net_t,samba_etc_t,samba_secrets_t,file)
+manage_files_pattern(samba_net_t, samba_etc_t, samba_secrets_t)
+filetrans_pattern(samba_net_t, samba_etc_t, samba_secrets_t, file)
 
-manage_dirs_pattern(samba_net_t,samba_net_tmp_t,samba_net_tmp_t)
-manage_files_pattern(samba_net_t,samba_net_tmp_t,samba_net_tmp_t)
+manage_dirs_pattern(samba_net_t, samba_net_tmp_t, samba_net_tmp_t)
+manage_files_pattern(samba_net_t, samba_net_tmp_t, samba_net_tmp_t)
 files_tmp_filetrans(samba_net_t, samba_net_tmp_t, { file dir })
 
 allow samba_net_t samba_var_t:dir rw_dir_perms;
-manage_files_pattern(samba_net_t,samba_var_t,samba_var_t)
-manage_lnk_files_pattern(samba_net_t,samba_var_t,samba_var_t)
+manage_files_pattern(samba_net_t, samba_var_t, samba_var_t)
+manage_lnk_files_pattern(samba_net_t, samba_var_t, samba_var_t)
 
 kernel_read_proc_symlinks(samba_net_t)
 
 corenet_all_recvfrom_unlabeled(samba_net_t)
 corenet_all_recvfrom_netlabel(samba_net_t)
-corenet_tcp_sendrecv_all_if(samba_net_t)
-corenet_udp_sendrecv_all_if(samba_net_t)
-corenet_raw_sendrecv_all_if(samba_net_t)
-corenet_tcp_sendrecv_all_nodes(samba_net_t)
-corenet_udp_sendrecv_all_nodes(samba_net_t)
-corenet_raw_sendrecv_all_nodes(samba_net_t)
+corenet_tcp_sendrecv_generic_if(samba_net_t)
+corenet_udp_sendrecv_generic_if(samba_net_t)
+corenet_raw_sendrecv_generic_if(samba_net_t)
+corenet_tcp_sendrecv_generic_node(samba_net_t)
+corenet_udp_sendrecv_generic_node(samba_net_t)
+corenet_raw_sendrecv_generic_node(samba_net_t)
 corenet_tcp_sendrecv_all_ports(samba_net_t)
 corenet_udp_sendrecv_all_ports(samba_net_t)
-corenet_tcp_bind_all_nodes(samba_net_t)
-corenet_udp_bind_all_nodes(samba_net_t)
+corenet_tcp_bind_generic_node(samba_net_t)
+corenet_udp_bind_generic_node(samba_net_t)
 corenet_tcp_connect_smbd_port(samba_net_t)
 
 dev_read_urand(samba_net_t)
@@ -186,14 +193,12 @@ files_read_etc_files(samba_net_t)
 
 auth_use_nsswitch(samba_net_t)
 
-libs_use_ld_so(samba_net_t)
-libs_use_shared_libs(samba_net_t)
-
 logging_send_syslog_msg(samba_net_t)
 
 miscfiles_read_localization(samba_net_t) 
 
-sysadm_dontaudit_search_home_dirs(samba_net_t)
+userdom_use_user_terminals(samba_net_t)
+userdom_dontaudit_search_user_home_dirs(samba_net_t)
 
 optional_policy(`
 	kerberos_use(samba_net_t)
@@ -213,7 +218,7 @@ allow smbd_t self:msg { send receive };
 allow smbd_t self:msgq create_msgq_perms;
 allow smbd_t self:sem create_sem_perms;
 allow smbd_t self:shm create_shm_perms;
-allow smbd_t self:sock_file read_file_perms;
+allow smbd_t self:sock_file read_sock_file_perms;
 allow smbd_t self:tcp_socket create_stream_socket_perms;
 allow smbd_t self:udp_socket create_socket_perms;
 allow smbd_t self:unix_dgram_socket { create_socket_perms sendto };
@@ -221,35 +226,35 @@ allow smbd_t self:unix_stream_socket { create_stream_socket_perms connectto };
 
 allow smbd_t samba_etc_t:file { rw_file_perms setattr };
 
-create_dirs_pattern(smbd_t,samba_log_t,samba_log_t)
-manage_files_pattern(smbd_t,samba_log_t,samba_log_t)
+create_dirs_pattern(smbd_t, samba_log_t, samba_log_t)
+manage_files_pattern(smbd_t, samba_log_t, samba_log_t)
 allow smbd_t samba_log_t:dir setattr;
 dontaudit smbd_t samba_log_t:dir remove_name;
 
 allow smbd_t samba_net_tmp_t:file getattr;
 
-manage_files_pattern(smbd_t,samba_secrets_t,samba_secrets_t)
-filetrans_pattern(smbd_t,samba_etc_t,samba_secrets_t,file)
+manage_files_pattern(smbd_t, samba_secrets_t, samba_secrets_t)
+filetrans_pattern(smbd_t, samba_etc_t, samba_secrets_t, file)
 
-manage_dirs_pattern(smbd_t,samba_share_t,samba_share_t)
-manage_files_pattern(smbd_t,samba_share_t,samba_share_t)
-manage_lnk_files_pattern(smbd_t,samba_share_t,samba_share_t)
+manage_dirs_pattern(smbd_t, samba_share_t, samba_share_t)
+manage_files_pattern(smbd_t, samba_share_t, samba_share_t)
+manage_lnk_files_pattern(smbd_t, samba_share_t, samba_share_t)
 
-manage_dirs_pattern(smbd_t,samba_var_t,samba_var_t)
-manage_files_pattern(smbd_t,samba_var_t,samba_var_t)
-manage_lnk_files_pattern(smbd_t,samba_var_t,samba_var_t)
-manage_sock_files_pattern(smbd_t,samba_var_t,samba_var_t)
+manage_dirs_pattern(smbd_t, samba_var_t, samba_var_t)
+manage_files_pattern(smbd_t, samba_var_t, samba_var_t)
+manage_lnk_files_pattern(smbd_t, samba_var_t, samba_var_t)
+manage_sock_files_pattern(smbd_t, samba_var_t, samba_var_t)
 
-manage_dirs_pattern(smbd_t,smbd_tmp_t,smbd_tmp_t)
-manage_files_pattern(smbd_t,smbd_tmp_t,smbd_tmp_t)
+manage_dirs_pattern(smbd_t, smbd_tmp_t, smbd_tmp_t)
+manage_files_pattern(smbd_t, smbd_tmp_t, smbd_tmp_t)
 files_tmp_filetrans(smbd_t, smbd_tmp_t, { file dir })
 
 allow smbd_t nmbd_var_run_t:file rw_file_perms;
 
-manage_dirs_pattern(smbd_t,smbd_var_run_t,smbd_var_run_t)
-manage_files_pattern(smbd_t,smbd_var_run_t,smbd_var_run_t)
-manage_sock_files_pattern(smbd_t,smbd_var_run_t,smbd_var_run_t)
-files_pid_filetrans(smbd_t,smbd_var_run_t,file)
+manage_dirs_pattern(smbd_t, smbd_var_run_t, smbd_var_run_t)
+manage_files_pattern(smbd_t, smbd_var_run_t, smbd_var_run_t)
+manage_sock_files_pattern(smbd_t, smbd_var_run_t, smbd_var_run_t)
+files_pid_filetrans(smbd_t, smbd_var_run_t, file)
 
 allow smbd_t winbind_var_run_t:sock_file { read write getattr };
 
@@ -266,16 +271,16 @@ corecmd_exec_bin(smbd_t)
 
 corenet_all_recvfrom_unlabeled(smbd_t)
 corenet_all_recvfrom_netlabel(smbd_t)
-corenet_tcp_sendrecv_all_if(smbd_t)
-corenet_udp_sendrecv_all_if(smbd_t)
-corenet_raw_sendrecv_all_if(smbd_t)
-corenet_tcp_sendrecv_all_nodes(smbd_t)
-corenet_udp_sendrecv_all_nodes(smbd_t)
-corenet_raw_sendrecv_all_nodes(smbd_t)
+corenet_tcp_sendrecv_generic_if(smbd_t)
+corenet_udp_sendrecv_generic_if(smbd_t)
+corenet_raw_sendrecv_generic_if(smbd_t)
+corenet_tcp_sendrecv_generic_node(smbd_t)
+corenet_udp_sendrecv_generic_node(smbd_t)
+corenet_raw_sendrecv_generic_node(smbd_t)
 corenet_tcp_sendrecv_all_ports(smbd_t)
 corenet_udp_sendrecv_all_ports(smbd_t)
-corenet_tcp_bind_all_nodes(smbd_t)
-corenet_udp_bind_all_nodes(smbd_t)
+corenet_tcp_bind_generic_node(smbd_t)
+corenet_udp_bind_generic_node(smbd_t)
 corenet_tcp_bind_smbd_port(smbd_t)
 corenet_tcp_connect_ipp_port(smbd_t)
 corenet_tcp_connect_smbd_port(smbd_t)
@@ -307,19 +312,14 @@ files_list_mnt(smbd_t)
 
 init_rw_utmp(smbd_t)
 
-libs_use_ld_so(smbd_t)
-libs_use_shared_libs(smbd_t)
-
 logging_search_logs(smbd_t)
 logging_send_syslog_msg(smbd_t)
 
 miscfiles_read_localization(smbd_t)
 miscfiles_read_public_files(smbd_t)
 
-userdom_dontaudit_use_unpriv_user_fds(smbd_t)
 userdom_use_unpriv_users_fds(smbd_t)
-
-sysadm_dontaudit_search_home_dirs(smbd_t)
+userdom_dontaudit_search_user_home_dirs(smbd_t)
 
 ifdef(`hide_broken_symptoms', `
 	files_dontaudit_getattr_default_dirs(smbd_t)
@@ -335,6 +335,15 @@ tunable_policy(`samba_domain_controller',`
 	usermanage_domtrans_passwd(smbd_t)
 	usermanage_domtrans_useradd(smbd_t)
 	usermanage_domtrans_groupadd(smbd_t)
+')
+
+tunable_policy(`samba_enable_home_dirs',`
+	userdom_manage_user_home_content_dirs(smbd_t)
+	userdom_manage_user_home_content_files(smbd_t)
+	userdom_manage_user_home_content_symlinks(smbd_t)
+	userdom_manage_user_home_content_sockets(smbd_t)
+	userdom_manage_user_home_content_pipes(smbd_t)
+	userdom_user_home_dir_filetrans_user_home_content(smbd_t, { dir file lnk_file sock_file fifo_file })
 ')
 
 # Support Samba sharing of NFS mount points
@@ -364,6 +373,12 @@ optional_policy(`
 	udev_read_db(smbd_t)
 ')
 
+tunable_policy(`samba_create_home_dirs',`
+	allow smbd_t self:capability chown;
+	userdom_create_user_home_dirs(smbd_t)
+	userdom_home_filetrans_user_home_dir(smbd_t)
+')
+
 tunable_policy(`samba_export_all_ro',`
 	fs_read_noxattr_fs_files(smbd_t) 
 	auth_read_all_files_except_shadow(smbd_t)
@@ -376,7 +391,7 @@ tunable_policy(`samba_export_all_rw',`
 	auth_manage_all_files_except_shadow(smbd_t)
 	fs_read_noxattr_fs_files(nmbd_t) 
 	auth_manage_all_files_except_shadow(nmbd_t)
-	unprivuser_home_dir_filetrans_home_content(nmbd_t, { file dir })
+	userdom_user_home_dir_filetrans_user_home_content(nmbd_t, { file dir })
 ')
 
 ########################################
@@ -392,26 +407,25 @@ allow nmbd_t self:msg { send receive };
 allow nmbd_t self:msgq create_msgq_perms;
 allow nmbd_t self:sem create_sem_perms;
 allow nmbd_t self:shm create_shm_perms;
-allow nmbd_t self:sock_file read_file_perms;
+allow nmbd_t self:sock_file read_sock_file_perms;
 allow nmbd_t self:tcp_socket create_stream_socket_perms;
 allow nmbd_t self:udp_socket create_socket_perms;
 allow nmbd_t self:unix_dgram_socket { create_socket_perms sendto };
 allow nmbd_t self:unix_stream_socket { create_stream_socket_perms connectto };
 
-manage_files_pattern(nmbd_t,nmbd_var_run_t,nmbd_var_run_t)
-files_pid_filetrans(nmbd_t,nmbd_var_run_t,file)
+manage_files_pattern(nmbd_t, nmbd_var_run_t, nmbd_var_run_t)
+files_pid_filetrans(nmbd_t, nmbd_var_run_t, file)
 
-read_files_pattern(nmbd_t,samba_etc_t,samba_etc_t)
+read_files_pattern(nmbd_t, samba_etc_t, samba_etc_t)
 
-manage_dirs_pattern(nmbd_t,samba_log_t,samba_log_t)
-append_files_pattern(nmbd_t,samba_log_t,samba_log_t)
-allow nmbd_t samba_log_t:file unlink;
+manage_dirs_pattern(nmbd_t, samba_log_t, samba_log_t)
+manage_files_pattern(nmbd_t, samba_log_t, samba_log_t)
 
-read_files_pattern(nmbd_t,samba_log_t,samba_log_t)
-create_files_pattern(nmbd_t,samba_log_t,samba_log_t)
+read_files_pattern(nmbd_t, samba_log_t, samba_log_t)
+create_files_pattern(nmbd_t, samba_log_t, samba_log_t)
 allow nmbd_t samba_log_t:dir setattr;
 
-manage_files_pattern(nmbd_t,samba_var_t,samba_var_t)
+manage_files_pattern(nmbd_t, samba_var_t, samba_var_t)
 
 allow nmbd_t smbd_var_run_t:dir rw_dir_perms;
 
@@ -424,13 +438,13 @@ kernel_read_system_state(nmbd_t)
 
 corenet_all_recvfrom_unlabeled(nmbd_t)
 corenet_all_recvfrom_netlabel(nmbd_t)
-corenet_tcp_sendrecv_all_if(nmbd_t)
-corenet_udp_sendrecv_all_if(nmbd_t)
-corenet_tcp_sendrecv_all_nodes(nmbd_t)
-corenet_udp_sendrecv_all_nodes(nmbd_t)
+corenet_tcp_sendrecv_generic_if(nmbd_t)
+corenet_udp_sendrecv_generic_if(nmbd_t)
+corenet_tcp_sendrecv_generic_node(nmbd_t)
+corenet_udp_sendrecv_generic_node(nmbd_t)
 corenet_tcp_sendrecv_all_ports(nmbd_t)
 corenet_udp_sendrecv_all_ports(nmbd_t)
-corenet_udp_bind_all_nodes(nmbd_t)
+corenet_udp_bind_generic_node(nmbd_t)
 corenet_udp_bind_nmbd_port(nmbd_t)
 corenet_sendrecv_nmbd_server_packets(nmbd_t)
 corenet_sendrecv_nmbd_client_packets(nmbd_t)
@@ -450,18 +464,13 @@ files_list_var_lib(nmbd_t)
 
 auth_use_nsswitch(nmbd_t)
 
-libs_use_ld_so(nmbd_t)
-libs_use_shared_libs(nmbd_t)
-
 logging_search_logs(nmbd_t)
 logging_send_syslog_msg(nmbd_t)
 
 miscfiles_read_localization(nmbd_t)
 
-userdom_dontaudit_use_unpriv_user_fds(nmbd_t)
 userdom_use_unpriv_users_fds(nmbd_t)
-
-sysadm_dontaudit_search_home_dirs(nmbd_t)
+userdom_dontaudit_search_user_home_dirs(nmbd_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(nmbd_t)
@@ -493,24 +502,24 @@ allow smbmount_t samba_log_t:file manage_file_perms;
 
 allow smbmount_t samba_secrets_t:file manage_file_perms;
 
-manage_files_pattern(smbmount_t,samba_var_t,samba_var_t)
-manage_lnk_files_pattern(smbmount_t,samba_var_t,samba_var_t)
+manage_files_pattern(smbmount_t, samba_var_t, samba_var_t)
+manage_lnk_files_pattern(smbmount_t, samba_var_t, samba_var_t)
 files_list_var_lib(smbmount_t)
 
 kernel_read_system_state(smbmount_t)
 
 corenet_all_recvfrom_unlabeled(smbmount_t)
 corenet_all_recvfrom_netlabel(smbmount_t)
-corenet_tcp_sendrecv_all_if(smbmount_t)
-corenet_raw_sendrecv_all_if(smbmount_t)
-corenet_udp_sendrecv_all_if(smbmount_t)
-corenet_tcp_sendrecv_all_nodes(smbmount_t)
-corenet_raw_sendrecv_all_nodes(smbmount_t)
-corenet_udp_sendrecv_all_nodes(smbmount_t)
+corenet_tcp_sendrecv_generic_if(smbmount_t)
+corenet_raw_sendrecv_generic_if(smbmount_t)
+corenet_udp_sendrecv_generic_if(smbmount_t)
+corenet_tcp_sendrecv_generic_node(smbmount_t)
+corenet_raw_sendrecv_generic_node(smbmount_t)
+corenet_udp_sendrecv_generic_node(smbmount_t)
 corenet_tcp_sendrecv_all_ports(smbmount_t)
 corenet_udp_sendrecv_all_ports(smbmount_t)
-corenet_tcp_bind_all_nodes(smbmount_t)
-corenet_udp_bind_all_nodes(smbmount_t)
+corenet_tcp_bind_generic_node(smbmount_t)
+corenet_udp_bind_generic_node(smbmount_t)
 corenet_tcp_connect_all_ports(smbmount_t)
 
 fs_getattr_cifs(smbmount_t)
@@ -522,8 +531,6 @@ fs_read_cifs_files(smbmount_t)
 
 storage_raw_read_fixed_disk(smbmount_t)
 storage_raw_write_fixed_disk(smbmount_t)
-
-term_list_ptys(smbmount_t)
 
 corecmd_list_bin(smbmount_t)
 
@@ -539,13 +546,11 @@ miscfiles_read_localization(smbmount_t)
 
 mount_use_fds(smbmount_t)
 
-libs_use_ld_so(smbmount_t)
-libs_use_shared_libs(smbmount_t)
-
 locallogin_use_fds(smbmount_t)
 
 logging_search_logs(smbmount_t)
 
+userdom_use_user_terminals(smbmount_t)
 userdom_use_all_users_fds(smbmount_t)
 
 ########################################
@@ -560,26 +565,26 @@ allow swat_t self:netlink_tcpdiag_socket r_netlink_socket_perms;
 allow swat_t self:tcp_socket create_stream_socket_perms;
 allow swat_t self:udp_socket create_socket_perms;
 
-allow swat_t nmbd_exec_t:file { execute read };
+allow swat_t nmbd_exec_t:file mmap_file_perms;
 
-rw_files_pattern(swat_t,samba_etc_t,samba_etc_t)
+rw_files_pattern(swat_t, samba_etc_t, samba_etc_t)
 
-append_files_pattern(swat_t,samba_log_t,samba_log_t)
+append_files_pattern(swat_t, samba_log_t, samba_log_t)
 
-allow swat_t smbd_exec_t:file execute ;
+allow swat_t smbd_exec_t:file mmap_file_perms ;
 
 allow swat_t smbd_t:process signull;
 
-allow swat_t smbd_var_run_t:file read;
+allow swat_t smbd_var_run_t:file read_file_perms;
 
-manage_dirs_pattern(swat_t,swat_tmp_t,swat_tmp_t)
-manage_files_pattern(swat_t,swat_tmp_t,swat_tmp_t)
+manage_dirs_pattern(swat_t, swat_tmp_t, swat_tmp_t)
+manage_files_pattern(swat_t, swat_tmp_t, swat_tmp_t)
 files_tmp_filetrans(swat_t, swat_tmp_t, { file dir })
 
-manage_files_pattern(swat_t,swat_var_run_t,swat_var_run_t)
-files_pid_filetrans(swat_t,swat_var_run_t,file)
+manage_files_pattern(swat_t, swat_var_run_t, swat_var_run_t)
+files_pid_filetrans(swat_t, swat_var_run_t, file)
 
-allow swat_t winbind_exec_t:file execute;
+allow swat_t winbind_exec_t:file mmap_file_perms;
 
 kernel_read_kernel_sysctls(swat_t)
 kernel_read_system_state(swat_t)
@@ -592,9 +597,9 @@ corenet_all_recvfrom_netlabel(swat_t)
 corenet_tcp_sendrecv_generic_if(swat_t)
 corenet_udp_sendrecv_generic_if(swat_t)
 corenet_raw_sendrecv_generic_if(swat_t)
-corenet_tcp_sendrecv_all_nodes(swat_t)
-corenet_udp_sendrecv_all_nodes(swat_t)
-corenet_raw_sendrecv_all_nodes(swat_t)
+corenet_tcp_sendrecv_generic_node(swat_t)
+corenet_udp_sendrecv_generic_node(swat_t)
+corenet_raw_sendrecv_generic_node(swat_t)
 corenet_tcp_sendrecv_all_ports(swat_t)
 corenet_udp_sendrecv_all_ports(swat_t)
 corenet_tcp_connect_smbd_port(swat_t)
@@ -612,9 +617,6 @@ fs_getattr_xattr_fs(swat_t)
 auth_domtrans_chk_passwd(swat_t)
 auth_use_nsswitch(swat_t)
 
-libs_use_ld_so(swat_t)
-libs_use_shared_libs(swat_t)
-
 logging_send_syslog_msg(swat_t)
 logging_search_logs(swat_t)
 
@@ -626,7 +628,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	inetd_service_domain(swat_t,swat_exec_t)
+	inetd_service_domain(swat_t, swat_exec_t)
 ')
 
 optional_policy(`
@@ -638,11 +640,10 @@ optional_policy(`
 # Winbind local policy
 #
 
-
 allow winbind_t self:capability { dac_override ipc_lock setuid };
 dontaudit winbind_t self:capability sys_tty_config;
 allow winbind_t self:process signal_perms;
-allow winbind_t self:fifo_file { read write };
+allow winbind_t self:fifo_file rw_fifo_file_perms;
 allow winbind_t self:unix_dgram_socket create_socket_perms;
 allow winbind_t self:unix_stream_socket create_stream_socket_perms;
 allow winbind_t self:tcp_socket create_stream_socket_perms;
@@ -653,33 +654,34 @@ allow winbind_t nmbd_t:process { signal signull };
 allow winbind_t nmbd_var_run_t:file read_file_perms;
 
 allow winbind_t samba_etc_t:dir list_dir_perms;
-read_files_pattern(winbind_t,samba_etc_t,samba_etc_t)
-read_lnk_files_pattern(winbind_t,samba_etc_t,samba_etc_t)
+read_files_pattern(winbind_t, samba_etc_t, samba_etc_t)
+read_lnk_files_pattern(winbind_t, samba_etc_t, samba_etc_t)
 
-manage_files_pattern(winbind_t,samba_etc_t,samba_secrets_t)
-filetrans_pattern(winbind_t,samba_etc_t,samba_secrets_t,file)
+manage_files_pattern(winbind_t, samba_etc_t, samba_secrets_t)
+filetrans_pattern(winbind_t, samba_etc_t, samba_secrets_t, file)
 
-manage_dirs_pattern(winbind_t,samba_log_t,samba_log_t)
-manage_files_pattern(winbind_t,samba_log_t,samba_log_t)
-manage_lnk_files_pattern(winbind_t,samba_log_t,samba_log_t)
+manage_dirs_pattern(winbind_t, samba_log_t, samba_log_t)
+manage_files_pattern(winbind_t, samba_log_t, samba_log_t)
+manage_lnk_files_pattern(winbind_t, samba_log_t, samba_log_t)
 
-manage_dirs_pattern(winbind_t,samba_var_t,samba_var_t)
-manage_files_pattern(winbind_t,samba_var_t,samba_var_t)
-manage_lnk_files_pattern(winbind_t,samba_var_t,samba_var_t)
+manage_dirs_pattern(winbind_t, samba_var_t, samba_var_t)
+manage_files_pattern(winbind_t, samba_var_t, samba_var_t)
+manage_lnk_files_pattern(winbind_t, samba_var_t, samba_var_t)
 files_list_var_lib(winbind_t)
 
-rw_files_pattern(winbind_t,smbd_tmp_t,smbd_tmp_t)
+rw_files_pattern(winbind_t, smbd_tmp_t, smbd_tmp_t)
 
 allow winbind_t winbind_log_t:file manage_file_perms;
 logging_log_filetrans(winbind_t,winbind_log_t,file)
 
-manage_dirs_pattern(winbind_t,winbind_tmp_t,winbind_tmp_t)
-manage_files_pattern(winbind_t,winbind_tmp_t,winbind_tmp_t)
+manage_dirs_pattern(winbind_t, winbind_tmp_t, winbind_tmp_t)
+manage_files_pattern(winbind_t, winbind_tmp_t, winbind_tmp_t)
+manage_sock_files_pattern(winbind_t, winbind_tmp_t, winbind_tmp_t)
 files_tmp_filetrans(winbind_t, winbind_tmp_t, { file dir })
 
-manage_files_pattern(winbind_t,winbind_var_run_t,winbind_var_run_t)
-manage_sock_files_pattern(winbind_t,winbind_var_run_t,winbind_var_run_t)
-files_pid_filetrans(winbind_t,winbind_var_run_t,file)
+manage_files_pattern(winbind_t, winbind_var_run_t, winbind_var_run_t)
+manage_sock_files_pattern(winbind_t, winbind_var_run_t, winbind_var_run_t)
+files_pid_filetrans(winbind_t, winbind_var_run_t, file)
 
 kernel_read_kernel_sysctls(winbind_t)
 kernel_list_proc(winbind_t)
@@ -687,16 +689,16 @@ kernel_read_proc_symlinks(winbind_t)
 
 corenet_all_recvfrom_unlabeled(winbind_t)
 corenet_all_recvfrom_netlabel(winbind_t)
-corenet_tcp_sendrecv_all_if(winbind_t)
-corenet_udp_sendrecv_all_if(winbind_t)
-corenet_raw_sendrecv_all_if(winbind_t)
-corenet_tcp_sendrecv_all_nodes(winbind_t)
-corenet_udp_sendrecv_all_nodes(winbind_t)
-corenet_raw_sendrecv_all_nodes(winbind_t)
+corenet_tcp_sendrecv_generic_if(winbind_t)
+corenet_udp_sendrecv_generic_if(winbind_t)
+corenet_raw_sendrecv_generic_if(winbind_t)
+corenet_tcp_sendrecv_generic_node(winbind_t)
+corenet_udp_sendrecv_generic_node(winbind_t)
+corenet_raw_sendrecv_generic_node(winbind_t)
 corenet_tcp_sendrecv_all_ports(winbind_t)
 corenet_udp_sendrecv_all_ports(winbind_t)
-corenet_tcp_bind_all_nodes(winbind_t)
-corenet_udp_bind_all_nodes(winbind_t)
+corenet_tcp_bind_generic_node(winbind_t)
+corenet_udp_bind_generic_node(winbind_t)
 corenet_tcp_connect_smbd_port(winbind_t)
 
 dev_read_sysfs(winbind_t)
@@ -712,17 +714,17 @@ domain_use_interactive_fds(winbind_t)
 
 files_read_etc_files(winbind_t)
 
-libs_use_ld_so(winbind_t)
-libs_use_shared_libs(winbind_t)
-
 logging_send_syslog_msg(winbind_t)
 
 miscfiles_read_localization(winbind_t)
 
 userdom_dontaudit_use_unpriv_user_fds(winbind_t)
-userdom_priveleged_home_dir_manager(winbind_t)
-
-sysadm_dontaudit_search_home_dirs(winbind_t)
+userdom_manage_user_home_content_dirs(winbind_t)
+userdom_manage_user_home_content_files(winbind_t)
+userdom_manage_user_home_content_symlinks(winbind_t)
+userdom_manage_user_home_content_pipes(winbind_t)
+userdom_manage_user_home_content_sockets(winbind_t)
+userdom_user_home_dir_filetrans_user_home_content(winbind_t, { dir file lnk_file fifo_file sock_file })
 
 optional_policy(`
 	kerberos_use(winbind_t)
@@ -745,13 +747,13 @@ allow winbind_helper_t self:unix_dgram_socket create_socket_perms;
 allow winbind_helper_t self:unix_stream_socket create_stream_socket_perms;
 
 allow winbind_helper_t samba_etc_t:dir list_dir_perms;
-read_files_pattern(winbind_helper_t,samba_etc_t,samba_etc_t)
-read_lnk_files_pattern(winbind_helper_t,samba_etc_t,samba_etc_t)
+read_files_pattern(winbind_helper_t, samba_etc_t, samba_etc_t)
+read_lnk_files_pattern(winbind_helper_t, samba_etc_t, samba_etc_t)
 
-allow winbind_helper_t samba_var_t:dir search;
+allow winbind_helper_t samba_var_t:dir search_dir_perms;
 files_list_var_lib(winbind_helper_t)
 
-stream_connect_pattern(winbind_helper_t,winbind_var_run_t,winbind_var_run_t,winbind_t)
+stream_connect_pattern(winbind_helper_t, winbind_var_run_t, winbind_var_run_t, winbind_t)
 
 term_list_ptys(winbind_helper_t)
 
@@ -759,12 +761,11 @@ domain_use_interactive_fds(winbind_helper_t)
 
 auth_use_nsswitch(winbind_helper_t)
 
-libs_use_ld_so(winbind_helper_t)
-libs_use_shared_libs(winbind_helper_t)
-
 logging_send_syslog_msg(winbind_helper_t)
 
 miscfiles_read_localization(winbind_helper_t) 
+
+userdom_use_user_terminals(winbind_helper_t)
 
 optional_policy(`
 	squid_read_log(winbind_helper_t)
@@ -780,7 +781,7 @@ optional_policy(`
 	type samba_unconfined_script_t;
 	type samba_unconfined_script_exec_t;
 	domain_type(samba_unconfined_script_t)
-	domain_entry_file(samba_unconfined_script_t,samba_unconfined_script_exec_t)
+	domain_entry_file(samba_unconfined_script_t, samba_unconfined_script_exec_t)
 	corecmd_shell_entry_type(samba_unconfined_script_t)
 	role system_r types samba_unconfined_script_t;
 

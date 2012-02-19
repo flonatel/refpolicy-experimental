@@ -133,6 +133,25 @@ interface(`ipsec_setcontext_default_spd',`
 
 ########################################
 ## <summary>
+##	write the ipsec_var_run_t files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`ipsec_write_pid',`
+	gen_require(`
+		type ipsec_var_run_t;
+	')
+
+	files_search_pids($1)
+	write_files_pattern($1, ipsec_var_run_t, ipsec_var_run_t)
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete the IPSEC pid files.
 ## </summary>
 ## <param name="domain">
@@ -200,11 +219,6 @@ interface(`ipsec_domtrans_setkey',`
 ##	The role to be allowed the racoon and setkey domains.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the racoon and setkey domains to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`ipsec_run_setkey',`
@@ -214,5 +228,4 @@ interface(`ipsec_run_setkey',`
 
 	ipsec_domtrans_setkey($1)
 	role $2 types setkey_t;
-	allow setkey_t $3:chr_file rw_term_perms;
 ')

@@ -1,5 +1,5 @@
 
-policy_module(finger, 1.7.0)
+policy_module(finger, 1.8.2)
 
 ########################################
 #
@@ -28,7 +28,7 @@ files_pid_file(fingerd_var_run_t)
 allow fingerd_t self:capability { setgid setuid };
 dontaudit fingerd_t self:capability { sys_tty_config fsetid };
 allow fingerd_t self:process signal_perms;
-allow fingerd_t self:fifo_file { read write getattr };
+allow fingerd_t self:fifo_file rw_fifo_file_perms;
 allow fingerd_t self:tcp_socket connected_stream_socket_perms;
 allow fingerd_t self:udp_socket create_socket_perms;
 allow fingerd_t self:unix_dgram_socket create_socket_perms;
@@ -49,13 +49,13 @@ kernel_read_system_state(fingerd_t)
 
 corenet_all_recvfrom_unlabeled(fingerd_t)
 corenet_all_recvfrom_netlabel(fingerd_t)
-corenet_tcp_sendrecv_all_if(fingerd_t)
-corenet_udp_sendrecv_all_if(fingerd_t)
-corenet_tcp_sendrecv_all_nodes(fingerd_t)
-corenet_udp_sendrecv_all_nodes(fingerd_t)
+corenet_tcp_sendrecv_generic_if(fingerd_t)
+corenet_udp_sendrecv_generic_if(fingerd_t)
+corenet_tcp_sendrecv_generic_node(fingerd_t)
+corenet_udp_sendrecv_generic_node(fingerd_t)
 corenet_tcp_sendrecv_all_ports(fingerd_t)
 corenet_udp_sendrecv_all_ports(fingerd_t)
-corenet_tcp_bind_all_nodes(fingerd_t)
+corenet_tcp_bind_generic_node(fingerd_t)
 corenet_tcp_bind_fingerd_port(fingerd_t)
 
 dev_read_sysfs(fingerd_t)
@@ -80,9 +80,6 @@ files_read_etc_runtime_files(fingerd_t)
 init_read_utmp(fingerd_t)
 init_dontaudit_write_utmp(fingerd_t)
 
-libs_use_ld_so(fingerd_t)
-libs_use_shared_libs(fingerd_t)
-
 logging_send_syslog_msg(fingerd_t)
 
 mta_getattr_spool(fingerd_t)
@@ -93,10 +90,8 @@ miscfiles_read_localization(fingerd_t)
 
 # stop it accessing sub-directories, prevents checking a Maildir for new mail,
 # have to change this when we create a type for Maildir
-userdom_read_unpriv_users_home_content_files(fingerd_t)
+userdom_read_user_home_content_files(fingerd_t)
 userdom_dontaudit_use_unpriv_user_fds(fingerd_t)
-
-sysadm_dontaudit_search_home_dirs(fingerd_t)
 
 optional_policy(`
 	cron_system_entry(fingerd_t, fingerd_exec_t)

@@ -2,6 +2,26 @@
 
 ########################################
 ## <summary>
+##	Do not audit attempts to read or write nagios
+##	unnamed pipes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`nagios_dontaudit_rw_pipes',`
+	gen_require(`
+		type nagios_t;
+	')
+
+	dontaudit $1 nagios_t:fifo_file rw_fifo_file_perms;
+')
+
+########################################
+## <summary>
 ##	Allow the specified domain to read
 ##	nagios configuration files.
 ## </summary>
@@ -58,7 +78,7 @@ interface(`nagios_domtrans_cgi',`
 		type nagios_cgi_t, nagios_cgi_exec_t;
 	')
 
-	domtrans_pattern($1,nagios_cgi_exec_t,nagios_cgi_t)
+	domtrans_pattern($1, nagios_cgi_exec_t, nagios_cgi_t)
 ')
 
 ########################################
@@ -77,5 +97,5 @@ interface(`nagios_domtrans_nrpe',`
 		type nrpe_t, nrpe_exec_t;
 	')
 
-	domtrans_pattern($1,nrpe_exec_t,nrpe_t)
+	domtrans_pattern($1, nrpe_exec_t, nrpe_t)
 ')

@@ -204,6 +204,10 @@ ifeq ($(DIRECT_INITRC),y)
 	M4PARAM += -D direct_sysadm_daemon
 endif
 
+ifeq "$(UBAC)" "y"
+	M4PARAM += -D enable_ubac
+endif
+
 # default MLS/MCS sensitivity and category settings.
 MLS_SENS ?= 16
 MLS_CATS ?= 256
@@ -393,7 +397,7 @@ $(moddir)/kernel/corenetwork.if: $(moddir)/kernel/corenetwork.te.in $(moddir)/ke
 	@echo "# $(notdir $@).in or $(notdir $@).m4 file should be modified." >> $@
 	@echo "#" >> $@
 	$(verbose) cat $@.in >> $@
-	$(verbose) $(GREP) "^[[:blank:]]*network_(interface|node|port|packet)\(.*\)" $< \
+	$(verbose) $(GREP) "^[[:blank:]]*network_(interface|node|port|packet)(_controlled)?\(.*\)" $< \
 		| $(M4) -D self_contained_policy $(M4PARAM) $@.m4 - \
 		| $(SED) -e 's/dollarsone/\$$1/g' -e 's/dollarszero/\$$0/g' >> $@
 
@@ -550,6 +554,7 @@ ifneq "$(DISTRO)" ""
 endif
 	$(verbose) echo "MONOLITHIC ?= n" >> $(headerdir)/build.conf
 	$(verbose) echo "DIRECT_INITRC ?= $(DIRECT_INITRC)" >> $(headerdir)/build.conf
+	$(verbose) echo "override UBAC := $(UBAC)" >> $(headerdir)/build.conf
 	$(verbose) echo "override MLS_SENS := $(MLS_SENS)" >> $(headerdir)/build.conf
 	$(verbose) echo "override MLS_CATS := $(MLS_CATS)" >> $(headerdir)/build.conf
 	$(verbose) echo "override MCS_CATS := $(MCS_CATS)" >> $(headerdir)/build.conf

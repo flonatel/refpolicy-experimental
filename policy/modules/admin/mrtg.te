@@ -1,5 +1,5 @@
 
-policy_module(mrtg, 1.4.0)
+policy_module(mrtg, 1.6.1)
 
 ########################################
 #
@@ -8,7 +8,7 @@ policy_module(mrtg, 1.4.0)
 
 type mrtg_t;
 type mrtg_exec_t;
-init_system_domain(mrtg_t,mrtg_exec_t)
+init_system_domain(mrtg_t, mrtg_exec_t)
 
 type mrtg_etc_t;
 files_config_file(mrtg_etc_t)
@@ -33,25 +33,25 @@ files_pid_file(mrtg_var_run_t)
 allow mrtg_t self:capability { setgid setuid chown };
 dontaudit mrtg_t self:capability sys_tty_config;
 allow mrtg_t self:process signal_perms;
-allow mrtg_t self:fifo_file { getattr read write ioctl };
+allow mrtg_t self:fifo_file rw_fifo_file_perms;
 allow mrtg_t self:unix_stream_socket create_socket_perms;
 allow mrtg_t self:tcp_socket create_socket_perms;
 allow mrtg_t self:udp_socket create_socket_perms;
 
 allow mrtg_t mrtg_etc_t:dir list_dir_perms;
-read_files_pattern(mrtg_t,mrtg_etc_t,mrtg_etc_t)
-read_lnk_files_pattern(mrtg_t,mrtg_etc_t,mrtg_etc_t)
+read_files_pattern(mrtg_t, mrtg_etc_t, mrtg_etc_t)
+read_lnk_files_pattern(mrtg_t, mrtg_etc_t, mrtg_etc_t)
 dontaudit mrtg_t mrtg_etc_t:dir write;
 dontaudit mrtg_t mrtg_etc_t:file { write ioctl };
 
-manage_files_pattern(mrtg_t,mrtg_lock_t,mrtg_lock_t)
-manage_lnk_files_pattern(mrtg_t,mrtg_lock_t,mrtg_lock_t)
+manage_files_pattern(mrtg_t, mrtg_lock_t, mrtg_lock_t)
+manage_lnk_files_pattern(mrtg_t, mrtg_lock_t, mrtg_lock_t)
 
-manage_files_pattern(mrtg_t,mrtg_log_t,mrtg_log_t)
-logging_log_filetrans(mrtg_t,mrtg_log_t,{ file dir })
+manage_files_pattern(mrtg_t, mrtg_log_t, mrtg_log_t)
+logging_log_filetrans(mrtg_t, mrtg_log_t, { file dir })
 
-manage_files_pattern(mrtg_t,mrtg_var_lib_t,mrtg_var_lib_t)
-manage_lnk_files_pattern(mrtg_t,mrtg_var_lib_t,mrtg_var_lib_t)
+manage_files_pattern(mrtg_t, mrtg_var_lib_t, mrtg_var_lib_t)
+manage_lnk_files_pattern(mrtg_t, mrtg_var_lib_t, mrtg_var_lib_t)
 
 allow mrtg_t mrtg_var_run_t:file manage_file_perms;
 files_pid_filetrans(mrtg_t,mrtg_var_run_t,file)
@@ -67,8 +67,8 @@ corenet_all_recvfrom_unlabeled(mrtg_t)
 corenet_all_recvfrom_netlabel(mrtg_t)
 corenet_tcp_sendrecv_generic_if(mrtg_t)
 corenet_udp_sendrecv_generic_if(mrtg_t)
-corenet_tcp_sendrecv_all_nodes(mrtg_t)
-corenet_udp_sendrecv_all_nodes(mrtg_t)
+corenet_tcp_sendrecv_generic_node(mrtg_t)
+corenet_udp_sendrecv_generic_node(mrtg_t)
 corenet_tcp_sendrecv_all_ports(mrtg_t)
 corenet_udp_sendrecv_all_ports(mrtg_t)
 corenet_tcp_connect_all_ports(mrtg_t)
@@ -78,6 +78,7 @@ dev_read_sysfs(mrtg_t)
 dev_read_urand(mrtg_t)
 
 domain_use_interactive_fds(mrtg_t)
+domain_dontaudit_search_all_domains_state(mrtg_t)
 
 files_read_usr_files(mrtg_t)
 files_search_var(mrtg_t)
@@ -92,6 +93,7 @@ files_read_etc_files(mrtg_t)
 
 fs_search_auto_mountpoints(mrtg_t)
 fs_getattr_xattr_fs(mrtg_t)
+fs_list_inotifyfs(mrtg_t)
 
 term_dontaudit_use_console(mrtg_t)
 
@@ -101,9 +103,9 @@ init_use_script_ptys(mrtg_t)
 init_read_utmp(mrtg_t)
 init_dontaudit_write_utmp(mrtg_t)
 
+auth_use_nsswitch(mrtg_t)
+
 libs_read_lib_files(mrtg_t)
-libs_use_ld_so(mrtg_t)
-libs_use_shared_libs(mrtg_t)
 
 logging_send_syslog_msg(mrtg_t)
 
@@ -111,12 +113,9 @@ miscfiles_read_localization(mrtg_t)
 
 selinux_dontaudit_getattr_dir(mrtg_t)
 
-# Use the network.
-sysnet_read_config(mrtg_t)
-
+userdom_use_user_terminals(mrtg_t)
+userdom_dontaudit_read_user_home_content_files(mrtg_t)
 userdom_dontaudit_use_unpriv_user_fds(mrtg_t)
-
-sysadm_use_terms(mrtg_t)
 
 ifdef(`enable_mls',`
 	corenet_udp_sendrecv_lo_if(mrtg_t)
@@ -124,7 +123,7 @@ ifdef(`enable_mls',`
 
 ifdef(`distro_redhat',`
 	allow mrtg_t mrtg_lock_t:file manage_file_perms;
-	filetrans_pattern(mrtg_t,mrtg_etc_t,mrtg_lock_t,file)
+	filetrans_pattern(mrtg_t, mrtg_etc_t, mrtg_lock_t, file)
 ')
 
 optional_policy(`
@@ -132,19 +131,11 @@ optional_policy(`
 ')
 
 optional_policy(`
-	cron_system_entry(mrtg_t,mrtg_exec_t)
+	cron_system_entry(mrtg_t, mrtg_exec_t)
 ')
 
 optional_policy(`
 	hostname_exec(mrtg_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(mrtg_t)
-')
-
-optional_policy(`
-	nscd_dontaudit_search_pid(mrtg_t)
 ')
 
 optional_policy(`
@@ -161,11 +152,4 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(mrtg_t)
-')
-
-ifdef(`TODO',`
-	# should not need this!
-	dontaudit mrtg_t { staff_home_dir_t sysadm_home_dir_t }:dir { search read getattr };
-	dontaudit mrtg_t { boot_t device_t file_t lost_found_t }:dir getattr;
-	dontaudit mrtg_t root_t:lnk_file getattr;
 ')

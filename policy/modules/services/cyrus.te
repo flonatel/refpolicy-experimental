@@ -1,5 +1,5 @@
 
-policy_module(cyrus, 1.6.0)
+policy_module(cyrus, 1.8.2)
 
 ########################################
 #
@@ -8,7 +8,10 @@ policy_module(cyrus, 1.6.0)
 
 type cyrus_t;
 type cyrus_exec_t;
-init_daemon_domain(cyrus_t,cyrus_exec_t)
+init_daemon_domain(cyrus_t, cyrus_exec_t)
+
+type cyrus_initrc_exec_t;
+init_script_file(cyrus_initrc_exec_t)
 
 type cyrus_tmp_t;
 files_tmp_file(cyrus_tmp_t)
@@ -42,19 +45,19 @@ allow cyrus_t self:unix_stream_socket connectto;
 allow cyrus_t self:tcp_socket create_stream_socket_perms;
 allow cyrus_t self:udp_socket create_socket_perms;
 
-manage_dirs_pattern(cyrus_t,cyrus_tmp_t,cyrus_tmp_t)
-manage_files_pattern(cyrus_t,cyrus_tmp_t,cyrus_tmp_t)
+manage_dirs_pattern(cyrus_t, cyrus_tmp_t, cyrus_tmp_t)
+manage_files_pattern(cyrus_t, cyrus_tmp_t, cyrus_tmp_t)
 files_tmp_filetrans(cyrus_t, cyrus_tmp_t, { file dir })
 
-manage_dirs_pattern(cyrus_t,cyrus_var_lib_t,cyrus_var_lib_t)
-manage_files_pattern(cyrus_t,cyrus_var_lib_t,cyrus_var_lib_t)
-manage_lnk_files_pattern(cyrus_t,cyrus_var_lib_t,cyrus_var_lib_t)
-manage_sock_files_pattern(cyrus_t,cyrus_var_lib_t,cyrus_var_lib_t)
-files_pid_filetrans(cyrus_t,cyrus_var_run_t,file)
+manage_dirs_pattern(cyrus_t, cyrus_var_lib_t, cyrus_var_lib_t)
+manage_files_pattern(cyrus_t, cyrus_var_lib_t, cyrus_var_lib_t)
+manage_lnk_files_pattern(cyrus_t, cyrus_var_lib_t, cyrus_var_lib_t)
+manage_sock_files_pattern(cyrus_t, cyrus_var_lib_t, cyrus_var_lib_t)
+files_pid_filetrans(cyrus_t, cyrus_var_run_t, file)
 
-manage_files_pattern(cyrus_t,cyrus_var_run_t,cyrus_var_run_t)
-manage_sock_files_pattern(cyrus_t,cyrus_var_run_t,cyrus_var_run_t)
-files_pid_filetrans(cyrus_t,cyrus_var_run_t,{ file sock_file })
+manage_files_pattern(cyrus_t, cyrus_var_run_t, cyrus_var_run_t)
+manage_sock_files_pattern(cyrus_t, cyrus_var_run_t, cyrus_var_run_t)
+files_pid_filetrans(cyrus_t, cyrus_var_run_t, { file sock_file })
 
 kernel_read_kernel_sysctls(cyrus_t)
 kernel_read_system_state(cyrus_t)
@@ -62,13 +65,13 @@ kernel_read_all_sysctls(cyrus_t)
 
 corenet_all_recvfrom_unlabeled(cyrus_t)
 corenet_all_recvfrom_netlabel(cyrus_t)
-corenet_tcp_sendrecv_all_if(cyrus_t)
-corenet_udp_sendrecv_all_if(cyrus_t)
-corenet_tcp_sendrecv_all_nodes(cyrus_t)
-corenet_udp_sendrecv_all_nodes(cyrus_t)
+corenet_tcp_sendrecv_generic_if(cyrus_t)
+corenet_udp_sendrecv_generic_if(cyrus_t)
+corenet_tcp_sendrecv_generic_node(cyrus_t)
+corenet_udp_sendrecv_generic_node(cyrus_t)
 corenet_tcp_sendrecv_all_ports(cyrus_t)
 corenet_udp_sendrecv_all_ports(cyrus_t)
-corenet_tcp_bind_all_nodes(cyrus_t)
+corenet_tcp_bind_generic_node(cyrus_t)
 corenet_tcp_bind_mail_port(cyrus_t)
 corenet_tcp_bind_lmtp_port(cyrus_t)
 corenet_tcp_bind_pop_port(cyrus_t)
@@ -96,8 +99,6 @@ files_read_usr_files(cyrus_t)
 
 auth_use_nsswitch(cyrus_t)
 
-libs_use_ld_so(cyrus_t)
-libs_use_shared_libs(cyrus_t)
 libs_exec_lib_files(cyrus_t)
 
 logging_send_syslog_msg(cyrus_t)
@@ -107,20 +108,18 @@ miscfiles_read_certs(cyrus_t)
 
 sysnet_read_config(cyrus_t)
 
-userdom_dontaudit_use_unpriv_user_fds(cyrus_t)
 userdom_use_unpriv_users_fds(cyrus_t)
+userdom_dontaudit_search_user_home_dirs(cyrus_t)
 
 mta_manage_spool(cyrus_t)
 mta_send_mail(cyrus_t)
 
-sysadm_dontaudit_search_home_dirs(cyrus_t)
-
 optional_policy(`
-	cron_system_entry(cyrus_t,cyrus_exec_t)
+	cron_system_entry(cyrus_t, cyrus_exec_t)
 ')
 
 optional_policy(`
-	kerberos_use(cyrus_t)
+	kerberos_keytab_template(cyrus, cyrus_t)
 ')
 
 optional_policy(`

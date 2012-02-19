@@ -1,5 +1,5 @@
 
-policy_module(sasl, 1.9.0)
+policy_module(sasl, 1.11.2)
 
 ########################################
 #
@@ -11,11 +11,14 @@ policy_module(sasl, 1.9.0)
 ## Allow sasl to read shadow
 ## </p>
 ## </desc>
-gen_tunable(allow_saslauthd_read_shadow,false)
+gen_tunable(allow_saslauthd_read_shadow, false)
 
 type saslauthd_t;
 type saslauthd_exec_t;
-init_daemon_domain(saslauthd_t,saslauthd_exec_t)
+init_daemon_domain(saslauthd_t, saslauthd_exec_t)
+
+type saslauthd_initrc_exec_t;
+init_script_file(saslauthd_initrc_exec_t)
 
 type saslauthd_tmp_t;
 files_tmp_file(saslauthd_tmp_t)
@@ -31,26 +34,26 @@ files_pid_file(saslauthd_var_run_t)
 allow saslauthd_t self:capability setuid;
 dontaudit saslauthd_t self:capability sys_tty_config;
 allow saslauthd_t self:process signal_perms;
-allow saslauthd_t self:fifo_file { read write };
+allow saslauthd_t self:fifo_file rw_fifo_file_perms;
 allow saslauthd_t self:unix_dgram_socket create_socket_perms;
 allow saslauthd_t self:unix_stream_socket create_stream_socket_perms;
 allow saslauthd_t self:tcp_socket create_socket_perms;
 
 allow saslauthd_t saslauthd_tmp_t:dir setattr;
-manage_files_pattern(saslauthd_t,saslauthd_tmp_t,saslauthd_tmp_t)
-files_tmp_filetrans(saslauthd_t,saslauthd_tmp_t,file)
+manage_files_pattern(saslauthd_t, saslauthd_tmp_t, saslauthd_tmp_t)
+files_tmp_filetrans(saslauthd_t, saslauthd_tmp_t, file)
 
-manage_files_pattern(saslauthd_t,saslauthd_var_run_t,saslauthd_var_run_t)
-manage_sock_files_pattern(saslauthd_t,saslauthd_var_run_t,saslauthd_var_run_t)
-files_pid_filetrans(saslauthd_t,saslauthd_var_run_t,file)
+manage_files_pattern(saslauthd_t, saslauthd_var_run_t, saslauthd_var_run_t)
+manage_sock_files_pattern(saslauthd_t, saslauthd_var_run_t, saslauthd_var_run_t)
+files_pid_filetrans(saslauthd_t, saslauthd_var_run_t, file)
 
 kernel_read_kernel_sysctls(saslauthd_t)
 kernel_read_system_state(saslauthd_t)
 
 corenet_all_recvfrom_unlabeled(saslauthd_t)
 corenet_all_recvfrom_netlabel(saslauthd_t)
-corenet_tcp_sendrecv_all_if(saslauthd_t)
-corenet_tcp_sendrecv_all_nodes(saslauthd_t)
+corenet_tcp_sendrecv_generic_if(saslauthd_t)
+corenet_tcp_sendrecv_generic_node(saslauthd_t)
 corenet_tcp_sendrecv_all_ports(saslauthd_t)
 corenet_tcp_connect_pop_port(saslauthd_t)
 corenet_sendrecv_pop_client_packets(saslauthd_t)
@@ -76,9 +79,6 @@ files_dontaudit_getattr_tmp_dirs(saslauthd_t)
 
 init_dontaudit_stream_connect_script(saslauthd_t)
 
-libs_use_ld_so(saslauthd_t)
-libs_use_shared_libs(saslauthd_t)
-
 logging_send_syslog_msg(saslauthd_t)
 
 miscfiles_read_localization(saslauthd_t)
@@ -89,8 +89,7 @@ seutil_dontaudit_read_config(saslauthd_t)
 sysnet_read_config(saslauthd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(saslauthd_t)
-
-sysadm_dontaudit_search_home_dirs(saslauthd_t)
+userdom_dontaudit_search_user_home_dirs(saslauthd_t)
 
 # cjp: typeattribute doesnt work in conditionals
 auth_can_read_shadow_passwords(saslauthd_t)
@@ -99,7 +98,7 @@ tunable_policy(`allow_saslauthd_read_shadow',`
 ')
 
 optional_policy(`
-	kerberos_read_keytab(saslauthd_t)
+	kerberos_keytab_template(saslauthd, saslauthd_t)
 ')
 
 optional_policy(`

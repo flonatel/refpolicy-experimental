@@ -1,5 +1,5 @@
 
-policy_module(fstools,1.10.0)
+policy_module(fstools, 1.12.1)
 
 ########################################
 #
@@ -142,9 +142,6 @@ init_use_fds(fsadm_t)
 init_use_script_ptys(fsadm_t)
 init_dontaudit_getattr_initctl(fsadm_t)
 
-libs_use_ld_so(fsadm_t)
-libs_use_shared_libs(fsadm_t)
-
 logging_send_syslog_msg(fsadm_t)
 
 miscfiles_read_localization(fsadm_t)
@@ -153,7 +150,14 @@ modutils_read_module_config(fsadm_t)
 
 seutil_read_config(fsadm_t)
 
+userdom_use_user_terminals(fsadm_t)
 userdom_use_unpriv_users_fds(fsadm_t)
+
+ifdef(`distro_redhat',`
+	optional_policy(`
+		unconfined_domain(fsadm_t)
+	')
+')
 
 tunable_policy(`read_default_t',`
 	files_list_default(fsadm_t)

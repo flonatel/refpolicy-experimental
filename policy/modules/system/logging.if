@@ -136,11 +136,6 @@ interface(`logging_domtrans_auditctl',`
 ##	The role to be allowed the auditctl domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the auditctl domain to use.
-##	</summary>
-## </param>
 ## <rolecap/>
 #
 interface(`logging_run_auditctl',`
@@ -150,7 +145,6 @@ interface(`logging_run_auditctl',`
 
 	logging_domtrans_auditctl($1)
 	role $2 types auditctl_t;
-	allow auditctl_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -186,11 +180,6 @@ interface(`logging_domtrans_auditd',`
 ##	The role to be allowed the auditd domain.
 ##	</summary>
 ## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the terminal allow the auditd domain to use.
-##	</summary>
-## </param>
 #
 interface(`logging_run_auditd',`
 	gen_require(`
@@ -199,7 +188,6 @@ interface(`logging_run_auditd',`
 
 	logging_domtrans_auditd($1)
 	role $2 types auditd_t;
-	allow auditd_t $3:chr_file rw_term_perms;
 ')
 
 ########################################
@@ -213,12 +201,97 @@ interface(`logging_run_auditd',`
 ## </param>
 #
 interface(`logging_stream_connect_auditd',`
+	refpolicywarn(`$0($*) has been deprecated, logging_stream_connect_dispatcher() should be used instead.')
+	logging_stream_connect_dispatcher($1)
+')
+
+########################################
+## <summary>
+##	Execute a domain transition to run the audit dispatcher.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`logging_domtrans_dispatcher',`
 	gen_require(`
-		type auditd_t, auditd_var_run_t;
+		type audisp_t, audisp_exec_t;
+	')
+
+	domtrans_pattern($1, audisp_exec_t, audisp_t)
+')
+
+########################################
+## <summary>
+##	Signal the audit dispatcher.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`logging_signal_dispatcher',`
+	gen_require(`
+		type audisp_t;
+	')
+
+	allow $1 audisp_t:process signal;
+')
+
+########################################
+## <summary>
+##	Create a domain for processes
+##	which can be started by the system audit dispatcher
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Type to be used as a domain.
+##	</summary>
+## </param>
+## <param name="entry_point">
+##	<summary>
+##	Type of the program to be used as an entry point to this domain.
+##	</summary>
+## </param>
+#
+interface(`logging_dispatcher_domain',`
+	gen_require(`
+		type audisp_t;
+		role system_r;
+	')
+
+	domain_type($1)
+	domain_entry_file($1, $2)
+
+	role system_r types $1;
+
+	domtrans_pattern(audisp_t, $2, $1)
+	allow audisp_t $1:process { sigkill sigstop signull signal };
+
+	allow audisp_t $2:file getattr;
+	allow $1 audisp_t:unix_stream_socket rw_socket_perms;
+')
+
+########################################
+## <summary>
+##	Connect to the audit dispatcher over an unix stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_stream_connect_dispatcher',`
+	gen_require(`
+		type audisp_t, audisp_var_run_t;
 	')
 
 	files_search_pids($1)
-	stream_connect_pattern($1,auditd_var_run_t,auditd_var_run_t,auditd_t)
+	stream_connect_pattern($1, audisp_var_run_t, audisp_var_run_t, audisp_t)
 ')
 
 ########################################
@@ -279,6 +352,26 @@ interface(`logging_domtrans_klog',`
 
 	corecmd_search_bin($1)
 	domtrans_pattern($1,klogd_exec_t,klogd_t)
+')
+
+########################################
+## <summary>
+##	Check if syslogd is executable.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_check_exec_syslog',`
+	gen_require(`
+		type syslogd_exec_t;
+	')
+
+	corecmd_list_bin($1)
+	corecmd_read_bin_symlinks($1)
+	allow $1 syslogd_exec_t:file execute;
 ')
 
 ########################################
@@ -346,7 +439,7 @@ interface(`logging_send_syslog_msg',`
 	')
 
 	allow $1 devlog_t:lnk_file read;
-	allow $1 devlog_t:sock_file rw_file_perms;
+	allow $1 devlog_t:sock_file rw_sock_file_perms;
 
 	# the type of socket depends on the syslog daemon
 	allow $1 syslogd_t:unix_dgram_socket sendto;
@@ -440,12 +533,12 @@ interface(`logging_search_logs',`
 
 #######################################
 ## <summary>
-##      Do not audit attempts to search the var log directory.
+##	Do not audit attempts to search the var log directory.
 ## </summary>
 ## <param name="domain">
-##      <summary>
-##      Domain not to audit.
-##      </summary>
+##	<summary>
+##	Domain not to audit.
+##	</summary>
 ## </param>
 #
 interface(`logging_dontaudit_search_logs',`
@@ -530,8 +623,7 @@ interface(`logging_append_all_logs',`
 	')
 
 	files_search_var($1)
-	allow $1 var_log_t:dir list_dir_perms;
-	allow $1 logfile:file { getattr append };
+	append_files_pattern($1, var_log_t, logfile)
 ')
 
 ########################################
@@ -575,6 +667,25 @@ interface(`logging_exec_all_logs',`
 	files_search_var($1)
 	allow $1 logfile:dir list_dir_perms;
 	can_exec($1,logfile)
+')
+
+########################################
+## <summary>
+##	read/write to all log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_rw_all_logs',`
+	gen_require(`
+		attribute logfile;
+	')
+
+	files_search_var($1)
+	rw_files_pattern($1, logfile, logfile)
 ')
 
 ########################################
@@ -641,6 +752,24 @@ interface(`logging_write_generic_logs',`
 
 ########################################
 ## <summary>
+##	Dontaudit Write generic log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`logging_dontaudit_write_generic_logs',`
+	gen_require(`
+		type var_log_t;
+	')
+
+	dontaudit $1 var_log_t:file write;
+')
+
+########################################
+## <summary>
 ##	Read and write generic log files.
 ## </summary>
 ## <param name="domain">
@@ -690,12 +819,18 @@ interface(`logging_manage_generic_logs',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <param name="role">
+##	<summary>
+##	User role allowed access.
+##	</summary>
+## </param>
 ## <rolecap/>
 #
 interface(`logging_admin_audit',`
 	gen_require(`
 		type auditd_t, auditd_etc_t, auditd_log_t;
 		type auditd_var_run_t;
+		type auditd_initrc_exec_t;
 	')
 
 	allow $1 auditd_t:process { ptrace signal_perms };
@@ -709,6 +844,13 @@ interface(`logging_admin_audit',`
 
 	manage_dirs_pattern($1, auditd_var_run_t, auditd_var_run_t)
 	manage_files_pattern($1, auditd_var_run_t, auditd_var_run_t)
+
+	logging_run_auditctl($1, $2)
+
+	init_labeled_script_domtrans($1, auditd_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 auditd_initrc_exec_t system_r;
+	allow $2 system_r;
 ')
 
 ########################################
@@ -721,6 +863,11 @@ interface(`logging_admin_audit',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <param name="role">
+##	<summary>
+##	User role allowed access.
+##	</summary>
+## </param>
 ## <rolecap/>
 #
 interface(`logging_admin_syslog',`
@@ -729,6 +876,7 @@ interface(`logging_admin_syslog',`
 		type syslogd_tmp_t, syslogd_var_lib_t;
 		type syslogd_var_run_t, klogd_var_run_t;
 		type klogd_tmp_t, var_log_t;
+		type syslogd_initrc_exec_t;
 	')
 
 	allow $1 syslogd_t:process { ptrace signal_perms };
@@ -756,6 +904,11 @@ interface(`logging_admin_syslog',`
 	manage_files_pattern($1, syslogd_var_run_t, syslogd_var_run_t)
 
 	logging_manage_all_logs($1)
+
+	init_labeled_script_domtrans($1, syslogd_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 syslogd_initrc_exec_t system_r;
+	allow $2 system_r;
 ')
 
 ########################################
@@ -768,9 +921,14 @@ interface(`logging_admin_syslog',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <param name="role">
+##	<summary>
+##	User role allowed access.
+##	</summary>
+## </param>
 ## <rolecap/>
 #
 interface(`logging_admin',`
-	logging_admin_audit($1)
-	logging_admin_syslog($1)
+	logging_admin_audit($1, $2)
+	logging_admin_syslog($1, $2)
 ')

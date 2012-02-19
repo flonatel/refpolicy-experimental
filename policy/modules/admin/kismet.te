@@ -1,5 +1,5 @@
 
-policy_module(kismet, 1.0.0)
+policy_module(kismet, 1.2.0)
 
 ########################################
 #
@@ -25,7 +25,11 @@ logging_log_file(kismet_log_t)
 # kismet local policy
 #
 
-allow kismet_t self:capability { net_admin setuid setgid };
+allow kismet_t self:capability { net_admin net_raw setuid setgid };
+allow kismet_t self:fifo_file rw_file_perms;
+allow kismet_t self:packet_socket create_socket_perms;
+allow kismet_t self:unix_dgram_socket create_socket_perms;
+allow kismet_t self:unix_stream_socket create_stream_socket_perms;
 
 manage_files_pattern(kismet_t, kismet_log_t, kismet_log_t)
 allow kismet_t kismet_log_t:dir setattr;
@@ -39,13 +43,14 @@ allow kismet_t kismet_var_run_t:file manage_file_perms;
 allow kismet_t kismet_var_run_t:dir manage_dir_perms;
 files_pid_filetrans(kismet_t, kismet_var_run_t, { file dir })
 
+kernel_search_debugfs(kismet_t)
+
 corecmd_exec_bin(kismet_t)
 
 auth_use_nsswitch(kismet_t)
 
 files_read_etc_files(kismet_t)
 
-libs_use_ld_so(kismet_t)
-libs_use_shared_libs(kismet_t)
-
 miscfiles_read_localization(kismet_t)
+
+userdom_use_user_terminals(kismet_t)

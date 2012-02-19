@@ -1,5 +1,5 @@
 
-policy_module(arpwatch, 1.6.0)
+policy_module(arpwatch, 1.7.2)
 
 ########################################
 #
@@ -8,10 +8,13 @@ policy_module(arpwatch, 1.6.0)
 
 type arpwatch_t;
 type arpwatch_exec_t;
-init_daemon_domain(arpwatch_t,arpwatch_exec_t)
+init_daemon_domain(arpwatch_t, arpwatch_exec_t)
 
 type arpwatch_data_t;
 files_type(arpwatch_data_t)
+
+type arpwatch_initrc_exec_t;
+init_script_file(arpwatch_initrc_exec_t)
 
 type arpwatch_tmp_t;
 files_tmp_file(arpwatch_tmp_t)
@@ -32,16 +35,16 @@ allow arpwatch_t self:tcp_socket { connect create_stream_socket_perms };
 allow arpwatch_t self:udp_socket create_socket_perms;
 allow arpwatch_t self:packet_socket create_socket_perms;
 
-manage_dirs_pattern(arpwatch_t,arpwatch_data_t,arpwatch_data_t)
-manage_files_pattern(arpwatch_t,arpwatch_data_t,arpwatch_data_t)
-manage_lnk_files_pattern(arpwatch_t,arpwatch_data_t,arpwatch_data_t)
+manage_dirs_pattern(arpwatch_t, arpwatch_data_t, arpwatch_data_t)
+manage_files_pattern(arpwatch_t, arpwatch_data_t, arpwatch_data_t)
+manage_lnk_files_pattern(arpwatch_t, arpwatch_data_t, arpwatch_data_t)
 
-manage_dirs_pattern(arpwatch_t,arpwatch_tmp_t,arpwatch_tmp_t)
-manage_files_pattern(arpwatch_t,arpwatch_tmp_t,arpwatch_tmp_t)
+manage_dirs_pattern(arpwatch_t, arpwatch_tmp_t, arpwatch_tmp_t)
+manage_files_pattern(arpwatch_t, arpwatch_tmp_t, arpwatch_tmp_t)
 files_tmp_filetrans(arpwatch_t, arpwatch_tmp_t, { file dir })
 
-manage_files_pattern(arpwatch_t,arpwatch_var_run_t,arpwatch_var_run_t)
-files_pid_filetrans(arpwatch_t,arpwatch_var_run_t,file)
+manage_files_pattern(arpwatch_t, arpwatch_var_run_t, arpwatch_var_run_t)
+files_pid_filetrans(arpwatch_t, arpwatch_var_run_t, file)
 
 kernel_read_kernel_sysctls(arpwatch_t)
 kernel_list_proc(arpwatch_t)
@@ -49,12 +52,12 @@ kernel_read_proc_symlinks(arpwatch_t)
 
 corenet_all_recvfrom_unlabeled(arpwatch_t)
 corenet_all_recvfrom_netlabel(arpwatch_t)
-corenet_tcp_sendrecv_all_if(arpwatch_t)
-corenet_udp_sendrecv_all_if(arpwatch_t)
-corenet_raw_sendrecv_all_if(arpwatch_t)
-corenet_tcp_sendrecv_all_nodes(arpwatch_t)
-corenet_udp_sendrecv_all_nodes(arpwatch_t)
-corenet_raw_sendrecv_all_nodes(arpwatch_t)
+corenet_tcp_sendrecv_generic_if(arpwatch_t)
+corenet_udp_sendrecv_generic_if(arpwatch_t)
+corenet_raw_sendrecv_generic_if(arpwatch_t)
+corenet_tcp_sendrecv_generic_node(arpwatch_t)
+corenet_udp_sendrecv_generic_node(arpwatch_t)
+corenet_raw_sendrecv_generic_node(arpwatch_t)
 corenet_tcp_sendrecv_all_ports(arpwatch_t)
 corenet_udp_sendrecv_all_ports(arpwatch_t)
 
@@ -73,18 +76,14 @@ files_search_var_lib(arpwatch_t)
 
 auth_use_nsswitch(arpwatch_t)
 
-libs_use_ld_so(arpwatch_t)
-libs_use_shared_libs(arpwatch_t)
-
 logging_send_syslog_msg(arpwatch_t)
 
 miscfiles_read_localization(arpwatch_t)
 
+userdom_dontaudit_search_user_home_dirs(arpwatch_t)
 userdom_dontaudit_use_unpriv_user_fds(arpwatch_t)
 
 mta_send_mail(arpwatch_t)
-
-sysadm_dontaudit_search_home_dirs(arpwatch_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(arpwatch_t)
