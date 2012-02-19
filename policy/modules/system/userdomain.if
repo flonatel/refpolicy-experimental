@@ -191,7 +191,7 @@ template(`userdom_ro_home_template',`
 		fs_read_nfs_named_sockets($1_t)
 		fs_read_nfs_named_pipes($1_t)
 	',`
-		fs_dontaudit_read_nfs_dirs($1_t)
+		fs_dontaudit_list_nfs($1_t)
 		fs_dontaudit_read_nfs_files($1_t)
 	')
 
@@ -202,7 +202,7 @@ template(`userdom_ro_home_template',`
 		fs_read_cifs_named_sockets($1_t)
 		fs_read_cifs_named_pipes($1_t)
 	',`
-		fs_dontaudit_list_cifs_dirs($1_t)
+		fs_dontaudit_list_cifs($1_t)
 		fs_dontaudit_read_cifs_files($1_t)
 	')
 ')
@@ -895,6 +895,10 @@ template(`userdom_common_user_template',`
 ## </param>
 #
 template(`userdom_login_user_template', `
+	gen_require(`
+		class context contains;
+	')
+
 	userdom_base_user_template($1)
 
 	userdom_manage_home_template($1)
@@ -1112,10 +1116,6 @@ template(`userdom_restricted_xwindows_user_template',`
 	')
 
 	optional_policy(`
-		mono_per_role_template($1, $1_t, $1_r)
-	')
-
-	optional_policy(`
 		setroubleshoot_dontaudit_stream_connect($1_t)
 	')
 ')
@@ -1199,6 +1199,10 @@ template(`userdom_unpriv_user_template', `
 	optional_policy(`
 		netutils_run_ping_cond($1_t,$1_r,{ $1_tty_device_t $1_devpts_t })
 		netutils_run_traceroute_cond($1_t,$1_r,{ $1_tty_device_t $1_devpts_t })
+	')
+
+	optional_policy(`
+		postgresql_userdom_template($1,$1_t,$1_r)
 	')
 
 	# Run pppd in pppd_t by default for user
@@ -1371,6 +1375,10 @@ template(`userdom_admin_user_template',`
 	')
 
 	optional_policy(`
+		postgresql_unconfined($1_t)
+	')
+
+	optional_policy(`
 		userhelper_exec($1_t)
 	')
 ')
@@ -1404,11 +1412,6 @@ template(`userdom_admin_user_template',`
 ## <param name="role">
 ##	<summary>
 ##	The role  of the object to create.
-##	</summary>
-## </param>
-## <param name="object_class">
-##	<summary>
-##	The terminal
 ##	</summary>
 ## </param>
 #
@@ -1451,8 +1454,9 @@ template(`userdom_security_admin_template',`
 	seutil_run_semanage($1,$2,$3)
 	seutil_run_setfiles($1, $2, $3)
 
-	userdom_dontaudit_append_staff_home_content_files($1)
-	userdom_dontaudit_read_sysadm_home_content_files($1)
+	staff_dontaudit_append_home_content_files($1)
+
+	sysadm_dontaudit_read_home_content_files($1)
 
 	optional_policy(`
 		aide_run($1,$2, $3)
@@ -1479,16 +1483,6 @@ template(`userdom_security_admin_template',`
 ## <summary>
 ##	Change to the generic user role.
 ## </summary>
-## <desc>
-##	<p>
-##	Change to the generic user role.
-##	</p>
-##	<p>
-##	This is a template to support third party modules
-##	and its use is not allowed in upstream reference
-##	policy.
-##	</p>
-## </desc>
 ## <param name="prefix">
 ##	<summary>
 ##	The prefix of the user role (e.g., user
@@ -1498,7 +1492,8 @@ template(`userdom_security_admin_template',`
 ## <rolecap/>
 #
 template(`userdom_role_change_generic_user',`
-	userdom_role_change_template($1, user)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_role_change_template() instead.')
+	unprivuser_role_change_template($1)
 ')
 
 ########################################
@@ -1525,23 +1520,14 @@ template(`userdom_role_change_generic_user',`
 ## <rolecap/>
 #
 template(`userdom_role_change_from_generic_user',`
-	userdom_role_change_template(user, $1)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_role_change_to_template() instead.')
+	unprivuser_role_change_to_template($1)
 ')
 
 ########################################
 ## <summary>
 ##	Change to the staff user role.
 ## </summary>
-## <desc>
-##	<p>
-##	Change to the staff user role.
-##	</p>
-##	<p>
-##	This is a template to support third party modules
-##	and its use is not allowed in upstream reference
-##	policy.
-##	</p>
-## </desc>
 ## <param name="prefix">
 ##	<summary>
 ##	The prefix of the user role (e.g., user
@@ -1551,7 +1537,8 @@ template(`userdom_role_change_from_generic_user',`
 ## <rolecap/>
 #
 template(`userdom_role_change_staff',`
-	userdom_role_change_template($1, staff)
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_role_change_template() instead.')
+	staff_role_change_template($1)
 ')
 
 ########################################
@@ -1578,23 +1565,14 @@ template(`userdom_role_change_staff',`
 ## <rolecap/>
 #
 template(`userdom_role_change_from_staff',`
-	userdom_role_change_template(staff, $1)
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_role_change_to_template() instead.')
+	staff_role_change_to_template($1)
 ')
 
 ########################################
 ## <summary>
 ##	Change to the sysadm user role.
 ## </summary>
-## <desc>
-##	<p>
-##	Change to the sysadm user role.
-##	</p>
-##	<p>
-##	This is a template to support third party modules
-##	and its use is not allowed in upstream reference
-##	policy.
-##	</p>
-## </desc>
 ## <param name="prefix">
 ##	<summary>
 ##	The prefix of the user role (e.g., user
@@ -1604,7 +1582,8 @@ template(`userdom_role_change_from_staff',`
 ## <rolecap/>
 #
 template(`userdom_role_change_sysadm',`
-	userdom_role_change_template($1, sysadm)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_role_change_template() instead.')
+	sysadm_role_change_template($1)
 ')
 
 ########################################
@@ -1631,23 +1610,14 @@ template(`userdom_role_change_sysadm',`
 ## <rolecap/>
 #
 template(`userdom_role_change_from_sysadm',`
-	userdom_role_change_template(sysadm, $1)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_role_change_to_template() instead.')
+	sysadm_role_change_to_template($1)
 ')
 
 ########################################
 ## <summary>
 ##	Change to the secadm user role.
 ## </summary>
-## <desc>
-##	<p>
-##	Change to the secadm user role.
-##	</p>
-##	<p>
-##	This is a template to support third party modules
-##	and its use is not allowed in upstream reference
-##	policy.
-##	</p>
-## </desc>
 ## <param name="prefix">
 ##	<summary>
 ##	The prefix of the user role (e.g., user
@@ -1657,11 +1627,8 @@ template(`userdom_role_change_from_sysadm',`
 ## <rolecap/>
 #
 template(`userdom_role_change_secadm',`
-	ifdef(`enable_mls',`
-		userdom_role_change_template($1,secadm)
-	',`
-		refpolicywarn(`$0($*) has no effect in non-MLS policy.')
-	')
+	refpolicywarn(`$0($*) has been deprecated.  Please use secadm_role_change_template() instead.')
+	secadm_role_change_template($1)
 ')
 
 ########################################
@@ -1688,27 +1655,14 @@ template(`userdom_role_change_secadm',`
 ## <rolecap/>
 #
 template(`userdom_role_change_from_secadm',`
-	ifdef(`enable_mls',`
-		userdom_role_change_template(secadm,$1)
-	',`
-		refpolicywarn(`$0($*) has no effect in non-MLS policy.')
-	')
+	refpolicywarn(`$0($*) has been deprecated.  Please use secadm_role_change_to_template() instead.')
+	secadm_role_change_to_template($1)
 ')
 
 ########################################
 ## <summary>
 ##	Change to the auditadm user role.
 ## </summary>
-## <desc>
-##	<p>
-##	Change to the auditadm user role.
-##	</p>
-##	<p>
-##	This is a template to support third party modules
-##	and its use is not allowed in upstream reference
-##	policy.
-##	</p>
-## </desc>
 ## <param name="prefix">
 ##	<summary>
 ##	The prefix of the auditadm role (e.g., user
@@ -1718,11 +1672,8 @@ template(`userdom_role_change_from_secadm',`
 ## <rolecap/>
 #
 template(`userdom_role_change_auditadm',`
-	ifdef(`enable_mls',`
-		userdom_role_change_template($1,auditadm)
-	',`
-		refpolicywarn(`$0($*) has no effect in non-MLS policy.')
-	')
+	refpolicywarn(`$0($*) has been deprecated.  Please use auditadm_role_change_template() instead.')
+	auditadm_role_change_template($1)
 ')
 
 ########################################
@@ -1749,11 +1700,8 @@ template(`userdom_role_change_auditadm',`
 ## <rolecap/>
 #
 template(`userdom_role_change_from_auditadm',`
-	ifdef(`enable_mls',`
-		userdom_role_change_template(auditadm,$1)
-	',`
-		refpolicywarn(`$0($*) has no effect in non-MLS policy.')
-	')
+	refpolicywarn(`$0($*) has been deprecated.  Please use auditadm_role_change_to_template() instead.')
+	auditadm_role_change_to_template($1)
 ')
 
 ########################################
@@ -3335,6 +3283,39 @@ template(`userdom_dontaudit_list_user_untrusted_content',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete users untrusted directories.
+## </summary>
+## <desc>
+##	<p>
+##	Create, read, write, and delete users untrusted directories.
+##	</p>
+##	<p>
+##	This is a templated interface, and should only
+##	be called from a per-userdomain template.
+##	</p>
+## </desc>
+## <param name="userdomain_prefix">
+##	<summary>
+##	The prefix of the user domain (e.g., user
+##	is the prefix for user_t).
+##	</summary>
+## </param>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+template(`userdom_manage_user_untrusted_content_dirs',`
+	gen_require(`
+		type $1_untrusted_content_t;
+	')
+
+	allow $2 $1_untrusted_content_t:dir manage_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Read user untrusted files.
 ## </summary>
 ## <desc>
@@ -4053,14 +4034,8 @@ interface(`userdom_entry_spec_domtrans_unpriv_users',`
 ## </param>
 #
 interface(`userdom_shell_domtrans_sysadm',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	corecmd_shell_domtrans($1, sysadm_t)
-	allow sysadm_t $1:fd use;
-	allow sysadm_t $1:fifo_file rw_file_perms;
-	allow sysadm_t $1:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_shell_domtrans() instead.')
+	sysadm_shell_domtrans($1)
 ')
 
 ########################################
@@ -4074,14 +4049,8 @@ interface(`userdom_shell_domtrans_sysadm',`
 ## </param>
 #
 interface(`userdom_bin_spec_domtrans_sysadm',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	corecmd_bin_spec_domtrans($1,sysadm_t)
-	allow sysadm_t $1:fd use;
-	allow sysadm_t $1:fifo_file rw_file_perms;
-	allow sysadm_t $1:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_bin_spec_domtrans() instead.')
+	sysadm_bin_spec_domtrans($1)
 ')
 
 ########################################
@@ -4095,8 +4064,8 @@ interface(`userdom_bin_spec_domtrans_sysadm',`
 ## </param>
 #
 interface(`userdom_sbin_spec_domtrans_sysadm',`
-	userdom_bin_spec_domtrans_sysadm($1)
-	refpolicywarn(`$0() has been deprecated, please use userdom_bin_spec_domtrans_sysadm() instead.')
+	refpolicywarn(`$0() has been deprecated, please use sysadm_bin_spec_domtrans() instead.')
+	sysadm_bin_spec_domtrans($1)
 ')
 
 ########################################
@@ -4112,14 +4081,8 @@ interface(`userdom_sbin_spec_domtrans_sysadm',`
 ## </param>
 #
 interface(`userdom_entry_spec_domtrans_sysadm',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	domain_entry_file_spec_domtrans($1,sysadm_t)
-	allow sysadm_t $1:fd use;
-	allow sysadm_t $1:fifo_file rw_file_perms;
-	allow sysadm_t $1:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_entry_spec_domtrans() instead.')
+	sysadm_entry_spec_domtrans($1)
 ')
 
 ########################################
@@ -4146,14 +4109,8 @@ interface(`userdom_entry_spec_domtrans_sysadm',`
 ## </param>
 #
 interface(`userdom_sysadm_bin_spec_domtrans_to',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	corecmd_bin_spec_domtrans(sysadm_t,$1)
-	allow $1 sysadm_t:fd use;
-	allow $1 sysadm_t:fifo_file rw_file_perms;
-	allow $1 sysadm_t:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_bin_spec_domtrans_to() instead.')
+	sysadm_bin_spec_domtrans_to($1)
 ')
 
 ########################################
@@ -4180,8 +4137,8 @@ interface(`userdom_sysadm_bin_spec_domtrans_to',`
 ## </param>
 #
 interface(`userdom_sysadm_sbin_spec_domtrans_to',`
-	userdom_sysadm_bin_spec_domtrans_to($1)
-	refpolicywarn(`$0() has been deprecated, please use userdom_sysadm_bin_spec_domtrans_to() instead.')
+	refpolicywarn(`$0() has been deprecated, please use sysadm_bin_spec_domtrans_to() instead.')
+	sysadm_bin_spec_domtrans_to($1)
 ')
 
 ########################################
@@ -4209,14 +4166,8 @@ interface(`userdom_sysadm_sbin_spec_domtrans_to',`
 ## </param>
 #
 interface(`userdom_sysadm_entry_spec_domtrans_to',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	domain_entry_file_spec_domtrans(sysadm_t, $1)
-	allow $1 sysadm_t:fd use;
-	allow $1 sysadm_t:fifo_file rw_file_perms;
-	allow $1 sysadm_t:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_entry_spec_domtrans() instead.')
+	sysadm_entry_spec_domtrans($1)
 ')
 
 ########################################
@@ -4230,12 +4181,8 @@ interface(`userdom_sysadm_entry_spec_domtrans_to',`
 ## </param>
 #
 interface(`userdom_search_staff_home_dirs',`
-	gen_require(`
-		type staff_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 staff_home_dir_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_search_home_dirs() instead.')
+	staff_search_home_dirs($1)
 ')
 
 ########################################
@@ -4250,11 +4197,8 @@ interface(`userdom_search_staff_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_search_staff_home_dirs',`
-	gen_require(`
-		type staff_home_dir_t;
-	')
-
-	dontaudit $1 staff_home_dir_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_dontaudit_search_home_dirs() instead.')
+	staff_dontaudit_search_home_dirs($1)
 ')
 
 ########################################
@@ -4269,12 +4213,8 @@ interface(`userdom_dontaudit_search_staff_home_dirs',`
 ## </param>
 #
 interface(`userdom_manage_staff_home_dirs',`
-	gen_require(`
-		type staff_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 staff_home_dir_t:dir manage_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_manage_home_dirs() instead.')
+	staff_manage_home_dirs($1)
 ')
 
 ########################################
@@ -4288,12 +4228,8 @@ interface(`userdom_manage_staff_home_dirs',`
 ## </param>
 #
 interface(`userdom_relabelto_staff_home_dirs',`
-	gen_require(`
-		type staff_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 staff_home_dir_t:dir relabelto;
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_relabelto_home_dirs() instead.')
+	staff_relabelto_home_dirs($1)
 ')
 
 ########################################
@@ -4308,11 +4244,8 @@ interface(`userdom_relabelto_staff_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_append_staff_home_content_files',`
-	gen_require(`
-		type staff_home_t;
-	')
-
-	dontaudit $1 staff_home_t:file append;
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_dontaudit_append_home_content_files() instead.')
+	staff_dontaudit_append_home_content_files($1)
 ')
 
 ########################################
@@ -4326,14 +4259,8 @@ interface(`userdom_dontaudit_append_staff_home_content_files',`
 ## </param>
 #
 interface(`userdom_read_staff_home_content_files',`
-	gen_require(`
-		type staff_home_dir_t, staff_home_t;
-	')
-
-	files_search_home($1)
-	allow $1 { staff_home_dir_t staff_home_t }:dir list_dir_perms;
-	read_files_pattern($1,{ staff_home_dir_t staff_home_t },staff_home_t)
-	read_lnk_files_pattern($1,{ staff_home_dir_t staff_home_t },staff_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use staff_read_home_content_files() instead.')
+	staff_read_home_content_files($1)
 ')
 
 ########################################
@@ -4347,11 +4274,8 @@ interface(`userdom_read_staff_home_content_files',`
 ## </param>
 #
 interface(`userdom_sigchld_sysadm',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	allow $1 sysadm_t:process sigchld;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_sigchld() instead.')
+	sysadm_sigchld($1)
 ')
 
 ########################################
@@ -4366,11 +4290,8 @@ interface(`userdom_sigchld_sysadm',`
 ## </param>
 #
 interface(`userdom_dontaudit_getattr_sysadm_ttys',`
-	gen_require(`
-		type sysadm_tty_device_t;
-	')
-
-	dontaudit $1 sysadm_tty_device_t:chr_file getattr;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_getattr_ttys() instead.')
+	sysadm_dontaudit_getattr_ttys($1)
 ')
 
 ########################################
@@ -4384,13 +4305,8 @@ interface(`userdom_dontaudit_getattr_sysadm_ttys',`
 ## </param>
 #
 interface(`userdom_use_sysadm_ttys',`
-	gen_require(`
-		type sysadm_tty_device_t;
-	')
-
-	dev_list_all_dev_nodes($1)
-	term_list_ptys($1)
-	allow $1 sysadm_tty_device_t:chr_file rw_term_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_use_ttys() instead.')
+	sysadm_use_ttys($1)
 ')
 
 ########################################
@@ -4404,11 +4320,8 @@ interface(`userdom_use_sysadm_ttys',`
 ## </param>
 #
 interface(`userdom_dontaudit_use_sysadm_ttys',`
-	gen_require(`
-		type sysadm_tty_device_t;
-	')
-
-	dontaudit $1 sysadm_tty_device_t:chr_file { read write };
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_use_ttys() instead.')
+	sysadm_dontaudit_use_ttys($1)
 ')
 
 ########################################
@@ -4422,13 +4335,8 @@ interface(`userdom_dontaudit_use_sysadm_ttys',`
 ## </param>
 #
 interface(`userdom_use_sysadm_ptys',`
-	gen_require(`
-		type sysadm_devpts_t;
-	')
-
-	dev_list_all_dev_nodes($1)
-	term_list_ptys($1)
-	allow $1 sysadm_devpts_t:chr_file rw_term_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_use_ptys() instead.')
+	sysadm_use_ptys($1)
 ')
 
 ########################################
@@ -4442,11 +4350,8 @@ interface(`userdom_use_sysadm_ptys',`
 ## </param>
 #
 interface(`userdom_dontaudit_use_sysadm_ptys',`
-	gen_require(`
-		type sysadm_devpts_t;
-	')
-
-	dontaudit $1 sysadm_devpts_t:chr_file { read write };
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_use_ptys() instead.')
+	sysadm_dontaudit_use_ptys($1)
 ')
 
 ########################################
@@ -4460,8 +4365,8 @@ interface(`userdom_dontaudit_use_sysadm_ptys',`
 ## </param>
 #
 interface(`userdom_use_sysadm_terms',`
-	userdom_use_sysadm_ttys($1)
-	userdom_use_sysadm_ptys($1)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_use_terms() instead.')
+	sysadm_use_terms($1)
 ')
 
 ########################################
@@ -4475,11 +4380,8 @@ interface(`userdom_use_sysadm_terms',`
 ## </param>
 #
 interface(`userdom_dontaudit_use_sysadm_terms',`
-	gen_require(`
-		attribute admin_terminal;
-	')
-
-	dontaudit $1 admin_terminal:chr_file { read write };
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_use_terms() instead.')
+	sysadm_dontaudit_use_terms($1)
 ')
 
 ########################################
@@ -4493,11 +4395,8 @@ interface(`userdom_dontaudit_use_sysadm_terms',`
 ## </param>
 #
 interface(`userdom_use_sysadm_fds',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	allow $1 sysadm_t:fd use;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_use_fds() instead.')
+	sysadm_use_fds($1)
 ')
 
 ########################################
@@ -4511,11 +4410,8 @@ interface(`userdom_use_sysadm_fds',`
 ## </param>
 #
 interface(`userdom_rw_sysadm_pipes',`
-	gen_require(`
-		type sysadm_t;
-	')
-
-	allow $1 sysadm_t:fifo_file rw_fifo_file_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_rw_pipes() instead.')
+	sysadm_rw_pipes($1)
 ')
 
 ########################################
@@ -4530,11 +4426,8 @@ interface(`userdom_rw_sysadm_pipes',`
 ## </param>
 #
 interface(`userdom_getattr_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	allow $1 sysadm_home_dir_t:dir getattr;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_getattr_home_dirs() instead.')
+	sysadm_getattr_home_dirs($1)
 ')
 
 ########################################
@@ -4550,11 +4443,8 @@ interface(`userdom_getattr_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_getattr_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	dontaudit $1 sysadm_home_dir_t:dir getattr;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_getattr_home_dirs() instead.')
+	sysadm_dontaudit_getattr_home_dirs($1)
 ')
 
 ########################################
@@ -4568,11 +4458,8 @@ interface(`userdom_dontaudit_getattr_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_search_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	allow $1 sysadm_home_dir_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_search_home_dirs() instead.')
+	sysadm_search_home_dirs($1)
 ')
 
 ########################################
@@ -4587,11 +4474,8 @@ interface(`userdom_search_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_search_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	dontaudit $1 sysadm_home_dir_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_search_home_dirs() instead.')
+	sysadm_dontaudit_search_home_dirs($1)
 ')
 
 ########################################
@@ -4605,11 +4489,8 @@ interface(`userdom_dontaudit_search_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_list_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	allow $1 sysadm_home_dir_t:dir list_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_list_home_dirs() instead.')
+	sysadm_list_home_dirs($1)
 ')
 
 ########################################
@@ -4624,11 +4505,8 @@ interface(`userdom_list_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_list_sysadm_home_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	dontaudit $1 sysadm_home_dir_t:dir list_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_list_home_dirs() instead.')
+	sysadm_dontaudit_list_home_dirs($1)
 ')
 
 ########################################
@@ -4643,13 +4521,8 @@ interface(`userdom_dontaudit_list_sysadm_home_dirs',`
 ## </param>
 #
 interface(`userdom_dontaudit_read_sysadm_home_content_files',`
-	gen_require(`
-		type sysadm_home_dir_t, sysadm_home_t;
-	')
-
-	dontaudit $1 sysadm_home_dir_t:dir search_dir_perms;
-	dontaudit $1 sysadm_home_t:dir search_dir_perms;
-	dontaudit $1 sysadm_home_t:file read_file_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_dontaudit_read_home_content_files() instead.')
+	sysadm_dontaudit_read_home_content_files($1)
 ')
 
 ########################################
@@ -4675,11 +4548,8 @@ interface(`userdom_dontaudit_read_sysadm_home_content_files',`
 ## </param>
 #
 interface(`userdom_sysadm_home_dir_filetrans',`
-	gen_require(`
-		type sysadm_home_dir_t;
-	')
-
-	filetrans_pattern($1,sysadm_home_dir_t,$2,$3)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_home_dir_filetrans() instead.')
+	sysadm_home_dir_filetrans($1,$2,$3)
 ')
 
 ########################################
@@ -4693,11 +4563,8 @@ interface(`userdom_sysadm_home_dir_filetrans',`
 ## </param>
 #
 interface(`userdom_search_sysadm_home_content_dirs',`
-	gen_require(`
-		type sysadm_home_dir_t, sysadm_home_t;
-	')
-
-	allow $1 { sysadm_home_dir_t sysadm_home_t }:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_search_home_content_dirs() instead.')
+	sysadm_search_home_content_dirs($1)
 ')
 
 ########################################
@@ -4711,14 +4578,8 @@ interface(`userdom_search_sysadm_home_content_dirs',`
 ## </param>
 #
 interface(`userdom_read_sysadm_home_content_files',`
-	gen_require(`
-		type sysadm_home_dir_t, sysadm_home_t;
-	')
-
-	files_search_home($1)
-	allow $1 { sysadm_home_dir_t sysadm_home_t }:dir list_dir_perms;
-	read_files_pattern($1, { sysadm_home_dir_t sysadm_home_t }, sysadm_home_t)
-	read_lnk_files_pattern($1, { sysadm_home_dir_t sysadm_home_t }, sysadm_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_read_home_content_files() instead.')
+	sysadm_read_home_content_files($1)
 ')
 
 ########################################
@@ -4732,14 +4593,8 @@ interface(`userdom_read_sysadm_home_content_files',`
 ## </param>
 #
 interface(`userdom_read_sysadm_tmp_files',`
-	gen_require(`
-		type sysadm_tmp_t;
-	')
-
-	files_search_tmp($1)
-	allow $1 sysadm_tmp_t:dir list_dir_perms;
-	read_files_pattern($1, sysadm_tmp_t, sysadm_tmp_t)
-	read_lnk_files_pattern($1, sysadm_tmp_t, sysadm_tmp_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use sysadm_read_tmp_files() instead.')
+	sysadm_read_tmp_files($1)
 ')
 
 ########################################
@@ -4993,11 +4848,8 @@ interface(`userdom_dontaudit_use_unpriv_user_fds',`
 ## </param>
 #
 interface(`userdom_home_filetrans_generic_user_home_dir',`
-	gen_require(`
-		type user_home_dir_t;
-	')
-
-	files_home_filetrans($1,user_home_dir_t,dir)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_home_filetrans_home_dir() instead.')
+	unprivuser_home_filetrans_home_dir($1)
 ')
 
 ########################################
@@ -5011,11 +4863,8 @@ interface(`userdom_home_filetrans_generic_user_home_dir',`
 ## </param>
 #
 interface(`userdom_search_generic_user_home_dirs',`
-	gen_require(`
-		type user_home_dir_t;
-	')
-
-	allow $1 user_home_dir_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_search_home_dirs() instead.')
+	unprivuser_search_home_dirs($1)
 ')
 
 ########################################
@@ -5036,12 +4885,8 @@ interface(`userdom_search_generic_user_home_dirs',`
 ## </param>
 #
 interface(`userdom_generic_user_home_dir_filetrans_generic_user_home_content',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	filetrans_pattern($1,user_home_dir_t,user_home_t,$2)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_home_dir_filetrans_home_content() instead.')
+	unprivuser_home_dir_filetrans_home_content($1, $2)
 ')
 
 ########################################
@@ -5055,11 +4900,8 @@ interface(`userdom_generic_user_home_dir_filetrans_generic_user_home_content',`
 ## </param>
 #
 interface(`userdom_dontaudit_search_generic_user_home_dirs',`
-	gen_require(`
-		type user_home_t;
-	')
-
-	dontaudit $1 user_home_t:dir search_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_dontaudit_search_home_dirs() instead.')
+	unprivuser_dontaudit_search_home_dirs($1)
 ')
 
 ########################################
@@ -5074,12 +4916,8 @@ interface(`userdom_dontaudit_search_generic_user_home_dirs',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_dirs',`
-	gen_require(`
-		type user_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 user_home_dir_t:dir manage_dir_perms;
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_dirs() instead.')
+	unprivuser_manage_home_dirs($1)
 ')
 
 ########################################
@@ -5095,17 +4933,13 @@ interface(`userdom_manage_generic_user_home_dirs',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_content_dirs',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	manage_dirs_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_content_dirs() instead.')
+	unprivuser_manage_home_content_dirs($1)
 ')
 
 ########################################
 ## <summary>
-##	Relabel to staff home directories.
+##	Relabel to generic user home directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -5114,12 +4948,8 @@ interface(`userdom_manage_generic_user_home_content_dirs',`
 ## </param>
 #
 interface(`userdom_relabelto_generic_user_home_dirs',`
-	gen_require(`
-		type staff_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 user_home_dir_t:dir relabelto;
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_relabelto_home_dirs() instead.')
+	unprivuser_relabelto_home_dirs($1)
 ')
 
 ########################################
@@ -5133,13 +4963,8 @@ interface(`userdom_relabelto_generic_user_home_dirs',`
 ## </param>
 #
 interface(`userdom_read_generic_user_home_content_files',`
-	gen_require(`
-		type user_home_t, user_home_dir_t;
-	')
-
-	files_search_home($1)
-	allow $1 user_home_t:dir list_dir_perms;
-	read_files_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_read_home_content_files() instead.')
+	unprivuser_read_home_content_files($1)
 ')
 
 ########################################
@@ -5154,12 +4979,8 @@ interface(`userdom_read_generic_user_home_content_files',`
 ## </param>
 #
 interface(`userdom_mmap_generic_user_home_content_files',`
-	gen_require(`
-		type user_home_t;
-	')
-
-	files_search_home($1)
-	allow $1 user_home_t:file execute;
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_mmap_home_content_files() instead.')
+	unprivuser_mmap_home_content_files($1)
 ')
 
 ########################################
@@ -5174,12 +4995,8 @@ interface(`userdom_mmap_generic_user_home_content_files',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_content_files',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	manage_files_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_content_files() instead.')
+	unprivuser_manage_home_content_files($1)
 ')
 
 ########################################
@@ -5194,11 +5011,8 @@ interface(`userdom_manage_generic_user_home_content_files',`
 ## </param>
 #
 interface(`userdom_dontaudit_relabel_generic_user_home_content_files',`
-	gen_require(`
-		type user_home_t;
-	')
-
-	dontaudit $1 user_home_t:file { relabelto relabelfrom };
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_dontaudit_relabel_home_content_files() instead.')
+	unprivuser_dontaudit_relabel_home_content_files($1)
 ')
 
 ########################################
@@ -5213,12 +5027,8 @@ interface(`userdom_dontaudit_relabel_generic_user_home_content_files',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_content_symlinks',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	manage_lnk_files_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_content_symlinks() instead.')
+	unprivuser_manage_home_content_symlinks($1)
 ')
 
 ########################################
@@ -5233,12 +5043,8 @@ interface(`userdom_manage_generic_user_home_content_symlinks',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_content_pipes',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	manage_fifo_files_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_content_pipes() instead.')
+	unprivuser_manage_home_content_pipes($1)
 ')
 
 ########################################
@@ -5253,12 +5059,8 @@ interface(`userdom_manage_generic_user_home_content_pipes',`
 ## </param>
 #
 interface(`userdom_manage_generic_user_home_content_sockets',`
-	gen_require(`
-		type user_home_dir_t, user_home_t;
-	')
-
-	files_search_home($1)
-	manage_sock_files_pattern($1,{ user_home_dir_t user_home_t },user_home_t)
+	refpolicywarn(`$0($*) has been deprecated.  Please use unprivuser_manage_home_content_sockets() instead.')
+	unprivuser_manage_home_content_sockets($1)
 ')
 
 ########################################

@@ -34,7 +34,7 @@
 #
 template(`mplayer_per_role_template',`
 	gen_require(`
-		type mencoder_exec_t, mplayer_exec_t;
+		type mencoder_exec_t, mplayer_exec_t, mplayer_etc_t;
 	')
 
 	########################################
@@ -75,7 +75,7 @@ template(`mplayer_per_role_template',`
 	domtrans_pattern($2, mencoder_exec_t, $1_mencoder_t)
 
 	# Allow the user domain to signal/ps.
-	ps_process_pattern($2,$1_mencoder_t,$1_mencoder_t)
+	ps_process_pattern($2,$1_mencoder_t)
 	allow $2 $1_mencoder_t:process signal_perms;
 
 	# Read /proc files and directories
@@ -235,9 +235,8 @@ template(`mplayer_per_role_template',`
 		files_tmp_filetrans($1_mencoder_t,$1_untrusted_content_tmp_t,file)
 		files_tmp_filetrans($1_mencoder_t,$1_untrusted_content_tmp_t,dir)
 
-		userdom_manage_user_untrusted_content_files($1,$1_mencoder_t,file)
-		userdom_manage_user_untrusted_content_files($1,$1_mencoder_t,dir)
-
+		userdom_manage_user_untrusted_content_dirs($1,$1_mencoder_t)
+		userdom_manage_user_untrusted_content_files($1,$1_mencoder_t)
 	',`
 		files_dontaudit_list_home($1_mencoder_t)
 		files_dontaudit_list_tmp($1_mencoder_t)
@@ -342,7 +341,7 @@ template(`mplayer_per_role_template',`
 	userdom_read_user_home_content_files($1,$1_mplayer_t)
 	userdom_read_user_home_content_symlinks($1,$1_mplayer_t)
 
-	xserver_user_client_template($1,$1_mplayer_t,$1_mplayer_tmpfs_t)
+	xserver_user_x_domain_template($1,$1_mplayer,$1_mplayer_t,$1_mplayer_tmpfs_t)
 	
 	# Read songs
 	ifdef(`enable_mls',`',`

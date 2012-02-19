@@ -1,5 +1,5 @@
 
-policy_module(gpm,1.4.0)
+policy_module(gpm, 1.5.0)
 
 ########################################
 #
@@ -41,8 +41,8 @@ files_tmp_filetrans(gpm_t, gpm_tmp_t, { file dir })
 allow gpm_t gpm_var_run_t:file manage_file_perms;
 files_pid_filetrans(gpm_t,gpm_var_run_t,file)
 
-allow gpm_t gpmctl_t:sock_file manage_file_perms;
-allow gpm_t gpmctl_t:fifo_file manage_file_perms;
+allow gpm_t gpmctl_t:sock_file manage_sock_file_perms;
+allow gpm_t gpmctl_t:fifo_file manage_fifo_file_perms;
 dev_filetrans(gpm_t,gpmctl_t,{ sock_file fifo_file })
 
 kernel_read_kernel_sysctls(gpm_t)
@@ -69,7 +69,8 @@ logging_send_syslog_msg(gpm_t)
 miscfiles_read_localization(gpm_t)
 
 userdom_dontaudit_use_unpriv_user_fds(gpm_t)
-userdom_dontaudit_search_sysadm_home_dirs(gpm_t)
+
+sysadm_dontaudit_search_home_dirs(gpm_t)
 
 optional_policy(`
 	seutil_sigchld_newrole(gpm_t)

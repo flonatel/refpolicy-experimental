@@ -158,7 +158,7 @@ interface(`corenet_tcp_sendrecv_generic_if',`
 		type netif_t;
 	')
 
-	allow $1 netif_t:netif { tcp_send tcp_recv };
+	allow $1 netif_t:netif { tcp_send tcp_recv egress ingress };
 ')
 
 ########################################
@@ -176,7 +176,7 @@ interface(`corenet_udp_send_generic_if',`
 		type netif_t;
 	')
 
-	allow $1 netif_t:netif udp_send;
+	allow $1 netif_t:netif { udp_send egress };
 ')
 
 ########################################
@@ -195,7 +195,7 @@ interface(`corenet_dontaudit_udp_send_generic_if',`
 		type netif_t;
 	')
 
-	dontaudit $1 netif_t:netif udp_send;
+	dontaudit $1 netif_t:netif { udp_send egress };
 ')
 
 ########################################
@@ -213,7 +213,7 @@ interface(`corenet_udp_receive_generic_if',`
 		type netif_t;
 	')
 
-	allow $1 netif_t:netif udp_recv;
+	allow $1 netif_t:netif { udp_recv ingress };
 ')
 
 ########################################
@@ -232,7 +232,7 @@ interface(`corenet_dontaudit_udp_receive_generic_if',`
 		type netif_t;
 	')
 
-	dontaudit $1 netif_t:netif udp_recv;
+	dontaudit $1 netif_t:netif { udp_recv ingress };
 ')
 
 ########################################
@@ -281,7 +281,7 @@ interface(`corenet_raw_send_generic_if',`
 		type netif_t;
 	')
 
-	allow $1 netif_t:netif rawip_send;
+	allow $1 netif_t:netif { rawip_send egress };
 ')
 
 ########################################
@@ -299,7 +299,7 @@ interface(`corenet_raw_receive_generic_if',`
 		type netif_t;
 	')
 
-	allow $1 netif_t:netif rawip_recv;
+	allow $1 netif_t:netif { rawip_recv ingress };
 ')
 
 ########################################
@@ -332,7 +332,7 @@ interface(`corenet_tcp_sendrecv_all_if',`
 		attribute netif_type;
 	')
 
-	allow $1 netif_type:netif { tcp_send tcp_recv };
+	allow $1 netif_type:netif { tcp_send tcp_recv egress ingress };
 ')
 
 ########################################
@@ -350,7 +350,7 @@ interface(`corenet_udp_send_all_if',`
 		attribute netif_type;
 	')
 
-	allow $1 netif_type:netif udp_send;
+	allow $1 netif_type:netif { udp_send egress };
 ')
 
 ########################################
@@ -368,7 +368,7 @@ interface(`corenet_udp_receive_all_if',`
 		attribute netif_type;
 	')
 
-	allow $1 netif_type:netif udp_recv;
+	allow $1 netif_type:netif { udp_recv ingress };
 ')
 
 ########################################
@@ -401,7 +401,7 @@ interface(`corenet_raw_send_all_if',`
 		attribute netif_type;
 	')
 
-	allow $1 netif_type:netif rawip_send;
+	allow $1 netif_type:netif { rawip_send egress };
 ')
 
 ########################################
@@ -419,7 +419,7 @@ interface(`corenet_raw_receive_all_if',`
 		attribute netif_type;
 	')
 
-	allow $1 netif_type:netif rawip_recv;
+	allow $1 netif_type:netif { rawip_recv ingress };
 ')
 
 ########################################
@@ -452,7 +452,7 @@ interface(`corenet_tcp_sendrecv_generic_node',`
 		type node_t;
 	')
 
-	allow $1 node_t:node { tcp_send tcp_recv };
+	allow $1 node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -470,7 +470,7 @@ interface(`corenet_udp_send_generic_node',`
 		type node_t;
 	')
 
-	allow $1 node_t:node udp_send;
+	allow $1 node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -488,7 +488,7 @@ interface(`corenet_udp_receive_generic_node',`
 		type node_t;
 	')
 
-	allow $1 node_t:node udp_recv;
+	allow $1 node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -521,7 +521,7 @@ interface(`corenet_raw_send_generic_node',`
 		type node_t;
 	')
 
-	allow $1 node_t:node rawip_send;
+	allow $1 node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -539,7 +539,7 @@ interface(`corenet_raw_receive_generic_node',`
 		type node_t;
 	')
 
-	allow $1 node_t:node rawip_recv;
+	allow $1 node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -608,7 +608,7 @@ interface(`corenet_tcp_sendrecv_all_nodes',`
 		attribute node_type;
 	')
 
-	allow $1 node_type:node { tcp_send tcp_recv };
+	allow $1 node_type:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -626,7 +626,7 @@ interface(`corenet_udp_send_all_nodes',`
 		attribute node_type;
 	')
 
-	allow $1 node_type:node udp_send;
+	allow $1 node_type:node { udp_send sendto };
 ')
 
 ########################################
@@ -645,7 +645,7 @@ interface(`corenet_dontaudit_udp_send_all_nodes',`
 		attribute node_type;
 	')
 
-	dontaudit $1 node_type:node udp_send;
+	dontaudit $1 node_type:node { udp_send sendto };
 ')
 
 ########################################
@@ -663,7 +663,7 @@ interface(`corenet_udp_receive_all_nodes',`
 		attribute node_type;
 	')
 
-	allow $1 node_type:node udp_recv;
+	allow $1 node_type:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -682,7 +682,7 @@ interface(`corenet_dontaudit_udp_receive_all_nodes',`
 		attribute node_type;
 	')
 
-	dontaudit $1 node_type:node udp_recv;
+	dontaudit $1 node_type:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -731,7 +731,7 @@ interface(`corenet_raw_send_all_nodes',`
 		attribute node_type;
 	')
 
-	allow $1 node_type:node rawip_send;
+	allow $1 node_type:node { rawip_send sendto };
 ')
 
 ########################################
@@ -749,7 +749,7 @@ interface(`corenet_raw_receive_all_nodes',`
 		attribute node_type;
 	')
 
-	allow $1 node_type:node rawip_recv;
+	allow $1 node_type:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -1741,6 +1741,7 @@ interface(`corenet_tcp_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	allow $1 netlabel_peer_t:peer recv;
 	allow $1 netlabel_peer_t:tcp_socket recvfrom;
 ')
 
@@ -1756,6 +1757,7 @@ interface(`corenet_tcp_recvfrom_netlabel',`
 #
 interface(`corenet_tcp_recvfrom_unlabeled',`
 	kernel_tcp_recvfrom_unlabeled($1)
+	kernel_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -1795,6 +1797,7 @@ interface(`corenet_dontaudit_tcp_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	dontaudit $1 netlabel_peer_t:peer recv;
 	dontaudit $1 netlabel_peer_t:tcp_socket recvfrom;
 ')
 
@@ -1811,6 +1814,7 @@ interface(`corenet_dontaudit_tcp_recvfrom_netlabel',`
 #
 interface(`corenet_dontaudit_tcp_recvfrom_unlabeled',`
 	kernel_dontaudit_tcp_recvfrom_unlabeled($1)
+	kernel_dontaudit_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -1848,6 +1852,7 @@ interface(`corenet_udp_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	allow $1 netlabel_peer_t:peer recv;
 	allow $1 netlabel_peer_t:udp_socket recvfrom;
 ')
 
@@ -1863,6 +1868,7 @@ interface(`corenet_udp_recvfrom_netlabel',`
 #
 interface(`corenet_udp_recvfrom_unlabeled',`
 	kernel_udp_recvfrom_unlabeled($1)
+	kernel_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -1902,6 +1908,7 @@ interface(`corenet_dontaudit_udp_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	dontaudit $1 netlabel_peer_t:peer recv;
 	dontaudit $1 netlabel_peer_t:udp_socket recvfrom;
 ')
 
@@ -1918,6 +1925,7 @@ interface(`corenet_dontaudit_udp_recvfrom_netlabel',`
 #
 interface(`corenet_dontaudit_udp_recvfrom_unlabeled',`
 	kernel_dontaudit_udp_recvfrom_unlabeled($1)
+	kernel_dontaudit_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -1955,6 +1963,7 @@ interface(`corenet_raw_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	allow $1 netlabel_peer_t:peer recv;
 	allow $1 netlabel_peer_t:rawip_socket recvfrom;
 ')
 
@@ -1970,6 +1979,7 @@ interface(`corenet_raw_recvfrom_netlabel',`
 #
 interface(`corenet_raw_recvfrom_unlabeled',`
 	kernel_raw_recvfrom_unlabeled($1)
+	kernel_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -2009,6 +2019,7 @@ interface(`corenet_dontaudit_raw_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	dontaudit $1 netlabel_peer_t:peer recv;
 	dontaudit $1 netlabel_peer_t:rawip_socket recvfrom;
 ')
 
@@ -2025,6 +2036,7 @@ interface(`corenet_dontaudit_raw_recvfrom_netlabel',`
 #
 interface(`corenet_dontaudit_raw_recvfrom_unlabeled',`
 	kernel_dontaudit_raw_recvfrom_unlabeled($1)
+	kernel_dontaudit_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -2046,6 +2058,7 @@ interface(`corenet_all_recvfrom_unlabeled',`
 	kernel_tcp_recvfrom_unlabeled($1)
 	kernel_udp_recvfrom_unlabeled($1)
 	kernel_raw_recvfrom_unlabeled($1)
+	kernel_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -2068,6 +2081,7 @@ interface(`corenet_all_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	allow $1 netlabel_peer_t:peer recv;
 	allow $1 netlabel_peer_t:{ tcp_socket udp_socket rawip_socket } recvfrom;
 ')
 
@@ -2085,6 +2099,7 @@ interface(`corenet_dontaudit_all_recvfrom_unlabeled',`
 	kernel_dontaudit_tcp_recvfrom_unlabeled($1)
 	kernel_dontaudit_udp_recvfrom_unlabeled($1)
 	kernel_dontaudit_raw_recvfrom_unlabeled($1)
+	kernel_dontaudit_recvfrom_unlabeled_peer($1)
 
 	# XXX - at some point the oubound/send access check will be removed
 	# but for right now we need to keep this in place so as not to break
@@ -2108,6 +2123,7 @@ interface(`corenet_dontaudit_all_recvfrom_netlabel',`
 		type netlabel_peer_t;
 	')
 
+	dontaudit $1 netlabel_peer_t:peer recv;
 	dontaudit $1 netlabel_peer_t:{ tcp_socket udp_socket rawip_socket } recvfrom;
 ')
 
@@ -2139,8 +2155,10 @@ interface(`corenet_tcp_recvfrom_labeled',`
 	allow $1 $2:{ association tcp_socket } recvfrom;
 	allow $2 $1:{ association tcp_socket } recvfrom;
 
-	# Netlabel (CIPSO)-based labeled networking
-	# currently only supports MLS portion of label
+	allow $1 $2:peer recv;
+	allow $2 $1:peer recv;
+
+	# allow receiving packets from MLS-only peers using NetLabel
 	corenet_tcp_recvfrom_netlabel($1)
 	corenet_tcp_recvfrom_netlabel($2)
 ')
@@ -2164,8 +2182,9 @@ interface(`corenet_udp_recvfrom_labeled',`
 	allow $2 self:association sendto;
 	allow $1 $2:{ association udp_socket } recvfrom;
 
-	# Netlabel (CIPSO)-based labeled networking
-	# currently only supports MLS portion of label
+	allow $1 $2:peer recv;
+
+	# allow receiving packets from MLS-only peers using NetLabel
 	corenet_udp_recvfrom_netlabel($1)
 ')
 
@@ -2188,8 +2207,9 @@ interface(`corenet_raw_recvfrom_labeled',`
 	allow $2 self:association sendto;
 	allow $1 $2:{ association rawip_socket } recvfrom;
 
-	# Netlabel (CIPSO)-based labeled networking
-	# currently only supports MLS portion of label
+	allow $1 $2:peer recv;
+
+	# allow receiving packets from MLS-only peers using NetLabel
 	corenet_raw_recvfrom_netlabel($1)
 ')
 
@@ -50537,7 +50557,7 @@ interface(`corenet_tcp_sendrecv_compat_ipv4_node',`
 		type compat_ipv4_node_t;
 	')
 
-	allow $1 compat_ipv4_node_t:node { tcp_send tcp_recv };
+	allow $1 compat_ipv4_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -50556,7 +50576,7 @@ interface(`corenet_udp_send_compat_ipv4_node',`
 		type compat_ipv4_node_t;
 	')
 
-	allow $1 compat_ipv4_node_t:node udp_send;
+	allow $1 compat_ipv4_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -50575,7 +50595,7 @@ interface(`corenet_udp_receive_compat_ipv4_node',`
 		type compat_ipv4_node_t;
 	')
 
-	allow $1 compat_ipv4_node_t:node udp_recv;
+	allow $1 compat_ipv4_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -50610,7 +50630,7 @@ interface(`corenet_raw_send_compat_ipv4_node',`
 		type compat_ipv4_node_t;
 	')
 
-	allow $1 compat_ipv4_node_t:node rawip_send;
+	allow $1 compat_ipv4_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -50629,7 +50649,7 @@ interface(`corenet_raw_receive_compat_ipv4_node',`
 		type compat_ipv4_node_t;
 	')
 
-	allow $1 compat_ipv4_node_t:node rawip_recv;
+	allow $1 compat_ipv4_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -50707,7 +50727,7 @@ interface(`corenet_tcp_sendrecv_inaddr_any_node',`
 		type inaddr_any_node_t;
 	')
 
-	allow $1 inaddr_any_node_t:node { tcp_send tcp_recv };
+	allow $1 inaddr_any_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -50726,7 +50746,7 @@ interface(`corenet_udp_send_inaddr_any_node',`
 		type inaddr_any_node_t;
 	')
 
-	allow $1 inaddr_any_node_t:node udp_send;
+	allow $1 inaddr_any_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -50745,7 +50765,7 @@ interface(`corenet_udp_receive_inaddr_any_node',`
 		type inaddr_any_node_t;
 	')
 
-	allow $1 inaddr_any_node_t:node udp_recv;
+	allow $1 inaddr_any_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -50780,7 +50800,7 @@ interface(`corenet_raw_send_inaddr_any_node',`
 		type inaddr_any_node_t;
 	')
 
-	allow $1 inaddr_any_node_t:node rawip_send;
+	allow $1 inaddr_any_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -50799,7 +50819,7 @@ interface(`corenet_raw_receive_inaddr_any_node',`
 		type inaddr_any_node_t;
 	')
 
-	allow $1 inaddr_any_node_t:node rawip_recv;
+	allow $1 inaddr_any_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -50877,7 +50897,7 @@ interface(`corenet_tcp_sendrecv_link_local_node',`
 		type link_local_node_t;
 	')
 
-	allow $1 link_local_node_t:node { tcp_send tcp_recv };
+	allow $1 link_local_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -50896,7 +50916,7 @@ interface(`corenet_udp_send_link_local_node',`
 		type link_local_node_t;
 	')
 
-	allow $1 link_local_node_t:node udp_send;
+	allow $1 link_local_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -50915,7 +50935,7 @@ interface(`corenet_udp_receive_link_local_node',`
 		type link_local_node_t;
 	')
 
-	allow $1 link_local_node_t:node udp_recv;
+	allow $1 link_local_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -50950,7 +50970,7 @@ interface(`corenet_raw_send_link_local_node',`
 		type link_local_node_t;
 	')
 
-	allow $1 link_local_node_t:node rawip_send;
+	allow $1 link_local_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -50969,7 +50989,7 @@ interface(`corenet_raw_receive_link_local_node',`
 		type link_local_node_t;
 	')
 
-	allow $1 link_local_node_t:node rawip_recv;
+	allow $1 link_local_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51047,7 +51067,7 @@ interface(`corenet_tcp_sendrecv_lo_node',`
 		type lo_node_t;
 	')
 
-	allow $1 lo_node_t:node { tcp_send tcp_recv };
+	allow $1 lo_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -51066,7 +51086,7 @@ interface(`corenet_udp_send_lo_node',`
 		type lo_node_t;
 	')
 
-	allow $1 lo_node_t:node udp_send;
+	allow $1 lo_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -51085,7 +51105,7 @@ interface(`corenet_udp_receive_lo_node',`
 		type lo_node_t;
 	')
 
-	allow $1 lo_node_t:node udp_recv;
+	allow $1 lo_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -51120,7 +51140,7 @@ interface(`corenet_raw_send_lo_node',`
 		type lo_node_t;
 	')
 
-	allow $1 lo_node_t:node rawip_send;
+	allow $1 lo_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -51139,7 +51159,7 @@ interface(`corenet_raw_receive_lo_node',`
 		type lo_node_t;
 	')
 
-	allow $1 lo_node_t:node rawip_recv;
+	allow $1 lo_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51217,7 +51237,7 @@ interface(`corenet_tcp_sendrecv_mapped_ipv4_node',`
 		type mapped_ipv4_node_t;
 	')
 
-	allow $1 mapped_ipv4_node_t:node { tcp_send tcp_recv };
+	allow $1 mapped_ipv4_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -51236,7 +51256,7 @@ interface(`corenet_udp_send_mapped_ipv4_node',`
 		type mapped_ipv4_node_t;
 	')
 
-	allow $1 mapped_ipv4_node_t:node udp_send;
+	allow $1 mapped_ipv4_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -51255,7 +51275,7 @@ interface(`corenet_udp_receive_mapped_ipv4_node',`
 		type mapped_ipv4_node_t;
 	')
 
-	allow $1 mapped_ipv4_node_t:node udp_recv;
+	allow $1 mapped_ipv4_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -51290,7 +51310,7 @@ interface(`corenet_raw_send_mapped_ipv4_node',`
 		type mapped_ipv4_node_t;
 	')
 
-	allow $1 mapped_ipv4_node_t:node rawip_send;
+	allow $1 mapped_ipv4_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -51309,7 +51329,7 @@ interface(`corenet_raw_receive_mapped_ipv4_node',`
 		type mapped_ipv4_node_t;
 	')
 
-	allow $1 mapped_ipv4_node_t:node rawip_recv;
+	allow $1 mapped_ipv4_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51387,7 +51407,7 @@ interface(`corenet_tcp_sendrecv_multicast_node',`
 		type multicast_node_t;
 	')
 
-	allow $1 multicast_node_t:node { tcp_send tcp_recv };
+	allow $1 multicast_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -51406,7 +51426,7 @@ interface(`corenet_udp_send_multicast_node',`
 		type multicast_node_t;
 	')
 
-	allow $1 multicast_node_t:node udp_send;
+	allow $1 multicast_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -51425,7 +51445,7 @@ interface(`corenet_udp_receive_multicast_node',`
 		type multicast_node_t;
 	')
 
-	allow $1 multicast_node_t:node udp_recv;
+	allow $1 multicast_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -51460,7 +51480,7 @@ interface(`corenet_raw_send_multicast_node',`
 		type multicast_node_t;
 	')
 
-	allow $1 multicast_node_t:node rawip_send;
+	allow $1 multicast_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -51479,7 +51499,7 @@ interface(`corenet_raw_receive_multicast_node',`
 		type multicast_node_t;
 	')
 
-	allow $1 multicast_node_t:node rawip_recv;
+	allow $1 multicast_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51557,7 +51577,7 @@ interface(`corenet_tcp_sendrecv_site_local_node',`
 		type site_local_node_t;
 	')
 
-	allow $1 site_local_node_t:node { tcp_send tcp_recv };
+	allow $1 site_local_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -51576,7 +51596,7 @@ interface(`corenet_udp_send_site_local_node',`
 		type site_local_node_t;
 	')
 
-	allow $1 site_local_node_t:node udp_send;
+	allow $1 site_local_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -51595,7 +51615,7 @@ interface(`corenet_udp_receive_site_local_node',`
 		type site_local_node_t;
 	')
 
-	allow $1 site_local_node_t:node udp_recv;
+	allow $1 site_local_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -51630,7 +51650,7 @@ interface(`corenet_raw_send_site_local_node',`
 		type site_local_node_t;
 	')
 
-	allow $1 site_local_node_t:node rawip_send;
+	allow $1 site_local_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -51649,7 +51669,7 @@ interface(`corenet_raw_receive_site_local_node',`
 		type site_local_node_t;
 	')
 
-	allow $1 site_local_node_t:node rawip_recv;
+	allow $1 site_local_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51727,7 +51747,7 @@ interface(`corenet_tcp_sendrecv_unspec_node',`
 		type unspec_node_t;
 	')
 
-	allow $1 unspec_node_t:node { tcp_send tcp_recv };
+	allow $1 unspec_node_t:node { tcp_send tcp_recv sendto recvfrom };
 ')
 
 ########################################
@@ -51746,7 +51766,7 @@ interface(`corenet_udp_send_unspec_node',`
 		type unspec_node_t;
 	')
 
-	allow $1 unspec_node_t:node udp_send;
+	allow $1 unspec_node_t:node { udp_send sendto };
 ')
 
 ########################################
@@ -51765,7 +51785,7 @@ interface(`corenet_udp_receive_unspec_node',`
 		type unspec_node_t;
 	')
 
-	allow $1 unspec_node_t:node udp_recv;
+	allow $1 unspec_node_t:node { udp_recv recvfrom };
 ')
 
 ########################################
@@ -51800,7 +51820,7 @@ interface(`corenet_raw_send_unspec_node',`
 		type unspec_node_t;
 	')
 
-	allow $1 unspec_node_t:node rawip_send;
+	allow $1 unspec_node_t:node { rawip_send sendto };
 ')
 
 ########################################
@@ -51819,7 +51839,7 @@ interface(`corenet_raw_receive_unspec_node',`
 		type unspec_node_t;
 	')
 
-	allow $1 unspec_node_t:node rawip_recv;
+	allow $1 unspec_node_t:node { rawip_recv recvfrom };
 ')
 
 ########################################
@@ -51897,7 +51917,7 @@ interface(`corenet_tcp_sendrecv_lo_if',`
 		type lo_netif_t;
 	')
 
-	allow $1 lo_netif_t:netif { tcp_send tcp_recv };
+	allow $1 lo_netif_t:netif { tcp_send tcp_recv egress ingress };
 ')
 
 ########################################
@@ -51916,7 +51936,7 @@ interface(`corenet_udp_send_lo_if',`
 		type lo_netif_t;
 	')
 
-	allow $1 lo_netif_t:netif udp_send;
+	allow $1 lo_netif_t:netif { udp_send egress };
 ')
 
 ########################################
@@ -51935,7 +51955,7 @@ interface(`corenet_udp_receive_lo_if',`
 		type lo_netif_t;
 	')
 
-	allow $1 lo_netif_t:netif udp_recv;
+	allow $1 lo_netif_t:netif { udp_recv ingress };
 ')
 
 ########################################
@@ -51970,7 +51990,7 @@ interface(`corenet_raw_send_lo_if',`
 		type lo_netif_t;
 	')
 
-	allow $1 lo_netif_t:netif rawip_send;
+	allow $1 lo_netif_t:netif { rawip_send egress };
 ')
 
 ########################################
@@ -51989,7 +52009,7 @@ interface(`corenet_raw_receive_lo_if',`
 		type lo_netif_t;
 	')
 
-	allow $1 lo_netif_t:netif rawip_recv;
+	allow $1 lo_netif_t:netif { rawip_recv ingress };
 ')
 
 ########################################

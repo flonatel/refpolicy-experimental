@@ -1,5 +1,5 @@
 
-policy_module(openct,1.2.0)
+policy_module(openct, 1.3.0)
 
 ########################################
 #
@@ -22,7 +22,8 @@ dontaudit openct_t self:capability sys_tty_config;
 allow openct_t self:process signal_perms;
 
 manage_files_pattern(openct_t,openct_var_run_t,openct_var_run_t)
-files_pid_filetrans(openct_t,openct_var_run_t,file)
+manage_sock_files_pattern(openct_t,openct_var_run_t,openct_var_run_t)
+files_pid_filetrans(openct_t,openct_var_run_t,{ file sock_file })
 
 kernel_read_kernel_sysctls(openct_t)
 kernel_list_proc(openct_t)
@@ -50,7 +51,8 @@ logging_send_syslog_msg(openct_t)
 miscfiles_read_localization(openct_t)
 
 userdom_dontaudit_use_unpriv_user_fds(openct_t)
-userdom_dontaudit_search_sysadm_home_dirs(openct_t)
+
+sysadm_dontaudit_search_home_dirs(openct_t)
 
 openct_exec(openct_t)
 

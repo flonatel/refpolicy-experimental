@@ -51,7 +51,7 @@ interface(`zabbix_read_log',`
 #
 interface(`zabbix_append_log',`
 	gen_require(`
-		type var_log_t, zabbix_log_t;
+		type zabbix_log_t;
 	')
 
 	logging_search_logs($1)
@@ -85,16 +85,6 @@ interface(`zabbix_read_pid_files',`
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
-##	</summary>
-## </param>
-## <param name="role">
-##	<summary>
-##	The role to be allowed to manage the zabbix domain.
-##	</summary>
-## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the user terminal.
 ##	</summary>
 ## </param>
 ## <rolecap/>
