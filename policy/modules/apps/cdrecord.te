@@ -1,0 +1,10 @@
+
+policy_module(cdrecord,1.0.3)
+
+########################################
+#
+# Declarations
+#
+
+type cdrecord_exec_t;
+corecmd_executable_file(cdrecord_exec_t)

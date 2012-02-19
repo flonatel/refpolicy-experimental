@@ -1,0 +1,13 @@
+
+policy_module(tvtime,1.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type tvtime_exec_t;
+corecmd_executable_file(tvtime_exec_t)
+
+type tvtime_dir_t;
+files_pid_file(tvtime_dir_t)

@@ -1,0 +1,22 @@
+
+policy_module(evolution,1.0.2)
+
+########################################
+#
+# Declarations
+#
+
+type evolution_exec_t;
+corecmd_executable_file(evolution_exec_t)
+
+type evolution_alarm_exec_t;
+corecmd_executable_file(evolution_alarm_exec_t)
+
+type evolution_exchange_exec_t;
+corecmd_executable_file(evolution_exchange_exec_t)
+
+type evolution_server_exec_t;
+corecmd_executable_file(evolution_server_exec_t)
+
+type evolution_webcal_exec_t;
+corecmd_executable_file(evolution_webcal_exec_t)

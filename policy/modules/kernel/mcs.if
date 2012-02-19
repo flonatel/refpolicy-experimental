@@ -1,0 +1,43 @@
+## <summary>Multicategory security policy</summary>
+## <required val="true">
+##	Contains attributes used in MCS policy.
+## </required>
+
+########################################
+## <summary>
+##	This domain is allowed to sigkill and sigstop 
+##	all domains regardless of their MCS level.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain target for user exemption.
+##	</summary>
+## </param>
+#
+interface(`mcs_killall',`
+	gen_require(`
+		attribute mcskillall;
+	')
+
+	typeattribute $1 mcskillall;
+')
+
+########################################
+## <summary>
+##	Make specified domain MCS trusted
+##	for setting any category set for
+##	the processes it executes.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain target for user exemption.
+##	</summary>
+## </param>
+#
+interface(`mcs_process_set_categories',`
+	gen_require(`
+		attribute mcssetcats;
+	')
+
+	typeattribute $1 mcssetcats;
+')

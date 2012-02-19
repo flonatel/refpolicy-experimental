@@ -1,0 +1,10 @@
+
+policy_module(irc,1.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type irc_exec_t;
+corecmd_executable_file(irc_exec_t)

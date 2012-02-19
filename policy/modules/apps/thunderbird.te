@@ -1,0 +1,10 @@
+
+policy_module(thunderbird,1.0.2)
+
+########################################
+#
+# Declarations
+#
+
+type thunderbird_exec_t;
+corecmd_executable_file(thunderbird_exec_t)

@@ -1,0 +1,13 @@
+
+policy_module(userhelper,1.0.3)
+
+########################################
+#
+# Declarations
+#
+
+type userhelper_conf_t;
+files_type(userhelper_conf_t)
+
+type userhelper_exec_t;
+corecmd_executable_file(userhelper_exec_t)

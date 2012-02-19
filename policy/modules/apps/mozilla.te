@@ -1,0 +1,13 @@
+
+policy_module(mozilla,1.0.2)
+
+########################################
+#
+# Declarations
+#
+
+type mozilla_conf_t;
+files_config_file(mozilla_conf_t)
+
+type mozilla_exec_t;
+corecmd_executable_file(mozilla_exec_t)

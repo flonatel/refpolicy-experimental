@@ -1,0 +1,10 @@
+
+policy_module(lockdev,1.0.1)
+
+########################################
+#
+# Declarations
+#
+
+type lockdev_exec_t;
+corecmd_executable_file(lockdev_exec_t)
