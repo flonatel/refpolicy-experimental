@@ -45,7 +45,7 @@
 #
 
 
-policy_module(corenetwork, 1.11.14)
+policy_module(corenetwork, 1.13.0)
 
 ########################################
 #
@@ -499,6 +499,13 @@ type gpsd_port_t, port_type;
 type gpsd_client_packet_t, packet_type, client_packet_type;
 type gpsd_server_packet_t, packet_type, server_packet_type;
 portcon tcp 2947 gen_context(system_u:object_r:gpsd_port_t,s0)
+
+
+
+type hddtemp_port_t, port_type;
+type hddtemp_client_packet_t, packet_type, client_packet_type;
+type hddtemp_server_packet_t, packet_type, server_packet_type;
+portcon tcp 7634 gen_context(system_u:object_r:hddtemp_port_t,s0)
 
 
 
@@ -1184,6 +1191,13 @@ type pulseaudio_port_t, port_type;
 type pulseaudio_client_packet_t, packet_type, client_packet_type;
 type pulseaudio_server_packet_t, packet_type, server_packet_type;
 portcon tcp 4713 gen_context(system_u:object_r:pulseaudio_port_t,s0)
+
+
+
+type puppet_port_t, port_type;
+type puppet_client_packet_t, packet_type, client_packet_type;
+type puppet_server_packet_t, packet_type, server_packet_type;
+portcon tcp 8140 gen_context(system_u:object_r:puppet_port_t,s0)
 
 
 
