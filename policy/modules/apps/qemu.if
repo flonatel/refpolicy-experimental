@@ -2,120 +2,6 @@
 
 ########################################
 ## <summary>
-##	Execute a domain transition to run qemu.
-## </summary>
-## <param name="domain">
-## <summary>
-##	Domain allowed to transition.
-## </summary>
-## </param>
-#
-interface(`qemu_domtrans',`
-	gen_require(`
-		type qemu_t, qemu_exec_t;
-	')
-
-	domtrans_pattern($1, qemu_exec_t, qemu_t)
-')
-
-########################################
-## <summary>
-##	Execute qemu in the qemu domain.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-## <param name="role">
-##	<summary>
-##	The role to allow the qemu domain.
-##	</summary>
-## </param>
-#
-interface(`qemu_run',`
-	gen_require(`
-		type qemu_t;
-	')
-
-	qemu_domtrans($1)
-	role $2 types qemu_t;
-')
-
-########################################
-## <summary>
-##	Allow the domain to read state files in /proc.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain to allow access.
-##	</summary>
-## </param>
-#
-interface(`qemu_read_state',`
-	gen_require(`
-		type qemu_t;
-	')
-
-	read_files_pattern($1, qemu_t, qemu_t)
-')
-
-########################################
-## <summary>
-##	Send a signal to qemu.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`qemu_signal',`
-	gen_require(`
-		type qemu_t;
-	')
-
-	allow $1 qemu_t:process signal;
-')
-
-########################################
-## <summary>
-##	Send a sigill to qemu
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`qemu_kill',`
-	gen_require(`
-		type qemu_t;
-	')
-
-	allow $1 qemu_t:process sigkill;
-')
-
-########################################
-## <summary>
-##	Execute a domain transition to run qemu unconfined.
-## </summary>
-## <param name="domain">
-## <summary>
-##	Domain allowed to transition.
-## </summary>
-## </param>
-#
-interface(`qemu_domtrans_unconfined',`
-	gen_require(`
-		type qemu_unconfined_t, qemu_exec_t;
-	')
-
-	domtrans_pattern($1, qemu_exec_t, qemu_unconfined_t)
-')
-
-########################################
-## <summary>
 ##	Creates types and rules for a basic
 ##	qemu process domain.
 ## </summary>
@@ -210,4 +96,213 @@ template(`qemu_domain_template',`
 		xserver_read_xdm_pid($1_t)
 #		xserver_xdm_rw_shm($1_t)
 	')
+')
+
+#######################################
+## <summary>
+##	The per role template for the qemu module.
+## </summary>
+## <desc>
+##	<p>
+##	This template creates a derived domains which are used
+##	for qemu web browser.
+##	</p>
+##	<p>
+##	This template is invoked automatically for each user, and
+##	generally does not need to be invoked directly
+##	by policy writers.
+##	</p>
+## </desc>
+## <param name="user_role">
+##	<summary>
+##	The role associated with the user domain.
+##	</summary>
+## </param>
+## <param name="user_domain">
+##	<summary>
+##	The type of the user domain.
+##	</summary>
+## </param>
+#
+template(`qemu_role',`
+	gen_require(`
+		type qemu_t, qemu_exec_t;
+	')
+
+	role $1 types { qemu_t qemu_config_t };
+
+	domtrans_pattern($2, qemu_exec_t, qemu_t)
+ 	domtrans_pattern($2, qemu_config_exec_t, qemu_config_t)
+')
+
+########################################
+## <summary>
+##	Execute a domain transition to run qemu.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`qemu_domtrans',`
+	gen_require(`
+		type qemu_t, qemu_exec_t;
+	')
+
+	domtrans_pattern($1, qemu_exec_t, qemu_t)
+')
+
+########################################
+## <summary>
+##	Execute qemu in the qemu domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	The role to allow the qemu domain.
+##	</summary>
+## </param>
+#
+interface(`qemu_run',`
+	gen_require(`
+		type qemu_t;
+	')
+
+	qemu_domtrans($1)
+	role $2 types qemu_t;
+
+	optional_policy(`
+		samba_run_smb(qemu_t, $2, $3)
+	')
+')
+
+########################################
+## <summary>
+##	Allow the domain to read state files in /proc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to allow access.
+##	</summary>
+## </param>
+#
+interface(`qemu_read_state',`
+	gen_require(`
+		type qemu_t;
+	')
+
+	read_files_pattern($1, qemu_t, qemu_t)
+')
+
+########################################
+## <summary>
+##	Set the schedule on qemu.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qemu_setsched',`
+	gen_require(`
+		type qemu_t;
+	')
+
+	allow $1 qemu_t:process setsched;
+')
+
+########################################
+## <summary>
+##	Send a signal to qemu.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qemu_signal',`
+	gen_require(`
+		type qemu_t;
+	')
+
+	allow $1 qemu_t:process signal;
+')
+
+########################################
+## <summary>
+##	Send a sigill to qemu
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qemu_kill',`
+	gen_require(`
+		type qemu_t;
+	')
+
+	allow $1 qemu_t:process sigkill;
+')
+
+########################################
+## <summary>
+##	Execute a domain transition to run qemu unconfined.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`qemu_domtrans_unconfined',`
+	gen_require(`
+		type unconfined_qemu_t, qemu_exec_t;
+	')
+
+	domtrans_pattern($1, qemu_exec_t, unconfined_qemu_t)
+')
+
+########################################
+## <summary>
+##	Manage qemu temporary dirs.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qemu_manage_tmp_dirs',`
+	gen_require(`
+		type qemu_tmp_t;
+	')
+
+	manage_dirs_pattern($1, qemu_tmp_t, qemu_tmp_t)
+')
+
+########################################
+## <summary>
+##	Manage qemu temporary files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qemu_manage_tmp_files',`
+	gen_require(`
+		type qemu_tmp_t;
+	')
+
+	manage_files_pattern($1, qemu_tmp_t, qemu_tmp_t)
 ')

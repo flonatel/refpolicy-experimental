@@ -1,5 +1,5 @@
 
-policy_module(exim, 1.4.0)
+policy_module(exim, 1.5.0)
 
 ########################################
 #
@@ -111,6 +111,7 @@ files_search_usr(exim_t)
 files_search_var(exim_t)
 files_read_etc_files(exim_t)
 files_read_etc_runtime_files(exim_t)
+files_getattr_all_mountpoints(exim_t)
 
 fs_getattr_xattr_fs(exim_t)
 fs_list_inotifyfs(exim_t)
@@ -188,6 +189,13 @@ optional_policy(`
 
 optional_policy(`
 	sasl_connect(exim_t)
+')
+
+optional_policy(`
+	# https://bugzilla.redhat.com/show_bug.cgi?id=512710
+	# uses sendmail for outgoing mail and exim
+	# for incoming mail
+	sendmail_manage_tmp_files(exim_t)
 ')
 
 optional_policy(`

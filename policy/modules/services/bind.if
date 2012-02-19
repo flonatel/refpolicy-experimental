@@ -2,6 +2,24 @@
 
 ########################################
 ## <summary>
+##	Execute bind server in the bind domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`bind_initrc_domtrans',`
+	gen_require(`
+		type named_initrc_exec_t;
+	')
+
+	init_labeled_script_domtrans($1, named_initrc_exec_t)
+')
+
+########################################
+## <summary>
 ##	Execute ndc in the ndc domain.
 ## </summary>
 ## <param name="domain">
@@ -235,8 +253,7 @@ interface(`bind_manage_cache',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to set the attributes
-##	of the BIND pid directory.
+##	Set the attributes of the BIND pid directory.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -250,6 +267,24 @@ interface(`bind_setattr_pid_dirs',`
 	')
 
 	allow $1 named_var_run_t:dir setattr;
+')
+
+########################################
+## <summary>
+##	Set the attributes of the BIND zone directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`bind_setattr_zone_dirs',`
+	gen_require(`
+		type named_zone_t;
+	')
+
+	allow $1 named_zone_t:dir setattr;
 ')
 
 ########################################
@@ -273,6 +308,25 @@ interface(`bind_read_zone',`
 
 ########################################
 ## <summary>
+##	Manage BIND zone files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`bind_manage_zone',`
+	gen_require(`
+		type named_zone_t;
+	')
+
+	files_search_var($1)
+	manage_files_pattern($1, named_zone_t, named_zone_t)
+')
+
+########################################
+## <summary>
 ##	Send and receive datagrams to and from named.  (Deprecated)
 ## </summary>
 ## <param name="domain">
@@ -287,7 +341,7 @@ interface(`bind_udp_chat_named',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate 
+##	All of the rules required to administrate
 ##	an bind environment
 ## </summary>
 ## <param name="domain">
@@ -319,7 +373,7 @@ interface(`bind_admin',`
 
 	bind_run_ndc($1, $2)
 
-	init_labeled_script_domtrans($1, bind_initrc_exec_t)
+	init_labeled_script_domtrans($1, named_initrc_exec_t)
 	domain_system_change_exemption($1)
 	role_transition $2 named_initrc_exec_t system_r;
 	allow $2 system_r;

@@ -24,11 +24,57 @@
 ##	Make the specified type usable for files
 ##	in a filesystem.
 ## </summary>
+## <desc>
+##	<p>
+##	Make the specified type usable for files
+##	in a filesystem.  Types used for files that
+##	do not use this interface, or an interface that
+##	calls this one, will have unexpected behaviors
+##	while the system is running. If the type is used
+##	for device nodes (character or block files), then
+##	the dev_node() interface is more appropriate.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>application_domain()</li>
+##		<li>application_executable_file()</li>
+##		<li>corecmd_executable_file()</li>
+##		<li>init_daemon_domain()</li>
+##		<li>init_domaion()</li>
+##		<li>init_ranged_daemon_domain()</li>
+##		<li>init_ranged_domain()</li>
+##		<li>init_ranged_system_domain()</li>
+##		<li>init_script_file()</li>
+##		<li>init_script_domain()</li>
+##		<li>init_system_domain()</li>
+##		<li>files_config_files()</li>
+##		<li>files_lock_file()</li>
+##		<li>files_mountpoint()</li>
+##		<li>files_pid_file()</li>
+##		<li>files_security_file()</li>
+##		<li>files_security_mountpoint()</li>
+##		<li>files_tmp_file()</li>
+##		<li>files_tmpfs_file()</li>
+##		<li>logging_log_file()</li>
+##		<li>userdom_user_home_content()</li>
+##	</ul>
+##	<p>
+##	Example:
+##	</p>
+##	<p>
+##	type myfile_t;
+##	files_type(myfile_t)
+##	allow mydomain_t myfile_t:file read_file_perms;
+##	</p>
+## </desc>
 ## <param name="type">
 ##	<summary>
 ##	Type to be used for files.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`files_type',`
 	gen_require(`
@@ -36,6 +82,27 @@ interface(`files_type',`
 	')
 
 	typeattribute $1 file_type, non_security_file_type;
+')
+
+########################################
+## <summary>
+##	Make the specified type a file that
+##	should not be dontaudited from
+##	browsing from user domains.
+## </summary>
+## <param name="file_type">
+##	<summary>
+##	Type of the file to be used as a
+##	member directory.
+##	</summary>
+## </param>
+#
+interface(`files_security_file',`
+	gen_require(`
+		attribute file_type, security_file_type;
+	')
+
+	typeattribute $1 file_type, security_file_type;
 ')
 
 ########################################
@@ -81,13 +148,61 @@ interface(`files_mountpoint',`
 ########################################
 ## <summary>
 ##	Make the specified type usable for
+##	security file filesystem mount points.
+## </summary>
+## <param name="type">
+##	<summary>
+##	Type to be used for mount points.
+##	</summary>
+## </param>
+#
+interface(`files_security_mountpoint',`
+	gen_require(`
+		attribute mountpoint;
+	')
+
+	files_security_file($1)
+	typeattribute $1 mountpoint;
+')
+
+########################################
+## <summary>
+##	Make the specified type usable for
 ##	runtime process ID files.
 ## </summary>
+## <desc>
+##	<p>
+##	Make the specified type usable for runtime process ID files,
+##	typically found in /var/run.
+##	This will also make the type usable for files, making 
+##	calls to files_type() redundant.  Failure to use this interface
+##	for a PID file type may result in problems with starting
+##	or stopping services.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>files_pid_filetrans()</li>
+##	</ul>
+##	<p>
+##	Example usage with a domain that can create and
+##	write its PID file with a private PID file type in the
+##	/var/run directory:
+##	</p>
+##	<p>
+##	type mypidfile_t;
+##	files_pid_file(mypidfile_t)
+##	allow mydomain_t mypidfile_t:file { create_file_perms write_file_perms };
+##	files_pid_filetrans(mydomain_t, mypidfile_t, file)
+##	</p>
+## </desc>
 ## <param name="type">
 ##	<summary>
 ##	Type to be used for PID files.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`files_pid_file',`
 	gen_require(`
@@ -100,14 +215,34 @@ interface(`files_pid_file',`
 
 ########################################
 ## <summary>
-##	Make the specified type a 
+##	Make the specified type a
 ##	configuration file.
 ## </summary>
+## <desc>
+##	<p>
+##	Make the specified type usable for configuration files.
+##	This will also make the type usable for files, making 
+##	calls to files_type() redundant.  Failure to use this interface
+##	for a temporary file may result in problems with
+##	configuration management tools.
+##	</p>
+##	<p>
+##	Example usage with a domain that can read
+##	its configuration file /etc:
+##	</p>
+##	<p>
+##	type myconffile_t;
+##	files_config_file(myconffile_t)
+##	allow mydomain_t myconffile_t:file read_file_perms;
+##	files_search_etc(mydomain_t)
+##	</p>
+## </desc>
 ## <param name="file_type">
 ##	<summary>
 ##	Type to be used as a configuration file.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`files_config_file',`
 	gen_require(`
@@ -119,7 +254,7 @@ interface(`files_config_file',`
 
 ########################################
 ## <summary>
-##	Make the specified type a 
+##	Make the specified type a
 ##	polyinstantiated directory.
 ## </summary>
 ## <param name="file_type">
@@ -208,56 +343,42 @@ interface(`files_poly_member_tmp',`
 
 ########################################
 ## <summary>
-##	Make the specified type a file that
-##	should not be dontaudited from
-##	browsing from user domains.
-## </summary>
-## <param name="file_type">
-##	<summary>
-##	Type of the file to be used as a
-##	member directory.
-##	</summary>
-## </param>
-#
-interface(`files_security_file',`
-	gen_require(`
-		attribute file_type, security_file_type;
-	')
-
-	typeattribute $1 file_type, security_file_type;
-')
-
-########################################
-## <summary>
-##	Make the specified type usable for
-##	security file filesystem mount points.
-## </summary>
-## <param name="type">
-##	<summary>
-##	Type to be used for mount points.
-##	</summary>
-## </param>
-#
-interface(`files_security_mountpoint',`
-	gen_require(`
-		attribute mountpoint;
-	')
-
-	files_security_file($1)
-	typeattribute $1 mountpoint;
-')
-
-########################################
-## <summary>
 ##	Make the specified type a file
 ##	used for temporary files.
 ## </summary>
+## <desc>
+##	<p>
+##	Make the specified type usable for temporary files.
+##	This will also make the type usable for files, making 
+##	calls to files_type() redundant.  Failure to use this interface
+##	for a temporary file may result in problems with
+##	purging temporary files.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>files_tmp_filetrans()</li>
+##	</ul>
+##	<p>
+##	Example usage with a domain that can create and
+##	write its temporary file in the system temporary file
+##	directories (/tmp or /var/tmp):
+##	</p>
+##	<p>
+##	type mytmpfile_t;
+##	files_tmp_file(mytmpfile_t)
+##	allow mydomain_t mytmpfile_t:file { create_file_perms write_file_perms };
+##	files_tmp_filetrans(mydomain_t, mytmpfile_t, file)
+##	</p>
+## </desc>
 ## <param name="file_type">
 ##	<summary>
 ##	Type of the file to be used as a
 ##	temporary file.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`files_tmp_file',`
 	gen_require(`
@@ -1070,7 +1191,7 @@ interface(`files_dontaudit_search_all_dirs',`
 ##	</summary>
 ## </param>
 #
-# dwalsh: This interface is to allow quotacheck to work on a 
+# dwalsh: This interface is to allow quotacheck to work on a
 # a filesystem mounted with the --context switch
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=212957
 #
@@ -1192,9 +1313,29 @@ interface(`files_relabel_config_dirs',`
 	relabel_dirs_pattern($1, configfile, configfile)
 ')
 
+########################################
+## <summary>
+##	Read config files in /etc.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_read_config_files',`
+	gen_require(`
+		attribute configfile;
+	')
+
+	allow $1 configfile:dir list_dir_perms;
+	read_files_pattern($1, configfile, configfile)
+	read_lnk_files_pattern($1, configfile, configfile)
+')
+
 ###########################################
 ## <summary>
-## 	Manage all configuration files on filesystem 
+## 	Manage all configuration files on filesystem
 ## </summary>
 ## <param name="domain">
 ## 	<summary>
@@ -1213,7 +1354,7 @@ interface(`files_manage_config_files',`
 
 #######################################
 ## <summary>
-##    Relabel configuration files
+##	Relabel configuration files
 ## </summary>
 ## <param name="domain">
 ## 	<summary>
@@ -1520,6 +1661,24 @@ interface(`files_dontaudit_search_boot',`
 
 ########################################
 ## <summary>
+##	List the /boot directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_list_boot',`
+	gen_require(`
+		type boot_t;
+	')
+
+	allow $1 boot_t:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Create directories in /boot
 ## </summary>
 ## <param name="domain">
@@ -1563,6 +1722,25 @@ interface(`files_boot_filetrans',`
 	')
 
 	filetrans_pattern($1, boot_t, $2, $3)
+')
+
+########################################
+## <summary>
+##	read files in the /boot directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`files_read_boot_files',`
+	gen_require(`
+		type boot_t;
+	')
+
+	manage_files_pattern($1, boot_t, boot_t)
 ')
 
 ########################################
@@ -1795,6 +1973,25 @@ interface(`files_dontaudit_list_default',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete directories with
+##	the default file type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_manage_default_dirs',`
+	gen_require(`
+		type default_t;
+	')
+
+	manage_dirs_pattern($1, default_t, default_t)
+')
+
+########################################
+## <summary>
 ##	Mount a filesystem on a directory with the default file type.
 ## </summary>
 ## <param name="domain">
@@ -1865,6 +2062,25 @@ interface(`files_dontaudit_read_default_files',`
 	')
 
 	dontaudit $1 default_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete files with
+##	the default file type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_manage_default_files',`
+	gen_require(`
+		type default_t;
+	')
+
+	manage_files_pattern($1, default_t, default_t)
 ')
 
 ########################################
@@ -2016,11 +2232,45 @@ interface(`files_manage_etc_dirs',`
 ## <summary>
 ##	Read generic files in /etc.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read generic
+##	files in /etc. These files are typically
+##	general system configuration files that do
+##	not have more specific SELinux types.  Some
+##	examples of these files are:
+##	</p>
+##	<ul>
+##		<li>/etc/fstab</li>
+##		<li>/etc/passwd</li>
+##		<li>/etc/services</li>
+##		<li>/etc/shells</li>
+##	</ul>
+##	<p>
+##	This interface does not include access to /etc/shadow.
+##	</p>
+##	<p>
+##	Generally, it is safe for many domains to have
+##	this access.  However, since this interface provides
+##	access to the /etc/passwd file, caution must be
+##	exercised, as user account names can be leaked
+##	through this access.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>auth_read_shadow()</li>
+##		<li>files_read_etc_runtime_files()</li>
+##		<li>seutil_read_config()</li>
+##	</ul>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`files_read_etc_files',`
 	gen_require(`
@@ -2245,11 +2495,29 @@ interface(`files_create_boot_flag',`
 ##	Read files in /etc that are dynamically
 ##	created on boot, such as mtab.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read dynamically created
+##	configuration files in /etc. These files are typically
+##	general system configuration files that do
+##	not have more specific SELinux types.  Some
+##	examples of these files are:
+##	</p>
+##	<ul>
+##		<li>/etc/motd</li>
+##		<li>/etc/mtab</li>
+##		<li>/etc/nologin</li>
+##	</ul>
+##	<p>
+##	This interface does not include access to /etc/shadow.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10" />
 ## <rolecap/>
 #
 interface(`files_read_etc_runtime_files',`
@@ -2559,7 +2827,7 @@ interface(`files_manage_isid_type_symlinks',`
 
 ########################################
 ## <summary>
-##	Read and write block device nodes on new filesystems 
+##	Read and write block device nodes on new filesystems
 ##	that have not yet been labeled.
 ## </summary>
 ## <param name="domain">
@@ -2725,6 +2993,24 @@ interface(`files_list_home',`
 	')
 
 	allow $1 home_root_t:dir list_dir_perms;
+')
+
+########################################
+## <summary>
+##	Relabel to user home root (/home).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_relabelto_home',`
+	gen_require(`
+		type home_root_t;
+	')
+
+	allow $1 home_root_t:dir relabelto;
 ')
 
 ########################################
@@ -3491,8 +3777,26 @@ interface(`files_setattr_all_tmp_dirs',`
 
 ########################################
 ## <summary>
+##	List all tmp directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_list_all_tmp',`
+	gen_require(`
+		attribute tmpfile;
+	')
+
+	allow $1 tmpfile:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to get the attributes
-##	of all tmp files. 
+##	of all tmp files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -3511,7 +3815,7 @@ interface(`files_dontaudit_getattr_all_tmp_files',`
 ########################################
 ## <summary>
 ##	Allow attempts to get the attributes
-##	of all tmp files. 
+##	of all tmp files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -3530,7 +3834,7 @@ interface(`files_getattr_all_tmp_files',`
 ########################################
 ## <summary>
 ##	Do not audit attempts to get the attributes
-##	of all tmp sock_file. 
+##	of all tmp sock_file.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -3747,11 +4051,29 @@ interface(`files_getattr_usr_files',`
 ## <summary>
 ##	Read generic files in /usr.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read generic
+##	files in /usr. These files are various program
+##	files that do not have more specific SELinux types.
+##	Some examples of these files are:
+##	</p>
+##	<ul>
+##		<li>/usr/include/*</li>
+##		<li>/usr/share/doc/*</li>
+##		<li>/usr/share/info/*</li>
+##	</ul>
+##	<p>
+##	Generally, it is safe for many domains to have
+##	this access.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="10"/>
 #
 interface(`files_read_usr_files',`
 	gen_require(`
@@ -4186,6 +4508,25 @@ interface(`files_rw_var_files',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to read and write
+##	files in the /var directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_rw_var_files',`
+	gen_require(`
+		type var_t;
+	')
+
+	dontaudit $1 var_t:file rw_file_perms;
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete files in the /var directory.
 ## </summary>
 ## <param name="domain">
@@ -4289,11 +4630,25 @@ interface(`files_getattr_var_lib_dirs',`
 ## <summary>
 ##	Search the /var/lib directory.
 ## </summary>
+## <desc>
+##	<p>
+##	Search the /var/lib directory.  This is
+##	necessary to access files or directories under
+##	/var/lib that have a private type.  For example, a
+##	domain accessing a private library file in the
+##	/var/lib directory:
+##	</p>
+##	<p>
+##	allow mydomain_t mylibfile_t:file read_file_perms;
+##	files_search_var_lib(mydomain_t)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="5"/>
 #
 interface(`files_search_var_lib',`
 	gen_require(`
@@ -4301,6 +4656,26 @@ interface(`files_search_var_lib',`
 	')
 
 	search_dirs_pattern($1, var_t, var_lib_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to search the
+##	contents of /var/lib.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+## <infoflow type="read" weight="5"/>
+#
+interface(`files_dontaudit_search_var_lib',`
+	gen_require(`
+		type var_lib_t;
+	')
+
+	dontaudit $1 var_lib_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -4335,7 +4710,7 @@ interface(`files_rw_var_lib_dirs',`
 	gen_require(`
 		type var_lib_t;
 	')
-	
+
 	rw_dirs_pattern($1, var_lib_t, var_lib_t)
 ')
 
@@ -4736,9 +5111,34 @@ interface(`files_read_generic_pids',`
 
 ########################################
 ## <summary>
-##	Create an object in the process ID directory, with a private
-##	type using a type transition.
+##	Create an object in the process ID directory, with a private type.
 ## </summary>
+## <desc>
+##	<p>
+##	Create an object in the process ID directory (e.g., /var/run)
+##	with a private type.  Typically this is used for creating
+##	private PID files in /var/run with the private type instead
+##	of the general PID file type. To accomplish this goal,
+##	either the program must be SELinux-aware, or use this interface.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>files_pid_file()</li>
+##	</ul>
+##	<p>
+##	Example usage with a domain that can create and
+##	write its PID file with a private PID file type in the
+##	/var/run directory:
+##	</p>
+##	<p>
+##	type mypidfile_t;
+##	files_pid_file(mypidfile_t)
+##	allow mydomain_t mypidfile_t:file { create_file_perms write_file_perms };
+##	files_pid_filetrans(mydomain_t, mypidfile_t, file)
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
@@ -4754,6 +5154,7 @@ interface(`files_read_generic_pids',`
 ##	The object class of the object being created.
 ##	</summary>
 ## </param>
+## <infoflow type="write" weight="10"/>
 #
 interface(`files_pid_filetrans',`
 	gen_require(`
@@ -4781,6 +5182,25 @@ interface(`files_rw_generic_pids',`
 
 	list_dirs_pattern($1, var_t, var_run_t)
 	rw_files_pattern($1, var_run_t, var_run_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes of
+##	daemon runtime data files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_dontaudit_getattr_all_pids',`
+	gen_require(`
+		attribute pidfile;
+	')
+
+	dontaudit $1 pidfile:file getattr;
 ')
 
 ########################################
@@ -5072,7 +5492,7 @@ interface(`files_polyinstantiate_all',`
 	selinux_compute_member($1)
 
 	# Need sys_admin capability for mounting
-	allow $1 self:capability { chown fsetid sys_admin };
+	allow $1 self:capability { chown fsetid sys_admin fowner };
 
 	# Need to give access to the directories to be polyinstantiated
 	allow $1 polydir:dir { create open getattr search write add_name setattr mounton rmdir };

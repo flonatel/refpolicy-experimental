@@ -576,7 +576,7 @@ template(`userdom_common_user_template',`
 	')
 
 	tunable_policy(`user_ttyfile_stat',`
-		term_getattr_all_user_ttys($1_t)
+		term_getattr_all_ttys($1_t)
 	')
 
 	optional_policy(`
@@ -994,10 +994,6 @@ template(`userdom_unpriv_user_template', `
 		netutils_run_traceroute_cond($1_t,$1_r)
 	')
 
-	optional_policy(`
-		postgresql_role($1_r,$1_t)
-	')
-
 	# Run pppd in pppd_t by default for user
 	optional_policy(`
 		ppp_run_cond($1_t,$1_r)
@@ -1317,7 +1313,7 @@ interface(`userdom_setattr_user_ptys',`
 		type user_devpts_t;
 	')
 
-	allow $1 user_devpts_t:chr_file setattr;
+	allow $1 user_devpts_t:chr_file setattr_chr_file_perms;
 ')
 
 ########################################
@@ -1396,13 +1392,21 @@ interface(`userdom_search_user_home_dirs',`
 
 ########################################
 ## <summary>
-##	Search user home directories.
+##	Do not audit attempts to search user home directories.
 ## </summary>
+## <desc>
+##	<p>
+##	Do not audit attempts to search user home directories.
+##	This will supress SELinux denial messages when the specified
+##	domain is denied the permission to search these directories.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`userdom_dontaudit_search_user_home_dirs',`
 	gen_require(`
@@ -1581,6 +1585,24 @@ interface(`userdom_dontaudit_search_user_home_content',`
 
 ########################################
 ## <summary>
+##	List contents of users home directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_list_user_home_content',`
+	gen_require(`
+		type user_home_t;
+	')
+
+	allow $1 user_home_t:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Create, read, write, and delete directories
 ##	in a user home subdirectory.
 ## </summary>
@@ -1633,7 +1655,7 @@ interface(`userdom_dontaudit_setattr_user_home_content_files',`
 		type user_home_t;
 	')
 
-	dontaudit $1 user_home_t:file setattr;
+	dontaudit $1 user_home_t:file setattr_file_perms;
 ')
 
 ########################################
@@ -1708,7 +1730,7 @@ interface(`userdom_dontaudit_append_user_home_content_files',`
 		type user_home_t;
 	')
 
-	dontaudit $1 user_home_t:file append;
+	dontaudit $1 user_home_t:file append_file_perms;
 ')
 
 ########################################
@@ -1726,7 +1748,7 @@ interface(`userdom_dontaudit_write_user_home_content_files',`
 		type user_home_t;
 	')
 
-	dontaudit $1 user_home_t:file write;
+	dontaudit $1 user_home_t:file write_file_perms;
 ')
 
 ########################################
@@ -1827,7 +1849,7 @@ interface(`userdom_dontaudit_exec_user_home_content_files',`
 		type user_home_t;
 	')
 
-	dontaudit $1 user_home_t:file execute;
+	dontaudit $1 user_home_t:file exec_file_perms;
 ')
 
 ########################################
@@ -2055,7 +2077,7 @@ interface(`userdom_write_user_tmp_sockets',`
 		type user_tmp_t;
 	')
 
-	allow $1 user_tmp_t:sock_file write;
+	allow $1 user_tmp_t:sock_file write_sock_file_perms;
 	files_search_tmp($1)
 ')
 
@@ -2171,7 +2193,7 @@ interface(`userdom_dontaudit_append_user_tmp_files',`
 		type user_tmp_t;
 	')
 
-	dontaudit $1 user_tmp_t:file append;
+	dontaudit $1 user_tmp_t:file append_file_perms;
 ')
 
 ########################################
@@ -2445,7 +2467,7 @@ interface(`userdom_getattr_user_ttys',`
 		type user_tty_device_t;
 	')
 
-	allow $1 user_tty_device_t:chr_file getattr;
+	allow $1 user_tty_device_t:chr_file getattr_chr_file_perms;
 ')
 
 ########################################
@@ -2463,7 +2485,7 @@ interface(`userdom_dontaudit_getattr_user_ttys',`
 		type user_tty_device_t;
 	')
 
-	dontaudit $1 user_tty_device_t:chr_file getattr;
+	dontaudit $1 user_tty_device_t:chr_file getattr_chr_file_perms;
 ')
 
 ########################################
@@ -2481,7 +2503,7 @@ interface(`userdom_setattr_user_ttys',`
 		type user_tty_device_t;
 	')
 
-	allow $1 user_tty_device_t:chr_file setattr;
+	allow $1 user_tty_device_t:chr_file setattr_chr_file_perms;
 ')
 
 ########################################
@@ -2499,7 +2521,7 @@ interface(`userdom_dontaudit_setattr_user_ttys',`
 		type user_tty_device_t;
 	')
 
-	dontaudit $1 user_tty_device_t:chr_file setattr;
+	dontaudit $1 user_tty_device_t:chr_file setattr_chr_file_perms;
 ')
 
 ########################################
@@ -2540,13 +2562,29 @@ interface(`userdom_use_user_ptys',`
 
 ########################################
 ## <summary>
-##	Read and write a user domain tty and pty.
+##	Read and write a user TTYs and PTYs.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read and write user
+##	TTYs and PTYs. This will allow the domain to
+##	interact with the user via the terminal. Typically
+##	all interactive applications will require this
+##	access.
+##	</p>
+##	<p>
+##	However, this also allows the applications to spy
+##	on user sessions or inject information into the
+##	user session.  Thus, this access should likely
+##	not be allowed for non-interactive domains.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="both" weight="10"/>
 #
 interface(`userdom_use_user_terminals',`
 	gen_require(`
@@ -2810,14 +2848,23 @@ interface(`userdom_use_unpriv_users_fds',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to inherit the
-##	file descriptors from all user domains.
+##	Do not audit attempts to inherit the file descriptors
+##	from unprivileged user domains.
 ## </summary>
+## <desc>
+##	<p>
+##	Do not audit attempts to inherit the file descriptors
+##	from unprivileged user domains. This will supress
+##	SELinux denial messages when the specified domain is denied
+##	the permission to inherit these file descriptors.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`userdom_dontaudit_use_unpriv_user_fds',`
 	gen_require(`

@@ -74,7 +74,7 @@ interface(`kerberos_use',`
 	')
 
 	files_search_etc($1)
-	allow $1 krb5_conf_t:file read_file_perms;
+	read_files_pattern($1, krb5_conf_t, krb5_conf_t)
 	dontaudit $1 krb5_conf_t:file write;
 	dontaudit $1 krb5kdc_conf_t:dir list_dir_perms;
 	dontaudit $1 krb5kdc_conf_t:file rw_file_perms;
@@ -110,6 +110,10 @@ interface(`kerberos_use',`
 		tunable_policy(`allow_kerberos',`
 			pcscd_stream_connect($1)
 		')
+	')
+
+	optional_policy(`
+		sssd_read_public_files($1)
 	')
 ')
 
@@ -191,6 +195,25 @@ interface(`kerberos_read_keytab',`
 
 	files_search_etc($1)
 	allow $1 krb5_keytab_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	Read/Write the kerberos key table.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kerberos_rw_keytab',`
+	gen_require(`
+		type krb5_keytab_t;
+	')
+
+	files_search_etc($1)
+	allow $1 krb5_keytab_t:file rw_file_perms;
 ')
 
 ########################################

@@ -1,7 +1,34 @@
+* Mon May 24 2010 Chris PeBenito <selinux@tresys.com> - 2.20100524
+- Merged a significant portion of Fedora policy.
+- Move rules from mta mailserver delivery from interface to .te to use
+  attributes.
+- Remove concept of users from terminal module interfaces since the
+  attributes are not specific to users.
+- Add non-drawing X client support, for consolekit usage.
+- Misc Gentoo fixes from Chris Richards.
+- AFS and abrt fixes from Dominick Grift.
+- Improved the XML docs of 55 most-used interfaces.
+- Apcupsd and amavis fixes from Dominick Grift.
+- Fix network_port() in corenetwork to correctly handle port ranges.
+- SE-Postgresql updates from KaiGai Kohei.
+- X object manager revisions from Eamon Walsh.
+- Added modules:
+	chronyd (Miroslav Grepl)
+	cobbler (Dominick Grift)
+	dbadm (KaiGai Kohei)
+	denyhosts (Dan Walsh)
+	nut (Stefan Schulze Frielinghaus, Miroslav Grepl)
+	likewise (Scott Salley)
+	plymouthd (Dan Walsh)
+	pyicqt (Stefan Schulze Frielinghaus)
+	sectoolm (Miroslav Grepl)
+	usbmuxd (Dan Walsh)
+	vhostmd (Dan Walsh)
+
 * Tue Nov 17 2009 Chris PeBenito <selinux@tresys.com> - 2.20091117
 - Add separate x_pointer and x_keyboard classes inheriting from x_device. 
   From Eamon Walsh.
-- Deprecated the userdom_xwindwos_client_template().
+- Deprecated the userdom_xwindows_client_template().
 - Misc Gentoo fixes from Corentin Labbe.
 - Debian policykit fixes from Martin Orr.
 - Fix unconfined_r use of unconfined_java_t.

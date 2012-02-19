@@ -1,5 +1,5 @@
 
-policy_module(logwatch, 1.10.0)
+policy_module(logwatch, 1.11.0)
 
 #################################
 #
@@ -101,6 +101,14 @@ ifdef(`distro_redhat',`
 	files_getattr_all_file_type_fs(logwatch_t)
 ')
 
+tunable_policy(`use_nfs_home_dirs',`
+	fs_list_nfs(logwatch_t)
+')
+
+tunable_policy(`use_samba_home_dirs',`
+	fs_list_cifs(logwatch_t)
+')
+
 optional_policy(`
 	apache_read_log(logwatch_t)
 ')
@@ -136,4 +144,5 @@ optional_policy(`
 
 optional_policy(`
 	samba_read_log(logwatch_t)
+	samba_read_share_files(logwatch_t)
 ')

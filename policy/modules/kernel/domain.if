@@ -35,11 +35,42 @@ interface(`domain_base_type',`
 ## <summary>
 ##	Make the specified type usable as a domain.
 ## </summary>
+## <desc>
+##	<p>
+##	Make the specified type usable as a domain.  This,
+##	or an interface that calls this interface, must be
+##	used on all types that are used as domains.
+##	</p>
+##	<p>
+##	Related interfaces:
+##	</p>
+##	<ul>
+##		<li>application_domain()</li>
+##		<li>init_daemon_domain()</li>
+##		<li>init_domaion()</li>
+##		<li>init_ranged_daemon_domain()</li>
+##		<li>init_ranged_domain()</li>
+##		<li>init_ranged_system_domain()</li>
+##		<li>init_script_domain()</li>
+##		<li>init_system_domain()</li>
+##	</ul>
+##	<p>
+##	Example:
+##	</p>
+##	<p>
+##	type mydomain_t;
+##	domain_type(mydomain_t)
+##	type myfile_t;
+##	files_type(myfile_t)
+##	allow mydomain_t myfile_t:file read_file_perms;
+##	</p>
+## </desc>
 ## <param name="type">
 ##	<summary>
 ##	Type to be used as a domain type.
 ##	</summary>
 ## </param>
+## <infoflow type="none"/>
 #
 interface(`domain_type',`
 	# start with basic domain
@@ -340,11 +371,20 @@ interface(`domain_cron_exemption_target',`
 ##	Inherit and use file descriptors from
 ##	domains with interactive programs.
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to inherit and use file
+##	descriptors from domains with interactive programs. 
+##	This does not allow access to the objects being referenced
+##	by the file descriptors.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <infoflow type="read" weight="1"/>
 #
 interface(`domain_use_interactive_fds',`
 	gen_require(`
@@ -810,6 +850,42 @@ interface(`domain_dontaudit_getsession_all_domains',`
 
 ########################################
 ## <summary>
+##	Get the process group ID of all domains.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_getpgid_all_domains',`
+	gen_require(`
+		attribute domain;
+	')
+
+	allow $1 domain:process getpgid;
+')
+
+########################################
+## <summary>
+##	Get the scheduler information of all domains.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_getsched_all_domains',`
+	gen_require(`
+		attribute domain;
+	')
+
+	allow $1 domain:process getsched;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of all domains
 ##	sockets, for all socket types.
 ## </summary>
@@ -1020,6 +1096,25 @@ interface(`domain_dontaudit_getattr_all_dgram_sockets',`
 
 ########################################
 ## <summary>
+##	Get the attributes
+##	of all domains unix datagram sockets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_getattr_all_stream_sockets',`
+	gen_require(`
+		attribute domain;
+	')
+
+	allow $1 domain:unix_stream_socket getattr;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to get the attributes
 ##	of all domains unix datagram sockets.
 ## </summary>
@@ -1035,6 +1130,35 @@ interface(`domain_dontaudit_getattr_all_stream_sockets',`
 	')
 
 	dontaudit $1 domain:unix_stream_socket getattr;
+')
+
+########################################
+## <summary>
+##	Get the attributes of all domains
+##	unnamed pipes.
+## </summary>
+## <desc>
+##	<p>
+##	Get the attributes of all domains
+##	unnamed pipes.
+##	</p>
+##	<p>
+##	This is commonly used for domains
+##	that can use lsof on all domains.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_getattr_all_pipes',`
+	gen_require(`
+		attribute domain;
+	')
+
+	allow $1 domain:fifo_file getattr;
 ')
 
 ########################################
@@ -1280,6 +1404,24 @@ interface(`domain_all_recvfrom_all_domains',`
 
 ########################################
 ## <summary>
+##	Send generic signals to the unconfined domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`domain_unconfined_signal',`
+	gen_require(`
+		attribute unconfined_domain_type;
+	')
+
+	allow $1 unconfined_domain_type:process signal;
+')
+
+########################################
+## <summary>
 ##	Unconfined access to domains.
 ## </summary>
 ## <param name="domain">
@@ -1303,4 +1445,3 @@ interface(`domain_unconfined',`
 	typeattribute $1 set_curr_context;
 	typeattribute $1 process_uncond_exempt;
 ')
-

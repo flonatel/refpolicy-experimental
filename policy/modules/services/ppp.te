@@ -1,5 +1,5 @@
 
-policy_module(ppp, 1.11.0)
+policy_module(ppp, 1.12.0)
 
 ########################################
 #
@@ -38,7 +38,7 @@ type pppd_etc_rw_t;
 files_type(pppd_etc_rw_t)
 
 type pppd_initrc_exec_t alias pppd_script_exec_t;
-files_type(pppd_initrc_exec_t)
+init_script_file(pppd_initrc_exec_t)
 
 # pppd_secret_t is the type of the pap and chap password files
 type pppd_secret_t;
@@ -73,7 +73,7 @@ files_pid_file(pptp_var_run_t)
 
 allow pppd_t self:capability { kill net_admin setuid setgid fsetid fowner net_raw dac_override };
 dontaudit pppd_t self:capability sys_tty_config;
-allow pppd_t self:process signal;
+allow pppd_t self:process { getsched signal };
 allow pppd_t self:fifo_file rw_fifo_file_perms;
 allow pppd_t self:socket create_socket_perms;
 allow pppd_t self:unix_dgram_socket create_socket_perms;
@@ -120,11 +120,12 @@ kernel_read_kernel_sysctls(pppd_t)
 kernel_read_system_state(pppd_t)
 kernel_rw_net_sysctls(pppd_t)
 kernel_read_network_state(pppd_t)
-kernel_load_module(pppd_t)
+kernel_request_load_module(pppd_t)
 
 dev_read_urand(pppd_t)
 dev_search_sysfs(pppd_t)
 dev_read_sysfs(pppd_t)
+dev_rw_modem(pppd_t)
 
 corenet_all_recvfrom_unlabeled(pppd_t)
 corenet_all_recvfrom_netlabel(pppd_t)
@@ -168,6 +169,7 @@ init_signal_script(pppd_t)
 auth_use_nsswitch(pppd_t)
 
 logging_send_syslog_msg(pppd_t)
+logging_send_audit_msgs(pppd_t)
 
 miscfiles_read_localization(pppd_t)
 
@@ -216,7 +218,7 @@ optional_policy(`
 # PPTP Local policy
 #
 
-allow pptp_t self:capability { net_raw net_admin };
+allow pptp_t self:capability { dac_override dac_read_search net_raw net_admin };
 dontaudit pptp_t self:capability sys_tty_config;
 allow pptp_t self:process signal;
 allow pptp_t self:fifo_file rw_fifo_file_perms;
@@ -289,9 +291,18 @@ sysnet_exec_ifconfig(pptp_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pptp_t)
 userdom_dontaudit_search_user_home_dirs(pptp_t)
+userdom_signal_unpriv_users(pptp_t)
 
 optional_policy(`
 	consoletype_exec(pppd_t)
+')
+
+optional_policy(`
+	dbus_system_domain(pppd_t, pppd_exec_t)
+
+	optional_policy(`
+		networkmanager_dbus_chat(pppd_t)
+	')
 ')
 
 optional_policy(`

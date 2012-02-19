@@ -20,7 +20,27 @@ interface(`tftp_read_content',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate 
+##	Manage tftp /var/lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`tftp_manage_rw_content',`
+	gen_require(`
+		type tftpdir_rw_t;
+	')
+
+	files_search_var_lib($1)
+	manage_dirs_pattern($1, tftpdir_rw_t, tftpdir_rw_t)
+	manage_files_pattern($1, tftpdir_rw_t, tftpdir_rw_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to administrate
 ##	an tftp environment
 ## </summary>
 ## <param name="domain">
