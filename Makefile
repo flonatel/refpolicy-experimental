@@ -101,6 +101,7 @@ setbools := $(AWK) -f $(support)/set_bools_tuns.awk
 get_type_attr_decl := $(SED) -r -f $(support)/get_type_attr_decl.sed
 comment_move_decl := $(SED) -r -f $(support)/comment_move_decl.sed
 gennetfilter := $(PYTHON) -E $(support)/gennetfilter.py
+m4iferror := $(support)/iferror.m4
 # use our own genhomedircon to make sure we have a known usable one,
 # so policycoreutils updates are not required (RHEL4)
 genhomedircon := $(PYTHON) -E $(support)/genhomedircon
@@ -184,6 +185,10 @@ ifeq "$(DISTRO)" "rhel4"
 	M4PARAM += -D distro_redhat
 endif
 
+ifeq "$(DISTRO)" "ubuntu"
+	M4PARAM += -D distro_debian
+endif
+
 ifneq ($(OUTPUT_POLICY),)
 	CHECKPOLICY += -c $(OUTPUT_POLICY)
 endif
@@ -231,7 +236,7 @@ seusers := $(appconf)/seusers
 appdir := $(contextpath)
 user_default_contexts := $(wildcard config/appconfig-$(TYPE)/*_default_contexts)
 user_default_contexts_names := $(addprefix $(contextpath)/users/,$(subst _default_contexts,,$(notdir $(user_default_contexts))))
-appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts customizable_types) $(contextpath)/files/media $(user_default_contexts_names)
+appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts customizable_types securetty_types) $(contextpath)/files/media $(user_default_contexts_names)
 net_contexts := $(builddir)net_contexts
 
 all_layers := $(shell find $(wildcard $(moddir)/*) -maxdepth 0 -type d)
@@ -513,37 +518,13 @@ $(contextpath)/files/media: $(appconf)/media
 	@mkdir -p $(contextpath)/files/
 	$(verbose) $(INSTALL) -m 644 $< $@
 
-$(appdir)/default_contexts: $(appconf)/default_contexts
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/removable_context: $(appconf)/removable_context
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/default_type: $(appconf)/default_type
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/userhelper_context: $(appconf)/userhelper_context
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/initrc_context: $(tmpdir)/initrc_context
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/failsafe_context: $(appconf)/failsafe_context
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
-$(appdir)/dbus_contexts: $(appconf)/dbus_contexts
-	@mkdir -p $(appdir)
-	$(verbose) $(INSTALL) -m 644 $< $@
-
 $(contextpath)/users/%: $(appconf)/%_default_contexts
 	@mkdir -p $(appdir)/users
 	$(verbose) $(INSTALL) -m 644 $^ $@
+
+$(appdir)/%: $(appconf)/%
+	@mkdir -p $(appdir)
+	$(verbose) $(INSTALL) -m 644 $< $@
 
 ########################################
 #

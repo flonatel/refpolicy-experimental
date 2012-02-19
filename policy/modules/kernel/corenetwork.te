@@ -43,7 +43,7 @@
 #
 
 
-policy_module(corenetwork,1.2.14)
+policy_module(corenetwork,1.2.15)
 
 ########################################
 #
@@ -1529,7 +1529,7 @@ netifcon lo gen_context(system_u:object_r:lo_netif_t,s0 - mls_systemhigh) gen_co
 
 ',`
 
-typealias netif_t alias netif_lo_t;
+typealias netif_t alias { lo_netif_t netif_lo_t };
 
 ')
 

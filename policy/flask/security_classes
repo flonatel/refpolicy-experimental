@@ -106,4 +106,10 @@ class db_column			# userspace
 class db_tuple			# userspace
 class db_blob			# userspace
 
+# network peer labels
+class peer
+
+# Capabilities >= 32
+class capability2
+
 # FLASK
