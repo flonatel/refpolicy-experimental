@@ -1,3 +1,6 @@
+* Thu Jul 30 2009 Chris PeBenito <selinux@tresys.com> - 2.20090730
+- Gentoo fixes for init scripts and system startup.
+- Remove read_default_t tunable.
 - Greylist milter from Paul Howarth.
 - Crack db access for su to handle password expiration, from Brandon Whalen.
 - Misc fixes for unix_update from Brandon Whalen.
@@ -20,18 +23,26 @@
 - Add kernel_service access vectors, from Stephen Smalley.
 - Added modules:
 	certmaster (Dan Walsh)
+	cpufreqselector (Dan Walsh)
+	devicekit (Dan Walsh)
+	fprintd (Dan Walsh)
 	git (Dan Walsh)
 	gpsd (Miroslav Grepl)
 	guest (Dan Walsh)
 	ifplugd (Dan Walsh)
 	lircd (Miroslav Grepl)
 	logadm (Dan Walsh)
+	pads (Dan Walsh)
 	pingd (Dan Walsh)
+	policykit (Dan Walsh)
+	pulseaudio (Dan Walsh)
 	psad (Dan Walsh)
 	portreserve (Dan Walsh)
 	sssd (Dan Walsh)
 	ulogd (Dan Walsh)
+	varnishd (Dan Walsh)
 	webadm (Dan Walsh)
+	wm (Dan Walsh)
 	xguest (Dan Walsh)
 	zosremote (Dan Walsh)
 
