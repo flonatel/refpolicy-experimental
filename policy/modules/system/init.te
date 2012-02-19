@@ -1,5 +1,5 @@
 
-policy_module(init,1.3.23)
+policy_module(init,1.4.0)
 
 gen_require(`
 	class passwd rootok;
@@ -16,29 +16,18 @@ attribute direct_run_init;
 attribute direct_init;
 attribute direct_init_entry;
 
+# Mark process types as daemons
+attribute daemon;
+
 #
 # init_t is the domain of the init process.
 #
-# real declaration moved to mls until
-# range_transition works in loadable modules
-# also remove the extra init_exec_t dependencies
-# in init_t interfaces when the decl gets moved back here.
-gen_require(`
-	type init_t;
-')
+type init_t;
+type init_exec_t;
 domain_type(init_t)
-role system_r types init_t;
-
-#
-# init_exec_t is the type of the init program.
-#
-# real declaration moved to mls until
-# range_transition works in loadable modules
-gen_require(`
-	type init_exec_t;
-')
-kernel_domtrans_to(init_t,init_exec_t)
 domain_entry_file(init_t,init_exec_t)
+kernel_domtrans_to(init_t,init_exec_t)
+role system_r types init_t;
 
 #
 # init_var_run_t is the type for /var/run/shutdown.pid.
@@ -55,20 +44,11 @@ type initctl_t;
 files_type(initctl_t)
 mls_trusted_object(initctl_t)
 
-# real declaration moved to mls until
-# range_transition works in loadable modules
-gen_require(`
-	type initrc_t;
-')
+type initrc_t;
+type initrc_exec_t;
 domain_type(initrc_t)
-role system_r types initrc_t;
-
-# real declaration moved to mls until
-# range_transition works in loadable modules
-gen_require(`
-	type initrc_exec_t;
-')
 domain_entry_file(initrc_t,initrc_exec_t)
+role system_r types initrc_t;
 
 type initrc_devpts_t;
 term_pty(initrc_devpts_t)
@@ -82,6 +62,10 @@ files_tmp_file(initrc_tmp_t)
 
 type initrc_var_run_t;
 files_pid_file(initrc_var_run_t)
+
+ifdef(`enable_mls',`
+	kernel_ranged_domtrans_to(init_t,init_exec_t,s0 - mls_systemhigh)
+')
 
 ########################################
 #
@@ -206,6 +190,7 @@ optional_policy(`
 
 allow initrc_t self:process { getpgid setsched setpgid setrlimit getsched };
 allow initrc_t self:capability ~{ sys_admin sys_module };
+dontaudit initrc_t self:capability sys_module; # sysctl is triggering this
 allow initrc_t self:passwd rootok;
 
 # Allow IPC with self
@@ -411,6 +396,12 @@ ifdef(`distro_gentoo',`
 	dev_create_generic_dirs(initrc_t)
 	term_create_console_dev(initrc_t)
 
+	# unfortunately /sbin/rc does stupid tricks
+	# with /dev/.rcboot to decide if we are in
+	# early init
+	dev_create_generic_dirs(initrc_t)
+	dev_delete_generic_dirs(initrc_t)
+
 	# needed until baselayout is fixed to have the
 	# restorecon on /dev to again be immediately after
 	# mounting tmpfs on /dev
@@ -418,6 +409,10 @@ ifdef(`distro_gentoo',`
 
 	# init scripts touch this
 	clock_dontaudit_write_adjtime(initrc_t)
+
+	# for integrated run_init to read run_init_type.
+	# happens during boot (/sbin/rc execs init scripts)
+	seutil_read_default_contexts(initrc_t)
 
 	optional_policy(`
 		arpwatch_manage_data_files(initrc_t)
@@ -438,11 +433,6 @@ ifdef(`distro_redhat',`
 	files_dontaudit_read_root_files(initrc_t)
 
 	selinux_set_enforce_mode(initrc_t)
-
-	# Create and read /boot/kernel.h and /boot/System.map.
-	# Redhat systems typically create this file at boot time.
-	bootloader_create_runtime_file(initrc_t)
-	files_rw_boot_symlinks(initrc_t)
 
 	# These seem to be from the initrd
 	# during device initialization:
@@ -469,10 +459,6 @@ ifdef(`distro_redhat',`
 
 	miscfiles_read_fonts(initrc_t)
 	miscfiles_read_hwdata(initrc_t)
-
-	# for integrated run_init to read run_init_type.
-	# happens during boot (/sbin/rc execs init scripts)
-	seutil_read_default_contexts(initrc_t)
 
 	optional_policy(`
 		bind_manage_config_dirs(initrc_t)
@@ -507,6 +493,11 @@ ifdef(`targeted_policy',`
 	optional_policy(`
 		mono_domtrans(initrc_t)
 	')
+
+	tunable_policy(`allow_daemons_use_tty',`
+		term_use_unallocated_ttys(daemon)
+		term_use_generic_ptys(daemon)
+	')
 ',`
 	# cjp: require doesnt work in the else of optionals :\
 	# this also would result in a type transition
@@ -514,6 +505,11 @@ ifdef(`targeted_policy',`
 #	optional_policy(`',`
 #		mta_send_mail(initrc_t)
 #	')
+
+	# allow init scripts to su
+	optional_policy(`
+		su_restricted_domain_template(initrc,initrc_t,system_r)
+	')
 ')
 
 optional_policy(`
@@ -560,6 +556,8 @@ optional_policy(`
 
 	cups_read_log(initrc_t)
 	cups_read_rw_config(initrc_t)
+#cups init script clears error log
+	cups_write_log(initrc_t)
 ')
 
 optional_policy(`
@@ -724,11 +722,6 @@ optional_policy(`
 
 optional_policy(`
 	ssh_dontaudit_read_server_keys(initrc_t)
-')
-
-# allow init scripts to su
-optional_policy(`
-	su_restricted_domain_template(initrc,initrc_t,system_r)
 ')
 
 optional_policy(`

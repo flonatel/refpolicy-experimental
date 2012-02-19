@@ -1,16 +1,12 @@
 
-policy_module(unconfined,1.3.14)
+policy_module(unconfined,1.4.0)
 
 ########################################
 #
 # Declarations
 #
 
-# real declaration moved to mls until
-# range_transition works in loadable modules
-gen_require(`
-	type unconfined_t;
-')
+type unconfined_t;
 type unconfined_exec_t;
 init_system_domain(unconfined_t,unconfined_exec_t)
 
@@ -127,6 +123,10 @@ ifdef(`targeted_policy',`
 
 	optional_policy(`
 		mono_domtrans(unconfined_t)
+	')
+
+	optional_policy(`
+		oddjob_domtrans_mkhomedir(unconfined_t)
 	')
 
 	optional_policy(`

@@ -93,17 +93,17 @@ endif
 
 # policy building support tools
 support := support
-genxml := $(PYTHON) $(support)/segenxml.py
-gendoc := $(PYTHON) $(support)/sedoctool.py
-genperm := $(PYTHON) $(support)/genclassperms.py
+genxml := $(PYTHON) -E $(support)/segenxml.py
+gendoc := $(PYTHON) -E $(support)/sedoctool.py
+genperm := $(PYTHON) -E $(support)/genclassperms.py
 fcsort := $(tmpdir)/fc_sort
 setbools := $(AWK) -f $(support)/set_bools_tuns.awk
 get_type_attr_decl := $(SED) -r -f $(support)/get_type_attr_decl.sed
 comment_move_decl := $(SED) -r -f $(support)/comment_move_decl.sed
-gennetfilter := $(PYTHON) $(support)/gennetfilter.py
+gennetfilter := $(PYTHON) -E $(support)/gennetfilter.py
 # use our own genhomedircon to make sure we have a known usable one,
 # so policycoreutils updates are not required (RHEL4)
-genhomedircon := $(PYTHON) $(support)/genhomedircon
+genhomedircon := $(PYTHON) -E $(support)/genhomedircon
 
 # documentation paths
 docs := doc
@@ -148,7 +148,9 @@ topdir = $(DESTDIR)/etc/selinux
 installdir = $(topdir)/$(strip $(NAME))
 srcpath = $(installdir)/src
 userpath = $(installdir)/users
+policypath = $(installdir)/policy
 contextpath = $(installdir)/contexts
+homedirpath = $(contextpath)/files/homedir_template
 fcpath = $(contextpath)/files/file_contexts
 ncpath = $(contextpath)/netfilter_contexts
 sharedir = $(prefix)/share/selinux
@@ -208,11 +210,16 @@ ifeq ($(DIRECT_INITRC),y)
 	M4PARAM += -D direct_sysadm_daemon
 endif
 
+# default MLS/MCS sensitivity and category settings.
+MLS_SENS ?= 16
+MLS_CATS ?= 256
+MCS_CATS ?= 256
+
 ifeq ($(QUIET),y)
 	verbose = @
 endif
 
-M4PARAM += -D hide_broken_symptoms
+M4PARAM += -D mls_num_sens=$(MLS_SENS) -D mls_num_cats=$(MLS_CATS) -D mcs_num_cats=$(MCS_CATS) -D hide_broken_symptoms
 
 # we need exuberant ctags; unfortunately it is named
 # differently on different distros
@@ -234,7 +241,9 @@ endif
 appconf := config/appconfig-$(TYPE)
 seusers := $(appconf)/seusers
 appdir := $(contextpath)
-appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts customizable_types) $(contextpath)/files/media
+user_default_contexts := $(wildcard config/appconfig-$(TYPE)/*_default_contexts)
+user_default_contexts_names := $(addprefix $(contextpath)/users/,$(subst _default_contexts,,$(notdir $(user_default_contexts))))
+appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts customizable_types) $(contextpath)/files/media $(user_default_contexts_names)
 net_contexts := $(builddir)net_contexts
 
 all_layers := $(filter-out $(moddir)/CVS,$(shell find $(wildcard $(moddir)/*) -maxdepth 0 -type d))
@@ -454,7 +463,15 @@ $(userpath)/local.users: config/local.users
 
 ########################################
 #
-# Appconfig files
+# Build Appconfig files
+#
+$(tmpdir)/initrc_context: $(appconf)/initrc_context
+	@mkdir -p $(tmpdir)
+	$(verbose) $(M4) $(M4PARAM) $(m4support) $^ | $(GREP) '^[a-z]' > $@
+
+########################################
+#
+# Install Appconfig files
 #
 install-appconfig: $(appfiles)
 
@@ -485,7 +502,7 @@ $(appdir)/userhelper_context: $(appconf)/userhelper_context
 	@mkdir -p $(appdir)
 	$(verbose) $(INSTALL) -m 644 $< $@
 
-$(appdir)/initrc_context: $(appconf)/initrc_context
+$(appdir)/initrc_context: $(tmpdir)/initrc_context
 	@mkdir -p $(appdir)
 	$(verbose) $(INSTALL) -m 644 $< $@
 
@@ -497,9 +514,9 @@ $(appdir)/dbus_contexts: $(appconf)/dbus_contexts
 	@mkdir -p $(appdir)
 	$(verbose) $(INSTALL) -m 644 $< $@
 
-$(appdir)/users/root: $(appconf)/root_default_contexts
+$(contextpath)/users/%: $(appconf)/%_default_contexts
 	@mkdir -p $(appdir)/users
-	$(verbose) $(INSTALL) -m 644 $< $@
+	$(verbose) $(INSTALL) -m 644 $^ $@
 
 ########################################
 #
@@ -527,6 +544,9 @@ endif
 	$(verbose) echo "MONOLITHIC ?= n" >> $(headerdir)/build.conf
 	$(verbose) echo "DIRECT_INITRC ?= $(DIRECT_INITRC)" >> $(headerdir)/build.conf
 	$(verbose) echo "POLY ?= $(POLY)" >> $(headerdir)/build.conf
+	$(verbose) echo "override MLS_SENS := $(MLS_SENS)" >> $(headerdir)/build.conf
+	$(verbose) echo "override MLS_CATS := $(MLS_CATS)" >> $(headerdir)/build.conf
+	$(verbose) echo "override MCS_CATS := $(MCS_CATS)" >> $(headerdir)/build.conf
 	$(verbose) $(INSTALL) -m 644 $(support)/Makefile.devel $(headerdir)/Makefile
 
 ########################################
