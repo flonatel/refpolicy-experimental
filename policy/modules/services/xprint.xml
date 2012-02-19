@@ -1,0 +1,3 @@
+<module name="xprint" filename="policy/modules/services/xprint.if">
+<summary>X print server</summary>
+</module>

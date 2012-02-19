@@ -1,0 +1,44 @@
+<module name="loadkeys" filename="policy/modules/apps/loadkeys.if">
+<summary>Load keyboard mappings.</summary>
+<interface name="loadkeys_domtrans" lineno="13">
+<summary>
+Execute the loadkeys program in the loadkeys domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="loadkeys_run" lineno="47">
+<summary>
+Execute the loadkeys program in the loadkeys domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to allow the loadkeys domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the loadkeys domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="loadkeys_exec" lineno="72">
+<summary>
+Execute the loadkeys program in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

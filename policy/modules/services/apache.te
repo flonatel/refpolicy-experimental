@@ -1,5 +1,5 @@
 
-policy_module(apache,1.4.0)
+policy_module(apache,1.6.0)
 
 #
 # NOTES: 
@@ -19,6 +19,92 @@ policy_module(apache,1.4.0)
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+## Allow Apache to modify public files
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(allow_httpd_anon_write,false)
+
+## <desc>
+## <p>
+## Allow Apache to use mod_auth_pam
+## </p>
+## </desc>
+gen_tunable(allow_httpd_mod_auth_pam,false)
+
+## <desc>
+## <p>
+## Allow httpd to use built in scripting (usually php)
+## </p>
+## </desc>
+gen_tunable(httpd_builtin_scripting,false)
+
+## <desc>
+## <p>
+## Allow http daemon to tcp connect
+## </p>
+## </desc>
+gen_tunable(httpd_can_network_connect,false)
+
+## <desc>
+## <p>
+## Allow httpd to connect to mysql/posgresql
+## </p>
+## </desc>
+gen_tunable(httpd_can_network_connect_db, false)
+
+## <desc>
+## <p>
+## Allow httpd to act as a relay
+## </p>
+## </desc>
+gen_tunable(httpd_can_network_relay, false)
+
+## <desc>
+## <p>
+## Allow httpd cgi support
+## </p>
+## </desc>
+gen_tunable(httpd_enable_cgi,false)
+
+## <desc>
+## <p>
+## Allow httpd to act as a FTP server by
+## listening on the ftp port.
+## </p>
+## </desc>
+gen_tunable(httpd_enable_ftp_server,false)
+
+## <desc>
+## <p>
+## Allow httpd to read home directories
+## </p>
+## </desc>
+gen_tunable(httpd_enable_homedirs,false)
+
+## <desc>
+## <p>
+## Run SSI execs in system CGI script domain.
+## </p>
+## </desc>
+gen_tunable(httpd_ssi_exec,false)
+
+## <desc>
+## <p>
+## Allow http daemon to communicate with the TTY
+## </p>
+## </desc>
+gen_tunable(httpd_tty_comm,false)
+
+## <desc>
+## <p>
+## Run CGI in the main httpd domain
+## </p>
+## </desc>
+gen_tunable(httpd_unified,false)
 
 attribute httpdcontent;
 
@@ -133,8 +219,8 @@ allow httpd_t self:capability { chown dac_override kill setgid setuid sys_tty_co
 dontaudit httpd_t self:capability { net_admin sys_tty_config };
 allow httpd_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow httpd_t self:fd use;
-allow httpd_t self:sock_file r_file_perms;
-allow httpd_t self:fifo_file rw_file_perms;
+allow httpd_t self:sock_file read_sock_file_perms;
+allow httpd_t self:fifo_file rw_fifo_file_perms;
 allow httpd_t self:shm create_shm_perms;
 allow httpd_t self:sem create_sem_perms;
 allow httpd_t self:msgq create_msgq_perms;
@@ -145,64 +231,68 @@ allow httpd_t self:tcp_socket create_stream_socket_perms;
 allow httpd_t self:udp_socket create_socket_perms;
 
 # Allow httpd_t to put files in /var/cache/httpd etc
-allow httpd_t httpd_cache_t:dir create_dir_perms;
-allow httpd_t httpd_cache_t:file create_file_perms;
-allow httpd_t httpd_cache_t:lnk_file create_lnk_perms;
+manage_dirs_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
+manage_files_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
+manage_lnk_files_pattern(httpd_t,httpd_cache_t,httpd_cache_t)
 
 # Allow the httpd_t to read the web servers config files
-allow httpd_t httpd_config_t:dir r_dir_perms;
-allow httpd_t httpd_config_t:file r_file_perms;
-allow httpd_t httpd_config_t:lnk_file { getattr read };
+allow httpd_t httpd_config_t:dir list_dir_perms;
+read_files_pattern(httpd_t,httpd_config_t,httpd_config_t)
+read_lnk_files_pattern(httpd_t,httpd_config_t,httpd_config_t)
 
 can_exec(httpd_t, httpd_exec_t)
 
-allow httpd_t httpd_lock_t:file create_file_perms;
+allow httpd_t httpd_lock_t:file manage_file_perms;
 files_lock_filetrans(httpd_t,httpd_lock_t,file)
 
-allow httpd_t httpd_log_t:dir { setattr rw_dir_perms };
-allow httpd_t httpd_log_t:file { create ra_file_perms };
-allow httpd_t httpd_log_t:lnk_file read;
+allow httpd_t httpd_log_t:dir setattr;
+create_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
+append_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
+read_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
+read_lnk_files_pattern(httpd_t,httpd_log_t,httpd_log_t)
 # cjp: need to refine create interfaces to
 # cut this back to add_name only
 logging_log_filetrans(httpd_t,httpd_log_t,file)
 
-allow httpd_t httpd_modules_t:file rx_file_perms;
-allow httpd_t httpd_modules_t:dir r_dir_perms;
-allow httpd_t httpd_modules_t:lnk_file r_file_perms;
+allow httpd_t httpd_modules_t:dir list_dir_perms;
+mmap_files_pattern(httpd_t,httpd_modules_t,httpd_modules_t)
+read_files_pattern(httpd_t,httpd_modules_t,httpd_modules_t)
 
-allow httpd_t httpd_squirrelmail_t:dir create_dir_perms;
-allow httpd_t httpd_squirrelmail_t:lnk_file create_lnk_perms;
-allow httpd_t httpd_squirrelmail_t:file create_file_perms;
+apache_domtrans_rotatelogs(httpd_t)
+# Apache-httpd needs to be able to send signals to the log rotate procs.
+allow httpd_t httpd_rotatelogs_t:process signal_perms;
+
+manage_dirs_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
+manage_files_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
+manage_lnk_files_pattern(httpd_t,httpd_squirrelmail_t,httpd_squirrelmail_t)
 
 allow httpd_t httpd_suexec_exec_t:file { getattr read };
 
-allow httpd_t httpd_sys_content_t:dir r_dir_perms;
-allow httpd_t httpd_sys_content_t:file r_file_perms;
-allow httpd_t httpd_sys_content_t:lnk_file r_file_perms;
+allow httpd_t httpd_sys_content_t:dir list_dir_perms;
+read_files_pattern(httpd_t,httpd_sys_content_t,httpd_sys_content_t)
+read_lnk_files_pattern(httpd_t,httpd_sys_content_t,httpd_sys_content_t)
 
-allow httpd_t httpd_tmp_t:dir create_dir_perms;
-allow httpd_t httpd_tmp_t:file create_file_perms;
+manage_dirs_pattern(httpd_t,httpd_tmp_t,httpd_tmp_t)
+manage_files_pattern(httpd_t,httpd_tmp_t,httpd_tmp_t)
 files_tmp_filetrans(httpd_t, httpd_tmp_t, { file dir })
 
-allow httpd_t httpd_tmpfs_t:dir create_dir_perms;
-allow httpd_t httpd_tmpfs_t:file create_file_perms;
-allow httpd_t httpd_tmpfs_t:lnk_file create_lnk_perms;
-allow httpd_t httpd_tmpfs_t:sock_file create_file_perms;
-allow httpd_t httpd_tmpfs_t:fifo_file create_file_perms;
+manage_dirs_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
+manage_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
+manage_lnk_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
+manage_fifo_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
+manage_sock_files_pattern(httpd_t,httpd_tmpfs_t,httpd_tmpfs_t)
 fs_tmpfs_filetrans(httpd_t,httpd_tmpfs_t,{ dir file lnk_file sock_file fifo_file })
 
-allow httpd_t httpd_var_lib_t:file create_file_perms;
-allow httpd_t httpd_var_lib_t:dir rw_dir_perms;
+manage_files_pattern(httpd_t,httpd_var_lib_t,httpd_var_lib_t)
 files_var_lib_filetrans(httpd_t,httpd_var_lib_t,file)
 
-allow httpd_t httpd_var_run_t:file create_file_perms;
-allow httpd_t httpd_var_run_t:sock_file create_file_perms;
-allow httpd_t httpd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(httpd_t,httpd_var_run_t,httpd_var_run_t)
+manage_sock_files_pattern(httpd_t,httpd_var_run_t,httpd_var_run_t)
 files_pid_filetrans(httpd_t,httpd_var_run_t, { file sock_file })
 
-allow httpd_t squirrelmail_spool_t:dir create_dir_perms;
-allow httpd_t squirrelmail_spool_t:file create_file_perms;
-allow httpd_t squirrelmail_spool_t:lnk_file create_lnk_perms;
+manage_dirs_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
+manage_files_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
+manage_lnk_files_pattern(httpd_t,squirrelmail_spool_t,squirrelmail_spool_t)
 
 kernel_read_kernel_sysctls(httpd_t)
 # for modules that want to access /proc/meminfo
@@ -219,6 +309,8 @@ corenet_tcp_bind_all_nodes(httpd_t)
 corenet_tcp_bind_http_port(httpd_t)
 corenet_tcp_bind_http_cache_port(httpd_t)
 corenet_sendrecv_http_server_packets(httpd_t)
+# Signal self for shutdown
+corenet_tcp_connect_http_port(httpd_t)
 
 dev_read_sysfs(httpd_t)
 dev_read_rand(httpd_t)
@@ -228,13 +320,11 @@ dev_rw_crypto(httpd_t)
 fs_getattr_all_fs(httpd_t)
 fs_search_auto_mountpoints(httpd_t)
 
-term_dontaudit_use_console(httpd_t)
-
 auth_use_nsswitch(httpd_t)
 
 # execute perl
 corecmd_exec_bin(httpd_t)
-corecmd_exec_sbin(httpd_t)
+corecmd_exec_shell(httpd_t)
 
 domain_use_interactive_fds(httpd_t)
 
@@ -251,8 +341,7 @@ files_read_etc_files(httpd_t)
 # for tomcat
 files_read_var_lib_symlinks(httpd_t)
 
-init_use_fds(httpd_t)
-init_use_script_ptys(httpd_t)
+fs_search_auto_mountpoints(httpd_sys_script_t)
 
 libs_use_ld_so(httpd_t)
 libs_use_shared_libs(httpd_t)
@@ -321,26 +410,18 @@ tunable_policy(`httpd_can_network_relay',`
 ')
 
 tunable_policy(`httpd_enable_cgi',`
-	domain_auto_trans(httpd_t, httpd_unconfined_script_exec_t, httpd_unconfined_script_t)
-	allow httpd_t httpd_unconfined_script_t:fd use;
-	allow httpd_unconfined_script_t httpd_t:fd use;
-	allow httpd_unconfined_script_t httpd_t:fifo_file rw_file_perms;
-	allow httpd_unconfined_script_t httpd_t:process sigchld;
+	domtrans_pattern(httpd_t, httpd_unconfined_script_exec_t, httpd_unconfined_script_t)
 
 	allow httpd_t httpd_unconfined_script_t:process { signal sigkill sigstop };
-	allow httpd_t httpd_unconfined_script_exec_t:dir r_dir_perms;
+	allow httpd_t httpd_unconfined_script_exec_t:dir list_dir_perms;
 ')
 
 tunable_policy(`httpd_enable_cgi && httpd_unified && httpd_builtin_scripting',`
-	domain_auto_trans(httpd_t, httpdcontent, httpd_sys_script_t)
-	allow httpd_t httpd_sys_script_t:fd use;
-	allow httpd_sys_script_t httpd_t:fd use;
-	allow httpd_sys_script_t httpd_t:fifo_file rw_file_perms;
-	allow httpd_sys_script_t httpd_t:process sigchld;
+	domtrans_pattern(httpd_t, httpdcontent, httpd_sys_script_t)
 
-	allow httpd_t httpdcontent:dir create_dir_perms;
-	allow httpd_t httpdcontent:file create_file_perms;
-	allow httpd_t httpdcontent:lnk_file create_lnk_perms;
+	manage_dirs_pattern(httpd_t,httpdcontent,httpdcontent)
+	manage_files_pattern(httpd_t,httpdcontent,httpdcontent)
+	manage_lnk_files_pattern(httpd_t,httpdcontent,httpdcontent)
 ')
 
 tunable_policy(`httpd_enable_ftp_server',`
@@ -359,7 +440,6 @@ tunable_policy(`httpd_enable_homedirs && use_samba_home_dirs',`
 
 tunable_policy(`httpd_ssi_exec',`
 	corecmd_shell_domtrans(httpd_t,httpd_sys_script_t)
-	allow httpd_t httpd_sys_script_t:fd use;
 	allow httpd_sys_script_t httpd_t:fd use;
 	allow httpd_sys_script_t httpd_t:fifo_file rw_file_perms;
 	allow httpd_sys_script_t httpd_t:process sigchld;
@@ -388,6 +468,7 @@ optional_policy(`
 
 optional_policy(`
 	kerberos_use(httpd_t)
+	kerberos_read_kdc_config(httpd_t)
 ')
 
 optional_policy(`
@@ -425,6 +506,11 @@ optional_policy(`
 ')
 
 optional_policy(`
+	snmp_dontaudit_read_snmp_var_lib_files(httpd_t)
+	snmp_dontaudit_write_snmp_var_lib_files(httpd_t)
+')
+
+optional_policy(`
 	udev_read_db(httpd_t)
 ')
 
@@ -437,11 +523,7 @@ optional_policy(`
 # Apache helper local policy
 #
 
-domain_auto_trans(httpd_t, httpd_helper_exec_t, httpd_helper_t)
-allow httpd_t httpd_helper_t:fd use;
-allow httpd_helper_t httpd_t:fd use;
-allow httpd_helper_t httpd_t:fifo_file rw_file_perms;
-allow httpd_helper_t httpd_t:process sigchld;
+domtrans_pattern(httpd_t, httpd_helper_exec_t, httpd_helper_t)
 
 allow httpd_helper_t httpd_config_t:file { getattr read };
 
@@ -466,8 +548,8 @@ tunable_policy(`httpd_tty_comm',`
 
 allow httpd_php_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow httpd_php_t self:fd use;
-allow httpd_php_t self:fifo_file rw_file_perms;
-allow httpd_php_t self:sock_file r_file_perms;
+allow httpd_php_t self:fifo_file rw_fifo_file_perms;
+allow httpd_php_t self:sock_file read_sock_file_perms;
 allow httpd_php_t self:unix_dgram_socket create_socket_perms;
 allow httpd_php_t self:unix_stream_socket create_stream_socket_perms;
 allow httpd_php_t self:unix_dgram_socket sendto;
@@ -477,17 +559,13 @@ allow httpd_php_t self:sem create_sem_perms;
 allow httpd_php_t self:msgq create_msgq_perms;
 allow httpd_php_t self:msg { send receive };
 
-domain_auto_trans(httpd_t, httpd_php_exec_t, httpd_php_t)
-allow httpd_t httpd_php_t:fd use;
-allow httpd_php_t httpd_t:fd use;
-allow httpd_php_t httpd_t:fifo_file rw_file_perms;
-allow httpd_php_t httpd_t:process sigchld;
+domtrans_pattern(httpd_t, httpd_php_exec_t, httpd_php_t)
 
 # allow php to read and append to apache logfiles
-allow httpd_php_t httpd_log_t:file ra_file_perms;
+allow httpd_php_t httpd_log_t:file { read_file_perms append_file_perms };
 
-allow httpd_php_t httpd_php_tmp_t:dir create_dir_perms;
-allow httpd_php_t httpd_php_tmp_t:file create_file_perms;
+manage_dirs_pattern(httpd_php_t,httpd_php_tmp_t,httpd_php_tmp_t)
+manage_files_pattern(httpd_php_t,httpd_php_tmp_t,httpd_php_tmp_t)
 files_tmp_filetrans(httpd_php_t, httpd_php_tmp_t, { file dir })
 
 fs_search_auto_mountpoints(httpd_php_t)
@@ -516,24 +594,16 @@ allow httpd_suexec_t self:process signal_perms;
 allow httpd_suexec_t self:unix_stream_socket create_stream_socket_perms;
 allow httpd_suexec_t self:netlink_route_socket r_netlink_socket_perms;
 
-ifdef(`targeted_policy',`
-	gen_tunable(httpd_suexec_disable_trans,false)
+domtrans_pattern(httpd_t, httpd_suexec_exec_t, httpd_suexec_t)
 
-	tunable_policy(`httpd_suexec_disable_trans',`',`
-		domain_auto_trans(httpd_t, httpd_suexec_exec_t, httpd_suexec_t)
-		allow httpd_t httpd_suexec_t:fd use;
-		allow httpd_suexec_t httpd_t:fd use;
-		allow httpd_suexec_t httpd_t:fifo_file rw_file_perms;
-		allow httpd_suexec_t httpd_t:process sigchld;
-	')
-')
+create_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
+append_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
+read_files_pattern(httpd_suexec_t,httpd_log_t,httpd_log_t)
 
-allow httpd_suexec_t httpd_log_t:dir ra_dir_perms;
-allow httpd_suexec_t httpd_log_t:file { create ra_file_perms };
 allow httpd_suexec_t httpd_t:fifo_file getattr;
 
-allow httpd_suexec_t httpd_suexec_tmp_t:dir create_dir_perms;
-allow httpd_suexec_t httpd_suexec_tmp_t:file create_file_perms;
+manage_dirs_pattern(httpd_suexec_t,httpd_suexec_tmp_t,httpd_suexec_tmp_t)
+manage_files_pattern(httpd_suexec_t,httpd_suexec_tmp_t,httpd_suexec_tmp_t)
 files_tmp_filetrans(httpd_suexec_t, httpd_suexec_tmp_t, { file dir })
 
 kernel_read_kernel_sysctls(httpd_suexec_t)
@@ -585,19 +655,11 @@ tunable_policy(`httpd_can_network_connect',`
 ')
 
 tunable_policy(`httpd_enable_cgi',`
-	domain_auto_trans(httpd_suexec_t, httpd_unconfined_script_exec_t, httpd_unconfined_script_t)
-	allow httpd_suexec_t httpd_unconfined_script_t:fd use;
-	allow httpd_unconfined_script_t httpd_suexec_t:fd use;
-	allow httpd_unconfined_script_t httpd_suexec_t:fifo_file rw_file_perms;
-	allow httpd_unconfined_script_t httpd_suexec_t:process sigchld;
+	domtrans_pattern(httpd_suexec_t, httpd_unconfined_script_exec_t, httpd_unconfined_script_t)
 ')
 
 tunable_policy(`httpd_enable_cgi && httpd_unified',`
-	domain_auto_trans(httpd_suexec_t, httpdcontent, httpd_sys_script_t)
-	allow httpd_suexec_t httpd_sys_script_t:fd use;
-	allow httpd_sys_script_t httpd_suexec_t:fd use;
-	allow httpd_sys_script_t httpd_suexec_t:fifo_file rw_file_perms;
-	allow httpd_sys_script_t httpd_suexec_t:process sigchld;
+	domtrans_pattern(httpd_suexec_t, httpdcontent, httpd_sys_script_t)
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
@@ -646,9 +708,9 @@ dontaudit httpd_sys_script_t httpd_config_t:dir search;
 
 allow httpd_sys_script_t httpd_squirrelmail_t:file { append read };
 
-allow httpd_sys_script_t squirrelmail_spool_t:dir r_dir_perms;
-allow httpd_sys_script_t squirrelmail_spool_t:file r_file_perms;
-allow httpd_sys_script_t squirrelmail_spool_t:lnk_file { getattr read };
+allow httpd_sys_script_t squirrelmail_spool_t:dir list_dir_perms;
+read_files_pattern(httpd_sys_script_t,squirrelmail_spool_t,squirrelmail_spool_t)
+read_lnk_files_pattern(httpd_sys_script_t,squirrelmail_spool_t,squirrelmail_spool_t)
 
 kernel_read_kernel_sysctls(httpd_sys_script_t)
 
@@ -666,6 +728,16 @@ ifdef(`targeted_policy',`
 	tunable_policy(`httpd_enable_homedirs',`
 		userdom_search_generic_user_home_dirs(httpd_sys_script_t)
 	')
+')
+
+tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
+	fs_read_nfs_files(httpd_sys_script_t)
+	fs_read_nfs_symlinks(httpd_sys_script_t)
+')
+
+tunable_policy(`httpd_enable_homedirs && use_samba_home_dirs',`
+	fs_read_cifs_files(httpd_sys_script_t)
+	fs_read_cifs_symlinks(httpd_sys_script_t)
 ')
 
 optional_policy(`
@@ -692,17 +764,12 @@ optional_policy(`
 	nscd_socket_use(httpd_unconfined_script_t)
 ')
 
-optional_policy(`
-	snmp_dontaudit_read_snmp_var_lib_files(httpd_t)
-')
-
 ########################################
 #
 # httpd_rotatelogs local policy
 #
 
-allow httpd_rotatelogs_t httpd_log_t:dir rw_dir_perms;
-allow httpd_rotatelogs_t httpd_log_t:file manage_file_perms;
+manage_files_pattern(httpd_rotatelogs_t,httpd_log_t,httpd_log_t)
 
 kernel_read_kernel_sysctls(httpd_rotatelogs_t)
 kernel_dontaudit_list_proc(httpd_rotatelogs_t)
@@ -712,6 +779,8 @@ files_read_etc_files(httpd_rotatelogs_t)
 
 libs_use_ld_so(httpd_rotatelogs_t)
 libs_use_shared_libs(httpd_rotatelogs_t)
+
+logging_search_logs(httpd_rotatelogs_t)
 
 miscfiles_read_localization(httpd_rotatelogs_t)
 

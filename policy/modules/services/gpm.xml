@@ -1,0 +1,48 @@
+<module name="gpm" filename="policy/modules/services/gpm.if">
+<summary>General Purpose Mouse driver</summary>
+<interface name="gpm_stream_connect" lineno="14">
+<summary>
+Connect to GPM over a unix domain
+stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="gpm_getattr_gpmctl" lineno="34">
+<summary>
+Get the attributes of the GPM
+control channel named socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="gpm_dontaudit_getattr_gpmctl" lineno="55">
+<summary>
+Do not audit attempts to get the
+attributes of the GPM control channel
+named socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="gpm_setattr_gpmctl" lineno="74">
+<summary>
+Set the attributes of the GPM
+control channel named socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,63 @@
+<module name="locallogin" filename="policy/modules/system/locallogin.if">
+<summary>Policy for local logins.</summary>
+<interface name="locallogin_domtrans" lineno="13">
+<summary>
+Execute local logins in the local login domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="locallogin_use_fds" lineno="35">
+<summary>
+Allow processes to inherit local login file descriptors.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="locallogin_dontaudit_use_fds" lineno="53">
+<summary>
+Do not audit attempts to inherit local login file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="locallogin_signull" lineno="71">
+<summary>
+Send a null signal to local login processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="locallogin_search_keys" lineno="89">
+<summary>
+Search for key.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="locallogin_link_keys" lineno="107">
+<summary>
+Allow link to the local_login key ring.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

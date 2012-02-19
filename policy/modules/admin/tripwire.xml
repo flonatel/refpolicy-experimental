@@ -1,0 +1,144 @@
+<module name="tripwire" filename="policy/modules/admin/tripwire.if">
+<summary>Tripwire file integrity checker.</summary>
+<desc>
+<p>
+Tripwire file integrity checker.
+</p>
+<p>
+NOTE: Tripwire creates temp file in its current working directory.
+This policy does not allow write access to home directories, so
+users will need to either cd to a directory where they have write
+permission, or set the TEMPDIRECTORY variable in the tripwire config
+file.  The latter is preferable, as then the file_type_auto_trans
+rules will kick in and label the files as private to tripwire.
+</p>
+</desc>
+<interface name="tripwire_domtrans_tripwire" lineno="26">
+<summary>
+Execute tripwire in the tripwire domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="tripwire_run_tripwire" lineno="56">
+<summary>
+Execute tripwire in the tripwire domain, and
+allow the specified role the tripwire domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the tripwire domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the tripwire domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="tripwire_domtrans_twadmin" lineno="76">
+<summary>
+Execute twadmin in the twadmin domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="tripwire_run_twadmin" lineno="106">
+<summary>
+Execute twadmin in the twadmin domain, and
+allow the specified role the twadmin domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the twadmin domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the twadmin domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="tripwire_domtrans_twprint" lineno="126">
+<summary>
+Execute twprint in the twprint domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="tripwire_run_twprint" lineno="156">
+<summary>
+Execute twprint in the twprint domain, and
+allow the specified role the twprint domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the twprint domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the twprint domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="tripwire_domtrans_siggen" lineno="176">
+<summary>
+Execute siggen in the siggen domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="tripwire_run_siggen" lineno="206">
+<summary>
+Execute siggen in the siggen domain, and
+allow the specified role the siggen domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the siggen domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the siggen domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

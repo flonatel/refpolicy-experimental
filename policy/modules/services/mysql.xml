@@ -1,0 +1,87 @@
+<module name="mysql" filename="policy/modules/services/mysql.if">
+<summary>Policy for MySQL</summary>
+<interface name="mysql_signal" lineno="13">
+<summary>
+Send a generic signal to MySQL.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mysql_stream_connect" lineno="32">
+<summary>
+Connect to MySQL using a unix domain stream socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="mysql_read_config" lineno="51">
+<summary>
+Read MySQL configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="mysql_search_db" lineno="74">
+<summary>
+Search the directories that contain MySQL
+database storage.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mysql_rw_db_dirs" lineno="93">
+<summary>
+Read and write to the MySQL database directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mysql_manage_db_dirs" lineno="112">
+<summary>
+Create, read, write, and delete MySQL database directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mysql_rw_db_sockets" lineno="132">
+<summary>
+Read and write to the MySQL database
+named socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="mysql_write_log" lineno="152">
+<summary>
+Write to the MySQL log.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

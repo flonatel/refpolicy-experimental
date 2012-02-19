@@ -1,0 +1,3 @@
+<module name="publicfile" filename="policy/modules/services/publicfile.if">
+<summary>publicfile supplies files to the public through HTTP and FTP</summary>
+</module>

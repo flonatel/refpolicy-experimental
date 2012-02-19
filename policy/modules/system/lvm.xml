@@ -1,0 +1,56 @@
+<module name="lvm" filename="policy/modules/system/lvm.if">
+<summary>Policy for logical volume management programs.</summary>
+<interface name="lvm_domtrans" lineno="13">
+<summary>
+Execute lvm programs in the lvm domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="lvm_run" lineno="43">
+<summary>
+Execute lvm programs in the lvm domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to allow the LVM domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the LVM domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="lvm_read_config" lineno="64">
+<summary>
+Read LVM configuration files.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="lvm_manage_config" lineno="85">
+<summary>
+Manage LVM configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

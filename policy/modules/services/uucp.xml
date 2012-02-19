@@ -1,0 +1,35 @@
+<module name="uucp" filename="policy/modules/services/uucp.if">
+<summary>Unix to Unix Copy</summary>
+<interface name="uucp_append_log" lineno="14">
+<summary>
+Allow the specified domain to append
+to uucp log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="uucp_manage_spool" lineno="34">
+<summary>
+Create, read, write, and delete uucp spool files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="uucp_domtrans_uux" lineno="56">
+<summary>
+Execute the master uux program in the
+uux_t domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

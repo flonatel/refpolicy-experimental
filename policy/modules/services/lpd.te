@@ -1,10 +1,17 @@
 
-policy_module(lpd,1.3.0)
+policy_module(lpd,1.5.0)
 
 ########################################
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+## Use lpd server instead of cups
+## </p>
+## </desc>
+gen_tunable(use_lpd_server,false)
 
 type checkpc_t;
 type checkpc_exec_t;
@@ -50,14 +57,14 @@ allow checkpc_t self:unix_stream_socket create_socket_perms;
 allow checkpc_t self:tcp_socket create_socket_perms;
 allow checkpc_t self:udp_socket create_socket_perms;
 
-allow checkpc_t checkpc_log_t:file create_file_perms;
+allow checkpc_t checkpc_log_t:file manage_file_perms;
 logging_log_filetrans(checkpc_t,checkpc_log_t,file)
 
-allow checkpc_t lpd_var_run_t:dir { search getattr };
+allow checkpc_t lpd_var_run_t:dir search_dir_perms;
 files_search_pids(checkpc_t)
 
-allow checkpc_t print_spool_t:file { rw_file_perms unlink };
-allow checkpc_t print_spool_t:dir { read write search add_name remove_name getattr };
+rw_files_pattern(checkpc_t,print_spool_t,print_spool_t)
+delete_files_pattern(checkpc_t,print_spool_t,print_spool_t)
 files_search_spool(checkpc_t)
 
 allow checkpc_t printconf_t:file getattr;
@@ -80,7 +87,6 @@ dev_append_printer(checkpc_t)
 # This is less desirable, but checkpc demands /bin/bash and /bin/chown:
 corecmd_exec_shell(checkpc_t)
 corecmd_exec_bin(checkpc_t)
-corecmd_search_sbin(checkpc_t)
 
 domain_use_interactive_fds(checkpc_t)
 
@@ -121,25 +127,22 @@ optional_policy(`
 allow lpd_t self:capability { setgid setuid net_bind_service dac_read_search dac_override chown fowner };
 dontaudit lpd_t self:capability sys_tty_config;
 allow lpd_t self:process signal_perms;
-allow lpd_t self:fifo_file rw_file_perms;
+allow lpd_t self:fifo_file rw_fifo_file_perms;
 allow lpd_t self:unix_stream_socket create_stream_socket_perms;
 allow lpd_t self:unix_dgram_socket create_socket_perms;
 allow lpd_t self:tcp_socket create_stream_socket_perms;
 allow lpd_t self:udp_socket create_stream_socket_perms;
 
-allow lpd_t lpd_tmp_t:dir create_dir_perms;
-allow lpd_t lpd_tmp_t:file create_file_perms;
+manage_dirs_pattern(lpd_t,lpd_tmp_t,lpd_tmp_t)
+manage_files_pattern(lpd_t,lpd_tmp_t,lpd_tmp_t)
 files_tmp_filetrans(lpd_t, lpd_tmp_t, { file dir })
 
-allow lpd_t lpd_var_run_t:dir rw_dir_perms;
-allow lpd_t lpd_var_run_t:file create_file_perms;
-allow lpd_t lpd_var_run_t:sock_file create_file_perms;
+manage_files_pattern(lpd_t,lpd_var_run_t,lpd_var_run_t)
+manage_sock_files_pattern(lpd_t,lpd_var_run_t,lpd_var_run_t)
 files_pid_filetrans(lpd_t,lpd_var_run_t,file)
 
 # Write to /var/spool/lpd.
-allow lpd_t print_spool_t:dir rw_dir_perms;
-allow lpd_t print_spool_t:file create_file_perms;
-allow lpd_t print_spool_t:file rw_file_perms;
+manage_files_pattern(lpd_t,print_spool_t,print_spool_t)
 files_search_spool(lpd_t)
 
 # lpd must be able to execute the filter utilities in /usr/share/printconf.
@@ -147,11 +150,8 @@ allow lpd_t printconf_t:dir { getattr search read };
 can_exec(lpd_t, printconf_t)
 
 # Create and bind to /dev/printer.
-allow lpd_t printer_t:lnk_file create_lnk_perms;
+allow lpd_t printer_t:lnk_file manage_lnk_file_perms;
 dev_filetrans(lpd_t,printer_t,lnk_file)
-# cjp: I believe these have no effect:
-allow lpd_t printer_t:unix_stream_socket name_bind;
-allow lpd_t printer_t:unix_dgram_socket name_bind;
 
 kernel_read_kernel_sysctls(lpd_t)
 # bash wants access to /proc/meminfo
@@ -174,11 +174,8 @@ dev_rw_printer(lpd_t)
 fs_getattr_all_fs(lpd_t)
 fs_search_auto_mountpoints(lpd_t)
 
-term_dontaudit_use_console(lpd_t)
-
 # Filter scripts may be shell scripts, and may invoke progs like /bin/mktemp
 corecmd_exec_bin(lpd_t)
-corecmd_exec_sbin(lpd_t)
 corecmd_exec_shell(lpd_t)
 
 domain_use_interactive_fds(lpd_t)
@@ -194,9 +191,6 @@ files_read_var_lib_files(lpd_t)
 files_read_var_lib_symlinks(lpd_t)
 # config files for lpd are of type etc_t, probably should change this
 files_read_etc_files(lpd_t)
-
-init_use_fds(lpd_t)
-init_use_script_ptys(lpd_t)
 
 libs_use_ld_so(lpd_t)
 libs_use_shared_libs(lpd_t)

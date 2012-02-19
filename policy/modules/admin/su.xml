@@ -1,0 +1,74 @@
+<module name="su" filename="policy/modules/admin/su.if">
+<summary>Run shells with substitute user and group</summary>
+<template name="su_restricted_domain_template" lineno="31">
+<summary>
+Restricted su domain template.
+</summary>
+<desc>
+<p>
+This template creates a derived domain which is allowed
+to change the linux user id, to run shells as a different
+user.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="su_per_role_template" lineno="162">
+<summary>
+The per role template for the su module.
+</summary>
+<desc>
+<p>
+This template creates a derived domain which is allowed
+to change the linux user id, to run shells as a different
+user.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<interface name="su_exec" lineno="331">
+<summary>
+Execute su in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

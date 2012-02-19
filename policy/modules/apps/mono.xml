@@ -1,0 +1,13 @@
+<module name="mono" filename="policy/modules/apps/mono.if">
+<summary>Run .NET server and client applications on Linux.</summary>
+<interface name="mono_domtrans" lineno="13">
+<summary>
+Execute the mono program in the mono domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,75 @@
+<module name="logrotate" filename="policy/modules/admin/logrotate.if">
+<summary>Rotate and archive system logs</summary>
+<interface name="logrotate_domtrans" lineno="13">
+<summary>
+Execute logrotate in the logrotate domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="logrotate_run" lineno="43">
+<summary>
+Execute logrotate in the logrotate domain, and
+allow the specified role the logrotate domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the logrotate domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the logrotate domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="logrotate_exec" lineno="63">
+<summary>
+Execute logrotate in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="logrotate_use_fds" lineno="81">
+<summary>
+Inherit and use logrotate file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="logrotate_dontaudit_use_fds" lineno="99">
+<summary>
+Do not audit attempts to inherit logrotate file descriptors.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+<interface name="logrotate_read_tmp_files" lineno="117">
+<summary>
+Read a logrotate temporary files.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to not audit.
+</summary>
+</param>
+</interface>
+</module>

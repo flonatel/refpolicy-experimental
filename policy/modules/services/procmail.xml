@@ -1,0 +1,23 @@
+<module name="procmail" filename="policy/modules/services/procmail.if">
+<summary>Procmail mail delivery agent</summary>
+<interface name="procmail_domtrans" lineno="13">
+<summary>
+Execute procmail with a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="procmail_exec" lineno="33">
+<summary>
+Execute procmail in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

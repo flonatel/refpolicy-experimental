@@ -1,0 +1,2613 @@
+<module name="files" filename="policy/modules/kernel/files.if">
+<summary>
+Basic filesystem types and interfaces.
+</summary>
+<desc>
+<p>
+This module contains basic filesystem types and interfaces. This
+includes:
+<ul>
+<li>The concept of different file types including basic
+files, mount points, tmp files, etc.</li>
+<li>Access to groups of files and all files.</li>
+<li>Types and interfaces for the basic filesystem layout
+(/, /etc, /tmp, /usr, etc.).</li>
+</ul>
+</p>
+</desc>
+<required val="true">
+Contains the concept of a file.
+Comains the file initial SID.
+</required>
+<interface name="files_type" lineno="33">
+<summary>
+Make the specified type usable for files
+in a filesystem.
+</summary>
+<param name="type">
+<summary>
+Type to be used for files.
+</summary>
+</param>
+</interface>
+<interface name="files_lock_file" lineno="52">
+<summary>
+Make the specified type usable for
+lock files.
+</summary>
+<param name="type">
+<summary>
+Type to be used for lock files.
+</summary>
+</param>
+</interface>
+<interface name="files_mountpoint" lineno="72">
+<summary>
+Make the specified type usable for
+filesystem mount points.
+</summary>
+<param name="type">
+<summary>
+Type to be used for mount points.
+</summary>
+</param>
+</interface>
+<interface name="files_pid_file" lineno="92">
+<summary>
+Make the specified type usable for
+runtime process ID files.
+</summary>
+<param name="type">
+<summary>
+Type to be used for PID files.
+</summary>
+</param>
+</interface>
+<interface name="files_config_file" lineno="112">
+<summary>
+Make the specified type a
+configuration file.
+</summary>
+<param name="file_type">
+<summary>
+Type to be used as a configuration file.
+</summary>
+</param>
+</interface>
+<interface name="files_poly" lineno="128">
+<summary>
+Make the specified type a
+polyinstantiated directory.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+polyinstantiated directory.
+</summary>
+</param>
+</interface>
+<interface name="files_poly_parent" lineno="149">
+<summary>
+Make the specified type a parent
+of a polyinstantiated directory.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+parent directory.
+</summary>
+</param>
+</interface>
+<interface name="files_poly_member" lineno="170">
+<summary>
+Make the specified type a
+polyinstantiation member directory.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+member directory.
+</summary>
+</param>
+</interface>
+<interface name="files_poly_member_tmp" lineno="197">
+<summary>
+Make the domain use the specified
+type of polyinstantiated directory.
+</summary>
+<param name="domain">
+<summary>
+Domain using the polyinstantiated
+directory.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+member directory.
+</summary>
+</param>
+</interface>
+<interface name="files_security_file" lineno="218">
+<summary>
+Make the specified type a file that
+should not be dontaudited from
+browsing from user domains.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+member directory.
+</summary>
+</param>
+</interface>
+<interface name="files_tmp_file" lineno="239">
+<summary>
+Make the specified type a file
+used for temporary files.
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to be used as a
+temporary file.
+</summary>
+</param>
+</interface>
+<interface name="files_tmpfs_file" lineno="261">
+<summary>
+Transform the type into a file, for use on a
+virtual memory filesystem (tmpfs).
+</summary>
+<param name="type">
+<summary>
+The type to be transformed.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_dirs" lineno="280">
+<summary>
+Get the attributes of all directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_dirs" lineno="299">
+<summary>
+Do not audit attempts to get the attributes
+of all directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_non_security" lineno="317">
+<summary>
+List all non-security directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_list_non_security" lineno="336">
+<summary>
+Do not audit attempts to list all
+non-security directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_mounton_non_security" lineno="355">
+<summary>
+Mount a filesystem on all non-security
+directories and files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_write_non_security_dirs" lineno="374">
+<summary>
+Allow attempts to modify any directory
+</summary>
+<param name="domain">
+<summary>
+Domain to allow
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_files" lineno="392">
+<summary>
+Get the attributes of all files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_files" lineno="412">
+<summary>
+Do not audit attempts to get the attributes
+of all files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_files" lineno="431">
+<summary>
+Do not audit attempts to get the attributes
+of non security files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_files" lineno="449">
+<summary>
+Read all files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_execmod_all_files" lineno="481">
+<summary>
+Allow shared library text relocations in all files.
+</summary>
+<desc>
+<p>
+Allow shared library text relocations in all files.
+</p>
+<p>
+This is added to support WINE in the targeted
+policy.  It has no effect on the strict policy.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_non_security_files" lineno="504">
+<summary>
+Read all non-security files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_all_dirs_except" lineno="530">
+<summary>
+Read all directories on the filesystem, except
+the listed exceptions.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain perfoming this action.
+</summary>
+</param>
+<param name="exception_types" optional="true">
+<summary>
+The types to be excluded.  Each type or attribute
+must be negated by the caller.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_files_except" lineno="555">
+<summary>
+Read all files on the filesystem, except
+the listed exceptions.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain perfoming this action.
+</summary>
+</param>
+<param name="exception_types" optional="true">
+<summary>
+The types to be excluded.  Each type or attribute
+must be negated by the caller.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_symlinks_except" lineno="580">
+<summary>
+Read all symbolic links on the filesystem, except
+the listed exceptions.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain perfoming this action.
+</summary>
+</param>
+<param name="exception_types" optional="true">
+<summary>
+The types to be excluded.  Each type or attribute
+must be negated by the caller.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_symlinks" lineno="598">
+<summary>
+Get the attributes of all symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_symlinks" lineno="617">
+<summary>
+Do not audit attempts to get the attributes
+of all symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_read_all_symlinks" lineno="635">
+<summary>
+Do not audit attempts to read all symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_symlinks" lineno="654">
+<summary>
+Do not audit attempts to get the attributes
+of non security symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_blk_files" lineno="673">
+<summary>
+Do not audit attempts to get the attributes
+of non security block devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_chr_files" lineno="692">
+<summary>
+Do not audit attempts to get the attributes
+of non security character devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_symlinks" lineno="711">
+<summary>
+Read all symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_getattr_all_pipes" lineno="730">
+<summary>
+Get the attributes of all named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_pipes" lineno="750">
+<summary>
+Do not audit attempts to get the attributes
+of all named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_pipes" lineno="769">
+<summary>
+Do not audit attempts to get the attributes
+of non security named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_sockets" lineno="787">
+<summary>
+Get the attributes of all named sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_sockets" lineno="807">
+<summary>
+Do not audit attempts to get the attributes
+of all named sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_non_security_sockets" lineno="826">
+<summary>
+Do not audit attempts to get the attributes
+of non security named sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_blk_files" lineno="844">
+<summary>
+Read all block nodes with file types.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_chr_files" lineno="862">
+<summary>
+Read all character nodes with file types.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_relabel_all_files" lineno="888">
+<summary>
+Relabel all files on the filesystem, except
+the listed exceptions.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain perfoming this action.
+</summary>
+</param>
+<param name="exception_types" optional="true">
+<summary>
+The types to be excluded.  Each type or attribute
+must be negated by the caller.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_manage_all_files" lineno="924">
+<summary>
+Manage all files on the filesystem, except
+the listed exceptions.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain perfoming this action.
+</summary>
+</param>
+<param name="exception_types" optional="true">
+<summary>
+The types to be excluded.  Each type or attribute
+must be negated by the caller.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_search_all" lineno="951">
+<summary>
+Search the contents of all directories on
+extended attribute filesystems.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_all" lineno="970">
+<summary>
+List the contents of all directories on
+extended attribute filesystems.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_all_dirs" lineno="990">
+<summary>
+Do not audit attempts to search the
+contents of any directories on extended
+attribute filesystems.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_file_type_fs" lineno="1013">
+<summary>
+Get the attributes of all filesystems
+with the type of a file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_relabelto_all_file_type_fs" lineno="1031">
+<summary>
+Relabel a filesystem to the type of a file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_mount_all_file_type_fs" lineno="1049">
+<summary>
+Mount all filesystems with the type of a file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_unmount_all_file_type_fs" lineno="1067">
+<summary>
+Unmount all filesystems with the type of a file.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_mounton_all_mountpoints" lineno="1085">
+<summary>
+Mount a filesystem on all mount points.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_all_mountpoints" lineno="1104">
+<summary>
+Get the attributes of all mount points.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_root" lineno="1122">
+<summary>
+List the contents of the root directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_root_filetrans" lineno="1152">
+<summary>
+Create an object in the root directory, with a private
+type using a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_read_root_files" lineno="1171">
+<summary>
+Do not audit attempts to read files in
+the root directory.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_rw_root_files" lineno="1190">
+<summary>
+Do not audit attempts to read or write
+files in the root directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_rw_root_chr_files" lineno="1209">
+<summary>
+Do not audit attempts to read or write
+character device nodes in the root directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_delete_root_dir_entry" lineno="1227">
+<summary>
+Remove entries from the root directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_unmount_rootfs" lineno="1245">
+<summary>
+Unmount a rootfs filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_boot_dirs" lineno="1263">
+<summary>
+Get attributes of the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_boot_dirs" lineno="1282">
+<summary>
+Do not audit attempts to get attributes
+of the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_search_boot" lineno="1300">
+<summary>
+Search the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_boot" lineno="1318">
+<summary>
+Do not audit attempts to search the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_create_boot_dirs" lineno="1336">
+<summary>
+Create directories in /boot
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_boot_filetrans" lineno="1365">
+<summary>
+Create a private type object in boot
+with an automatic type transition
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private_type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_boot_files" lineno="1385">
+<summary>
+Create, read, write, and delete files
+in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_relabelfrom_boot_files" lineno="1403">
+<summary>
+Relabel from files in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_boot_symlinks" lineno="1422">
+<summary>
+Read and write symbolic links
+in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_boot_symlinks" lineno="1442">
+<summary>
+Create, read, write, and delete symbolic links
+in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_kernel_img" lineno="1460">
+<summary>
+Read kernel files in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_create_kernel_img" lineno="1481">
+<summary>
+Install a kernel into the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_delete_kernel" lineno="1501">
+<summary>
+Delete a kernel from /boot.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_getattr_default_dirs" lineno="1519">
+<summary>
+Getattr of directories with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_default_dirs" lineno="1538">
+<summary>
+Do not audit attempts to get the attributes of
+directories with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_search_default" lineno="1556">
+<summary>
+Search the contents of directories with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_default" lineno="1574">
+<summary>
+List contents of directories with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_list_default" lineno="1593">
+<summary>
+Do not audit attempts to list contents of
+directories with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_mounton_default" lineno="1611">
+<summary>
+Mount a filesystem on a directory with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_default_files" lineno="1630">
+<summary>
+Do not audit attempts to get the attributes of
+files with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_default_files" lineno="1648">
+<summary>
+Read files with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_read_default_files" lineno="1667">
+<summary>
+Do not audit attempts to read files
+with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_default_symlinks" lineno="1685">
+<summary>
+Read symbolic links with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_default_sockets" lineno="1703">
+<summary>
+Read sockets with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_default_pipes" lineno="1721">
+<summary>
+Read named pipes with the default file type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_etc" lineno="1739">
+<summary>
+Search the contents of /etc directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_setattr_etc_dirs" lineno="1757">
+<summary>
+Set the attributes of the /etc directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_etc" lineno="1775">
+<summary>
+List the contents of /etc directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_etc_dirs" lineno="1793">
+<summary>
+Add and remove entries from /etc directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_etc_files" lineno="1811">
+<summary>
+Read generic files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_write_etc_files" lineno="1831">
+<summary>
+Do not audit attempts to write generic files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_etc_files" lineno="1850">
+<summary>
+Read and write generic files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_manage_etc_files" lineno="1872">
+<summary>
+Create, read, write, and delete generic
+files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_delete_etc_files" lineno="1891">
+<summary>
+Delete system configuration files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_exec_etc_files" lineno="1909">
+<summary>
+Execute generic files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_relabel_etc_files" lineno="1929">
+<summary>
+Relabel from and to generic files in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_etc_symlinks" lineno="1948">
+<summary>
+Read symbolic links in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_etc_symlinks" lineno="1966">
+<summary>
+Create, read, write, and delete symbolic links in /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_etc_filetrans" lineno="1995">
+<summary>
+Create objects in /etc with a private
+type using a type_transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+Private file type.
+</summary>
+</param>
+<param name="class">
+<summary>
+Object classes to be created.
+</summary>
+</param>
+</interface>
+<interface name="files_create_boot_flag" lineno="2020">
+<summary>
+Create a boot flag.
+</summary>
+<desc>
+<p>
+Create a boot flag, such as
+/.autorelabel and /.autofsck.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_etc_runtime_files" lineno="2041">
+<summary>
+Read files in /etc that are dynamically
+created on boot, such as mtab.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_dontaudit_read_etc_runtime_files" lineno="2063">
+<summary>
+Do not audit attempts to read files
+in /etc that are dynamically
+created on boot, such as mtab.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_etc_runtime_files" lineno="2083">
+<summary>
+Read and write files in /etc that are dynamically
+created on boot, such as mtab.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_manage_etc_runtime_files" lineno="2105">
+<summary>
+Create, read, write, and delete files in
+/etc that are dynamically created on boot,
+such as mtab.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_etc_filetrans_etc_runtime" lineno="2129">
+<summary>
+Create, etc runtime objects with an automatic
+type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="object">
+<summary>
+The class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_isid_type_dirs" lineno="2148">
+<summary>
+Getattr of directories on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_isid_type_dirs" lineno="2167">
+<summary>
+Do not audit attempts to search directories on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_isid_type_dirs" lineno="2186">
+<summary>
+List the contents of directories on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_isid_type_dirs" lineno="2205">
+<summary>
+Read and write directories on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_isid_type_dirs" lineno="2224">
+<summary>
+Create, read, write, and delete directories
+on new filesystems that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_mounton_isid_type_dirs" lineno="2243">
+<summary>
+Mount a filesystem on a directory on new filesystems
+that has not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_isid_type_files" lineno="2262">
+<summary>
+Read files on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_isid_type_files" lineno="2281">
+<summary>
+Create, read, write, and delete files
+on new filesystems that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_isid_type_symlinks" lineno="2300">
+<summary>
+Create, read, write, and delete symbolic links
+on new filesystems that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_isid_type_blk_files" lineno="2319">
+<summary>
+Read and write block device nodes on new filesystems
+that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_isid_type_blk_files" lineno="2338">
+<summary>
+Create, read, write, and delete block device nodes
+on new filesystems that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_isid_type_chr_files" lineno="2357">
+<summary>
+Create, read, write, and delete character device nodes
+on new filesystems that have not yet been labeled.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_home_dir" lineno="2376">
+<summary>
+Get the attributes of the home directories root
+(/home).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_home_dir" lineno="2396">
+<summary>
+Do not audit attempts to get the
+attributes of the home directories root
+(/home).
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_search_home" lineno="2414">
+<summary>
+Search home directories root (/home).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_home" lineno="2433">
+<summary>
+Do not audit attempts to search
+home directories root (/home).
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_list_home" lineno="2452">
+<summary>
+Do not audit attempts to list
+home directories root (/home).
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_home" lineno="2470">
+<summary>
+Get listing of home directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_home_filetrans" lineno="2498">
+<summary>
+Create objects in /home.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="home_type">
+<summary>
+The private type.
+</summary>
+</param>
+<param name="object">
+<summary>
+The class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_lost_found_dirs" lineno="2516">
+<summary>
+Get the attributes of lost+found directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_lost_found_dirs" lineno="2535">
+<summary>
+Do not audit attempts to get the attributes of
+lost+found directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_lost_found" lineno="2555">
+<summary>
+Create, read, write, and delete objects in
+lost+found directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_search_mnt" lineno="2577">
+<summary>
+Search the contents of /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_mnt" lineno="2595">
+<summary>
+Do not audit attempts to search /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_mnt" lineno="2613">
+<summary>
+List the contents of /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_mounton_mnt" lineno="2631">
+<summary>
+Mount a filesystem on /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_mnt_dirs" lineno="2650">
+<summary>
+Create, read, write, and delete directories in /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_manage_mnt_files" lineno="2668">
+<summary>
+Create, read, write, and delete files in /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_mnt_symlinks" lineno="2686">
+<summary>
+Create, read, write, and delete symbolic links in /mnt.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_kernel_modules" lineno="2704">
+<summary>
+Search the contents of the kernel module directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_kernel_modules" lineno="2722">
+<summary>
+List the contents of the kernel module directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_kernel_modules" lineno="2740">
+<summary>
+Get the attributes of kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_kernel_modules" lineno="2758">
+<summary>
+Read kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_write_kernel_modules" lineno="2778">
+<summary>
+Write kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_delete_kernel_modules" lineno="2797">
+<summary>
+Delete kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_kernel_modules" lineno="2817">
+<summary>
+Create, read, write, and delete
+kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_relabel_kernel_modules" lineno="2835">
+<summary>
+Relabel from and to kernel module files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_kernel_modules_filetrans" lineno="2865">
+<summary>
+Create objects in the kernel module directories
+with a private type via an automatic type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private_type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_list_world_readable" lineno="2884">
+<summary>
+List world-readable directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_world_readable_files" lineno="2903">
+<summary>
+Read world-readable files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_world_readable_symlinks" lineno="2922">
+<summary>
+Read world-readable symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_world_readable_pipes" lineno="2940">
+<summary>
+Read world-readable named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_world_readable_sockets" lineno="2958">
+<summary>
+Read world-readable sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_associate_tmp" lineno="2978">
+<summary>
+Allow the specified type to associate
+to a filesystem with the type of the
+temporary directory (/tmp).
+</summary>
+<param name="file_type">
+<summary>
+Type of the file to associate.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_tmp_dirs" lineno="2996">
+<summary>
+Get the	attributes of the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_tmp_dirs" lineno="3015">
+<summary>
+Do not audit attempts to get the
+attributes of the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_tmp" lineno="3033">
+<summary>
+Search the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_tmp" lineno="3051">
+<summary>
+Do not audit attempts to search the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_tmp" lineno="3069">
+<summary>
+Read the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_list_tmp" lineno="3087">
+<summary>
+Do not audit listing of the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain not to audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_generic_tmp_files" lineno="3105">
+<summary>
+Read files in the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_generic_tmp_files" lineno="3123">
+<summary>
+Manage temporary files and directories in /tmp.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="files_read_generic_tmp_symlinks" lineno="3141">
+<summary>
+Read symbolic links in the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_generic_tmp_sockets" lineno="3159">
+<summary>
+Read and write generic named sockets in the tmp directory (/tmp).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_setattr_all_tmp_dirs" lineno="3177">
+<summary>
+Set the attributes of all tmp directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_all_tmp_files" lineno="3196">
+<summary>
+Do not audit attempts to get the attributes
+of all tmp files.
+</summary>
+<param name="domain">
+<summary>
+Domain not to audit.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_tmp_files" lineno="3214">
+<summary>
+Read all tmp files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_tmp_filetrans" lineno="3243">
+<summary>
+Create an object in the tmp directories, with a private
+type using a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_purge_tmp" lineno="3261">
+<summary>
+Delete the contents of /tmp.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_usr" lineno="3284">
+<summary>
+Search the content of /etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_usr" lineno="3303">
+<summary>
+List the contents of generic
+directories in /usr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_usr_files" lineno="3321">
+<summary>
+Get the attributes of files in /usr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_usr_files" lineno="3339">
+<summary>
+Read generic files in /usr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_exec_usr_files" lineno="3359">
+<summary>
+Execute generic programs in /usr in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_relabelto_usr_files" lineno="3379">
+<summary>
+Relabel a file to the type used in /usr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_usr_symlinks" lineno="3397">
+<summary>
+Read symbolic links in /usr.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_usr_filetrans" lineno="3425">
+<summary>
+Create objects in the /usr directory
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+The type of the object to be created
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_src" lineno="3443">
+<summary>
+Do not audit attempts to search /usr/src.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_usr_src_files" lineno="3461">
+<summary>
+Get the attributes of files in /usr/src.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_usr_src_files" lineno="3482">
+<summary>
+Read files in /usr/src.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_exec_usr_src_files" lineno="3503">
+<summary>
+Execute programs in /usr/src in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_create_kernel_symbol_table" lineno="3523">
+<summary>
+Install a system.map into the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_kernel_symbol_table" lineno="3542">
+<summary>
+Read system.map in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_delete_kernel_symbol_table" lineno="3561">
+<summary>
+Delete a system.map in the /boot directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_var" lineno="3580">
+<summary>
+Search the contents of /var.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_write_var_dirs" lineno="3598">
+<summary>
+Do not audit attempts to write to /var.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_write_var_dirs" lineno="3616">
+<summary>
+Allow attempts to write to /var.dirs
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_var" lineno="3635">
+<summary>
+Do not audit attempts to search
+the contents of /var.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_var" lineno="3653">
+<summary>
+List the contents of /var.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_var_dirs" lineno="3672">
+<summary>
+Create, read, write, and delete directories
+in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_var_files" lineno="3690">
+<summary>
+Read files in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_var_files" lineno="3708">
+<summary>
+Read and write files in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_var_files" lineno="3726">
+<summary>
+Create, read, write, and delete files in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_var_symlinks" lineno="3744">
+<summary>
+Read symbolic links in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_var_symlinks" lineno="3763">
+<summary>
+Create, read, write, and delete symbolic
+links in the /var directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_var_filetrans" lineno="3791">
+<summary>
+Create objects in the /var directory
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+The type of the object to be created
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_var_lib_dirs" lineno="3809">
+<summary>
+Get the attributes of the /var/lib directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_var_lib" lineno="3827">
+<summary>
+Search the /var/lib directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_list_var_lib" lineno="3845">
+<summary>
+List the contents of the /var/lib directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_var_lib_filetrans" lineno="3873">
+<summary>
+Create objects in the /var/lib directory
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file_type">
+<summary>
+The type of the object to be created
+</summary>
+</param>
+<param name="object_class">
+<summary>
+The object class.
+</summary>
+</param>
+</interface>
+<interface name="files_read_var_lib_files" lineno="3892">
+<summary>
+Read generic files in /var/lib.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_var_lib_symlinks" lineno="3911">
+<summary>
+Read generic symbolic links in /var/lib
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_urandom_seed" lineno="3933">
+<summary>
+Create, read, write, and delete the
+pseudorandom number generator seed.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_mounttab" lineno="3953">
+<summary>
+Allow domain to manage mount tables
+necessary for rpcd, nfsd, etc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_locks" lineno="3972">
+<summary>
+Search the locks directory (/var/lock).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_locks" lineno="3991">
+<summary>
+Do not audit attempts to search the
+locks directory (/var/lock).
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_lock_dirs" lineno="4010">
+<summary>
+Add and remove entries in the /var/lock
+directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_getattr_generic_locks" lineno="4028">
+<summary>
+Get the attributes of generic lock files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_generic_locks" lineno="4049">
+<summary>
+Create, read, write, and delete generic
+lock files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_delete_all_locks" lineno="4069">
+<summary>
+Delete all lock files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_read_all_locks" lineno="4088">
+<summary>
+Read all lock files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_lock_filetrans" lineno="4121">
+<summary>
+Create an object in the locks directory, with a private
+type using a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_getattr_pid_dirs" lineno="4141">
+<summary>
+Do not audit attempts to get the attributes
+of the /var/run directory.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_search_pids" lineno="4160">
+<summary>
+Search the contents of runtime process
+ID directories (/var/run).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_pids" lineno="4179">
+<summary>
+Do not audit attempts to search
+the /var/run directory.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_pids" lineno="4198">
+<summary>
+List the contents of the runtime process
+ID directories (/var/run).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_pid_filetrans" lineno="4227">
+<summary>
+Create an object in the process ID directory, with a private
+type using a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="private type">
+<summary>
+The type of the object to be created.
+</summary>
+</param>
+<param name="object">
+<summary>
+The object class of the object being created.
+</summary>
+</param>
+</interface>
+<interface name="files_rw_generic_pids" lineno="4246">
+<summary>
+Read and write generic process ID files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_write_all_pids" lineno="4265">
+<summary>
+Do not audit attempts to write to daemon runtime data files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_ioctl_all_pids" lineno="4283">
+<summary>
+Do not audit attempts to ioctl daemon runtime data files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_all_pids" lineno="4302">
+<summary>
+Read all process ID files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_mounton_all_poly_members" lineno="4323">
+<summary>
+Mount filesystems on all polyinstantiation
+member directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_delete_all_pids" lineno="4342">
+<summary>
+Delete all process IDs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="files_delete_all_pid_dirs" lineno="4366">
+<summary>
+Delete all process ID directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_search_spool" lineno="4387">
+<summary>
+Search the contents of generic spool
+directories (/var/spool).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_dontaudit_search_spool" lineno="4406">
+<summary>
+Do not audit attempts to search generic
+spool directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="files_list_spool" lineno="4425">
+<summary>
+List the contents of generic spool
+(/var/spool) directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_generic_spool_dirs" lineno="4444">
+<summary>
+Create, read, write, and delete generic
+spool directories (/var/spool).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_read_generic_spool" lineno="4463">
+<summary>
+Read generic spool files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_generic_spool" lineno="4483">
+<summary>
+Create, read, write, and delete generic
+spool files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_spool_filetrans" lineno="4503">
+<summary>
+Create objects in the spool directory
+with a private type with a type transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_polyinstantiate_all" lineno="4523">
+<summary>
+Allow access to manage all polyinstantiated
+directories on the system.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_unconfined" lineno="4566">
+<summary>
+Unconfined access to files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="files_manage_non_security_dirs" lineno="4584">
+<summary>
+Allow attempts to monage any directory
+</summary>
+<param name="domain">
+<summary>
+Domain to allow
+</summary>
+</param>
+</interface>
+</module>

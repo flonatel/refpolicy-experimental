@@ -1,10 +1,19 @@
 
-policy_module(netutils,1.2.0)
+policy_module(netutils,1.4.0)
 
 ########################################
 #
 # Declarations
 #
+
+ifdef(`strict_policy',`
+## <desc>
+## <p>
+## Control users use of ping and traceroute
+## </p>
+## </desc>
+gen_tunable(user_ping,false)
+')
 
 type netutils_t;
 type netutils_exec_t;
@@ -37,8 +46,8 @@ allow netutils_t self:packet_socket create_socket_perms;
 allow netutils_t self:udp_socket create_socket_perms;
 allow netutils_t self:tcp_socket create_stream_socket_perms;
 
-allow netutils_t netutils_tmp_t:dir create_dir_perms;
-allow netutils_t netutils_tmp_t:file create_file_perms;
+manage_dirs_pattern(netutils_t,netutils_tmp_t,netutils_tmp_t)
+manage_files_pattern(netutils_t,netutils_tmp_t,netutils_tmp_t)
 files_tmp_filetrans(netutils_t, netutils_tmp_t, { file dir })
 
 kernel_search_proc(netutils_t)
@@ -55,6 +64,8 @@ corenet_udp_sendrecv_all_ports(netutils_t)
 corenet_tcp_connect_all_ports(netutils_t)
 corenet_sendrecv_all_client_packets(netutils_t)
 corenet_udp_bind_generic_node(netutils_t)
+
+dev_read_sysfs(netutils_t)
 
 fs_getattr_xattr_fs(netutils_t)
 
@@ -87,6 +98,10 @@ optional_policy(`
 	nis_use_ypbind(netutils_t)
 ')
 
+optional_policy(`
+	xen_append_log(netutils_t)
+')
+
 ########################################
 #
 # Ping local policy
@@ -94,7 +109,6 @@ optional_policy(`
 
 allow ping_t self:capability { setuid net_raw };
 dontaudit ping_t self:capability sys_tty_config;
-
 allow ping_t self:tcp_socket create_socket_perms;
 allow ping_t self:rawip_socket { create ioctl read write bind getopt setopt };
 allow ping_t self:packet_socket { create ioctl read write bind getopt setopt };
@@ -116,10 +130,10 @@ files_dontaudit_search_var(ping_t)
 libs_use_ld_so(ping_t)
 libs_use_shared_libs(ping_t)
 
+logging_send_syslog_msg(ping_t)
+
 sysnet_read_config(ping_t)
 sysnet_dns_name_resolve(ping_t)
-
-logging_send_syslog_msg(ping_t)
 
 ifdef(`hide_broken_symptoms',`
 	init_dontaudit_use_fds(ping_t)

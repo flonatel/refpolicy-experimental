@@ -1,0 +1,3 @@
+<module name="rdisc" filename="policy/modules/services/rdisc.if">
+<summary>Network router discovery daemon</summary>
+</module>

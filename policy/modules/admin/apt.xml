@@ -1,0 +1,95 @@
+<module name="apt" filename="policy/modules/admin/apt.if">
+<summary>APT advanced package toll.</summary>
+<interface name="apt_domtrans" lineno="13">
+<summary>
+Execute apt programs in the apt domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_run" lineno="44">
+<summary>
+Execute apt programs in the apt domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to allow the apt domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the apt domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apt_use_fds" lineno="65">
+<summary>
+Inherit and use file descriptors from apt.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_read_pipes" lineno="84">
+<summary>
+Read from an unnamed apt pipe.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_rw_pipes" lineno="103">
+<summary>
+Read and write an unnamed apt pipe.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_read_db" lineno="122">
+<summary>
+Read the apt package database.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_manage_db" lineno="143">
+<summary>
+Create, read, write, and delete the apt package database.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="apt_dontaudit_manage_db" lineno="166">
+<summary>
+Do not audit attempts to create, read,
+write, and delete the apt package database.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+</module>

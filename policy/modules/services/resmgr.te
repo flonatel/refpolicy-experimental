@@ -1,5 +1,5 @@
 
-policy_module(resmgr,1.0.0)
+policy_module(resmgr,1.1.0)
 
 ########################################
 #
@@ -29,7 +29,7 @@ allow resmgrd_t resmgrd_etc_t:file { getattr read };
 files_search_etc(resmgrd_t)
 
 allow resmgrd_t resmgrd_var_run_t:file manage_file_perms;
-allow resmgrd_t resmgrd_var_run_t:sock_file manage_file_perms;
+allow resmgrd_t resmgrd_var_run_t:sock_file manage_sock_file_perms;
 files_pid_filetrans(resmgrd_t,resmgrd_var_run_t,{ file sock_file })
 
 kernel_list_proc(resmgrd_t)
@@ -51,11 +51,6 @@ storage_raw_read_removable_device(resmgrd_t)
 # not sure if it needs write access, needs to be investigated further...
 storage_write_scsi_generic(resmgrd_t)
 storage_raw_write_removable_device(resmgrd_t)
-
-term_dontaudit_use_console(resmgrd_t)
-
-init_use_fds(resmgrd_t)
-init_use_script_ptys(resmgrd_t)
 
 libs_use_ld_so(resmgrd_t)
 libs_use_shared_libs(resmgrd_t)

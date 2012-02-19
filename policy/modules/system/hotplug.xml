@@ -1,0 +1,99 @@
+<module name="hotplug" filename="policy/modules/system/hotplug.if">
+<summary>
+Policy for hotplug system, for supporting the
+connection and disconnection of devices at runtime.
+</summary>
+<interface name="hotplug_domtrans" lineno="16">
+<summary>
+Execute hotplug with a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_exec" lineno="35">
+<summary>
+Execute hotplug in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_use_fds" lineno="54">
+<summary>
+Inherit and use hotplug file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_dontaudit_use_fds" lineno="73">
+<summary>
+Do not audit attempts to inherit
+hotplug file descriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_dontaudit_search_config" lineno="92">
+<summary>
+Do not audit attempts to search the
+hotplug configuration directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_getattr_config_dirs" lineno="110">
+<summary>
+Get the attributes of the hotplug configuration directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_search_config" lineno="128">
+<summary>
+Search the hotplug configuration directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="hotplug_read_config" lineno="147">
+<summary>
+Read the configuration files for hotplug.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="hotplug_search_pids" lineno="168">
+<summary>
+Search the hotplug PIDs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,3 @@
+<module name="fetchmail" filename="policy/modules/services/fetchmail.if">
+<summary>Remote-mail retrieval and forwarding utility</summary>
+</module>

@@ -1,0 +1,13 @@
+<module name="nx" filename="policy/modules/services/nx.if">
+<summary>NX remote desktop</summary>
+<interface name="nx_spec_domtrans_server" lineno="13">
+<summary>
+Transition to NX server.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

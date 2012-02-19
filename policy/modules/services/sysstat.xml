@@ -1,0 +1,14 @@
+<module name="sysstat" filename="policy/modules/services/sysstat.if">
+<summary>Policy for sysstat. Reports on various system states</summary>
+<interface name="sysstat_manage_log" lineno="14">
+<summary>
+Manage sysstat logs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

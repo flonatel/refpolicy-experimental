@@ -1,0 +1,15 @@
+<module name="openvpn" filename="policy/modules/services/openvpn.if">
+<summary>full-featured SSL VPN solution</summary>
+<interface name="openvpn_read_config" lineno="15">
+<summary>
+Allow the specified domain to read
+OpenVPN configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+</module>

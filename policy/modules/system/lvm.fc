@@ -4,6 +4,13 @@
 # for this policy to work (unless you have no separate /var)
 
 #
+# /bin
+#
+ifdef(`distro_gentoo',`
+/bin/cryptsetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+')
+
+#
 # /etc
 #
 /etc/lvm(/.*)?			gen_context(system_u:object_r:lvm_etc_t,s0)
@@ -88,3 +95,4 @@
 /var/cache/multipathd(/.*)?	gen_context(system_u:object_r:lvm_metadata_t,s0)
 /var/lock/lvm(/.*)?		gen_context(system_u:object_r:lvm_lock_t,s0)
 /var/run/multipathd.sock -s	gen_context(system_u:object_r:lvm_var_run_t,s0)
+/var/lib/multipath(/.*)?	gen_context(system_u:object_r:lvm_var_lib_t,s0)

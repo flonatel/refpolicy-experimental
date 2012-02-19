@@ -1,0 +1,3 @@
+<module name="timidity" filename="policy/modules/services/timidity.if">
+<summary>MIDI to WAV converter and player configured as a service</summary>
+</module>

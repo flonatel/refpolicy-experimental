@@ -40,6 +40,7 @@ ifdef(`distro_gentoo',`
 /usr/share/ghostscript/fonts(/.*)? gen_context(system_u:object_r:fonts_t,s0)
 /usr/share/locale(/.*)?		gen_context(system_u:object_r:locale_t,s0)
 /usr/share/man(/.*)?		gen_context(system_u:object_r:man_t,s0)
+/usr/share/X11/locale(/.*)?	gen_context(system_u:object_r:locale_t,s0)
 /usr/share/zoneinfo(/.*)?	gen_context(system_u:object_r:locale_t,s0)
 
 /usr/share/ssl/certs(/.*)?	gen_context(system_u:object_r:cert_t,s0)
@@ -72,4 +73,9 @@ ifdef(`distro_redhat',`
 ifdef(`distro_debian',`
 /var/lib/msttcorefonts(/.*)?	gen_context(system_u:object_r:fonts_t,s0)
 /var/lib/usbutils(/.*)?		gen_context(system_u:object_r:hwdata_t,s0)
+')
+
+ifdef(`distro_redhat',`
+/var/empty/sshd/etc/localtime -- gen_context(system_u:object_r:locale_t,s0)
+/var/spool/postfix/etc/localtime -- gen_context(system_u:object_r:locale_t,s0)
 ')

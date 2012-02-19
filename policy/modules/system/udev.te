@@ -1,5 +1,5 @@
 
-policy_module(udev,1.4.0)
+policy_module(udev,1.6.0)
 
 ########################################
 #
@@ -44,8 +44,8 @@ dontaudit udev_t self:capability sys_tty_config;
 allow udev_t self:process ~{ setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow udev_t self:process { execmem setfscreate };
 allow udev_t self:fd use;
-allow udev_t self:fifo_file rw_file_perms;
-allow udev_t self:sock_file r_file_perms;
+allow udev_t self:fifo_file rw_fifo_file_perms;
+allow udev_t self:sock_file read_file_perms;
 allow udev_t self:shm create_shm_perms;
 allow udev_t self:sem create_sem_perms;
 allow udev_t self:msgq create_msgq_perms;
@@ -59,17 +59,16 @@ allow udev_t self:rawip_socket create_socket_perms;
 allow udev_t udev_exec_t:file write;
 can_exec(udev_t, udev_exec_t)
 
-allow udev_t udev_helper_exec_t:dir r_dir_perms;
+allow udev_t udev_helper_exec_t:dir list_dir_perms;
 
 # read udev config
-allow udev_t udev_etc_t:file r_file_perms;
+allow udev_t udev_etc_t:file read_file_perms;
 
 # create udev database in /dev/.udevdb
-allow udev_t udev_tbl_t:file create_file_perms;
+allow udev_t udev_tbl_t:file manage_file_perms;
 dev_filetrans(udev_t,udev_tbl_t,file)
 
-allow udev_t udev_var_run_t:file create_file_perms;
-allow udev_t udev_var_run_t:dir rw_dir_perms;
+manage_files_pattern(udev_t,udev_var_run_t,udev_var_run_t)
 files_pid_filetrans(udev_t,udev_var_run_t,file)
 
 kernel_read_system_state(udev_t)
@@ -123,7 +122,6 @@ auth_read_pam_console_data(udev_t)
 auth_domtrans_pam_console(udev_t)
 auth_use_nsswitch(udev_t)
 
-init_use_fds(udev_t)
 init_read_utmp(udev_t)
 init_dontaudit_write_utmp(udev_t)
 
@@ -136,6 +134,8 @@ logging_send_syslog_msg(udev_t)
 miscfiles_read_localization(udev_t)
 
 modutils_domtrans_insmod(udev_t)
+# read modules.inputmap:
+modutils_read_module_deps(udev_t)
 
 seutil_read_config(udev_t)
 seutil_read_default_contexts(udev_t)
@@ -148,6 +148,12 @@ sysnet_domtrans_dhcpc(udev_t)
 userdom_use_sysadm_ttys(udev_t)
 userdom_dontaudit_search_all_users_home_content(udev_t)
 
+ifdef(`distro_gentoo',`
+	# during boot, init scripts use /dev/.rcsysinit
+	# existance to determine if we are in early booting
+	init_getattr_script_status_files(udev_t)
+')
+
 ifdef(`distro_redhat',`
 	fs_manage_tmpfs_dirs(udev_t)
 	fs_manage_tmpfs_files(udev_t)
@@ -158,6 +164,8 @@ ifdef(`distro_redhat',`
 	fs_relabel_tmpfs_blk_file(udev_t)
 	fs_relabel_tmpfs_chr_file(udev_t)
 
+	term_search_ptys(udev_t)
+
 	# for arping used for static IP addresses on PCMCIA ethernet
 	netutils_domtrans(udev_t)
 ')
@@ -165,8 +173,6 @@ ifdef(`distro_redhat',`
 ifdef(`targeted_policy',`
 	term_dontaudit_use_unallocated_ttys(udev_t)
 	term_dontaudit_use_generic_ptys(udev_t)
-
-	unconfined_domain(udev_t)
 ')
 
 optional_policy(`
@@ -183,6 +189,8 @@ optional_policy(`
 
 optional_policy(`
 	hotplug_read_config(udev_t)
+	# usb.agent searches /var/run/usb
+	hotplug_search_pids(udev_t)
 ')
 
 optional_policy(`

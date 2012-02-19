@@ -1,0 +1,1783 @@
+<module name="devices" filename="policy/modules/kernel/devices.if">
+<summary>
+Device nodes and interfaces for many basic system devices.
+</summary>
+<desc>
+<p>
+This module creates the device node concept and provides
+the policy for many of the device files. Notable exceptions are
+the mass storage and terminal devices that are covered by other
+modules.
+</p>
+<p>
+This module creates the concept of a device node. That is a
+char or block device file, usually in /dev. All types that
+are used to label device nodes should use the dev_node macro.
+</p>
+<p>
+Additionally, this module controls access to three things:
+<ul>
+<li>the device directories containing device nodes</li>
+<li>device nodes as a group</li>
+<li>individual access to specific device nodes covered by
+this module.</li>
+</ul>
+</p>
+</desc>
+<required val="true">
+Depended on by other required modules.
+</required>
+<interface name="dev_node" lineno="41">
+<summary>
+Make the passed in type a type appropriate for
+use on device nodes (usually files in /dev).
+</summary>
+<param name="object_type">
+<summary>
+The object type that will be used on device nodes.
+</summary>
+</param>
+</interface>
+<interface name="dev_relabel_all_dev_nodes" lineno="60">
+<summary>
+Allow full relabeling (to and from) of all device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to relabel.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="dev_list_all_dev_nodes" lineno="85">
+<summary>
+List all of the device nodes in a device directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to list device nodes.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_generic_dirs" lineno="105">
+<summary>
+Set the attributes of /dev directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_list_all_dev_nodes" lineno="123">
+<summary>
+Dontaudit attempts to list all device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit listing of device nodes.
+</summary>
+</param>
+</interface>
+<interface name="dev_add_entry_generic_dirs" lineno="141">
+<summary>
+Add entries to directories in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to add entries.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_generic_dirs" lineno="159">
+<summary>
+Create a directory in the device directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to create the directory.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_generic_dirs" lineno="178">
+<summary>
+Delete a directory in the device directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to create the directory.
+</summary>
+</param>
+</interface>
+<interface name="dev_relabel_generic_dev_dirs" lineno="196">
+<summary>
+Allow full relabeling (to and from) of directories in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to relabel.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_generic_files" lineno="214">
+<summary>
+dontaudit getattr generic files in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_generic_files" lineno="232">
+<summary>
+Read and write generic files in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_generic_files" lineno="250">
+<summary>
+Delete generic files in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_generic_files" lineno="268">
+<summary>
+Create a file in the device directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to create the files.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_generic_pipes" lineno="286">
+<summary>
+Dontaudit getattr on generic pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_generic_blk_files" lineno="304">
+<summary>
+Allow getattr on generic block devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_generic_blk_files" lineno="322">
+<summary>
+Dontaudit getattr on generic block devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_generic_blk_files" lineno="340">
+<summary>
+Dontaudit setattr on generic block devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_generic_chr_files" lineno="358">
+<summary>
+Allow read, write, and create for generic character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_generic_chr_files" lineno="376">
+<summary>
+Allow getattr for generic character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_generic_chr_files" lineno="394">
+<summary>
+Dontaudit getattr for generic character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_generic_chr_files" lineno="412">
+<summary>
+Dontaudit setattr for generic character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_generic_symlinks" lineno="431">
+<summary>
+Do not audit attempts to set the attributes
+of symbolic links in device directories (/dev).
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_generic_symlinks" lineno="449">
+<summary>
+Create symbolic links in device directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_generic_symlinks" lineno="467">
+<summary>
+Delete symbolic links in device directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_generic_symlinks" lineno="485">
+<summary>
+Create, delete, read, and write symbolic links in device directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_relabel_generic_symlinks" lineno="503">
+<summary>
+Relabel symbolic links in device directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_all_dev_nodes" lineno="521">
+<summary>
+Create, delete, read, and write device nodes in device directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_rw_generic_dev_nodes" lineno="557">
+<summary>
+Dontaudit getattr for generic device files.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_generic_blk_files" lineno="575">
+<summary>
+Create, delete, read, and write block device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_generic_chr_files" lineno="593">
+<summary>
+Create, delete, read, and write character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_filetrans" lineno="623">
+<summary>
+Create, read, and write device nodes. The node
+will be transitioned to the type provided.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="file">
+<summary>
+Type to which the created node will be transitioned.
+</summary>
+</param>
+<param name="objectclass(es)">
+<summary>
+Object class(es) (single or set including {}) for which this
+the transition will occur.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_all_blk_files" lineno="645">
+<summary>
+Getattr on all block file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="dev_dontaudit_getattr_all_blk_files" lineno="664">
+<summary>
+Dontaudit getattr on all block file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_all_chr_files" lineno="683">
+<summary>
+Getattr on all character file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="dev_dontaudit_getattr_all_chr_files" lineno="701">
+<summary>
+Dontaudit getattr on all character file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_all_blk_files" lineno="720">
+<summary>
+Setattr on all block file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="dev_setattr_all_chr_files" lineno="739">
+<summary>
+Setattr on all character file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="dev_dontaudit_read_all_blk_files" lineno="757">
+<summary>
+Dontaudit read on all block file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_read_all_chr_files" lineno="775">
+<summary>
+Dontaudit read on all character file device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_all_blk_files" lineno="793">
+<summary>
+Create all block device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_all_chr_files" lineno="811">
+<summary>
+Create all character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_all_blk_files" lineno="829">
+<summary>
+Delete all block device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_all_chr_files" lineno="847">
+<summary>
+Delete all character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rename_all_blk_files" lineno="865">
+<summary>
+Rename all block device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rename_all_chr_files" lineno="883">
+<summary>
+Rename all character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_all_blk_files" lineno="901">
+<summary>
+Read, write, create, and delete all block device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_all_chr_files" lineno="925">
+<summary>
+Read, write, create, and delete all character device files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_agp_dev" lineno="945">
+<summary>
+Getattr the agp devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_agp" lineno="963">
+<summary>
+Read and write the agp devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_apm_bios_dev" lineno="981">
+<summary>
+Get the attributes of the apm bios device node.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_apm_bios_dev" lineno="1000">
+<summary>
+Do not audit attempts to get the attributes of
+the apm bios device node.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_apm_bios_dev" lineno="1018">
+<summary>
+Set the attributes of the apm bios device node.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_apm_bios_dev" lineno="1037">
+<summary>
+Do not audit attempts to set the attributes of
+the apm bios device node.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_apm_bios" lineno="1055">
+<summary>
+Read and write the apm bios.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_cardmgr" lineno="1073">
+<summary>
+Read and write the PCMCIA card manager device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_rw_cardmgr" lineno="1092">
+<summary>
+Do not audit attempts to read and
+write the PCMCIA card manager device.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_cardmgr_dev" lineno="1111">
+<summary>
+Create, read, write, and delete
+the PCMCIA card manager device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_cardmgr_dev" lineno="1132">
+<summary>
+Create, read, write, and delete
+the PCMCIA card manager device
+with the correct type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_cpu_dev" lineno="1153">
+<summary>
+Get the attributes of the CPU
+microcode and id interfaces.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_cpuid" lineno="1171">
+<summary>
+Read the CPU identity.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_cpu_microcode" lineno="1190">
+<summary>
+Read and write the the CPU microcode device. This
+is required to load CPU microcode.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_crypto" lineno="1208">
+<summary>
+Read and write the the hardware SSL accelerator.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_dri_dev" lineno="1226">
+<summary>
+getattr the dri devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_dri_dev" lineno="1244">
+<summary>
+Setattr the dri devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_dri" lineno="1262">
+<summary>
+Read and write the dri devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_rw_dri" lineno="1280">
+<summary>
+Dontaudit read and write on the dri devices.
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_dri_dev" lineno="1298">
+<summary>
+Create, read, write, and delete the dri devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_input" lineno="1317">
+<summary>
+Read input event devices (/dev/input).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_input_dev" lineno="1335">
+<summary>
+Read input event devices (/dev/input).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_framebuffer_dev" lineno="1353">
+<summary>
+Get the attributes of the framebuffer device node.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_framebuffer_dev" lineno="1371">
+<summary>
+Set the attributes of the framebuffer device node.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_framebuffer_dev" lineno="1390">
+<summary>
+Dot not audit attempts to set the attributes
+of the framebuffer device node.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_framebuffer" lineno="1408">
+<summary>
+Read the framebuffer.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_read_framebuffer" lineno="1426">
+<summary>
+Do not audit attempts to read the framebuffer.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_framebuffer" lineno="1444">
+<summary>
+Write the framebuffer.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_framebuffer" lineno="1462">
+<summary>
+Read and write the framebuffer.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_lvm_control" lineno="1480">
+<summary>
+Read the lvm comtrol device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_lvm_control" lineno="1498">
+<summary>
+Read and write the lvm control device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_delete_lvm_control_dev" lineno="1516">
+<summary>
+Delete the lvm control device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_memory_dev" lineno="1534">
+<summary>
+dontaudit getattr raw memory devices (e.g. /dev/mem).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_raw_memory" lineno="1552">
+<summary>
+Read raw memory devices (e.g. /dev/mem).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_raw_memory" lineno="1574">
+<summary>
+Write raw memory devices (e.g. /dev/mem).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rx_raw_memory" lineno="1596">
+<summary>
+Read and execute raw memory devices (e.g. /dev/mem).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_wx_raw_memory" lineno="1615">
+<summary>
+Write and execute raw memory devices (e.g. /dev/mem).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_misc_dev" lineno="1634">
+<summary>
+Get the attributes of miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_misc_dev" lineno="1653">
+<summary>
+Do not audit attempts to get the attributes
+of miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_misc_dev" lineno="1671">
+<summary>
+Set the attributes of miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_misc_dev" lineno="1690">
+<summary>
+Do not audit attempts to set the attributes
+of miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_misc" lineno="1708">
+<summary>
+Read miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_misc" lineno="1726">
+<summary>
+Write miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_rw_misc" lineno="1744">
+<summary>
+Do not audit attempts to read and write miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_mouse_dev" lineno="1762">
+<summary>
+Get the attributes of the mouse devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_mouse_dev" lineno="1780">
+<summary>
+Set the attributes of the mouse devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_mouse" lineno="1798">
+<summary>
+Read the mouse devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_mouse" lineno="1816">
+<summary>
+Read and write to mouse devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_mtrr_dev" lineno="1835">
+<summary>
+Get the attributes of the memory type range
+registers (MTRR) device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_mtrr" lineno="1868">
+<summary>
+Read the memory type range
+registers (MTRR).  (Deprecated)
+</summary>
+<desc>
+<p>
+Read the memory type range
+registers (MTRR).  This interface has
+been deprecated, dev_rw_mtrr() should be
+used instead.
+</p>
+<p>
+The MTRR device ioctls can be used for
+reading and writing; thus, read access to the
+device cannot be separated from write access.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_mtrr" lineno="1897">
+<summary>
+Write the memory type range
+registers (MTRR).  (Deprecated)
+</summary>
+<desc>
+<p>
+Write the memory type range
+registers (MTRR).  This interface has
+been deprecated, dev_rw_mtrr() should be
+used instead.
+</p>
+<p>
+The MTRR device ioctls can be used for
+reading and writing; thus, write access to the
+device cannot be separated from read access.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_mtrr" lineno="1912">
+<summary>
+Read and write the memory type range registers (MTRR).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_null" lineno="1931">
+<summary>
+Read and write to the null device (/dev/null).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_null_dev" lineno="1949">
+<summary>
+Create the null device (/dev/null).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_nvram_dev" lineno="1968">
+<summary>
+Do not audit attempts to get the attributes
+of the BIOS non-volatile RAM device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_nvram" lineno="1986">
+<summary>
+Read and write BIOS non-volatile RAM.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_printer_dev" lineno="2004">
+<summary>
+Get the attributes of the printer device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_printer_dev" lineno="2022">
+<summary>
+Set the attributes of the printer device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_append_printer" lineno="2041">
+<summary>
+Append the printer device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_printer" lineno="2059">
+<summary>
+Read and write the printer device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_rand" lineno="2078">
+<summary>
+Read from random number generator
+devices (e.g., /dev/random)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_read_rand" lineno="2097">
+<summary>
+Do not audit attempts to read from random
+number generator devices (e.g., /dev/random)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_rand" lineno="2117">
+<summary>
+Write to the random device (e.g., /dev/random). This adds
+entropy used to generate the random data read from the
+random device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_realtime_clock" lineno="2135">
+<summary>
+Read the realtime clock (/dev/rtc).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_realtime_clock" lineno="2153">
+<summary>
+Set the realtime clock (/dev/rtc).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_realtime_clock" lineno="2173">
+<summary>
+Read and set the realtime clock (/dev/rtc).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_scanner_dev" lineno="2188">
+<summary>
+Get the attributes of the scanner device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_scanner_dev" lineno="2207">
+<summary>
+Do not audit attempts to get the attributes of
+the scanner device.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_scanner_dev" lineno="2225">
+<summary>
+Set the attributes of the scanner device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_scanner_dev" lineno="2244">
+<summary>
+Do not audit attempts to set the attributes of
+the scanner device.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_scanner" lineno="2262">
+<summary>
+Read and write the scanner device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_sound_dev" lineno="2280">
+<summary>
+Get the attributes of the sound devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_sound_dev" lineno="2298">
+<summary>
+Set the attributes of the sound devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_sound" lineno="2316">
+<summary>
+Read the sound devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_sound" lineno="2334">
+<summary>
+Write the sound devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_sound_mixer" lineno="2352">
+<summary>
+Read the sound mixer devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_sound_mixer" lineno="2370">
+<summary>
+Write the sound mixer devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_power_mgmt_dev" lineno="2388">
+<summary>
+Get the attributes of the the power management device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_power_mgmt_dev" lineno="2406">
+<summary>
+Set the attributes of the the power management device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_power_management" lineno="2424">
+<summary>
+Read and write the the power management device.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_sysfs_dirs" lineno="2442">
+<summary>
+Get the attributes of sysfs directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_search_sysfs" lineno="2460">
+<summary>
+Search the sysfs directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_search_sysfs" lineno="2478">
+<summary>
+Do not audit attempts to search sysfs.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_list_sysfs" lineno="2496">
+<summary>
+List the contents of the sysfs directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_sysfs_dirs" lineno="2515">
+<summary>
+Write in a sysfs directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_sysfs" lineno="2533">
+<summary>
+Allow caller to read hardware state information.
+</summary>
+<param name="domain">
+<summary>
+The process type reading hardware state information.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_sysfs" lineno="2554">
+<summary>
+Allow caller to modify hardware state information.
+</summary>
+<param name="domain">
+<summary>
+The process type modifying hardware state information.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_urand" lineno="2576">
+<summary>
+Read from pseudo random devices (e.g., /dev/urandom)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_read_urand" lineno="2595">
+<summary>
+Do not audit attempts to read from pseudo
+random devices (e.g., /dev/urandom)
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_urand" lineno="2614">
+<summary>
+Write to the pseudo random device (e.g., /dev/urandom). This
+sets the random number generator seed.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_generic_usb_dev" lineno="2632">
+<summary>
+Getattr generic the USB devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_generic_usb_dev" lineno="2650">
+<summary>
+Setattr generic the USB devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_generic_usb_dev" lineno="2668">
+<summary>
+Read and write generic the USB devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_mount_usbfs" lineno="2686">
+<summary>
+Mount a usbfs filesystem.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_associate_usbfs" lineno="2704">
+<summary>
+Associate a file to a usbfs filesystem.
+</summary>
+<param name="file_type">
+<summary>
+The type of the file to be associated to usbfs.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_usbfs_dirs" lineno="2722">
+<summary>
+Get the attributes of a directory in the usb filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_usbfs_dirs" lineno="2741">
+<summary>
+Do not audit attempts to get the attributes
+of a directory in the usb filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_search_usbfs" lineno="2759">
+<summary>
+Search the directory containing USB hardware information.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_list_usbfs" lineno="2777">
+<summary>
+Allow caller to get a list of usb hardware.
+</summary>
+<param name="domain">
+<summary>
+The process type getting the list.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_usbfs_files" lineno="2798">
+<summary>
+Set the attributes of usbfs filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_usbfs" lineno="2818">
+<summary>
+Read USB hardware information using
+the usbfs filesystem interface.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_usbfs" lineno="2838">
+<summary>
+Allow caller to modify usb hardware configuration files.
+</summary>
+<param name="domain">
+<summary>
+The process type modifying the options.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_video_dev" lineno="2858">
+<summary>
+Get the attributes of video4linux devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_video_dev" lineno="2877">
+<summary>
+Do not audit attempts to get the attributes
+of video4linux device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_video_dev" lineno="2895">
+<summary>
+Set the attributes of video4linux device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_setattr_video_dev" lineno="2914">
+<summary>
+Do not audit attempts to set the attributes
+of video4linux device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="dev_read_video_dev" lineno="2932">
+<summary>
+Read the video4linux devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_vmware" lineno="2950">
+<summary>
+Read and write VMWare devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rwx_vmware" lineno="2968">
+<summary>
+Read, write, and mmap VMWare devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_write_watchdog" lineno="2987">
+<summary>
+Write to watchdog devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_xen" lineno="3005">
+<summary>
+Read and write Xen devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_manage_xen" lineno="3023">
+<summary>
+Create, read, write, and delete Xen devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_filetrans_xen" lineno="3042">
+<summary>
+Automatic type transition to the type
+for xen device nodes when created in /dev.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_getattr_xserver_misc_dev" lineno="3060">
+<summary>
+Get the attributes of X server miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_setattr_xserver_misc_dev" lineno="3078">
+<summary>
+Set the attributes of X server miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_xserver_misc" lineno="3096">
+<summary>
+Read and write X server miscellaneous devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rw_zero" lineno="3114">
+<summary>
+Read and write to the zero device (/dev/zero).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_rwx_zero" lineno="3132">
+<summary>
+Read, write, and execute the zero device (/dev/zero).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_execmod_zero" lineno="3151">
+<summary>
+Execmod the zero device (/dev/zero).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_create_zero_dev" lineno="3170">
+<summary>
+Create the zero device (/dev/zero).
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_unconfined" lineno="3188">
+<summary>
+Unconfined access to devices.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

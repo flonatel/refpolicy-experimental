@@ -1,0 +1,46 @@
+<module name="rssh" filename="policy/modules/apps/rssh.if">
+<summary>Restricted (scp/sftp) only shell</summary>
+<template name="rssh_per_role_template" lineno="26">
+<summary>
+The per role template for the rssh module.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for rssh client sessions.  Derived types are also created
+for read-only and read-write file access.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+</template>
+<interface name="rssh_spec_domtrans_all_users" lineno="113">
+<summary>
+Transition to all user rssh domains.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="rssh_read_all_users_ro_content" lineno="132">
+<summary>
+Read all users rssh read-only content.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

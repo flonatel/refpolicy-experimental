@@ -1,0 +1,113 @@
+<module name="ethereal" filename="policy/modules/apps/ethereal.if">
+<summary>Ethereal packet capture tool.</summary>
+<template name="ethereal_per_role_template" lineno="35">
+<summary>
+The per role template for the ethereal module.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for ethereal packet capture tool.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="ethereal_admin_template" lineno="202">
+<summary>
+The administrative functions template for the ethereal module.
+</summary>
+<desc>
+<p>
+This template creates rules for administrating ethereal,
+allowing the specified user to manage ethereal files.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+</template>
+<template name="ethereal_domtrans_user_ethereal" lineno="244">
+<summary>
+Run ethereal in ethereal domain.
+</summary>
+<desc>
+<p>
+Run ethereal in ethereal domain.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<template name="ethereal_domtrans_tethereal" lineno="262">
+<summary>
+Run tethereal in the tethereal domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<interface name="ethereal_run_tethereal" lineno="291">
+<summary>
+Execute tethereal in the tethereal domain, and
+allow the specified role the tethereal domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the tethereal domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the tethereal domain to use.
+</summary>
+</param>
+</interface>
+</module>

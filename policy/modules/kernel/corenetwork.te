@@ -43,7 +43,7 @@
 #
 
 
-policy_module(corenetwork,1.2.0)
+policy_module(corenetwork,1.2.6)
 
 ########################################
 #
@@ -211,6 +211,21 @@ type clockspeed_port_t, port_type;
 type clockspeed_client_packet_t, packet_type, client_packet_type;
 type clockspeed_server_packet_t, packet_type, server_packet_type;
 portcon udp 4041 gen_context(system_u:object_r:clockspeed_port_t,s0)
+
+
+
+type cluster_port_t, port_type;
+type cluster_client_packet_t, packet_type, client_packet_type;
+type cluster_server_packet_t, packet_type, server_packet_type;
+portcon tcp 5149 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon udp 5149 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon tcp 40040 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon tcp 50006 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon udp 50006 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon tcp 50007 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon udp 50007 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon tcp 50008 gen_context(system_u:object_r:cluster_port_t,s0)
+portcon udp 50008 gen_context(system_u:object_r:cluster_port_t,s0)
 
 
 
@@ -615,6 +630,13 @@ portcon udp 500 gen_context(system_u:object_r:isakmp_port_t,s0)
 
 
 
+type iscsi_port_t, port_type;
+type iscsi_client_packet_t, packet_type, client_packet_type;
+type iscsi_server_packet_t, packet_type, server_packet_type;
+portcon tcp 3260 gen_context(system_u:object_r:iscsi_port_t,s0)
+
+
+
 type jabber_client_port_t, port_type;
 type jabber_client_client_packet_t, packet_type, client_packet_type;
 type jabber_client_server_packet_t, packet_type, server_packet_type;
@@ -776,6 +798,14 @@ portcon tcp 1241 gen_context(system_u:object_r:nessus_port_t,s0)
 
 
 
+type netsupport_port_t, port_type;
+type netsupport_client_packet_t, packet_type, client_packet_type;
+type netsupport_server_packet_t, packet_type, server_packet_type;
+portcon tcp 5405 gen_context(system_u:object_r:netsupport_port_t,s0)
+portcon udp 5405 gen_context(system_u:object_r:netsupport_port_t,s0)
+
+
+
 type nmbd_port_t, port_type;
 type nmbd_client_packet_t, packet_type, client_packet_type;
 type nmbd_server_packet_t, packet_type, server_packet_type;
@@ -790,11 +820,6 @@ typeattribute nmbd_port_t reserved_port_type;
 
 portcon udp 138 gen_context(system_u:object_r:nmbd_port_t,s0)
 
-typeattribute nmbd_port_t reserved_port_type;
-#bindresvport in glibc starts searching for reserved ports at 600
-
-portcon udp 139 gen_context(system_u:object_r:nmbd_port_t,s0)
-
 
 
 type ntp_port_t, port_type;
@@ -808,9 +833,17 @@ portcon udp 123 gen_context(system_u:object_r:ntp_port_t,s0)
 
 
 
+type ocsp_port_t, port_type;
+type ocsp_client_packet_t, packet_type, client_packet_type;
+type ocsp_server_packet_t, packet_type, server_packet_type;
+portcon tcp 9080 gen_context(system_u:object_r:ocsp_port_t,s0)
+
+
+
 type openvpn_port_t, port_type;
 type openvpn_client_packet_t, packet_type, client_packet_type;
 type openvpn_server_packet_t, packet_type, server_packet_type;
+portcon tcp 1194 gen_context(system_u:object_r:openvpn_port_t,s0)
 portcon udp 1194 gen_context(system_u:object_r:openvpn_port_t,s0)
 
 
@@ -958,6 +991,22 @@ portcon tcp 2703 gen_context(system_u:object_r:razor_port_t,s0)
 
 
 
+type ricci_port_t, port_type;
+type ricci_client_packet_t, packet_type, client_packet_type;
+type ricci_server_packet_t, packet_type, server_packet_type;
+portcon tcp 11111 gen_context(system_u:object_r:ricci_port_t,s0)
+portcon udp 11111 gen_context(system_u:object_r:ricci_port_t,s0)
+
+
+
+type ricci_modcluster_port_t, port_type;
+type ricci_modcluster_client_packet_t, packet_type, client_packet_type;
+type ricci_modcluster_server_packet_t, packet_type, server_packet_type;
+portcon tcp 16851 gen_context(system_u:object_r:ricci_modcluster_port_t,s0)
+portcon udp 16851 gen_context(system_u:object_r:ricci_modcluster_port_t,s0)
+
+
+
 type rlogind_port_t, port_type;
 type rlogind_client_packet_t, packet_type, client_packet_type;
 type rlogind_server_packet_t, packet_type, server_packet_type;
@@ -1028,7 +1077,7 @@ type smbd_server_packet_t, packet_type, server_packet_type;
 typeattribute smbd_port_t reserved_port_type;
 #bindresvport in glibc starts searching for reserved ports at 600
 
-portcon tcp 137-139 gen_context(system_u:object_r:smbd_port_t,s0)
+portcon tcp 139 gen_context(system_u:object_r:smbd_port_t,s0)
 
 typeattribute smbd_port_t reserved_port_type;
 #bindresvport in glibc starts searching for reserved ports at 600
@@ -1345,6 +1394,8 @@ netifcon lo gen_context(system_u:object_r:lo_netif_t,s0 - mls_systemhigh) gen_co
 
 ',`
 
+typealias netif_t alias netif_lo_t;
+
 ')
 
 
@@ -1361,4 +1412,4 @@ allow corenet_unconfined_type port_type:udp_socket { send_msg recv_msg };
 
 # Bind to any network address.
 allow corenet_unconfined_type port_type:{ tcp_socket udp_socket } name_bind;
-allow corenet_unconfined_type node_type:{ tcp_socket udp_socket } node_bind;
+allow corenet_unconfined_type node_type:{ tcp_socket udp_socket rawip_socket } node_bind;

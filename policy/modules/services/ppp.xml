@@ -1,0 +1,150 @@
+<module name="ppp" filename="policy/modules/services/ppp.if">
+<summary>Point to Point Protocol daemon creates links in ppp networks</summary>
+<interface name="ppp_use_fds" lineno="13">
+<summary>
+Use PPP file discriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_dontaudit_use_fds" lineno="32">
+<summary>
+Do not audit attempts to inherit
+and use PPP file discriptors.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="ppp_sigchld" lineno="50">
+<summary>
+Send a SIGCHLD signal to PPP.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_signal" lineno="69">
+<summary>
+Send a generic signal to PPP.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_domtrans" lineno="87">
+<summary>
+Execute domain in the ppp domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_run_cond" lineno="107">
+<summary>
+Conditionally execute ppp daemon on behalf of a user or staff type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="ppp_run" lineno="131">
+<summary>
+Unconditionally execute ppp daemon on behalf of a user or staff type.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="ppp_exec" lineno="151">
+<summary>
+Execute domain in the ppp caller.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_read_rw_config" lineno="170">
+<summary>
+Read PPP-writable configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_read_secrets" lineno="190">
+<summary>
+Read PPP secrets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_read_pid_files" lineno="210">
+<summary>
+Read PPP pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_manage_pid_files" lineno="228">
+<summary>
+Create, read, write, and delete PPP pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ppp_pid_filetrans" lineno="246">
+<summary>
+Create, read, write, and delete PPP pid files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<tunable name="pppd_can_insmod" dftval="false">
+<desc>
+<p>
+Allow pppd to load kernel modules for certain modems
+</p>
+</desc>
+</tunable>
+<tunable name="pppd_for_user" dftval="false">
+<desc>
+<p>
+Allow pppd to be run for a regular user
+</p>
+</desc>
+</tunable>
+</module>

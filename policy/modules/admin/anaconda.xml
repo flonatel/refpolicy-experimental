@@ -1,0 +1,3 @@
+<module name="anaconda" filename="policy/modules/admin/anaconda.if">
+<summary>Policy for the Anaconda installer.</summary>
+</module>

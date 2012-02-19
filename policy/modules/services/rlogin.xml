@@ -1,0 +1,13 @@
+<module name="rlogin" filename="policy/modules/services/rlogin.if">
+<summary>Remote login daemon</summary>
+<interface name="rlogin_domtrans" lineno="13">
+<summary>
+Execute rlogind in the rlogin domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

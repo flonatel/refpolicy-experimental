@@ -40,6 +40,11 @@ interface(`mta_stub',`
 #
 template(`mta_base_mail_template',`
 
+	gen_require(`
+		attribute user_mail_domain;
+		type sendmail_exec_t;
+	')
+
 	##############################
 	#
 	# $1_mail_t declarations
@@ -63,7 +68,7 @@ template(`mta_base_mail_template',`
 
 	# re-exec itself
 	can_exec($1_mail_t, sendmail_exec_t)
-	allow $1_mail_t sendmail_exec_t:lnk_file r_file_perms;
+	allow $1_mail_t sendmail_exec_t:lnk_file read_lnk_file_perms;
 
 	kernel_read_kernel_sysctls($1_mail_t)
 
@@ -76,7 +81,6 @@ template(`mta_base_mail_template',`
 	corenet_sendrecv_smtp_client_packets($1_mail_t)
 
 	corecmd_exec_bin($1_mail_t)
-	corecmd_search_sbin($1_mail_t)
 
 	files_read_etc_files($1_mail_t)
 	files_search_spool($1_mail_t)
@@ -118,17 +122,15 @@ template(`mta_base_mail_template',`
 			type etc_mail_t, mail_spool_t, mqueue_spool_t;
 		')
 
-		allow $1_mail_t $1_mail_tmp_t:dir create_dir_perms;
-		allow $1_mail_t $1_mail_tmp_t:file create_file_perms;
+		manage_dirs_pattern($1_mail_t,$1_mail_tmp_t,$1_mail_tmp_t)
+		manage_files_pattern($1_mail_t,$1_mail_tmp_t,$1_mail_tmp_t)
 		files_tmp_filetrans($1_mail_t, $1_mail_tmp_t, { file dir })
 
 		allow $1_mail_t etc_mail_t:dir { getattr search };
 
 		# Write to /var/spool/mail and /var/spool/mqueue.
-		allow $1_mail_t mail_spool_t:dir rw_dir_perms;
-		allow $1_mail_t mail_spool_t:file create_file_perms;
-		allow $1_mail_t mqueue_spool_t:dir rw_dir_perms;
-		allow $1_mail_t mqueue_spool_t:file create_file_perms;
+		manage_files_pattern($1_mail_t,mail_spool_t,mail_spool_t)
+		manage_files_pattern($1_mail_t,mqueue_spool_t,mqueue_spool_t)
 
 		# Check available space.
 		fs_getattr_xattr_fs($1_mail_t)
@@ -176,6 +178,10 @@ template(`mta_base_mail_template',`
 ## </param>
 #
 template(`mta_per_role_template',`
+	gen_require(`
+		attribute mta_user_agent;
+		attribute mailserver_delivery;
+	')
 
 	##############################
 	#
@@ -191,13 +197,8 @@ template(`mta_per_role_template',`
 	#
 
 	# Transition from the user domain to the derived domain.
-	domain_auto_trans($2, sendmail_exec_t, $1_mail_t)
+	domtrans_pattern($2, sendmail_exec_t, $1_mail_t)
 	allow $2 sendmail_exec_t:lnk_file { getattr read };
-
-	allow $2 $1_mail_t:fd use;
-	allow $1_mail_t $2:fd use;
-	allow $1_mail_t $2:fifo_file rw_file_perms;
-	allow $1_mail_t $2:process sigchld;
 
 	domain_use_interactive_fds($1_mail_t)
 
@@ -275,11 +276,11 @@ template(`mta_admin_template',`
 
 		allow mta_user_agent $2:fifo_file { read write };
 
-		allow $1_mail_t etc_aliases_t:dir create_dir_perms;
-		allow $1_mail_t etc_aliases_t:file create_file_perms;
-		allow $1_mail_t etc_aliases_t:lnk_file create_lnk_perms;
-		allow $1_mail_t etc_aliases_t:sock_file create_file_perms;
-		allow $1_mail_t etc_aliases_t:fifo_file create_file_perms;
+		manage_dirs_pattern($1_mail_t,etc_aliases_t,etc_aliases_t)
+		manage_files_pattern($1_mail_t,etc_aliases_t,etc_aliases_t)
+		manage_lnk_files_pattern($1_mail_t,etc_aliases_t,etc_aliases_t)
+		manage_fifo_files_pattern($1_mail_t,etc_aliases_t,etc_aliases_t)
+		manage_sock_files_pattern($1_mail_t,etc_aliases_t,etc_aliases_t)
 		files_etc_filetrans($1_mail_t,etc_aliases_t,{ file lnk_file sock_file fifo_file })
 
 		# postfix needs this for newaliases
@@ -390,9 +391,11 @@ interface(`mta_mailserver_delivery',`
 
 	typeattribute $1 mailserver_delivery;
 
-	allow $1 mail_spool_t:dir ra_dir_perms;
-	allow $1 mail_spool_t:file { create ioctl read getattr lock append };
-	allow $1 mail_spool_t:lnk_file { create read getattr };
+	allow $1 mail_spool_t:dir list_dir_perms;
+	create_files_pattern($1,mail_spool_t,mail_spool_t)
+	read_files_pattern($1,mail_spool_t,mail_spool_t)
+	create_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
+	read_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
 
 	optional_policy(`
 		dovecot_manage_spool($1)
@@ -449,7 +452,7 @@ interface(`mta_send_mail',`
 		type system_mail_t, sendmail_exec_t;
 	')
 
-	allow $1 sendmail_exec_t:lnk_file r_file_perms;
+	allow $1 sendmail_exec_t:lnk_file read_lnk_file_perms;
 	domain_auto_trans($1, sendmail_exec_t, system_mail_t)
 
 	allow $1 system_mail_t:fd use;
@@ -493,7 +496,7 @@ interface(`mta_sendmail_domtrans',`
 	')
 
 	files_search_usr($1)
-	corecmd_read_sbin_symlinks($1)
+	corecmd_read_bin_symlinks($1)
 	domain_auto_trans($1,sendmail_exec_t,$2)
 ')
 
@@ -533,8 +536,8 @@ interface(`mta_read_config',`
 
 	files_search_etc($1)
 	allow $1 etc_mail_t:dir list_dir_perms;
-	allow $1 etc_mail_t:file r_file_perms;
-	allow $1 etc_mail_t:lnk_file { getattr read };
+	read_files_pattern($1,etc_mail_t,etc_mail_t)
+	read_lnk_files_pattern($1,etc_mail_t,etc_mail_t)
 ')
 
 ########################################
@@ -553,7 +556,7 @@ interface(`mta_read_aliases',`
 	')
 
 	files_search_etc($1)
-	allow $1 etc_aliases_t:file r_file_perms;
+	allow $1 etc_aliases_t:file read_file_perms;
 ')
 
 ########################################
@@ -663,7 +666,7 @@ interface(`mta_getattr_spool',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir r_dir_perms;
+	allow $1 mail_spool_t:dir list_dir_perms;
 	allow $1 mail_spool_t:lnk_file read;
 	allow $1 mail_spool_t:file getattr;
 ')
@@ -717,8 +720,7 @@ interface(`mta_spool_filetrans',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir rw_dir_perms;
-	type_transition $1 mail_spool_t:$3 $2;
+	filetrans_pattern($1,mail_spool_t,$2,$3)
 ')
 
 ########################################
@@ -737,9 +739,10 @@ interface(`mta_rw_spool',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir r_dir_perms;
-	allow $1 mail_spool_t:lnk_file { getattr read };
-	allow $1 mail_spool_t:file { rw_file_perms setattr };
+	allow $1 mail_spool_t:dir list_dir_perms;
+	allow $1 mail_spool_t:file setattr;
+	rw_files_pattern($1,mail_spool_t,mail_spool_t)
+	read_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
 ')
 
 #######################################
@@ -758,9 +761,10 @@ interface(`mta_append_spool',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir ra_dir_perms;
-	allow $1 mail_spool_t:lnk_file { getattr read };
-	allow $1 mail_spool_t:file create_file_perms;
+	allow $1 mail_spool_t:dir list_dir_perms;
+	create_files_pattern($1,mail_spool_t,mail_spool_t)
+	write_files_pattern($1,mail_spool_t,mail_spool_t)
+	read_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
 ')
 
 #######################################
@@ -779,8 +783,7 @@ interface(`mta_delete_spool',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir { list_dir_perms write remove_name };
-	allow $1 mail_spool_t:file unlink;
+	delete_files_pattern($1,mail_spool_t,mail_spool_t)
 ')
 
 ########################################
@@ -799,9 +802,9 @@ interface(`mta_manage_spool',`
 	')
 
 	files_search_spool($1)
-	allow $1 mail_spool_t:dir manage_dir_perms;
-	allow $1 mail_spool_t:lnk_file create_lnk_perms;
-	allow $1 mail_spool_t:file manage_file_perms;
+	manage_dirs_pattern($1,mail_spool_t,mail_spool_t)
+	manage_files_pattern($1,mail_spool_t,mail_spool_t)
+	manage_lnk_files_pattern($1,mail_spool_t,mail_spool_t)
 ')
 
 #######################################
@@ -820,6 +823,7 @@ interface(`mta_dontaudit_rw_queue',`
 		type mqueue_spool_t;
 	')
 
+	dontaudit $1 mqueue_spool_t:dir search_dir_perms;
 	dontaudit $1 mqueue_spool_t:file { getattr read write };
 ')
 
@@ -840,8 +844,7 @@ interface(`mta_manage_queue',`
 	')
 
 	files_search_spool($1)
-	allow $1 mqueue_spool_t:dir rw_dir_perms;
-	allow $1 mqueue_spool_t:file create_file_perms;
+	manage_files_pattern($1,mqueue_spool_t,mqueue_spool_t)
 ')
 
 #######################################
@@ -860,7 +863,7 @@ interface(`mta_read_sendmail_bin',`
 		type sendmail_exec_t;
 	')
 
-	allow $1 sendmail_exec_t:file r_file_perms;
+	allow $1 sendmail_exec_t:file read_file_perms;
 ')
 
 #######################################

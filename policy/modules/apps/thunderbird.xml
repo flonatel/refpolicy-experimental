@@ -1,0 +1,60 @@
+<module name="thunderbird" filename="policy/modules/apps/thunderbird.if">
+<summary>Thunderbird email client</summary>
+<template name="thunderbird_per_role_template" lineno="35">
+<summary>
+The per role template for the thunderbird module.
+</summary>
+<desc>
+<p>
+This template creates a derived domain which is used
+for the thunderbird email client.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="thunderbird_domtrans_user_thunderbird" lineno="393">
+<summary>
+Run thunderbird in the user thunderbird domain.
+</summary>
+<desc>
+<p>
+Run thunderbird in the user thunderbird domain.
+</p>
+<p>
+This is a templated interface, and should only
+be called from a per-userdomain template.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+</module>

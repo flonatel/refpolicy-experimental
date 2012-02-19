@@ -1,0 +1,13 @@
+<module name="i18n_input" filename="policy/modules/services/i18n_input.if">
+<summary>IIIMF htt server</summary>
+<interface name="i18n_use" lineno="13">
+<summary>
+Use i18n_input over a TCP connection.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

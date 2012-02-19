@@ -1,0 +1,1383 @@
+<module name="kernel" filename="policy/modules/kernel/kernel.if">
+<summary>
+Policy for kernel threads, proc filesystem,
+and unlabeled processes and objects.
+</summary>
+<required val="true">
+This module has initial SIDs.
+</required>
+<interface name="kernel_domtrans_to" lineno="25">
+<summary>
+Allows to start userland processes
+by transitioning to the specified domain.
+</summary>
+<param name="domain">
+<summary>
+The process type entered by kernel.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The executable type for the entrypoint.
+</summary>
+</param>
+</interface>
+<interface name="kernel_ranged_domtrans_to" lineno="55">
+<summary>
+Allows to start userland processes
+by transitioning to the specified domain,
+with a range transition.
+</summary>
+<param name="domain">
+<summary>
+The process type entered by kernel.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The executable type for the entrypoint.
+</summary>
+</param>
+<param name="range">
+<summary>
+Range for the domain.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rootfs_mountpoint" lineno="83">
+<summary>
+Allows the kernel to mount filesystems on
+the specified directory type.
+</summary>
+<param name="directory_type">
+<summary>
+The type of the directory to use as a mountpoint.
+</summary>
+</param>
+</interface>
+<interface name="kernel_setpgid" lineno="101">
+<summary>
+Set the process group of kernel threads.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_sigchld" lineno="119">
+<summary>
+Send a SIGCHLD signal to kernel threads.
+</summary>
+<param name="domain">
+<summary>
+The type of the process sending the signal.
+</summary>
+</param>
+</interface>
+<interface name="kernel_signal" lineno="137">
+<summary>
+Send a generic signal to kernel threads.
+</summary>
+<param name="domain">
+<summary>
+The type of the process sending the signal.
+</summary>
+</param>
+</interface>
+<interface name="kernel_share_state" lineno="156">
+<summary>
+Allows the kernel to share state information with
+the caller.
+</summary>
+<param name="domain">
+<summary>
+The type of the process with which to share state information.
+</summary>
+</param>
+</interface>
+<interface name="kernel_use_fds" lineno="174">
+<summary>
+Permits caller to use kernel file descriptors.
+</summary>
+<param name="domain">
+<summary>
+The type of the process using the descriptors.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_use_fds" lineno="193">
+<summary>
+Do not audit attempts to use
+kernel file descriptors.
+</summary>
+<param name="domain">
+<summary>
+The type of process not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rw_pipes" lineno="211">
+<summary>
+Read and write kernel unnamed pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rw_unix_dgram_sockets" lineno="229">
+<summary>
+Read and write kernel unix datagram sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dgram_send" lineno="247">
+<summary>
+Send messages to kernel unix datagram sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_tcp_recvfrom" lineno="265">
+<summary>
+Receive messages from kernel TCP sockets.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_udp_send" lineno="279">
+<summary>
+Send UDP network traffic to the kernel.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_udp_recvfrom" lineno="293">
+<summary>
+Receive messages from kernel UDP sockets.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_load_module" lineno="307">
+<summary>
+Allows caller to load kernel modules
+</summary>
+<param name="domain">
+<summary>
+The process type to allow to load kernel modules.
+</summary>
+</param>
+</interface>
+<interface name="kernel_search_key" lineno="326">
+<summary>
+Allow search the kernel key ring.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_link_key" lineno="344">
+<summary>
+Allow link to the kernel key ring.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_ring_buffer" lineno="363">
+<summary>
+Allows caller to read the ring buffer.
+</summary>
+<param name="domain">
+<summary>
+The process type allowed to read the ring buffer.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_dontaudit_read_ring_buffer" lineno="381">
+<summary>
+Do not audit attempts to read the ring buffer.
+</summary>
+<param name="domain">
+<summary>
+The domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_change_ring_buffer_level" lineno="400">
+<summary>
+Change the level of kernel messages logged to the console.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_clear_ring_buffer" lineno="419">
+<summary>
+Allows the caller to clear the ring buffer.
+</summary>
+<param name="domain">
+<summary>
+The process type clearing the buffer.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_get_sysvipc_info" lineno="437">
+<summary>
+Get information on all System V IPC objects.
+</summary>
+<param name="domain">
+<summary>
+
+</summary>
+</param>
+</interface>
+<interface name="kernel_getattr_debugfs" lineno="455">
+<summary>
+Get the attributes of a kernel debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_mount_debugfs" lineno="473">
+<summary>
+Mount a kernel debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain mounting the filesystem.
+</summary>
+</param>
+</interface>
+<interface name="kernel_unmount_debugfs" lineno="491">
+<summary>
+Unmount a kernel debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain unmounting the filesystem.
+</summary>
+</param>
+</interface>
+<interface name="kernel_remount_debugfs" lineno="509">
+<summary>
+Remount a kernel debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain remounting the filesystem.
+</summary>
+</param>
+</interface>
+<interface name="kernel_search_debugfs" lineno="527">
+<summary>
+Search the contents of a kernel debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_debugfs" lineno="545">
+<summary>
+Read information from the debugging filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_unmount_proc" lineno="565">
+<summary>
+Unmount the proc filesystem.
+</summary>
+<param name="domain">
+<summary>
+The type of the domain unmounting the filesystem.
+</summary>
+</param>
+</interface>
+<interface name="kernel_getattr_proc" lineno="583">
+<summary>
+Get the attributes of the proc filesystem.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_search_proc" lineno="601">
+<summary>
+Search directories in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_list_proc" lineno="619">
+<summary>
+List the contents of directories in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_list_proc" lineno="638">
+<summary>
+Do not audit attempts to list the
+contents of directories in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_getattr_proc_files" lineno="656">
+<summary>
+Get the attributes of files in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_proc_symlinks" lineno="674">
+<summary>
+Read symbolic links in /proc.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_system_state" lineno="693">
+<summary>
+Allows caller to read system state information in proc.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the system state information.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_write_proc_files" lineno="719">
+<summary>
+Write to generic proc entries.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_dontaudit_read_system_state" lineno="738">
+<summary>
+Do not audit attempts by caller to
+read system state information in proc.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_read_proc_symlinks" lineno="757">
+<summary>
+Do not audit attempts by caller to
+read system state information in proc.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_software_raid_state" lineno="776">
+<summary>
+Allow caller to read the state information for software raid.
+</summary>
+<param name="domain">
+<summary>
+The process type reading software raid state.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_software_raid_state" lineno="796">
+<summary>
+Allow caller to read and set the state information for software raid.
+</summary>
+<param name="domain">
+<summary>
+The process type reading software raid state.
+</summary>
+</param>
+</interface>
+<interface name="kernel_getattr_core_if" lineno="816">
+<summary>
+Allows caller to get attribues of core kernel interface.
+</summary>
+<param name="domain">
+<summary>
+The process type getting the attibutes.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_core_if" lineno="837">
+<summary>
+Do not audit attempts to get the attributes of
+core kernel interfaces.
+</summary>
+<param name="domain">
+<summary>
+The process type to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_messages" lineno="856">
+<summary>
+Allow caller to read kernel messages
+using the /proc/kmsg interface.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the messages.
+</summary>
+</param>
+</interface>
+<interface name="kernel_getattr_message_if" lineno="878">
+<summary>
+Allow caller to get the attributes of kernel message
+interface (/proc/kmsg).
+</summary>
+<param name="domain">
+<summary>
+The process type getting the attributes.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_message_if" lineno="897">
+<summary>
+Do not audit attempts by caller to get the attributes of kernel
+message interfaces.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_search_network_state" lineno="917">
+<summary>
+Do not audit attempts to search the network
+state directory.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_search_network_state" lineno="936">
+<summary>
+Allow searching of network state directory.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_read_network_state" lineno="955">
+<summary>
+Allow caller to read the network state information.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_network_state_symlinks" lineno="976">
+<summary>
+Allow caller to read the network state symbolic links.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+</interface>
+<interface name="kernel_search_xen_state" lineno="997">
+<summary>
+Allow searching of xen state directory.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_dontaudit_search_xen_state" lineno="1017">
+<summary>
+Do not audit attempts to search the xen
+state directory.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_read_xen_state" lineno="1036">
+<summary>
+Allow caller to read the xen state information.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_read_xen_state_symlinks" lineno="1058">
+<summary>
+Allow caller to read the xen state symbolic links.
+</summary>
+<param name="domain">
+<summary>
+The process type reading the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_write_xen_state" lineno="1079">
+<summary>
+Allow caller to write xen state information.
+</summary>
+<param name="domain">
+<summary>
+The process type writing the state.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_dontaudit_list_all_proc" lineno="1097">
+<summary>
+Do not audit attempts to list all proc directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_search_sysctl" lineno="1117">
+<summary>
+Do not audit attempts by caller to search
+the base directory of sysctls.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_read_sysctl" lineno="1136">
+<summary>
+Allow access to read sysctl directories.
+</summary>
+<param name="domain">
+<summary>
+The process type to allow to read sysctl directories.
+</summary>
+</param>
+
+</interface>
+<interface name="kernel_read_device_sysctls" lineno="1155">
+<summary>
+Allow caller to read the device sysctls.
+</summary>
+<param name="domain">
+<summary>
+The process type to allow to read the device sysctls.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_device_sysctls" lineno="1176">
+<summary>
+Read and write device sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_search_vm_sysctl" lineno="1196">
+<summary>
+Allow caller to search virtual memory sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_vm_sysctls" lineno="1215">
+<summary>
+Allow caller to read virtual memory sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_vm_sysctls" lineno="1236">
+<summary>
+Read and write virtual memory sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_search_network_sysctl" lineno="1258">
+<summary>
+Search network sysctl directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_search_network_sysctl" lineno="1276">
+<summary>
+Do not audit attempts by caller to search network sysctl directories.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_net_sysctls" lineno="1295">
+<summary>
+Allow caller to read network sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_net_sysctls" lineno="1316">
+<summary>
+Allow caller to modiry contents of sysctl network files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_unix_sysctls" lineno="1338">
+<summary>
+Allow caller to read unix domain
+socket sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_unix_sysctls" lineno="1360">
+<summary>
+Read and write unix domain
+socket sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_hotplug_sysctls" lineno="1381">
+<summary>
+Read the hotplug sysctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_hotplug_sysctls" lineno="1402">
+<summary>
+Read and write the hotplug sysctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_modprobe_sysctls" lineno="1423">
+<summary>
+Read the modprobe sysctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_modprobe_sysctls" lineno="1444">
+<summary>
+Read and write the modprobe sysctl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_dontaudit_search_kernel_sysctl" lineno="1464">
+<summary>
+Do not audit attempts to search generic kernel sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_kernel_sysctls" lineno="1482">
+<summary>
+Read generic kernel sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_write_kernel_sysctl" lineno="1502">
+<summary>
+Do not audit attempts to write generic kernel sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rw_kernel_sysctl" lineno="1521">
+<summary>
+Read and write generic kernel sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_fs_sysctls" lineno="1542">
+<summary>
+Read filesystem sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_fs_sysctls" lineno="1563">
+<summary>
+Read and write fileystem sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_irq_sysctls" lineno="1584">
+<summary>
+Read IRQ sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_irq_sysctls" lineno="1605">
+<summary>
+Read and write IRQ sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_read_rpc_sysctls" lineno="1626">
+<summary>
+Read RPC sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_rpc_sysctls" lineno="1647">
+<summary>
+Read and write RPC sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_dontaudit_list_all_sysctls" lineno="1667">
+<summary>
+Do not audit attempts to list all sysctl directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_read_all_sysctls" lineno="1686">
+<summary>
+Allow caller to read all sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_rw_all_sysctls" lineno="1709">
+<summary>
+Read and write all sysctls.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="kernel_kill_unlabeled" lineno="1733">
+<summary>
+Send a kill signal to unlabeled processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_signal_unlabeled" lineno="1751">
+<summary>
+Send general signals to unlabeled processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_signull_unlabeled" lineno="1769">
+<summary>
+Send a null signal to unlabeled processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_sigstop_unlabeled" lineno="1787">
+<summary>
+Send a stop signal to unlabeled processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_sigchld_unlabeled" lineno="1805">
+<summary>
+Send a child terminated signal to unlabeled processes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_list_unlabeled" lineno="1823">
+<summary>
+List unlabeled directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_list_unlabeled" lineno="1841">
+<summary>
+Do not audit attempts to list unlabeled directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rw_unlabeled_dirs" lineno="1859">
+<summary>
+Read and write unlabeled directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_files" lineno="1878">
+<summary>
+Do not audit attempts by caller to get the
+attributes of an unlabeled file.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_read_unlabeled_files" lineno="1897">
+<summary>
+Do not audit attempts by caller to
+read an unlabeled file.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_symlinks" lineno="1916">
+<summary>
+Do not audit attempts by caller to get the
+attributes of unlabeled symbolic links.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_pipes" lineno="1935">
+<summary>
+Do not audit attempts by caller to get the
+attributes of unlabeled named pipes.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_sockets" lineno="1954">
+<summary>
+Do not audit attempts by caller to get the
+attributes of unlabeled named sockets.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_blk_files" lineno="1973">
+<summary>
+Do not audit attempts by caller to get attributes for
+unlabeled block devices.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_rw_unlabeled_blk_files" lineno="1991">
+<summary>
+Read and write unlabeled block device nodes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_getattr_unlabeled_chr_files" lineno="2010">
+<summary>
+Do not audit attempts by caller to get attributes for
+unlabeled character devices.
+</summary>
+<param name="domain">
+<summary>
+The process type not to audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_relabelfrom_unlabeled_dirs" lineno="2028">
+<summary>
+Allow caller to relabel unlabeled directories.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_relabelfrom_unlabeled_files" lineno="2046">
+<summary>
+Allow caller to relabel unlabeled files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_relabelfrom_unlabeled_symlinks" lineno="2065">
+<summary>
+Allow caller to relabel unlabeled symbolic links.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_relabelfrom_unlabeled_pipes" lineno="2084">
+<summary>
+Allow caller to relabel unlabeled named pipes.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_relabelfrom_unlabeled_sockets" lineno="2103">
+<summary>
+Allow caller to relabel unlabeled named sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_sendrecv_unlabeled_association" lineno="2137">
+<summary>
+Send and receive messages from an
+unlabeled IPSEC association.
+</summary>
+<desc>
+<p>
+Send and receive messages from an
+unlabeled IPSEC association.  Network
+connections that are not protected
+by IPSEC have use an unlabeled
+assocation.
+</p>
+<p>
+The corenetwork interface
+corenet_non_ipsec_sendrecv() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_sendrecv_unlabeled_association" lineno="2173">
+<summary>
+Do not audit attempts to send and receive messages
+from an	unlabeled IPSEC association.
+</summary>
+<desc>
+<p>
+Do not audit attempts to send and receive messages
+from an	unlabeled IPSEC association.  Network
+connections that are not protected
+by IPSEC have use an unlabeled
+assocation.
+</p>
+<p>
+The corenetwork interface
+corenet_dontaudit_non_ipsec_sendrecv() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_tcp_recvfrom_unlabeled" lineno="2203">
+<summary>
+Receive TCP packets from a NetLabel connection.
+</summary>
+<desc>
+<p>
+Receive TCP packets from a NetLabel connection, NetLabel is an
+explicit packet labeling framework which implements CIPSO and
+similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_tcp_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_tcp_recvfrom_unlabeled" lineno="2234">
+<summary>
+Do not audit attempts to receive TCP packets from a NetLabel
+connection.
+</summary>
+<desc>
+<p>
+Do not audit attempts to receive TCP packets from a NetLabel
+connection.  NetLabel is an explicit packet labeling framework
+which implements CIPSO and similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_dontaudit_tcp_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_udp_recvfrom_unlabeled" lineno="2264">
+<summary>
+Receive UDP packets from a NetLabel connection.
+</summary>
+<desc>
+<p>
+Receive UDP packets from a NetLabel connection, NetLabel is an
+explicit packet labeling framework which implements CIPSO and
+similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_udp_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_udp_recvfrom_unlabeled" lineno="2295">
+<summary>
+Do not audit attempts to receive UDP packets from a NetLabel
+connection.
+</summary>
+<desc>
+<p>
+Do not audit attempts to receive UDP packets from a NetLabel
+connection.  NetLabel is an explicit packet labeling framework
+which implements CIPSO and similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_dontaudit_udp_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_raw_recvfrom_unlabeled" lineno="2325">
+<summary>
+Receive Raw IP packets from a NetLabel connection.
+</summary>
+<desc>
+<p>
+Receive Raw IP packets from a NetLabel connection, NetLabel is an
+explicit packet labeling framework which implements CIPSO and
+similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_raw_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_dontaudit_raw_recvfrom_unlabeled" lineno="2356">
+<summary>
+Do not audit attempts to receive Raw IP packets from a NetLabel
+connection.
+</summary>
+<desc>
+<p>
+Do not audit attempts to receive Raw IP packets from a NetLabel
+connection.  NetLabel is an explicit packet labeling framework
+which implements CIPSO and similar protocols.
+</p>
+<p>
+The corenetwork interface
+corenet_dontaudit_raw_recv_netlabel() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="kernel_sendrecv_unlabeled_packets" lineno="2386">
+<summary>
+Send and receive unlabeled packets.
+</summary>
+<desc>
+<p>
+Send and receive unlabeled packets.
+These packets do not match any netfilter
+SECMARK rules.
+</p>
+<p>
+The corenetwork interface
+corenet_sendrecv_unlabeled_packets() should
+be used instead of this one.
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="kernel_unconfined" lineno="2404">
+<summary>
+Unconfined access to kernel module resources.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

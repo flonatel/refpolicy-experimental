@@ -1,0 +1,85 @@
+<module name="amanda" filename="policy/modules/admin/amanda.if">
+<summary>Automated backup program.</summary>
+<interface name="amanda_domtrans_recover" lineno="13">
+<summary>
+Execute amrecover in the amanda_recover domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="amanda_run_recover" lineno="43">
+<summary>
+Execute amrecover in the amanda_recover domain, and
+allow the specified role the amanda_recover domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the amanda_recover domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the amanda_recover domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="amanda_search_lib" lineno="63">
+<summary>
+Search amanda library directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="amanda_dontaudit_read_dumpdates" lineno="82">
+<summary>
+Do not audit attempts to read /etc/dumpdates.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="amanda_rw_dumpdates_files" lineno="100">
+<summary>
+Allow read/writing /etc/dumpdates.
+</summary>
+<param name="domain">
+<summary>
+Domain to allow
+</summary>
+</param>
+</interface>
+<interface name="amanda_manage_lib" lineno="118">
+<summary>
+Search amanda library directories.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="amanda_append_log_files" lineno="137">
+<summary>
+Allow read/writing amanda logs
+</summary>
+<param name="domain">
+<summary>
+Domain to allow
+</summary>
+</param>
+</interface>
+</module>

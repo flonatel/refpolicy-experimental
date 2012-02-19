@@ -1,0 +1,54 @@
+<module name="prelink" filename="policy/modules/admin/prelink.if">
+<summary>Prelink ELF shared library mappings.</summary>
+<interface name="prelink_domtrans" lineno="13">
+<summary>
+Execute the prelink program in the prelink domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="prelink_object_file" lineno="33">
+<summary>
+Make the specified file type prelinkable.
+</summary>
+<param name="file_type">
+<summary>
+File type to be prelinked.
+</summary>
+</param>
+</interface>
+<interface name="prelink_read_cache" lineno="51">
+<summary>
+Read the prelink cache.
+</summary>
+<param name="file_type">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="prelink_delete_cache" lineno="70">
+<summary>
+Delete the prelink cache.
+</summary>
+<param name="file_type">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="prelink_manage_log" lineno="90">
+<summary>
+Create, read, write, and delete
+prelink log files.
+</summary>
+<param name="file_type">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

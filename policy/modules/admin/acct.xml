@@ -1,0 +1,43 @@
+<module name="acct" filename="policy/modules/admin/acct.if">
+<summary>Berkeley process accounting</summary>
+<interface name="acct_domtrans" lineno="13">
+<summary>
+Transition to the accounting management domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="acct_exec" lineno="32">
+<summary>
+Execute accounting management tools in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="acct_exec_data" lineno="53">
+<summary>
+Execute accounting management data in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="acct_manage_data" lineno="72">
+<summary>
+Create, read, write, and delete process accounting data.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

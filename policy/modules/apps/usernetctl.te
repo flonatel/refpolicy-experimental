@@ -1,10 +1,20 @@
 
-policy_module(usernetctl,1.0.0)
+policy_module(usernetctl,1.1.0)
 
 ########################################
 #
 # Declarations
 #
+
+ifdef(`strict_policy',`
+## <desc>
+## <p>
+## Allow users to control network interfaces
+## (also needs USERCTL=true)
+## </p>
+## </desc>
+gen_tunable(user_net_control,false)
+')
 
 type usernetctl_t;
 type usernetctl_exec_t;
@@ -20,7 +30,7 @@ domain_interactive_fd(usernetctl_t)
 allow usernetctl_t self:capability { setuid setgid dac_override };
 allow usernetctl_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow usernetctl_t self:fd use;
-allow usernetctl_t self:fifo_file rw_file_perms;
+allow usernetctl_t self:fifo_file rw_fifo_file_perms;
 allow usernetctl_t self:shm create_shm_perms;
 allow usernetctl_t self:sem create_sem_perms;
 allow usernetctl_t self:msgq create_msgq_perms;
@@ -37,8 +47,6 @@ kernel_read_kernel_sysctls(usernetctl_t)
 
 corecmd_list_bin(usernetctl_t)
 corecmd_exec_bin(usernetctl_t)
-corecmd_list_sbin(usernetctl_t)
-corecmd_exec_sbin(usernetctl_t)
 corecmd_exec_shell(usernetctl_t)
 
 domain_dontaudit_read_all_domains_state(usernetctl_t)

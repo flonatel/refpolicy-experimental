@@ -1,5 +1,5 @@
 
-policy_module(nessus,1.1.0)
+policy_module(nessus,1.2.0)
 
 ########################################
 #
@@ -37,20 +37,18 @@ allow nessusd_t self:rawip_socket create_socket_perms;
 allow nessusd_t self:packet_socket create_socket_perms;
 
 # Allow access to the nessusd authentication database
-allow nessusd_t nessusd_db_t:dir create_dir_perms;
-allow nessusd_t nessusd_db_t:file create_file_perms;
-allow nessusd_t nessusd_db_t:lnk_file create_lnk_perms;
+manage_dirs_pattern(nessusd_t,nessusd_db_t,nessusd_db_t)
+manage_files_pattern(nessusd_t,nessusd_db_t,nessusd_db_t)
+manage_lnk_files_pattern(nessusd_t,nessusd_db_t,nessusd_db_t)
 files_list_var_lib(nessusd_t)
 
 allow nessusd_t nessusd_etc_t:file { getattr read };
 files_search_etc(nessusd_t)
 
-allow nessusd_t nessusd_log_t:file create_file_perms;
-allow nessusd_t nessusd_log_t:dir rw_dir_perms;
+manage_files_pattern(nessusd_t,nessusd_log_t,nessusd_log_t)
 logging_log_filetrans(nessusd_t,nessusd_log_t,{ file dir })
 
-allow nessusd_t nessusd_var_run_t:file create_file_perms;
-allow nessusd_t nessusd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(nessusd_t,nessusd_var_run_t,nessusd_var_run_t)
 files_pid_filetrans(nessusd_t,nessusd_var_run_t,file)
 
 kernel_read_system_state(nessusd_t)
@@ -84,11 +82,6 @@ files_read_etc_runtime_files(nessusd_t)
 
 fs_getattr_all_fs(nessusd_t)
 fs_search_auto_mountpoints(nessusd_t)
-
-term_dontaudit_use_console(nessusd_t)
-
-init_use_fds(nessusd_t)
-init_use_script_ptys(nessusd_t)
 
 libs_use_ld_so(nessusd_t)
 libs_use_shared_libs(nessusd_t)

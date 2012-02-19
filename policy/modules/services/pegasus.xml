@@ -1,0 +1,3 @@
+<module name="pegasus" filename="policy/modules/services/pegasus.if">
+<summary>The Open Group Pegasus CIM/WBEM Server.</summary>
+</module>

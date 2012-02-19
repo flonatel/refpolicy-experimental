@@ -1,10 +1,17 @@
 
-policy_module(java,1.2.0)
+policy_module(java,1.4.0)
 
 ########################################
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+## Allow java executable stack
+## </p>
+## </desc>
+gen_tunable(allow_java_execstack,false)
 
 type java_t;
 type java_exec_t;
@@ -16,7 +23,12 @@ init_system_domain(java_t,java_exec_t)
 #
 
 ifdef(`targeted_policy',`
-	allow java_t self:process { execstack execmem };
-	unconfined_domain_noaudit(java_t)
+	# execheap is needed for itanium/BEA jrocket
+	allow java_t self:process { execstack execmem execheap };
 	role system_r types java_t;
+
+	init_dbus_chat_script(java_t)
+
+	unconfined_domain_noaudit(java_t)
+	unconfined_dbus_chat(java_t)
 ')

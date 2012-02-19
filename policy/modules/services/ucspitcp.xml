@@ -1,0 +1,23 @@
+<module name="ucspitcp" filename="policy/modules/services/ucspitcp.if">
+<summary>ucspitcp policy</summary>
+<desc>
+<p>
+Policy for DJB's ucspi-tcpd
+</p>
+</desc>
+<interface name="ucspitcp_service_domain" lineno="23">
+<summary>
+Define a specified domain as a ucspitcp service.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+</module>

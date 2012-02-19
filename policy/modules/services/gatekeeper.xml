@@ -1,0 +1,3 @@
+<module name="gatekeeper" filename="policy/modules/services/gatekeeper.if">
+<summary>OpenH.323 Voice-Over-IP Gatekeeper</summary>
+</module>

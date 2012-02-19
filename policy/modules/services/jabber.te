@@ -1,5 +1,5 @@
 
-policy_module(jabber,1.1.0)
+policy_module(jabber,1.2.0)
 
 ########################################
 #
@@ -31,16 +31,13 @@ allow jabberd_t self:fifo_file { read write getattr };
 allow jabberd_t self:tcp_socket create_stream_socket_perms;
 allow jabberd_t self:udp_socket create_socket_perms;
 
-allow jabberd_t jabberd_var_lib_t:file create_file_perms;
-allow jabberd_t jabberd_var_lib_t:dir rw_dir_perms;
+manage_files_pattern(jabberd_t,jabberd_var_lib_t,jabberd_var_lib_t)
 files_var_lib_filetrans(jabberd_t,jabberd_var_lib_t,file)
 
-allow jabberd_t jabberd_log_t:file create_file_perms;
-allow jabberd_t jabberd_log_t:dir rw_dir_perms;
+manage_files_pattern(jabberd_t,jabberd_log_t,jabberd_log_t)
 logging_log_filetrans(jabberd_t,jabberd_log_t,{ file dir })
 
-allow jabberd_t jabberd_var_run_t:file create_file_perms;
-allow jabberd_t jabberd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(jabberd_t,jabberd_var_run_t,jabberd_var_run_t)
 files_pid_filetrans(jabberd_t,jabberd_var_run_t,file)
 
 kernel_read_kernel_sysctls(jabberd_t)
@@ -71,11 +68,6 @@ files_read_etc_runtime_files(jabberd_t)
 
 fs_getattr_all_fs(jabberd_t)
 fs_search_auto_mountpoints(jabberd_t)
-
-term_dontaudit_use_console(jabberd_t)
-
-init_use_fds(jabberd_t)
-init_use_script_ptys(jabberd_t)
 
 libs_use_ld_so(jabberd_t)
 libs_use_shared_libs(jabberd_t)

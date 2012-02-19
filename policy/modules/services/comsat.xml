@@ -1,0 +1,3 @@
+<module name="comsat" filename="policy/modules/services/comsat.if">
+<summary>Comsat, a biff server.</summary>
+</module>

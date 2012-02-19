@@ -1,0 +1,13 @@
+<module name="tmpreaper" filename="policy/modules/admin/tmpreaper.if">
+<summary>Manage temporary directory sizes and file ages</summary>
+<interface name="tmpreaper_exec" lineno="13">
+<summary>
+Execute tmpreaper in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

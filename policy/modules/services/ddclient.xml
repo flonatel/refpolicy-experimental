@@ -1,0 +1,13 @@
+<module name="ddclient" filename="policy/modules/services/ddclient.if">
+<summary>Update dynamic IP address at DynDNS.org</summary>
+<interface name="ddclient_domtrans" lineno="13">
+<summary>
+Execute ddclient in the ddclient domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

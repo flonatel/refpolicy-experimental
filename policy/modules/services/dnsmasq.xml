@@ -1,0 +1,3 @@
+<module name="dnsmasq" filename="policy/modules/services/dnsmasq.if">
+<summary>dnsmasq DNS forwarder and DHCP server</summary>
+</module>

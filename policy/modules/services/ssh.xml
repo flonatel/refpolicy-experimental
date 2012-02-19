@@ -1,0 +1,202 @@
+<module name="ssh" filename="policy/modules/services/ssh.if">
+<summary>Secure shell client and server policy.</summary>
+<template name="ssh_basic_client_template" lineno="34">
+<summary>
+Basic SSH client template.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for ssh client sessions.  A derived
+type is also created to protect the user ssh keys.
+</p>
+<p>
+This template was added for NX.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="ssh_per_role_template" lineno="203">
+<summary>
+The per role template for the ssh module.
+</summary>
+<desc>
+<p>
+This template creates a derived domains which are used
+for ssh client sessions and user ssh agents.  A derived
+type is also created to protect the user ssh keys.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="ssh_server_template" lineno="437">
+<summary>
+The template to define a ssh server.
+</summary>
+<desc>
+<p>
+This template creates a domains to be used for
+creating a ssh server.  This is typically done
+to have multiple ssh servers of different sensitivities,
+such as for an internal network-facing ssh server, and
+a external network-facing ssh server.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the server domain (e.g., sshd
+is the prefix for sshd_t).
+</summary>
+</param>
+</template>
+<interface name="ssh_sigchld" lineno="544">
+<summary>
+Send a SIGCHLD signal to the ssh server.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_read_pipes" lineno="562">
+<summary>
+Read a ssh server unnamed pipe.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_rw_stream_sockets" lineno="580">
+<summary>
+Read and write ssh server unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_rw_tcp_sockets" lineno="598">
+<summary>
+Read and write ssh server TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_dontaudit_rw_tcp_sockets" lineno="617">
+<summary>
+Do not audit attempts to read and write
+ssh server TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="ssh_tcp_connect" lineno="635">
+<summary>
+Connect to SSH daemons over TCP sockets.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_domtrans" lineno="649">
+<summary>
+Execute the ssh daemon sshd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_exec" lineno="667">
+<summary>
+Execute the ssh client in the caller domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_domtrans_keygen" lineno="686">
+<summary>
+Execute the ssh key generator in the ssh keygen domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="ssh_dontaudit_read_server_keys" lineno="704">
+<summary>
+Read ssh server keys
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<tunable name="allow_ssh_keysign" dftval="false">
+<desc>
+<p>
+allow host key based authentication
+</p>
+</desc>
+</tunable>
+<tunable name="ssh_sysadm_login" dftval="false">
+<desc>
+<p>
+Allow ssh logins as sysadm_r:sysadm_t
+</p>
+</desc>
+</tunable>
+</module>

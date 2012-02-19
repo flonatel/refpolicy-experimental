@@ -1,5 +1,5 @@
 
-policy_module(clock,1.1.0)
+policy_module(clock,1.3.0)
 
 ########################################
 #
@@ -21,17 +21,21 @@ role system_r types hwclock_t;
 
 # Give hwclock the capabilities it requires.  dac_override is a surprise,
 # but hwclock does require it.
-allow hwclock_t self:capability { dac_override sys_rawio sys_time sys_tty_config audit_write };
+allow hwclock_t self:capability { dac_override sys_rawio sys_time sys_tty_config };
 dontaudit hwclock_t self:capability sys_tty_config;
 allow hwclock_t self:process signal_perms;
-allow hwclock_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
+allow hwclock_t self:fifo_file { getattr read write };
+
+send_audit_msgs_pattern(hwclock_t)
 
 # Allow hwclock to store & retrieve correction factors.
 allow hwclock_t adjtime_t:file { rw_file_perms setattr };
 
 kernel_read_kernel_sysctls(hwclock_t)
-kernel_list_proc(hwclock_t)
-kernel_read_proc_symlinks(hwclock_t)
+kernel_read_system_state(hwclock_t)
+
+corecmd_exec_bin(hwclock_t)
+corecmd_exec_shell(hwclock_t)
 
 dev_read_sysfs(hwclock_t)
 dev_rw_realtime_clock(hwclock_t)

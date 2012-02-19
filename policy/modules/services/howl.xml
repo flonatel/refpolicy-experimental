@@ -1,0 +1,13 @@
+<module name="howl" filename="policy/modules/services/howl.if">
+<summary>Port of Apple Rendezvous multicast DNS</summary>
+<interface name="howl_signal" lineno="13">
+<summary>
+Send generic signals to howl.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,5 +1,5 @@
 
-policy_module(locallogin,1.3.0)
+policy_module(locallogin,1.4.0)
 
 ########################################
 #
@@ -47,13 +47,13 @@ allow local_login_t self:shm create_shm_perms;
 allow local_login_t self:sem create_sem_perms;
 allow local_login_t self:msgq create_msgq_perms;
 allow local_login_t self:msg { send receive };
-allow local_login_t self:key { search write };
+allow local_login_t self:key { search write link };
 
-allow local_login_t local_login_lock_t:file create_file_perms;
+allow local_login_t local_login_lock_t:file manage_file_perms;
 files_lock_filetrans(local_login_t,local_login_lock_t,file)
 
-allow local_login_t local_login_tmp_t:dir create_dir_perms;
-allow local_login_t local_login_tmp_t:file create_file_perms;
+allow local_login_t local_login_tmp_t:dir manage_dir_perms;
+allow local_login_t local_login_tmp_t:file manage_file_perms;
 files_tmp_filetrans(local_login_t, local_login_tmp_t, { file dir })
 
 kernel_read_system_state(local_login_t)
@@ -104,16 +104,11 @@ auth_manage_pam_console_data(local_login_t)
 auth_domtrans_pam_console(local_login_t)
 
 corecmd_list_bin(local_login_t)
-corecmd_list_sbin(local_login_t)
 corecmd_read_bin_symlinks(local_login_t)
-corecmd_read_sbin_symlinks(local_login_t)
 # cjp: these are probably not needed:
 corecmd_read_bin_files(local_login_t)
 corecmd_read_bin_pipes(local_login_t)
 corecmd_read_bin_sockets(local_login_t)
-corecmd_read_sbin_files(local_login_t)
-corecmd_read_sbin_pipes(local_login_t)
-corecmd_read_sbin_sockets(local_login_t)
 
 domain_read_all_entry_files(local_login_t)
 

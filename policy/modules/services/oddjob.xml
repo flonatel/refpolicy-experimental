@@ -1,0 +1,54 @@
+<module name="oddjob" filename="policy/modules/services/oddjob.if">
+<summary>
+Oddjob provides a mechanism by which unprivileged applications can
+request that specified privileged operations be performed on their
+behalf.
+</summary>
+<interface name="oddjob_domtrans" lineno="17">
+<summary>
+Execute a domain transition to run oddjob.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="oddjob_system_entry" lineno="41">
+<summary>
+Make the specified program domain accessable
+from the oddjob.
+</summary>
+<param name="domain">
+<summary>
+The type of the process to transition to.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type of the file used as an entrypoint to this domain.
+</summary>
+</param>
+</interface>
+<interface name="oddjob_dbus_chat" lineno="60">
+<summary>
+Send and receive messages from
+oddjob over dbus.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="oddjob_domtrans_mkhomedir" lineno="80">
+<summary>
+Execute a domain transition to run oddjob_mkhomedir.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+</module>

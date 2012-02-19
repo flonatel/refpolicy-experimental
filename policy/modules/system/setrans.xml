@@ -1,0 +1,13 @@
+<module name="setrans" filename="policy/modules/system/setrans.if">
+<summary>SELinux MLS/MCS label translation service.</summary>
+<interface name="setrans_translate_context" lineno="13">
+<summary>
+Allow a domain to translate contexts.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,508 @@
+<module name="apache" filename="policy/modules/services/apache.if">
+<summary>Apache web server</summary>
+<template name="apache_content_template" lineno="14">
+<summary>
+Create a set of derived types for apache
+web content.
+</summary>
+<param name="prefix">
+<summary>
+The prefix to be used for deriving type names.
+</summary>
+</param>
+</template>
+<template name="apache_per_role_template" lineno="263">
+<summary>
+The per role template for the apache module.
+</summary>
+<desc>
+<p>
+This template creates types used for web pages
+and web cgi to be used from the user home directory.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<template name="apache_read_user_scripts" lineno="344">
+<summary>
+Read httpd user scripts executables.
+</summary>
+<param name="domain_prefix">
+<summary>
+Prefix of the domain. Example, user would be
+the prefix for the uder_t domain.
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<template name="apache_read_user_content" lineno="370">
+<summary>
+Read user web content.
+</summary>
+<param name="domain_prefix">
+<summary>
+Prefix of the domain. Example, user would be
+the prefix for the uder_t domain.
+</summary>
+</param>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</template>
+<interface name="apache_domtrans" lineno="390">
+<summary>
+Transition to apache.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_signull" lineno="409">
+<summary>
+Send a null signal to apache.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_sigchld" lineno="427">
+<summary>
+Send a SIGCHLD signal to apache.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_use_fds" lineno="445">
+<summary>
+Inherit and use file descriptors from Apache.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_dontaudit_rw_stream_sockets" lineno="464">
+<summary>
+Do not audit attempts to read and write Apache
+unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_dontaudit_rw_tcp_sockets" lineno="483">
+<summary>
+Do not audit attempts to read and write Apache
+TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_manage_all_content" lineno="502">
+<summary>
+Create, read, write, and delete all web content.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apache_rw_cache_files" lineno="527">
+<summary>
+Allow the specified domain to read
+and write Apache cache files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_read_config" lineno="547">
+<summary>
+Allow the specified domain to read
+apache configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apache_manage_config" lineno="569">
+<summary>
+Allow the specified domain to manage
+apache configuration files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_domtrans_helper" lineno="591">
+<summary>
+Execute the Apache helper program with
+a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_run_helper" lineno="623">
+<summary>
+Execute the Apache helper program with
+a domain transition, and allow the
+specified role the dmidecode domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the dmidecode domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the dmidecode domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apache_read_log" lineno="645">
+<summary>
+Allow the specified domain to read
+apache log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apache_append_log" lineno="667">
+<summary>
+Allow the specified domain to append
+to apache log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_dontaudit_append_log" lineno="688">
+<summary>
+Do not audit attempts to append to the
+Apache logs.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="apache_manage_log" lineno="707">
+<summary>
+Allow the specified domain to manage
+to apache log files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_dontaudit_search_modules" lineno="729">
+<summary>
+Do not audit attempts to search Apache
+module directories.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="apache_list_modules" lineno="749">
+<summary>
+Allow the specified domain to list
+the contents of the apache modules
+directory.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_exec_modules" lineno="768">
+<summary>
+Allow the specified domain to execute
+apache modules.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_domtrans_rotatelogs" lineno="788">
+<summary>
+Execute a domain transition to run httpd_rotatelogs.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_manage_sys_content" lineno="809">
+<summary>
+Allow the specified domain to manage
+apache system content files.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="apache_domtrans_sys_script" lineno="833">
+<summary>
+Execute all web scripts in the system
+script domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_dontaudit_rw_sys_script_stream_sockets" lineno="855">
+<summary>
+Do not audit attempts to read and write Apache
+system script unix domain stream sockets.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_domtrans_all_scripts" lineno="874">
+<summary>
+Execute all user scripts in the user
+script domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_run_all_scripts" lineno="901">
+<summary>
+Execute all user scripts in the user
+script domain.  Add user script domains
+to the specified role.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the script domains.
+</summary>
+</param>
+</interface>
+<interface name="apache_read_squirrelmail_data" lineno="921">
+<summary>
+Allow the specified domain to read
+apache squirrelmail data.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_append_squirrelmail_data" lineno="940">
+<summary>
+Allow the specified domain to append
+apache squirrelmail data.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_search_sys_content" lineno="958">
+<summary>
+Search apache system content.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_read_sys_content" lineno="976">
+<summary>
+Read apache system content.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="apache_search_sys_script_state" lineno="996">
+<summary>
+Search system script state directory.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<tunable name="allow_httpd_anon_write" dftval="false">
+<desc>
+<p>
+Allow Apache to modify public files
+used for public file transfer services.
+</p>
+</desc>
+</tunable>
+<tunable name="allow_httpd_mod_auth_pam" dftval="false">
+<desc>
+<p>
+Allow Apache to use mod_auth_pam
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_builtin_scripting" dftval="false">
+<desc>
+<p>
+Allow httpd to use built in scripting (usually php)
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_can_network_connect" dftval="false">
+<desc>
+<p>
+Allow http daemon to tcp connect
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_can_network_connect_db" dftval="false">
+<desc>
+<p>
+Allow httpd to connect to mysql/posgresql
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_can_network_relay" dftval="false">
+<desc>
+<p>
+Allow httpd to act as a relay
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_enable_cgi" dftval="false">
+<desc>
+<p>
+Allow httpd cgi support
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_enable_ftp_server" dftval="false">
+<desc>
+<p>
+Allow httpd to act as a FTP server by
+listening on the ftp port.
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_enable_homedirs" dftval="false">
+<desc>
+<p>
+Allow httpd to read home directories
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_ssi_exec" dftval="false">
+<desc>
+<p>
+Run SSI execs in system CGI script domain.
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_tty_comm" dftval="false">
+<desc>
+<p>
+Allow http daemon to communicate with the TTY
+</p>
+</desc>
+</tunable>
+<tunable name="httpd_unified" dftval="false">
+<desc>
+<p>
+Run CGI in the main httpd domain
+</p>
+</desc>
+</tunable>
+</module>

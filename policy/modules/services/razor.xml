@@ -1,0 +1,66 @@
+<module name="razor" filename="policy/modules/services/razor.if">
+<summary>A distributed, collaborative, spam detection and filtering network.</summary>
+<desc>
+<p>
+A distributed, collaborative, spam detection and filtering network.
+</p>
+<p>
+This policy will work with either the ATrpms provided config
+file in /etc/razor, or with the default of dumping everything into
+$HOME/.razor.
+</p>
+</desc>
+<template name="razor_common_domain_template" lineno="25">
+<summary>
+Template to create types and rules common to
+all razor domains.
+</summary>
+<param name="prefix">
+<summary>
+The prefix of the domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+</template>
+<template name="razor_per_role_template" lineno="136">
+<summary>
+The per role template for the razor module.
+</summary>
+<desc>
+<p>
+The per role template for the razor module.
+</p>
+<p>
+This template is invoked automatically for each user, and
+generally does not need to be invoked directly
+by policy writers.
+</p>
+</desc>
+<param name="userdomain_prefix">
+<summary>
+The prefix of the user domain (e.g., user
+is the prefix for user_t).
+</summary>
+</param>
+<param name="user_domain">
+<summary>
+The type of the user domain.
+</summary>
+</param>
+<param name="user_role">
+<summary>
+The role associated with the user domain.
+</summary>
+</param>
+</template>
+<interface name="razor_domtrans" lineno="213">
+<summary>
+Execute razor in the system razor domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

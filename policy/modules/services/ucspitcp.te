@@ -23,8 +23,6 @@ role system_r types ucspitcp_t;
 
 ucspitcp_service_domain(rblsmtpd_t, rblsmtpd_exec_t)
 
-allow rblsmtpd_t self:process { fork sigchld };
-
 corecmd_search_bin(rblsmtpd_t)
 
 corenet_tcp_sendrecv_all_if(rblsmtpd_t)
@@ -58,7 +56,6 @@ allow ucspitcp_t self:tcp_socket create_stream_socket_perms;
 allow ucspitcp_t self:udp_socket create_socket_perms;
 
 corecmd_search_bin(ucspitcp_t)
-corecmd_search_sbin(ucspitcp_t)
 
 # base networking:
 corenet_non_ipsec_sendrecv(ucspitcp_t)

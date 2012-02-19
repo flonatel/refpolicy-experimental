@@ -1,0 +1,13 @@
+<module name="portslave" filename="policy/modules/services/portslave.if">
+<summary>Portslave terminal server software</summary>
+<interface name="portslave_domtrans" lineno="13">
+<summary>
+Execute portslave with a domain transition.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+</module>

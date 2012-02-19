@@ -1,0 +1,122 @@
+<module name="inetd" filename="policy/modules/services/inetd.if">
+<summary>Internet services daemon.</summary>
+<interface name="inetd_core_service_domain" lineno="27">
+<summary>
+Define the specified domain as a inetd service.
+</summary>
+<desc>
+<p>
+Define the specified domain as a inetd service.  The
+inetd_service_domain(), inetd_tcp_service_domain(),
+or inetd_udp_service_domain() interfaces should be used
+instead of this interface, as this interface only provides
+the common rules to these three interfaces.
+</p>
+</desc>
+<param name="domain">
+<summary>
+The type associated with the inetd service process.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+<interface name="inetd_tcp_service_domain" lineno="58">
+<summary>
+Define the specified domain as a TCP inetd service.
+</summary>
+<param name="domain">
+<summary>
+The type associated with the inetd service process.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+<interface name="inetd_udp_service_domain" lineno="84">
+<summary>
+Define the specified domain as a UDP inetd service.
+</summary>
+<param name="domain">
+<summary>
+The type associated with the inetd service process.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+<interface name="inetd_service_domain" lineno="109">
+<summary>
+Define the specified domain as a TCP and UDP inetd service.
+</summary>
+<param name="domain">
+<summary>
+The type associated with the inetd service process.
+</summary>
+</param>
+<param name="entrypoint">
+<summary>
+The type associated with the process program.
+</summary>
+</param>
+</interface>
+<interface name="inetd_use_fds" lineno="130">
+<summary>
+Inherit and use file descriptors from inetd.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inetd_tcp_connect" lineno="148">
+<summary>
+Connect to the inetd service using a TCP connection.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inetd_domtrans_child" lineno="162">
+<summary>
+Run inetd child process in the inet child domain
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="inetd_udp_send" lineno="181">
+<summary>
+Send UDP network traffic to inetd.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="inetd_rw_tcp_sockets" lineno="195">
+<summary>
+Read and write inetd TCP sockets.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

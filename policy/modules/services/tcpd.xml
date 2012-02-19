@@ -1,0 +1,13 @@
+<module name="tcpd" filename="policy/modules/services/tcpd.if">
+<summary>Policy for TCP daemon.</summary>
+<interface name="tcpd_domtrans" lineno="13">
+<summary>
+Execute tcpd in the tcpd domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+</module>

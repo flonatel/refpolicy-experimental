@@ -1,5 +1,5 @@
 
-policy_module(sysstat,1.1.0)
+policy_module(sysstat,1.2.0)
 
 ########################################
 #
@@ -21,12 +21,11 @@ logging_log_file(sysstat_log_t)
 
 allow sysstat_t self:capability sys_resource;
 dontaudit sysstat_t self:capability sys_admin;
-allow sysstat_t self:fifo_file rw_file_perms;
+allow sysstat_t self:fifo_file rw_fifo_file_perms;
 
 can_exec(sysstat_t, sysstat_exec_t)
 
-allow sysstat_t sysstat_log_t:file create_file_perms;
-allow sysstat_t sysstat_log_t:dir rw_dir_perms;
+manage_files_pattern(sysstat_t,sysstat_log_t,sysstat_log_t)
 logging_log_filetrans(sysstat_t,sysstat_log_t,{ file dir })
 
 # get info from /proc
@@ -36,10 +35,10 @@ kernel_read_kernel_sysctls(sysstat_t)
 kernel_read_fs_sysctls(sysstat_t)
 kernel_read_rpc_sysctls(sysstat_t)
 
-corecmd_dontaudit_search_sbin(sysstat_t)
 corecmd_exec_bin(sysstat_t)
 
 dev_read_urand(sysstat_t)
+dev_read_sysfs(sysstat_t)
 
 files_search_var(sysstat_t)
 # for mtab
@@ -53,7 +52,6 @@ term_use_console(sysstat_t)
 term_use_all_terms(sysstat_t)
 
 init_use_fds(sysstat_t)
-init_use_script_ptys(sysstat_t)
 
 libs_use_ld_so(sysstat_t)
 libs_use_shared_libs(sysstat_t)

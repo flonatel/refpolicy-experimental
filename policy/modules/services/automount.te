@@ -1,5 +1,5 @@
 
-policy_module(automount,1.3.0)
+policy_module(automount,1.5.0)
 
 ########################################
 #
@@ -13,9 +13,6 @@ init_daemon_domain(automount_t,automount_exec_t)
 type automount_var_run_t;
 files_pid_file(automount_var_run_t)
 
-type automount_etc_t;
-files_config_file(automount_etc_t)
-
 type automount_lock_t;
 files_lock_file(automount_lock_t)
 
@@ -28,35 +25,33 @@ files_mountpoint(automount_tmp_t)
 # Local policy
 #
 
-allow automount_t self:capability { net_bind_service sys_nice sys_resource dac_override sys_admin };
+allow automount_t self:capability { net_bind_service setgid setuid sys_nice sys_resource dac_override sys_admin };
 dontaudit automount_t self:capability sys_tty_config;
 allow automount_t self:process { signal_perms getpgid setpgid setsched setrlimit };
-allow automount_t self:fifo_file rw_file_perms;
+allow automount_t self:fifo_file rw_fifo_file_perms;
 allow automount_t self:unix_stream_socket create_socket_perms;
 allow automount_t self:unix_dgram_socket create_socket_perms;
 allow automount_t self:tcp_socket create_stream_socket_perms;
 allow automount_t self:udp_socket create_socket_perms;
+allow automount_t self:rawip_socket create_socket_perms;
+
 allow automount_t self:netlink_route_socket r_netlink_socket_perms;
 
-allow automount_t automount_etc_t:file { getattr read };
-# because config files can be shell scripts
-can_exec(automount_t, automount_etc_t)
 can_exec(automount_t, automount_exec_t)
 
-allow automount_t automount_lock_t:file create_file_perms;
+allow automount_t automount_lock_t:file manage_file_perms;
 files_lock_filetrans(automount_t,automount_lock_t,file)
 
-allow automount_t automount_tmp_t:dir create_dir_perms;
-allow automount_t automount_tmp_t:file create_file_perms;
+manage_dirs_pattern(automount_t,automount_tmp_t,automount_tmp_t)
+manage_files_pattern(automount_t,automount_tmp_t,automount_tmp_t)
 files_tmp_filetrans(automount_t, automount_tmp_t, { file dir })
 
 # Allow automount to create and delete directories in / and /home
-allow automount_t automount_tmp_t:dir create_dir_perms;
+allow automount_t automount_tmp_t:dir manage_dir_perms;
 files_home_filetrans(automount_t,automount_tmp_t,dir)
 files_root_filetrans(automount_t,automount_tmp_t,dir)
 
-allow automount_t automount_var_run_t:file create_file_perms;
-allow automount_t automount_var_run_t:dir rw_dir_perms;
+manage_files_pattern(automount_t,automount_var_run_t,automount_var_run_t)
 files_pid_filetrans(automount_t,automount_var_run_t,file)
 
 kernel_read_kernel_sysctls(automount_t)
@@ -78,7 +73,6 @@ files_unmount_all_file_type_fs(automount_t)
 fs_mount_all_fs(automount_t)
 fs_unmount_all_fs(automount_t)
 
-corecmd_exec_sbin(automount_t)
 corecmd_exec_bin(automount_t)
 corecmd_exec_shell(automount_t)
 
@@ -128,12 +122,9 @@ fs_search_auto_mountpoints(automount_t)
 fs_manage_auto_mountpoints(automount_t)
 fs_unmount_autofs(automount_t)
 fs_mount_autofs(automount_t)
+fs_manage_autofs_symlinks(automount_t)
 
-term_dontaudit_use_console(automount_t)
 term_dontaudit_getattr_pty_dirs(automount_t)
-
-init_use_fds(automount_t)
-init_use_script_ptys(automount_t)
 
 libs_use_ld_so(automount_t)
 libs_use_shared_libs(automount_t)

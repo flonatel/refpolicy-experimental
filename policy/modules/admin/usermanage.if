@@ -17,12 +17,7 @@ interface(`usermanage_domtrans_chfn',`
 
 	files_search_usr($1)
 	corecmd_search_bin($1)
-	domain_auto_trans($1,chfn_exec_t,chfn_t)
-
-	allow $1 chfn_t:fd use;
-	allow chfn_t $1:fd use;
-	allow chfn_t $1:fifo_file rw_file_perms;
-	allow chfn_t $1:process sigchld;
+	domtrans_pattern($1,chfn_exec_t,chfn_t)
 ')
 
 ########################################
@@ -72,13 +67,8 @@ interface(`usermanage_domtrans_groupadd',`
 	')
 
 	files_search_usr($1)
-	corecmd_search_sbin($1)
-	domain_auto_trans($1,groupadd_exec_t,groupadd_t)
-
-	allow $1 groupadd_t:fd use;
-	allow groupadd_t $1:fd use;
-	allow groupadd_t $1:fifo_file rw_file_perms;
-	allow groupadd_t $1:process sigchld;
+	corecmd_search_bin($1)
+	domtrans_pattern($1,groupadd_exec_t,groupadd_t)
 ')
 
 ########################################
@@ -111,6 +101,7 @@ interface(`usermanage_run_groupadd',`
 	usermanage_domtrans_groupadd($1)
 	role $2 types groupadd_t;
 	allow groupadd_t $3:chr_file rw_term_perms;
+	nscd_run(groupadd_t, $2, $3)
 ')
 
 ########################################
@@ -130,12 +121,7 @@ interface(`usermanage_domtrans_passwd',`
 
 	files_search_usr($1)
 	corecmd_search_bin($1)
-	domain_auto_trans($1,passwd_exec_t,passwd_t)
-
-	allow $1 passwd_t:fd use;
-	allow passwd_t $1:fd use;
-	allow passwd_t $1:fifo_file rw_file_perms;
-	allow passwd_t $1:process sigchld;
+	domtrans_pattern($1,passwd_exec_t,passwd_t)
 ')
 
 ########################################
@@ -187,12 +173,7 @@ interface(`usermanage_domtrans_admin_passwd',`
 
 	files_search_usr($1)
 	corecmd_search_bin($1)
-	domain_auto_trans($1,admin_passwd_exec_t,sysadm_passwd_t)
-
-	allow $1 sysadm_passwd_t:fd use;
-	allow sysadm_passwd_t $1:fd use;
-	allow sysadm_passwd_t $1:fifo_file rw_file_perms;
-	allow sysadm_passwd_t $1:process sigchld;
+	domtrans_pattern($1,admin_passwd_exec_t,sysadm_passwd_t)
 ')
 
 ########################################
@@ -226,6 +207,7 @@ interface(`usermanage_run_admin_passwd',`
 	usermanage_domtrans_admin_passwd($1)
 	role $2 types sysadm_passwd_t;
 	allow sysadm_passwd_t $3:chr_file rw_term_perms;
+	nscd_run(sysadm_passwd_t, $2, $3)
 ')
 
 ########################################
@@ -244,13 +226,8 @@ interface(`usermanage_domtrans_useradd',`
 	')
 
 	files_search_usr($1)
-	corecmd_search_sbin($1)
-	domain_auto_trans($1,useradd_exec_t,useradd_t)
-
-	allow $1 useradd_t:fd use;
-	allow useradd_t $1:fd use;
-	allow useradd_t $1:fifo_file rw_file_perms;
-	allow useradd_t $1:process sigchld;
+	corecmd_search_bin($1)
+	domtrans_pattern($1,useradd_exec_t,useradd_t)
 ')
 
 ########################################
@@ -283,6 +260,7 @@ interface(`usermanage_run_useradd',`
 	usermanage_domtrans_useradd($1)
 	role $2 types useradd_t;
 	allow useradd_t $3:chr_file rw_term_perms;
+	nscd_run(useradd_t, $2, $3)
 ')
 
 ########################################
@@ -300,5 +278,5 @@ interface(`usermanage_read_crack_db',`
 		type crack_db_t;
 	')
 
-	allow $1 crack_db_t:file r_file_perms;
+	allow $1 crack_db_t:file read_file_perms;
 ')

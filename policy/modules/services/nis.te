@@ -1,5 +1,5 @@
 
-policy_module(nis,1.2.0)
+policy_module(nis,1.4.0)
 
 ########################################
 #
@@ -49,23 +49,21 @@ init_daemon_domain(ypxfr_t,ypxfr_exec_t)
 # ypbind local policy
 
 dontaudit ypbind_t self:capability { net_admin sys_tty_config };
-allow ypbind_t self:fifo_file rw_file_perms;
+allow ypbind_t self:fifo_file rw_fifo_file_perms;
 allow ypbind_t self:process signal_perms;
 allow ypbind_t self:{ unix_dgram_socket unix_stream_socket } create_socket_perms;
 allow ypbind_t self:netlink_route_socket r_netlink_socket_perms;
 allow ypbind_t self:tcp_socket create_stream_socket_perms;
 allow ypbind_t self:udp_socket create_socket_perms;
 
-allow ypbind_t ypbind_tmp_t:dir create_dir_perms;
-allow ypbind_t ypbind_tmp_t:file create_file_perms;
+manage_dirs_pattern(ypbind_t,ypbind_tmp_t,ypbind_tmp_t)
+manage_files_pattern(ypbind_t,ypbind_tmp_t,ypbind_tmp_t)
 files_tmp_filetrans(ypbind_t, ypbind_tmp_t, { file dir })
 
-allow ypbind_t ypbind_var_run_t:file manage_file_perms;
-allow ypbind_t ypbind_var_run_t:dir rw_dir_perms;
+manage_files_pattern(ypbind_t,ypbind_var_run_t,ypbind_var_run_t)
 files_pid_filetrans(ypbind_t,ypbind_var_run_t,file)
 
-allow ypbind_t var_yp_t:dir rw_dir_perms;
-allow ypbind_t var_yp_t:file create_file_perms;
+manage_files_pattern(ypbind_t,var_yp_t,var_yp_t)
 
 kernel_read_kernel_sysctls(ypbind_t)
 kernel_list_proc(ypbind_t)
@@ -97,15 +95,10 @@ dev_read_sysfs(ypbind_t)
 fs_getattr_all_fs(ypbind_t)
 fs_search_auto_mountpoints(ypbind_t)
 
-term_dontaudit_use_console(ypbind_t)
-
 domain_use_interactive_fds(ypbind_t)
 
 files_read_etc_files(ypbind_t)
 files_list_var(ypbind_t)
-
-init_use_fds(ypbind_t)
-init_use_script_ptys(ypbind_t)
 
 libs_use_ld_so(ypbind_t)
 libs_use_shared_libs(ypbind_t)
@@ -140,7 +133,7 @@ optional_policy(`
 #
 
 dontaudit yppasswdd_t self:capability sys_tty_config;
-allow yppasswdd_t self:fifo_file rw_file_perms;
+allow yppasswdd_t self:fifo_file rw_fifo_file_perms;
 allow yppasswdd_t self:process { setfscreate signal_perms };
 allow yppasswdd_t self:unix_dgram_socket create_socket_perms;
 allow yppasswdd_t self:unix_stream_socket create_stream_socket_perms;
@@ -148,13 +141,11 @@ allow yppasswdd_t self:netlink_route_socket r_netlink_socket_perms;
 allow yppasswdd_t self:tcp_socket create_stream_socket_perms;
 allow yppasswdd_t self:udp_socket create_socket_perms;
 
-allow yppasswdd_t yppasswdd_var_run_t:file create_file_perms;
-allow yppasswdd_t yppasswdd_var_run_t:dir rw_dir_perms;
+manage_files_pattern(yppasswdd_t,yppasswdd_var_run_t,yppasswdd_var_run_t)
 files_pid_filetrans(yppasswdd_t,yppasswdd_var_run_t,file)
 
-allow yppasswdd_t var_yp_t:dir rw_dir_perms;
-allow yppasswdd_t var_yp_t:file create_file_perms;
-allow yppasswdd_t var_yp_t:lnk_file create_lnk_perms;
+manage_files_pattern(yppasswdd_t,var_yp_t,var_yp_t)
+manage_lnk_files_pattern(yppasswdd_t,var_yp_t,var_yp_t)
 
 kernel_list_proc(yppasswdd_t)
 kernel_read_proc_symlinks(yppasswdd_t)
@@ -183,24 +174,18 @@ fs_search_auto_mountpoints(yppasswdd_t)
 
 selinux_get_fs_mount(yppasswdd_t)
 
-term_dontaudit_use_console(yppasswdd_t)
-
 auth_manage_shadow(yppasswdd_t)
 auth_relabel_shadow(yppasswdd_t)
 auth_etc_filetrans_shadow(yppasswdd_t)
 
 corecmd_exec_bin(yppasswdd_t)
 corecmd_exec_shell(yppasswdd_t)
-corecmd_search_sbin(yppasswdd_t)
 
 domain_use_interactive_fds(yppasswdd_t)
 
 files_read_etc_files(yppasswdd_t)
 files_read_etc_runtime_files(yppasswdd_t)
 files_relabel_etc_files(yppasswdd_t)
-
-init_use_fds(yppasswdd_t)
-init_use_script_ptys(yppasswdd_t)
 
 libs_use_ld_so(yppasswdd_t)
 libs_use_shared_libs(yppasswdd_t)
@@ -239,7 +224,7 @@ optional_policy(`
 #
 
 dontaudit ypserv_t self:capability sys_tty_config;
-allow ypserv_t self:fifo_file rw_file_perms;
+allow ypserv_t self:fifo_file rw_fifo_file_perms;
 allow ypserv_t self:process signal_perms;
 allow ypserv_t self:unix_dgram_socket create_socket_perms;
 allow ypserv_t self:unix_stream_socket create_stream_socket_perms;
@@ -247,17 +232,15 @@ allow ypserv_t self:netlink_route_socket r_netlink_socket_perms;
 allow ypserv_t self:tcp_socket connected_stream_socket_perms;
 allow ypserv_t self:udp_socket create_socket_perms;
 
-allow ypserv_t var_yp_t:dir rw_dir_perms;
-allow ypserv_t var_yp_t:file create_file_perms;
+manage_files_pattern(ypserv_t,var_yp_t,var_yp_t)
 
 allow ypserv_t ypserv_conf_t:file { getattr read };
 
-allow ypserv_t ypserv_tmp_t:dir create_dir_perms;
-allow ypserv_t ypserv_tmp_t:file create_file_perms;
+manage_dirs_pattern(ypserv_t,ypserv_tmp_t,ypserv_tmp_t)
+manage_files_pattern(ypserv_t,ypserv_tmp_t,ypserv_tmp_t)
 files_tmp_filetrans(ypserv_t, ypserv_tmp_t, { file dir })
 
-allow ypserv_t ypserv_var_run_t:dir rw_dir_perms;
-allow ypserv_t ypserv_var_run_t:file manage_file_perms;
+manage_files_pattern(ypserv_t,ypserv_var_run_t,ypserv_var_run_t)
 files_pid_filetrans(ypserv_t,ypserv_var_run_t,file)
 
 kernel_read_kernel_sysctls(ypserv_t)
@@ -284,16 +267,12 @@ dev_read_sysfs(ypserv_t)
 fs_getattr_all_fs(ypserv_t)
 fs_search_auto_mountpoints(ypserv_t)
 
-term_dontaudit_use_console(ypserv_t)
-
 corecmd_exec_bin(ypserv_t)
 
 domain_use_interactive_fds(ypserv_t)
 
 files_read_var_files(ypserv_t)
-
-init_use_fds(ypserv_t)
-init_use_script_ptys(ypserv_t)
+files_read_etc_files(ypserv_t)
 
 libs_use_ld_so(ypserv_t)
 libs_use_shared_libs(ypserv_t)
@@ -330,6 +309,17 @@ optional_policy(`
 #
 
 allow ypxfr_t self:unix_stream_socket create_stream_socket_perms;
+allow ypxfr_t self:unix_dgram_socket create_stream_socket_perms;
+allow ypxfr_t self:tcp_socket create_stream_socket_perms;
+allow ypxfr_t self:udp_socket create_socket_perms;
+allow ypxfr_t self:netlink_route_socket r_netlink_socket_perms;
+
+manage_files_pattern(ypxfr_t, var_yp_t, var_yp_t)
+
+allow ypxfr_t ypserv_t:tcp_socket { read write };
+allow ypxfr_t ypserv_t:udp_socket { read write };
+
+allow ypxfr_t ypserv_conf_t:file { getattr read };
 
 corenet_non_ipsec_sendrecv(ypxfr_t)
 corenet_tcp_sendrecv_all_if(ypxfr_t)
@@ -349,3 +339,18 @@ corenet_sendrecv_generic_server_packets(ypxfr_t)
 corenet_sendrecv_all_client_packets(ypxfr_t)
 
 files_read_etc_files(ypxfr_t)
+files_search_usr(ypxfr_t)
+
+libs_use_shared_libs(ypxfr_t)
+libs_use_ld_so(ypxfr_t)
+
+logging_send_syslog_msg(ypxfr_t)
+
+miscfiles_read_localization(ypxfr_t)
+
+sysnet_read_config(ypxfr_t)
+
+ifdef(`targeted_policy',`
+	term_dontaudit_use_unallocated_ttys(ypxfr_t)
+	term_dontaudit_use_generic_ptys(ypxfr_t)
+')

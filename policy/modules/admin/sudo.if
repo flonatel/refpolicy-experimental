@@ -37,7 +37,6 @@ template(`sudo_per_role_template',`
 
 	gen_require(`
 		type sudo_exec_t;
-		bool secure_mode;
 	')
 
 	##############################
@@ -61,7 +60,7 @@ template(`sudo_per_role_template',`
 	allow $1_sudo_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 	allow $1_sudo_t self:process { setexec setrlimit };
 	allow $1_sudo_t self:fd use;
-	allow $1_sudo_t self:fifo_file rw_file_perms;
+	allow $1_sudo_t self:fifo_file rw_fifo_file_perms;
 	allow $1_sudo_t self:shm create_shm_perms;
 	allow $1_sudo_t self:sem create_sem_perms;
 	allow $1_sudo_t self:msgq create_msgq_perms;
@@ -71,23 +70,20 @@ template(`sudo_per_role_template',`
 	allow $1_sudo_t self:unix_dgram_socket sendto;
 	allow $1_sudo_t self:unix_stream_socket connectto;
 	allow $1_sudo_t self:netlink_audit_socket { create bind write nlmsg_read read };
+	allow $1_sudo_t self:netlink_route_socket r_netlink_socket_perms;
 
 	# Enter this derived domain from the user domain
-	domain_auto_trans($2, sudo_exec_t, $1_sudo_t)
-	allow $1_sudo_t $2:fd use;
-	allow $2 $1_sudo_t:fd use;
-	allow $2 $1_sudo_t:fifo_file rw_file_perms;
-	allow $2 $1_sudo_t:process sigchld;
+	domtrans_pattern($2, sudo_exec_t, $1_sudo_t)
 
 	# By default, revert to the calling domain when a shell is executed.
 	corecmd_shell_domtrans($1_sudo_t,$2)
 	allow $2 $1_sudo_t:fd use;
-	allow $1_sudo_t $2:fd use;
-	allow $1_sudo_t $2:fifo_file rw_file_perms;
-	allow $1_sudo_t $2:process sigchld;
+	allow $2 $1_sudo_t:fifo_file rw_file_perms;
+	allow $2 $1_sudo_t:process sigchld;
 
 	kernel_read_kernel_sysctls($1_sudo_t)
 	kernel_read_system_state($1_sudo_t)
+	kernel_search_key($1_sudo_t)
 
 	dev_read_urand($1_sudo_t)
 
@@ -95,10 +91,11 @@ template(`sudo_per_role_template',`
 	fs_getattr_xattr_fs($1_sudo_t)
 
 	auth_domtrans_chk_passwd($1_sudo_t)
+	# sudo stores a token in the pam_pid directory
+	auth_manage_pam_pid($1_sudo_t)
 
-	corecmd_getattr_bin_files($1_sudo_t)
-	corecmd_read_sbin_symlinks($1_sudo_t)
-	corecmd_getattr_sbin_files($1_sudo_t)
+	corecmd_read_bin_symlinks($1_sudo_t)
+	corecmd_getattr_all_executables($1_sudo_t)
 
 	domain_use_interactive_fds($1_sudo_t)
 	domain_sigchld_interactive_fds($1_sudo_t)
@@ -145,9 +142,5 @@ template(`sudo_per_role_template',`
 	domain_auto_trans($1_sudo_t, sendmail_exec_t, $1_mail_t)
 	')
 
-	ifdef(`pam.te', `
-	allow $1_sudo_t pam_var_run_t:dir create_dir_perms;
-	allow $1_sudo_t pam_var_run_t:file create_file_perms;
-	')
 	') dnl end TODO
 ')

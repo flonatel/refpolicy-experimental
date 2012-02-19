@@ -1,0 +1,13 @@
+<module name="radius" filename="policy/modules/services/radius.if">
+<summary>RADIUS authentication and accounting server.</summary>
+<interface name="radius_use" lineno="13">
+<summary>
+Use radius over a UDP connection.  (Deprecated)
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+</module>

@@ -1,0 +1,57 @@
+<module name="quota" filename="policy/modules/admin/quota.if">
+<summary>File system quota management</summary>
+<interface name="quota_domtrans" lineno="13">
+<summary>
+Execute quota management tools in the quota domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+</interface>
+<interface name="quota_run" lineno="43">
+<summary>
+Execute quota management tools in the quota domain, and
+allow the specified role the quota domain.
+</summary>
+<param name="domain">
+<summary>
+The type of the process performing this action.
+</summary>
+</param>
+<param name="role">
+<summary>
+The role to be allowed the quota domain.
+</summary>
+</param>
+<param name="terminal">
+<summary>
+The type of the terminal allow the quota domain to use.
+</summary>
+</param>
+<rolecap/>
+</interface>
+<interface name="quota_dontaudit_getattr_db" lineno="64">
+<summary>
+Do not audit attempts to get the attributes
+of filesystem quota data files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+<interface name="quota_manage_flags" lineno="83">
+<summary>
+Create, read, write, and delete quota
+flag files.
+</summary>
+<param name="domain">
+<summary>
+Domain to not audit.
+</summary>
+</param>
+</interface>
+</module>
