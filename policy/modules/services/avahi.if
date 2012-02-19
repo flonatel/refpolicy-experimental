@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -25,7 +25,7 @@ interface(`avahi_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -119,7 +119,7 @@ interface(`avahi_stream_connect',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -133,7 +133,7 @@ interface(`avahi_dontaudit_search_pid',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate 
+##	All of the rules required to administrate
 ##	an avahi environment
 ## </summary>
 ## <param name="domain">
@@ -150,8 +150,7 @@ interface(`avahi_dontaudit_search_pid',`
 #
 interface(`avahi_admin',`
 	gen_require(`
-		type avahi_t, avahi_var_run_t;
-		type avahi_initrc_exec_t;
+		type avahi_t, avahi_var_run_t, avahi_initrc_exec_t;
 	')
 
 	allow $1 avahi_t:process { ptrace signal_perms };

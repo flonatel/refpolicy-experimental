@@ -1,5 +1,4 @@
-
-policy_module(likewise, 1.0.0)
+policy_module(likewise, 1.2.0)
 
 #################################
 #
@@ -99,7 +98,7 @@ allow lsassd_t netlogond_var_lib_t:file read_file_perms;
 
 manage_files_pattern(lsassd_t, likewise_etc_t, likewise_etc_t)
 
-manage_files_pattern(lsassd_t, lsassd_tmp_t, lsassd_tmp_t);
+manage_files_pattern(lsassd_t, lsassd_tmp_t, lsassd_tmp_t)
 files_tmp_filetrans(lsassd_t, lsassd_tmp_t, file)
 
 stream_connect_pattern(lsassd_t, likewise_var_lib_t, dcerpcd_var_socket_t, dcerpcd_t)
@@ -138,13 +137,13 @@ selinux_validate_context(lsassd_t)
 seutil_read_config(lsassd_t)
 seutil_read_default_contexts(lsassd_t)
 seutil_read_file_contexts(lsassd_t)
-seutil_run_semanage(lsassd_t, lsassd_t)
+seutil_run_semanage(lsassd_t, system_r)
 
 sysnet_use_ldap(lsassd_t)
 sysnet_read_config(lsassd_t)
 
 userdom_home_filetrans_user_home_dir(lsassd_t)
-userdom_manage_home_role(system_r, lsassd_t)
+userdom_manage_user_home_content_files(lsassd_t)
 
 optional_policy(`
 	kerberos_rw_keytab(lsassd_t)

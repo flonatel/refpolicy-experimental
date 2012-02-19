@@ -1,11 +1,11 @@
-
-policy_module(authlogin, 2.2.0)
+policy_module(authlogin, 2.3.0)
 
 ########################################
 #
 # Declarations
 #
 
+attribute auth_file_type;
 attribute can_read_shadow_passwords;
 attribute can_write_shadow_passwords;
 attribute can_relabelto_shadow_passwords;
@@ -45,13 +45,13 @@ type pam_tmp_t;
 files_tmp_file(pam_tmp_t)
 
 type pam_var_console_t;
-files_type(pam_var_console_t)
+files_pid_file(pam_var_console_t)
 
 type pam_var_run_t;
 files_pid_file(pam_var_run_t)
 
 type shadow_t;
-files_security_file(shadow_t)
+auth_file(shadow_t)
 neverallow ~can_read_shadow_passwords shadow_t:file read;
 neverallow ~can_write_shadow_passwords shadow_t:file { create write };
 neverallow ~can_relabelto_shadow_passwords shadow_t:file relabelto;
@@ -84,11 +84,12 @@ logging_log_file(wtmp_t)
 
 allow chkpwd_t self:capability { dac_override setuid };
 dontaudit chkpwd_t self:capability sys_tty_config;
-allow chkpwd_t self:process getattr;
+allow chkpwd_t self:process { getattr signal };
 
 allow chkpwd_t shadow_t:file read_file_perms;
 files_list_etc(chkpwd_t)
 
+kernel_read_crypto_sysctls(chkpwd_t)
 # is_selinux_enabled
 kernel_read_system_state(chkpwd_t)
 
@@ -149,7 +150,7 @@ dontaudit pam_t self:capability sys_tty_config;
 
 allow pam_t self:fd use;
 allow pam_t self:fifo_file rw_file_perms;
-allow pam_t self:unix_dgram_socket create_socket_perms; 
+allow pam_t self:unix_dgram_socket create_socket_perms;
 allow pam_t self:unix_stream_socket rw_stream_socket_perms;
 allow pam_t self:unix_dgram_socket sendto;
 allow pam_t self:unix_stream_socket connectto;
@@ -281,7 +282,7 @@ init_use_script_ptys(pam_console_t)
 logging_send_syslog_msg(pam_console_t)
 
 miscfiles_read_localization(pam_console_t)
-miscfiles_read_certs(pam_console_t)
+miscfiles_read_generic_certs(pam_console_t)
 
 seutil_read_file_contexts(pam_console_t)
 

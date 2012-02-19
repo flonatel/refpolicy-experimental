@@ -1,5 +1,4 @@
-
-policy_module(slocate, 1.9.0)
+policy_module(slocate, 1.11.0)
 
 #################################
 #
@@ -30,6 +29,7 @@ manage_dirs_pattern(locate_t, locate_var_lib_t, locate_var_lib_t)
 manage_files_pattern(locate_t, locate_var_lib_t, locate_var_lib_t)
 
 kernel_read_system_state(locate_t)
+kernel_dontaudit_search_network_state(locate_t)
 kernel_dontaudit_search_sysctl(locate_t)
 
 corecmd_exec_bin(locate_t)
@@ -38,6 +38,7 @@ dev_getattr_all_blk_files(locate_t)
 dev_getattr_all_chr_files(locate_t)
 
 files_list_all(locate_t)
+files_dontaudit_read_all_symlinks(locate_t)
 files_getattr_all_files(locate_t)
 files_getattr_all_pipes(locate_t)
 files_getattr_all_sockets(locate_t)
@@ -48,8 +49,11 @@ fs_getattr_all_fs(locate_t)
 fs_getattr_all_files(locate_t)
 fs_getattr_all_pipes(locate_t)
 fs_getattr_all_symlinks(locate_t)
+fs_getattr_all_blk_files(locate_t)
+fs_getattr_all_chr_files(locate_t)
 fs_list_all(locate_t)
 fs_list_inotifyfs(locate_t)
+fs_read_noxattr_fs_symlinks(locate_t)
 
 # getpwnam
 auth_use_nsswitch(locate_t)

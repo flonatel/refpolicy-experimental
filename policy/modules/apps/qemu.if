@@ -127,12 +127,14 @@ template(`qemu_domain_template',`
 template(`qemu_role',`
 	gen_require(`
 		type qemu_t, qemu_exec_t;
+		type qemu_config_t, qemu_config_exec_t;
 	')
 
 	role $1 types { qemu_t qemu_config_t };
 
 	domtrans_pattern($2, qemu_exec_t, qemu_t)
  	domtrans_pattern($2, qemu_config_exec_t, qemu_config_t)
+	allow qemu_t $2:process signull;
 ')
 
 ########################################
@@ -159,7 +161,7 @@ interface(`qemu_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
@@ -167,6 +169,7 @@ interface(`qemu_domtrans',`
 ##	The role to allow the qemu domain.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`qemu_run',`
 	gen_require(`
@@ -175,10 +178,8 @@ interface(`qemu_run',`
 
 	qemu_domtrans($1)
 	role $2 types qemu_t;
-
-	optional_policy(`
-		samba_run_smb(qemu_t, $2, $3)
-	')
+	allow qemu_t $1:process signull;
+	allow $1 qemu_t:process signull;
 ')
 
 ########################################

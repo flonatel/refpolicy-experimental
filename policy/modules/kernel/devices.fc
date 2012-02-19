@@ -18,6 +18,7 @@
 /dev/beep		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/btrfs-control	-c	gen_context(system_u:object_r:lvm_control_t,s0)
 /dev/controlD64		-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
+/dev/crash		-c	gen_context(system_u:object_r:crash_device_t,mls_systemhigh)
 /dev/dahdi/.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/dmfm		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/dmmidi.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
@@ -70,6 +71,7 @@
 /dev/modem		-c	gen_context(system_u:object_r:modem_device_t,s0)
 /dev/mpu401.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/msr.*		-c	gen_context(system_u:object_r:cpu_device_t,s0)
+/dev/net/vhost		-c	gen_context(system_u:object_r:vhost_device_t,s0)
 /dev/network_latency	-c	gen_context(system_u:object_r:netcontrol_device_t,s0)
 /dev/network_throughput	-c	gen_context(system_u:object_r:netcontrol_device_t,s0)
 /dev/noz.* 		-c	gen_context(system_u:object_r:modem_device_t,s0)
@@ -109,9 +111,11 @@
 /dev/ub[a-c]		-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/usb.+		-c	gen_context(system_u:object_r:usb_device_t,s0)
 /dev/usblp.*		-c	gen_context(system_u:object_r:printer_device_t,s0)
+/dev/usbmon.+		-c	gen_context(system_u:object_r:usbmon_device_t,s0)
 ifdef(`distro_suse', `
 /dev/usbscanner		-c	gen_context(system_u:object_r:scanner_device_t,s0)
 ')
+/dev/vhost-net		-c	gen_context(system_u:object_r:vhost_device_t,s0)
 /dev/vbi.*		-c	gen_context(system_u:object_r:v4l_device_t,s0)
 /dev/vbox.*		-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
 /dev/vga_arbiter	-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
@@ -152,6 +156,10 @@ ifdef(`distro_suse', `
 
 /dev/mapper/control	-c	gen_context(system_u:object_r:lvm_control_t,s0)
 
+/dev/mfpports/.*	-c	gen_context(system_u:object_r:printer_device_t,s0)
+
+/dev/mqueue(/.*)?		<<none>>
+
 /dev/mvideo/.*		-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
 
 /dev/pts(/.*)?			<<none>>
@@ -168,16 +176,18 @@ ifdef(`distro_suse', `
 
 /dev/xen/blktap.*	-c	gen_context(system_u:object_r:xen_device_t,s0)
 /dev/xen/evtchn		-c	gen_context(system_u:object_r:xen_device_t,s0)
+/dev/xen/gntdev		-c	gen_context(system_u:object_r:xen_device_t,s0)
+/dev/xen/gntalloc	-c	gen_context(system_u:object_r:xen_device_t,s0)
 
 /etc/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
 
-/lib/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
-
-ifdef(`distro_gentoo',`
 # used by init scripts to initally populate udev /dev
+/lib/udev/devices(/.*)?		gen_context(system_u:object_r:device_t,s0)
+/lib/udev/devices/lp.*	-c	gen_context(system_u:object_r:printer_device_t,s0)
 /lib/udev/devices/null	-c	gen_context(system_u:object_r:null_device_t,s0)
 /lib/udev/devices/zero	-c	gen_context(system_u:object_r:zero_device_t,s0)
-')
+
+/sys(/.*)?			gen_context(system_u:object_r:sysfs_t,s0)
 
 ifdef(`distro_redhat',`
 # originally from named.fc

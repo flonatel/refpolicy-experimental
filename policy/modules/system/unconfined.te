@@ -1,5 +1,4 @@
-
-policy_module(unconfined, 3.2.0)
+policy_module(unconfined, 3.3.0)
 
 ########################################
 #
@@ -116,6 +115,10 @@ optional_policy(`
 
 optional_policy(`
 	ftp_run_ftpdctl(unconfined_t, unconfined_r)
+')
+
+optional_policy(`
+	hadoop_role(unconfined_r, unconfined_t)
 ')
 
 optional_policy(`

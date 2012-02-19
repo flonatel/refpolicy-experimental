@@ -1,5 +1,4 @@
-
-policy_module(selinuxutil, 1.14.0)
+policy_module(selinuxutil, 1.15.0)
 
 gen_require(`
 	bool secure_mode;
@@ -324,8 +323,8 @@ selinux_compute_create_context(restorecond_t)
 selinux_compute_relabel_context(restorecond_t)
 selinux_compute_user_contexts(restorecond_t)
 
-auth_relabel_all_files_except_shadow(restorecond_t )
-auth_read_all_files_except_shadow(restorecond_t)
+auth_relabel_all_files_except_auth_files(restorecond_t )
+auth_read_all_files_except_auth_files(restorecond_t)
 auth_use_nsswitch(restorecond_t)
 
 locallogin_dontaudit_use_fds(restorecond_t)
@@ -479,6 +478,10 @@ seutil_get_semanage_read_lock(semanage_t)
 # netfilter_contexts:
 seutil_manage_default_contexts(semanage_t)
 
+# Handle pp files created in homedir and /tmp
+userdom_read_user_home_content_files(semanage_t)
+userdom_read_user_tmp_files(semanage_t)
+
 ifdef(`distro_debian',`
 	files_read_var_lib_files(semanage_t)
 	files_read_var_lib_symlinks(semanage_t)
@@ -488,15 +491,6 @@ ifdef(`distro_ubuntu',`
 	optional_policy(`
 		unconfined_domain(semanage_t)
 	')
-')
-
-# cjp: need a more general way to handle this:
-ifdef(`enable_mls',`
-	# read secadm tmp files
-',`
-	# Handle pp files created in homedir and /tmp
-	userdom_read_user_home_content_files(semanage_t)
-	userdom_read_user_tmp_files(semanage_t)
 ')
 
 ########################################

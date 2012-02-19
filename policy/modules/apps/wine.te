@@ -1,10 +1,16 @@
-
-policy_module(wine, 1.7.0)
+policy_module(wine, 1.9.0)
 
 ########################################
 #
 # Declarations
 #
+
+## <desc>
+## <p>
+##	Ignore wine mmap_zero errors.
+## </p>
+## </desc>
+gen_tunable(wine_mmap_zero_ignore, false)
 
 type wine_t;
 type wine_exec_t;
@@ -36,12 +42,20 @@ files_execmod_all_files(wine_t)
 
 userdom_use_user_terminals(wine_t)
 
+tunable_policy(`wine_mmap_zero_ignore',`
+	dontaudit wine_t self:memprotect mmap_zero;
+')
+
 optional_policy(`
 	hal_dbus_chat(wine_t)
 ')
 
 optional_policy(`
-	unconfined_domain_noaudit(wine_t)
+	policykit_dbus_chat(wine_t)
+')
+
+optional_policy(`
+	unconfined_domain(wine_t)
 ')
 
 optional_policy(`

@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -25,7 +25,7 @@ interface(`abrt_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -62,7 +62,7 @@ interface(`abrt_signull',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to allow access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -72,6 +72,25 @@ interface(`abrt_read_state',`
 	')
 
 	ps_process_pattern($1, abrt_t)
+')
+
+########################################
+## <summary>
+##	Connect to abrt over an unix stream socket.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`abrt_stream_connect',`
+	gen_require(`
+		type abrt_t, abrt_var_run_t;
+	')
+
+	files_search_pids($1)
+	stream_connect_pattern($1, abrt_var_run_t, abrt_var_run_t, abrt_t)
 ')
 
 ########################################
@@ -101,7 +120,7 @@ interface(`abrt_dbus_chat',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -120,7 +139,7 @@ interface(`abrt_domtrans_helper',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
@@ -213,6 +232,25 @@ interface(`abrt_read_pid_files',`
 
 	files_search_pids($1)
 	read_files_pattern($1, abrt_var_run_t, abrt_var_run_t)
+')
+
+######################################
+## <summary>
+##	Create, read, write, and delete abrt PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`abrt_manage_pid_files',`
+	gen_require(`
+		type abrt_var_run_t;
+	')
+
+	files_search_pids($1)
+	manage_files_pattern($1, abrt_var_run_t, abrt_var_run_t)
 ')
 
 #####################################

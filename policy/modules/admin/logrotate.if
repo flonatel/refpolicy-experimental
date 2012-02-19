@@ -6,7 +6,7 @@
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -15,6 +15,7 @@ interface(`logrotate_domtrans',`
 		type logrotate_t, logrotate_exec_t;
 	')
 
+	corecmd_search_bin($1)
 	domtrans_pattern($1, logrotate_exec_t, logrotate_t)
 ')
 
@@ -25,12 +26,12 @@ interface(`logrotate_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the logrotate domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -50,7 +51,7 @@ interface(`logrotate_run',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -59,6 +60,7 @@ interface(`logrotate_exec',`
 		type logrotate_exec_t;
 	')
 
+	corecmd_search_bin($1)
 	can_exec($1, logrotate_exec_t)
 ')
 
@@ -86,7 +88,7 @@ interface(`logrotate_use_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -104,7 +106,7 @@ interface(`logrotate_dontaudit_use_fds',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #

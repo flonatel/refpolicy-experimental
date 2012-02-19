@@ -28,7 +28,7 @@ define(`devfile_class_set', `{ chr_file blk_file }')
 #
 # All socket classes.
 #
-define(`socket_class_set', `{ tcp_socket udp_socket rawip_socket netlink_socket packet_socket unix_stream_socket unix_dgram_socket appletalk_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket netlink_kobject_uevent_socket }')
+define(`socket_class_set', `{ tcp_socket udp_socket rawip_socket netlink_socket packet_socket unix_stream_socket unix_dgram_socket appletalk_socket netlink_route_socket netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket netlink_xfrm_socket netlink_selinux_socket netlink_audit_socket netlink_ip6fw_socket netlink_dnrt_socket netlink_kobject_uevent_socket tun_socket }')
 
 
 #
@@ -84,7 +84,7 @@ define(`link_file_perms', `{ getattr link unlink rename } refpolicywarn(`$0 is d
 #
 # Permissions for creating lnk_files.
 #
-define(`create_lnk_perms', `{ create read getattr setattr link unlink rename } refpolicywarn(`$0 is deprecated please use manage_lnk_file_perms instead.')')
+define(`create_lnk_perms', `{ create read write getattr setattr link unlink rename } refpolicywarn(`$0 is deprecated please use manage_lnk_file_perms instead.')')
 
 # 
 # Permissions for reading directories and their attributes.
@@ -305,7 +305,7 @@ define(`relabel_chr_file_perms',`{ getattr relabelfrom relabelto }')
 #
 # Use (read and write) terminals
 #
-define(`rw_term_perms', `{ getattr open read write ioctl }')
+define(`rw_term_perms', `{ getattr open read write append ioctl }')
 
 #
 # Sockets

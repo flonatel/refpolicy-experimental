@@ -1,5 +1,4 @@
-
-policy_module(evolution, 2.1.0)
+policy_module(evolution, 2.2.0)
 
 ########################################
 #
@@ -60,7 +59,6 @@ ubac_constrained(evolution_exchange_orbit_tmp_t)
 type evolution_home_t;
 typealias evolution_home_t alias { user_evolution_home_t staff_evolution_home_t sysadm_evolution_home_t };
 typealias evolution_home_t alias { auditadm_evolution_home_t secadm_evolution_home_t };
-files_poly_member(evolution_home_t)
 userdom_user_home_content(evolution_home_t)
 
 type evolution_orbit_tmp_t;
@@ -543,7 +541,7 @@ fs_search_auto_mountpoints(evolution_server_t)
 
 miscfiles_read_localization(evolution_server_t)
 # Look in /etc/pki
-miscfiles_read_certs(evolution_server_t)
+miscfiles_read_generic_certs(evolution_server_t)
 
 # Talk to ldap (address book)
 sysnet_read_config(evolution_server_t)

@@ -1,5 +1,4 @@
-
-policy_module(gift, 2.1.0)
+policy_module(gift, 2.2.0)
 
 ########################################
 #
@@ -16,7 +15,6 @@ ubac_constrained(gift_t)
 type gift_home_t;
 typealias gift_home_t alias { user_gift_home_t staff_gift_home_t sysadm_gift_home_t };
 typealias gift_home_t alias { auditadm_gift_home_t secadm_gift_home_t };
-files_poly_member(gift_home_t)
 userdom_user_home_content(gift_home_t)
 
 type gift_tmpfs_t;
@@ -54,7 +52,7 @@ userdom_user_home_dir_filetrans(gift_t, gift_home_t, dir)
 domtrans_pattern(gift_t, giftd_exec_t, giftd_t)
 
 # Read /proc/meminfo
-kernel_read_system_state(giftd_t)
+kernel_read_system_state(gift_t)
 
 # Connect to gift daemon
 corenet_all_recvfrom_unlabeled(gift_t)

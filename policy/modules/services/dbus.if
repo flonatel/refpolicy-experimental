@@ -172,7 +172,7 @@ template(`dbus_role_template',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -185,6 +185,7 @@ interface(`dbus_system_bus_client',`
 
 	# SE-DBus specific permissions
 	allow $1 { system_dbusd_t self }:dbus send_msg;
+	allow system_dbusd_t $1:dbus send_msg;
 
 	read_files_pattern($1, system_dbusd_var_lib_t, system_dbusd_var_lib_t)
 	files_search_var_lib($1)
@@ -202,7 +203,7 @@ interface(`dbus_system_bus_client',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the domain.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -445,11 +446,29 @@ interface(`dbus_system_domain',`
 
 ########################################
 ## <summary>
-##	Dontaudit Read, and write system dbus TCP sockets.
+##	Use and inherit system DBUS file descriptors.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
 ##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dbus_use_system_bus_fds',`
+	gen_require(`
+		type system_dbusd_t;
+	')
+
+	allow $1 system_dbusd_t:fd use;
+')
+
+########################################
+## <summary>
+##	Dontaudit Read, and write system dbus TCP sockets.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #

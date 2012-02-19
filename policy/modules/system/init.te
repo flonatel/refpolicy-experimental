@@ -1,5 +1,4 @@
-
-policy_module(init, 1.15.0)
+policy_module(init, 1.17.0)
 
 gen_require(`
 	class passwd rootok;
@@ -47,7 +46,7 @@ type init_var_run_t;
 files_pid_file(init_var_run_t)
 
 #
-# initctl_t is the type of the named pipe created 
+# initctl_t is the type of the named pipe created
 # by init during initialization.  This pipe is used
 # to communicate with init.
 #
@@ -89,7 +88,7 @@ ifdef(`enable_mls',`
 
 # Use capabilities. old rule:
 allow init_t self:capability ~sys_module;
-# is ~sys_module really needed? observed: 
+# is ~sys_module really needed? observed:
 # sys_boot
 # sys_tty_config
 # kill: now provided by domain_kill_all_domains()
@@ -109,7 +108,6 @@ files_pid_filetrans(init_t, init_var_run_t, file)
 
 allow init_t initctl_t:fifo_file manage_fifo_file_perms;
 dev_filetrans(init_t, initctl_t, fifo_file)
-fs_associate_tmpfs(initctl_t)
 
 # Modify utmp.
 allow init_t initrc_var_run_t:file { rw_file_perms setattr };
@@ -121,12 +119,13 @@ corecmd_exec_chroot(init_t)
 corecmd_exec_bin(init_t)
 
 dev_read_sysfs(init_t)
+# Early devtmpfs
+dev_rw_generic_chr_files(init_t)
 
 domain_getpgid_all_domains(init_t)
 domain_kill_all_domains(init_t)
 domain_signal_all_domains(init_t)
 domain_signull_all_domains(init_t)
-domain_sigstop_all_domains(init_t)
 domain_sigstop_all_domains(init_t)
 domain_sigchld_all_domains(init_t)
 
@@ -299,13 +298,12 @@ dev_manage_generic_files(initrc_t)
 dev_delete_generic_symlinks(initrc_t)
 dev_getattr_all_blk_files(initrc_t)
 dev_getattr_all_chr_files(initrc_t)
-
-corecmd_exec_all_executables(initrc_t)
+# Early devtmpfs
+dev_rw_generic_chr_files(initrc_t)
 
 domain_kill_all_domains(initrc_t)
 domain_signal_all_domains(initrc_t)
 domain_signull_all_domains(initrc_t)
-domain_sigstop_all_domains(initrc_t)
 domain_sigstop_all_domains(initrc_t)
 domain_sigchld_all_domains(initrc_t)
 domain_read_all_domains_state(initrc_t)
@@ -343,6 +341,7 @@ files_mounton_isid_type_dirs(initrc_t)
 files_list_default(initrc_t)
 files_mounton_default(initrc_t)
 
+fs_write_cgroup_files(initrc_t)
 fs_list_inotifyfs(initrc_t)
 fs_register_binary_executable_type(initrc_t)
 # rhgb-console writes to ramfs
@@ -395,7 +394,7 @@ logging_read_audit_config(initrc_t)
 
 miscfiles_read_localization(initrc_t)
 # slapd needs to read cert files from its initscript
-miscfiles_read_certs(initrc_t)
+miscfiles_read_generic_certs(initrc_t)
 
 modutils_read_module_config(initrc_t)
 modutils_domtrans_insmod(initrc_t)
@@ -442,6 +441,7 @@ ifdef(`distro_gentoo',`
 
 	# openrc uses tmpfs for its state data
 	fs_tmpfs_filetrans(initrc_t, initrc_state_t, { dir file fifo_file lnk_file })
+	files_mountpoint(initrc_state_t)
 
 	# init scripts touch this
 	clock_dontaudit_write_adjtime(initrc_t)
@@ -456,6 +456,10 @@ ifdef(`distro_gentoo',`
 	sysnet_create_config(initrc_t)
 	sysnet_write_config(initrc_t)
 	sysnet_setattr_config(initrc_t)
+
+	optional_policy(`
+		alsa_read_lib(initrc_t)
+	')
 
 	optional_policy(`
 		arpwatch_manage_data_files(initrc_t)
@@ -569,6 +573,10 @@ optional_policy(`
 optional_policy(`
 	dev_read_usbfs(initrc_t)
 	bluetooth_read_config(initrc_t)
+')
+
+optional_policy(`
+	cgroup_stream_connect_cgred(initrc_t)
 ')
 
 optional_policy(`
@@ -770,6 +778,11 @@ optional_policy(`
 optional_policy(`
 	samba_rw_config(initrc_t)
 	samba_read_winbind_pid(initrc_t)
+')
+
+optional_policy(`
+	# shorewall-init script run /var/lib/shorewall/firewall
+	shorewall_lib_domtrans(initrc_t)
 ')
 
 optional_policy(`

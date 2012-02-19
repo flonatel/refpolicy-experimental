@@ -1,5 +1,4 @@
-
-policy_module(filesystem, 1.13.0)
+policy_module(filesystem, 1.15.0)
 
 ########################################
 #
@@ -68,6 +67,13 @@ fs_type(capifs_t)
 files_mountpoint(capifs_t)
 genfscon capifs / gen_context(system_u:object_r:capifs_t,s0)
 
+type cgroup_t;
+fs_type(cgroup_t)
+files_type(cgroup_t)
+files_mountpoint(cgroup_t)
+dev_associate_sysfs(cgroup_t) # only for systemd systems
+genfscon cgroup / gen_context(system_u:object_r:cgroup_t,s0)
+
 type configfs_t;
 fs_type(configfs_t)
 genfscon configfs / gen_context(system_u:object_r:configfs_t,s0)
@@ -82,11 +88,6 @@ fs_noxattr_type(ecryptfs_t)
 files_mountpoint(ecryptfs_t)
 genfscon ecryptfs / gen_context(system_u:object_r:ecryptfs_t,s0)
 
-type eventpollfs_t;
-fs_type(eventpollfs_t)
-# change to task SID 20060628
-#genfscon eventpollfs / gen_context(system_u:object_r:eventpollfs_t,s0)
-
 type futexfs_t;
 fs_type(futexfs_t)
 genfscon futexfs / gen_context(system_u:object_r:futexfs_t,s0)
@@ -100,6 +101,11 @@ type ibmasmfs_t;
 fs_type(ibmasmfs_t)
 allow ibmasmfs_t self:filesystem associate;
 genfscon ibmasmfs / gen_context(system_u:object_r:ibmasmfs_t,s0)
+
+type infinibandeventfs_t;
+fs_type(infinibandeventfs_t)
+allow infinibandeventfs_t self:filesystem associate;
+genfscon infinibandeventfs / gen_context(system_u:object_r:infinibandeventfs_t,s0)
 
 type inotifyfs_t;
 fs_type(inotifyfs_t)
@@ -143,6 +149,12 @@ fs_type(squash_t)
 genfscon squash / gen_context(system_u:object_r:squash_t,s0)
 files_mountpoint(squash_t)
 
+type sysv_t;
+fs_noxattr_type(sysv_t)
+files_mountpoint(sysv_t)
+genfscon sysv / gen_context(system_u:object_r:sysv_t,s0)
+genfscon v7 / gen_context(system_u:object_r:sysv_t,s0)
+
 type vmblock_t;
 fs_noxattr_type(vmblock_t)
 files_mountpoint(vmblock_t)
@@ -169,7 +181,6 @@ files_poly_parent(tmpfs_t)
 # and label the filesystem itself with the specified context.
 # This is appropriate for pseudo filesystems like devpts and tmpfs
 # where we want to label objects with a derived type.
-fs_use_trans devtmpfs gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans mqueue gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans shm gen_context(system_u:object_r:tmpfs_t,s0);
 fs_use_trans tmpfs gen_context(system_u:object_r:tmpfs_t,s0);

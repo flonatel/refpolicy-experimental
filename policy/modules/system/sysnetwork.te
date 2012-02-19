@@ -1,5 +1,4 @@
-
-policy_module(sysnetwork, 1.11.0)
+policy_module(sysnetwork, 1.12.0)
 
 ########################################
 #
@@ -332,10 +331,7 @@ optional_policy(`
 
 optional_policy(`
 	ipsec_write_pid(ifconfig_t)
-')
-
-optional_policy(`
-	netutils_domtrans(dhcpc_t)
+	ipsec_setcontext_default_spd(ifconfig_t)
 ')
 
 optional_policy(`

@@ -1,5 +1,4 @@
-
-policy_module(hostname, 1.6.0)
+policy_module(hostname, 1.7.0)
 
 ########################################
 #
@@ -26,6 +25,8 @@ kernel_list_proc(hostname_t)
 kernel_read_proc_symlinks(hostname_t)
 
 dev_read_sysfs(hostname_t)
+# Early devtmpfs, before udev relabel
+dev_dontaudit_rw_generic_chr_files(hostname_t)
 
 domain_use_interactive_fds(hostname_t)
 
@@ -52,6 +53,10 @@ miscfiles_read_localization(hostname_t)
 
 sysnet_read_config(hostname_t)
 sysnet_dns_name_resolve(hostname_t)
+
+optional_policy(`
+	nis_use_ypbind(hostname_t)
+')
 
 optional_policy(`
 	xen_append_log(hostname_t)

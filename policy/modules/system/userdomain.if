@@ -37,6 +37,7 @@ template(`userdom_base_user_template',`
 	corecmd_bin_entry_type($1_t)
 	domain_user_exemption_target($1_t)
 	ubac_constrained($1_t)
+	role $1_r;
 	role $1_r types $1_t;
 	allow system_r $1_r;
 
@@ -103,7 +104,7 @@ template(`userdom_base_user_template',`
 	libs_exec_ld_so($1_t)
 
 	miscfiles_read_localization($1_t)
-	miscfiles_read_certs($1_t)
+	miscfiles_read_generic_certs($1_t)
 
 	sysnet_read_config($1_t)
 
@@ -148,8 +149,6 @@ interface(`userdom_ro_home_role',`
 	gen_require(`
 		type user_home_t, user_home_dir_t;
 	')
-
-	role $1 types { user_home_t user_home_dir_t };
 
 	##############################
 	#
@@ -222,8 +221,6 @@ interface(`userdom_manage_home_role',`
 		type user_home_t, user_home_dir_t;
 	')
 
-	role $1 types { user_home_t user_home_dir_t };
-
 	##############################
 	#
 	# Domain access to home dir
@@ -293,8 +290,6 @@ interface(`userdom_manage_tmp_role',`
 		type user_tmp_t;
 	')
 
-	role $1 types user_tmp_t;
-
 	files_poly_member_tmp($2, user_tmp_t)
 
 	manage_dirs_pattern($2, user_tmp_t, user_tmp_t)
@@ -355,8 +350,6 @@ interface(`userdom_manage_tmpfs_role',`
 	gen_require(`
 		type user_tmpfs_t;
 	')
-
-	role $1 types user_tmpfs_t;
 
 	manage_dirs_pattern($2, user_tmpfs_t, user_tmpfs_t)
 	manage_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
@@ -470,8 +463,8 @@ template(`userdom_change_password_template',`
 	')
 
 	optional_policy(`
-		usermanage_run_chfn($1_t,$1_r)
-		usermanage_run_passwd($1_t,$1_r)
+		usermanage_run_chfn($1_t, $1_r)
+		usermanage_run_passwd($1_t, $1_r)
 	')
 ')
 
@@ -542,6 +535,8 @@ template(`userdom_common_user_template',`
 	# Stat lost+found.
 	files_getattr_lost_found_dirs($1_t)
 
+	fs_rw_cgroup_files($1_t)
+
 	# cjp: some of this probably can be removed
 	selinux_get_fs_mount($1_t)
 	selinux_validate_context($1_t)
@@ -556,14 +551,14 @@ template(`userdom_common_user_template',`
 	auth_use_nsswitch($1_t)
 	auth_read_login_records($1_t)
 	auth_search_pam_console_data($1_t)
-	auth_run_pam($1_t,$1_r)
-	auth_run_utempter($1_t,$1_r)
+	auth_run_pam($1_t, $1_r)
+	auth_run_utempter($1_t, $1_r)
 
 	init_read_utmp($1_t)
 
 	seutil_read_file_contexts($1_t)
 	seutil_read_default_contexts($1_t)
-	seutil_run_newrole($1_t,$1_r)
+	seutil_run_newrole($1_t, $1_r)
 	seutil_exec_checkpolicy($1_t)
 	seutil_exec_setfiles($1_t)
 	# for when the network connection is killed
@@ -580,7 +575,9 @@ template(`userdom_common_user_template',`
 	')
 
 	optional_policy(`
+		alsa_manage_home_files($1_t)
 		alsa_read_rw_config($1_t)
+		alsa_relabel_home_files($1_t)
 	')
 
 	optional_policy(`
@@ -648,6 +645,11 @@ template(`userdom_common_user_template',`
 	')
 
 	optional_policy(`
+		oident_manage_user_content($1_t)
+		oident_relabel_user_content($1_t)
+	')
+
+	optional_policy(`
 		# to allow monitoring of pcmcia status
 		pcmcia_read_pid($1_t)
 	')
@@ -682,7 +684,7 @@ template(`userdom_common_user_template',`
 	')
 
 	optional_policy(`
-		usernetctl_run($1_t,$1_r)
+		usernetctl_run($1_t, $1_r)
 	')
 ')
 
@@ -753,15 +755,17 @@ template(`userdom_login_user_template', `
 	fs_getattr_all_fs($1_t)
 	fs_getattr_all_dirs($1_t)
 	fs_search_auto_mountpoints($1_t)
+	fs_list_cgroup_dirs($1_t)
 	fs_list_inotifyfs($1_t)
 	fs_rw_anon_inodefs_files($1_t)
+	fs_dontaudit_rw_cgroup_files($1_t)
 
 	auth_dontaudit_write_login_records($1_t)
 
 	application_exec_all($1_t)
 
 	# The library functions always try to open read-write first,
-	# then fall back to read-only if it fails. 
+	# then fall back to read-only if it fails.
 	init_dontaudit_rw_utmp($1_t)
 	# Stop warnings about access to /dev/console
 	init_dontaudit_use_fds($1_t)
@@ -836,7 +840,7 @@ template(`userdom_restricted_user_template',`
 	#
 
 	optional_policy(`
-		loadkeys_run($1_t,$1_r)
+		loadkeys_run($1_t, $1_r)
 	')
 ')
 
@@ -967,7 +971,7 @@ template(`userdom_unpriv_user_template', `
 		tunable_policy(`user_rw_noexattrfile',`
 			fs_manage_noxattr_fs_files($1_t)
 			fs_manage_noxattr_fs_dirs($1_t)
-			# Write floppies 
+			# Write floppies
 			storage_raw_read_removable_device($1_t)
 			storage_raw_write_removable_device($1_t)
 		',`
@@ -990,13 +994,13 @@ template(`userdom_unpriv_user_template', `
 	')
 
 	optional_policy(`
-		netutils_run_ping_cond($1_t,$1_r)
-		netutils_run_traceroute_cond($1_t,$1_r)
+		netutils_run_ping_cond($1_t, $1_r)
+		netutils_run_traceroute_cond($1_t, $1_r)
 	')
 
 	# Run pppd in pppd_t by default for user
 	optional_policy(`
-		ppp_run_cond($1_t,$1_r)
+		ppp_run_cond($1_t, $1_r)
 	')
 
 	optional_policy(`
@@ -1130,9 +1134,9 @@ template(`userdom_admin_user_template',`
 
 	auth_getattr_shadow($1_t)
 	# Manage almost all files
-	auth_manage_all_files_except_shadow($1_t)
+	auth_manage_all_files_except_auth_files($1_t)
 	# Relabel almost all files
-	auth_relabel_all_files_except_shadow($1_t)
+	auth_relabel_all_files_except_auth_files($1_t)
 
 	init_telinit($1_t)
 
@@ -1220,7 +1224,7 @@ template(`userdom_security_admin_template',`
 	selinux_set_all_booleans($1)
 	selinux_set_parameters($1)
 
-	auth_relabel_all_files_except_shadow($1)
+	auth_relabel_all_files_except_auth_files($1)
 	auth_relabel_shadow($1)
 
 	init_exec($1)
@@ -1231,13 +1235,13 @@ template(`userdom_security_admin_template',`
 	logging_read_audit_config($1)
 
 	seutil_manage_bin_policy($1)
-	seutil_run_checkpolicy($1,$2)
-	seutil_run_loadpolicy($1,$2)
-	seutil_run_semanage($1,$2)
+	seutil_run_checkpolicy($1, $2)
+	seutil_run_loadpolicy($1, $2)
+	seutil_run_semanage($1, $2)
 	seutil_run_setfiles($1, $2)
 
 	optional_policy(`
-		aide_run($1,$2)
+		aide_run($1, $2)
 	')
 
 	optional_policy(`
@@ -1248,12 +1252,16 @@ template(`userdom_security_admin_template',`
 		dmesg_exec($1)
 	')
 
-	optional_policy(`	
-		ipsec_run_setkey($1,$2)
+	optional_policy(`
+		ipsec_run_setkey($1, $2)
 	')
 
 	optional_policy(`
-		netlabel_run_mgmt($1,$2)
+		netlabel_run_mgmt($1, $2)
+	')
+
+	optional_policy(`
+		samhain_run($1, $2)
 	')
 ')
 
@@ -1276,6 +1284,7 @@ interface(`userdom_user_home_content',`
 
 	allow $1 user_home_t:filesystem associate;
 	files_type($1)
+	files_poly_member($1)
 	ubac_constrained($1)
 ')
 
@@ -1359,7 +1368,7 @@ interface(`userdom_getattr_user_home_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1441,7 +1450,7 @@ interface(`userdom_list_user_home_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1546,7 +1555,7 @@ interface(`userdom_home_filetrans_user_home_dir',`
 ## </desc>
 ## <param name="source_domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="target_domain">
@@ -1571,7 +1580,7 @@ interface(`userdom_user_home_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain to not audit
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1646,7 +1655,7 @@ interface(`userdom_delete_user_home_content_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1840,7 +1849,7 @@ interface(`userdom_exec_user_home_content_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1880,7 +1889,7 @@ interface(`userdom_manage_user_home_content_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2454,6 +2463,26 @@ interface(`userdom_rw_user_tmpfs_files',`
 
 ########################################
 ## <summary>
+##	Create, read, write, and delete user tmpfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_manage_user_tmpfs_files',`
+	gen_require(`
+		type user_tmpfs_t;
+	')
+
+	manage_files_pattern($1, user_tmpfs_t, user_tmpfs_t)
+	allow $1 user_tmpfs_t:dir list_dir_perms;
+	fs_search_tmpfs($1)
+')
+
+########################################
+## <summary>
 ##	Get the attributes of a user domain tty.
 ## </summary>
 ## <param name="domain">
@@ -2476,7 +2505,7 @@ interface(`userdom_getattr_user_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2512,7 +2541,7 @@ interface(`userdom_setattr_user_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2603,7 +2632,7 @@ interface(`userdom_use_user_terminals',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2624,7 +2653,7 @@ interface(`userdom_dontaudit_use_user_terminals',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -2647,7 +2676,7 @@ interface(`userdom_spec_domtrans_all_users',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -2670,7 +2699,7 @@ interface(`userdom_xsession_spec_domtrans_all_users',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -2693,7 +2722,7 @@ interface(`userdom_spec_domtrans_unpriv_users',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -2706,6 +2735,24 @@ interface(`userdom_xsession_spec_domtrans_unpriv_users',`
 	allow unpriv_userdomain $1:fd use;
 	allow unpriv_userdomain $1:fifo_file rw_file_perms;
 	allow unpriv_userdomain $1:process sigchld;
+')
+
+#######################################
+## <summary>
+##	Read and write unpriviledged user SysV sempaphores.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_rw_unpriv_user_semaphores',`
+	gen_require(`
+		attribute unpriv_userdomain;
+	')
+
+	allow $1 unpriv_userdomain:sem rw_sem_perms;
 ')
 
 ########################################
@@ -2724,6 +2771,25 @@ interface(`userdom_manage_unpriv_user_semaphores',`
 	')
 
 	allow $1 unpriv_userdomain:sem create_sem_perms;
+')
+
+#######################################
+## <summary>
+##	Read and write unpriviledged user SysV shared
+##	memory segments.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_rw_unpriv_user_shared_mem',`
+	gen_require(`
+		attribute unpriv_userdomain;
+	')
+
+	allow $1 unpriv_userdomain:shm rw_shm_perms;
 ')
 
 ########################################
@@ -2753,7 +2819,7 @@ interface(`userdom_manage_unpriv_user_shared_mem',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -2808,6 +2874,24 @@ interface(`userdom_search_user_home_content',`
 
 	files_list_home($1)
 	allow $1 { user_home_dir_t user_home_t }:dir search_dir_perms;
+')
+
+########################################
+## <summary>
+##	Send signull to unprivileged user domains.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_signull_unpriv_users',`
+	gen_require(`
+		attribute unpriv_userdomain;
+	')
+
+	allow $1 unpriv_userdomain:process signull;
 ')
 
 ########################################
@@ -2917,7 +3001,7 @@ interface(`userdom_relabelto_user_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2953,7 +3037,7 @@ interface(`userdom_write_user_tmp_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #

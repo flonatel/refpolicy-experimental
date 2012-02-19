@@ -72,7 +72,7 @@ template(`java_role_template',`
 
 	domain_interactive_fd($1_java_t)
 
-	userdom_manage_tmpfs_role($2, $1_java_t)
+	userdom_manage_user_tmpfs_files($1_java_t)
 
 	allow $1_java_t self:process { ptrace signal getsched execmem execstack };
 
@@ -101,7 +101,7 @@ template(`java_role_template',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -120,12 +120,12 @@ template(`java_domtrans',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed the java domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 #
@@ -144,7 +144,7 @@ interface(`java_run',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 #
@@ -163,7 +163,7 @@ interface(`java_domtrans_unconfined',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain allowed to transition.
 ##	</summary>
 ## </param>
 ## <param name="role">

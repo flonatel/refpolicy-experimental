@@ -196,6 +196,10 @@ ifneq ($(OUTPUT_POLICY),)
 	CHECKPOLICY += -c $(OUTPUT_POLICY)
 endif
 
+ifneq "$(CUSTOM_BUILDOPT)" ""
+	M4PARAM += $(foreach opt,$(CUSTOM_BUILDOPT),-D $(opt))
+endif
+
 # if not set, use the type as the name.
 NAME ?= $(TYPE)
 
@@ -212,8 +216,8 @@ endif
 
 # default MLS/MCS sensitivity and category settings.
 MLS_SENS ?= 16
-MLS_CATS ?= 256
-MCS_CATS ?= 256
+MLS_CATS ?= 1024
+MCS_CATS ?= 1024
 
 ifeq ($(QUIET),y)
 	verbose = @
@@ -244,7 +248,7 @@ seusers := $(appconf)/seusers
 appdir := $(contextpath)
 user_default_contexts := $(wildcard config/appconfig-$(TYPE)/*_default_contexts)
 user_default_contexts_names := $(addprefix $(contextpath)/users/,$(subst _default_contexts,,$(notdir $(user_default_contexts))))
-appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts x_contexts customizable_types securetty_types) $(contextpath)/files/media $(user_default_contexts_names)
+appfiles := $(addprefix $(appdir)/,default_contexts default_type initrc_context failsafe_context userhelper_context removable_context dbus_contexts sepgsql_contexts x_contexts customizable_types securetty_types) $(contextpath)/files/media $(user_default_contexts_names)
 net_contexts := $(builddir)net_contexts
 
 all_layers := $(shell find $(wildcard $(moddir)/*) -maxdepth 0 -type d)

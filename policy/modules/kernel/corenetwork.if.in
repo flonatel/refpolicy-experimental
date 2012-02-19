@@ -86,6 +86,60 @@ interface(`corenet_rpc_port',`
 
 ########################################
 ## <summary>
+##	Define type to be a network node type
+## </summary>
+## <desc>
+##	<p>
+##	Define type to be a network node type
+##	</p>
+##	<p>
+##	This is for supporting third party modules and its
+##	use is not allowed in upstream reference policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used for network nodes.
+##	</summary>
+## </param>
+#
+interface(`corenet_node',`
+	gen_require(`
+		attribute node_type;
+	')
+
+	typeattribute $1 node_type;
+')
+
+########################################
+## <summary>
+##	Define type to be a network packet type
+## </summary>
+## <desc>
+##	<p>
+##	Define type to be a network packet type
+##	</p>
+##	<p>
+##	This is for supporting third party modules and its
+##	use is not allowed in upstream reference policy.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Type to be used for a network packet.
+##	</summary>
+## </param>
+#
+interface(`corenet_packet',`
+	gen_require(`
+		attribute packet_type;
+	')
+
+	typeattribute $1 packet_type;
+')
+
+########################################
+## <summary>
 ##	Define type to be a network client packet type
 ## </summary>
 ## <desc>
@@ -140,6 +194,25 @@ interface(`corenet_server_packet',`
 
 ########################################
 ## <summary>
+##	Make the specified type usable
+##	for labeled ipsec.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Type to be used for labeled ipsec.
+##	</summary>
+## </param>
+#
+interface(`corenet_spd_type',`
+	gen_require(`
+		attribute ipsec_spd_type;
+	')
+
+	typeattribute $1 ipsec_spd_type;
+')
+
+########################################
+## <summary>
 ##	Send and receive TCP network traffic on generic interfaces.
 ## </summary>
 ## <desc>
@@ -190,7 +263,7 @@ interface(`corenet_tcp_sendrecv_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -227,7 +300,7 @@ interface(`corenet_dontaudit_udp_send_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -321,7 +394,7 @@ interface(`corenet_dontaudit_udp_sendrecv_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -339,7 +412,7 @@ interface(`corenet_raw_send_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -357,7 +430,7 @@ interface(`corenet_raw_receive_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -426,7 +499,7 @@ interface(`corenet_inout_generic_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -444,7 +517,7 @@ interface(`corenet_tcp_sendrecv_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -462,7 +535,7 @@ interface(`corenet_udp_send_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -480,7 +553,7 @@ interface(`corenet_udp_receive_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -495,7 +568,7 @@ interface(`corenet_udp_sendrecv_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -513,7 +586,7 @@ interface(`corenet_raw_send_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -531,7 +604,7 @@ interface(`corenet_raw_receive_all_if',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -592,7 +665,7 @@ interface(`corenet_tcp_sendrecv_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -610,7 +683,7 @@ interface(`corenet_udp_send_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -669,7 +742,7 @@ interface(`corenet_udp_sendrecv_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -687,7 +760,7 @@ interface(`corenet_raw_send_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -705,7 +778,7 @@ interface(`corenet_raw_receive_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -786,7 +859,7 @@ interface(`corenet_udp_bind_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 # rawip_socket node_bind does not make much sense.
@@ -859,7 +932,7 @@ interface(`corenet_inout_generic_node',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -877,7 +950,7 @@ interface(`corenet_tcp_sendrecv_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -914,7 +987,7 @@ interface(`corenet_dontaudit_udp_send_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -951,7 +1024,7 @@ interface(`corenet_dontaudit_udp_receive_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -982,7 +1055,7 @@ interface(`corenet_dontaudit_udp_sendrecv_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1000,7 +1073,7 @@ interface(`corenet_raw_send_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1018,7 +1091,7 @@ interface(`corenet_raw_receive_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1033,7 +1106,7 @@ interface(`corenet_raw_sendrecv_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1051,7 +1124,7 @@ interface(`corenet_tcp_bind_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1069,7 +1142,7 @@ interface(`corenet_udp_bind_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 # rawip_socket node_bind does not make much sense.
@@ -1088,7 +1161,7 @@ interface(`corenet_raw_bind_all_nodes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1106,7 +1179,7 @@ interface(`corenet_tcp_sendrecv_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1124,7 +1197,7 @@ interface(`corenet_dontaudit_tcp_sendrecv_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1142,7 +1215,7 @@ interface(`corenet_udp_send_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1160,7 +1233,7 @@ interface(`corenet_udp_receive_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1175,7 +1248,7 @@ interface(`corenet_udp_sendrecv_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1213,7 +1286,7 @@ interface(`corenet_dontaudit_tcp_bind_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1233,7 +1306,7 @@ interface(`corenet_udp_bind_generic_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1295,7 +1368,7 @@ interface(`corenet_tcp_sendrecv_all_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1313,7 +1386,7 @@ interface(`corenet_udp_send_all_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1370,7 +1443,7 @@ interface(`corenet_udp_sendrecv_all_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1407,7 +1480,7 @@ interface(`corenet_dontaudit_tcp_bind_all_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1509,7 +1582,7 @@ interface(`corenet_dontaudit_tcp_connect_all_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1527,7 +1600,7 @@ interface(`corenet_tcp_sendrecv_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1545,7 +1618,7 @@ interface(`corenet_udp_send_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1563,7 +1636,7 @@ interface(`corenet_udp_receive_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1578,7 +1651,7 @@ interface(`corenet_udp_sendrecv_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1597,7 +1670,7 @@ interface(`corenet_tcp_bind_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1616,7 +1689,7 @@ interface(`corenet_udp_bind_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1634,7 +1707,7 @@ interface(`corenet_tcp_connect_reserved_port',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1652,7 +1725,7 @@ interface(`corenet_tcp_sendrecv_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1670,7 +1743,7 @@ interface(`corenet_udp_send_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1688,7 +1761,7 @@ interface(`corenet_udp_receive_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1703,7 +1776,7 @@ interface(`corenet_udp_sendrecv_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1722,7 +1795,7 @@ interface(`corenet_tcp_bind_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1740,7 +1813,7 @@ interface(`corenet_dontaudit_tcp_bind_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1759,7 +1832,7 @@ interface(`corenet_udp_bind_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1777,7 +1850,7 @@ interface(`corenet_dontaudit_udp_bind_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1795,7 +1868,7 @@ interface(`corenet_tcp_bind_all_unreserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1813,7 +1886,7 @@ interface(`corenet_udp_bind_all_unreserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1831,7 +1904,7 @@ interface(`corenet_tcp_connect_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1868,7 +1941,7 @@ interface(`corenet_dontaudit_tcp_connect_all_reserved_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1980,7 +2053,7 @@ interface(`corenet_rw_ppp_dev',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1999,7 +2072,7 @@ interface(`corenet_tcp_bind_all_rpc_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2017,7 +2090,7 @@ interface(`corenet_dontaudit_tcp_bind_all_rpc_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -2036,7 +2109,7 @@ interface(`corenet_udp_bind_all_rpc_ports',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -2654,9 +2727,28 @@ interface(`corenet_raw_recvfrom_labeled',`
 ## </param>
 #
 interface(`corenet_all_recvfrom_labeled',`
-	corenet_tcp_recvfrom_labeled($1,$2)
-	corenet_udp_recvfrom_labeled($1,$2)
-	corenet_raw_recvfrom_labeled($1,$2)
+	corenet_tcp_recvfrom_labeled($1, $2)
+	corenet_udp_recvfrom_labeled($1, $2)
+	corenet_raw_recvfrom_labeled($1, $2)
+')
+
+########################################
+## <summary>
+##	Make the specified type usable
+##	for labeled ipsec.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Type to be used for labeled ipsec.
+##	</summary>
+## </param>
+#
+interface(`corenet_setcontext_all_spds',`
+	gen_require(`
+		attribute ipsec_spd_type;
+	')
+
+	allow $1 ipsec_spd_type:association setcontext;
 ')
 
 ########################################

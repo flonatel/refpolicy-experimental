@@ -146,10 +146,6 @@ template(`userhelper_role_template',`
 	')
 
 	optional_policy(`
-		ethereal_domtrans($1_userhelper_t)
-	')
-
-	optional_policy(`
 		logging_send_syslog_msg($1_userhelper_t)
 	')
 
@@ -190,7 +186,7 @@ interface(`userhelper_search_config',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to search 
+##	Do not audit attempts to search
 ##	the userhelper configuration directory.
 ## </summary>
 ## <param name="domain">
@@ -249,7 +245,7 @@ interface(`userhelper_sigchld',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #

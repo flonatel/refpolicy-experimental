@@ -40,6 +40,13 @@ Allow system to run with NIS
 </p>
 </desc>
 </tunable>
+<tunable name="console_login" dftval="true">
+<desc>
+<p>
+Allow logging in and using the system from /dev/console.
+</p>
+</desc>
+</tunable>
 <tunable name="global_ssp" dftval="false">
 <desc>
 <p>

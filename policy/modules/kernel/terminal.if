@@ -110,6 +110,7 @@ interface(`term_tty',`
 interface(`term_user_tty',`
 	gen_require(`
 		attribute ttynode;
+		type console_device_t;
 		type tty_device_t;
 	')
 
@@ -121,6 +122,12 @@ interface(`term_user_tty',`
 	# have to fix this!
 	ifdef(`distro_debian',`
 		type_change $1 ttynode:chr_file $2;
+	')
+
+	tunable_policy(`console_login',`
+		# When user logs in from /dev/console, relabel it
+		# to user tty type as well.
+		type_change $1 console_device_t:chr_file $2;
 	')
 ')
 
@@ -245,7 +252,7 @@ interface(`term_read_console',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -285,7 +292,7 @@ interface(`term_use_console',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -334,7 +341,7 @@ interface(`term_relabel_console',`
 	')
 
 	dev_list_all_dev_nodes($1)
-	allow $1 console_device_t:chr_file { relabelfrom relabelto };
+	allow $1 console_device_t:chr_file relabel_chr_file_perms;
 ')
 
 ########################################
@@ -382,7 +389,7 @@ interface(`term_getattr_pty_fs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -420,7 +427,7 @@ interface(`term_search_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -460,7 +467,7 @@ interface(`term_list_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -479,7 +486,7 @@ interface(`term_dontaudit_list_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -498,7 +505,7 @@ interface(`term_dontaudit_manage_pty_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -557,7 +564,7 @@ interface(`term_setattr_generic_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -600,7 +607,7 @@ interface(`term_use_generic_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -651,13 +658,50 @@ interface(`term_use_controlling_term',`
 	allow $1 devtty_t:chr_file { rw_term_perms lock append };
 ')
 
+#######################################
+## <summary>
+##	Get the attributes of the pty multiplexor (/dev/ptmx).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`term_getattr_ptmx',`
+	gen_require(`
+		type ptmx_t;
+	')
+
+	allow $1 ptmx_t:chr_file getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to get attributes
+##	on the pty multiplexor (/dev/ptmx).
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`term_dontaudit_getattr_ptmx',`
+	gen_require(`
+		type ptmx_t;
+	')
+
+	dontaudit $1 ptmx_t:chr_file getattr;
+')
+
 ########################################
 ## <summary>
 ##	Read and write the pty multiplexor (/dev/ptmx).
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to allow access.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -677,7 +721,7 @@ interface(`term_use_ptmx',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -720,7 +764,7 @@ interface(`term_getattr_all_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -956,7 +1000,7 @@ interface(`term_use_all_user_ptys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1009,7 +1053,7 @@ interface(`term_getattr_unallocated_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1049,7 +1093,7 @@ interface(`term_setattr_unallocated_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1068,7 +1112,7 @@ interface(`term_dontaudit_setattr_unallocated_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1097,7 +1141,7 @@ interface(`term_relabel_unallocated_ttys',`
 	')
 
 	dev_list_all_dev_nodes($1)
-	allow $1 tty_device_t:chr_file { relabelfrom relabelto };
+	allow $1 tty_device_t:chr_file relabel_chr_file_perms;
 ')
 
 ########################################
@@ -1187,7 +1231,7 @@ interface(`term_use_unallocated_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process to not audit.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1226,7 +1270,7 @@ interface(`term_getattr_all_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1275,7 +1319,7 @@ interface(`term_relabel_all_ttys',`
 	')
 
 	dev_list_all_dev_nodes($1)
-	allow $1 ttynode:chr_file { relabelfrom relabelto };
+	allow $1 ttynode:chr_file relabel_chr_file_perms;
 ')
 
 ########################################
@@ -1324,7 +1368,7 @@ interface(`term_use_all_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
@@ -1361,7 +1405,7 @@ interface(`term_getattr_all_user_ttys',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	Domain allowed access.
+##	Domain to not audit.
 ##	</summary>
 ## </param>
 #
