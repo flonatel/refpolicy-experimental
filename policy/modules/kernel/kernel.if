@@ -220,7 +220,7 @@ interface(`kernel_dgram_send',`
 
 ########################################
 ## <summary>
-##	Receive messages from kernel TCP sockets.
+##	Receive messages from kernel TCP sockets.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -229,16 +229,12 @@ interface(`kernel_dgram_send',`
 ## </param>
 #
 interface(`kernel_tcp_recvfrom',`
-	gen_require(`
-		type kernel_t;
-	')
-
-	allow $1 kernel_t:tcp_socket recvfrom;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
 ## <summary>
-##	Send UDP network traffic to the kernel.
+##	Send UDP network traffic to the kernel.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -247,17 +243,12 @@ interface(`kernel_tcp_recvfrom',`
 ## </param>
 #
 interface(`kernel_udp_send',`
-	gen_require(`
-		type kernel_t;
-	')
-
-	allow $1 kernel_t:udp_socket sendto;
-	allow kernel_t $1:udp_socket recvfrom;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
 ## <summary>
-##	Receive messages from kernel UDP sockets.
+##	Receive messages from kernel UDP sockets.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -266,11 +257,7 @@ interface(`kernel_udp_send',`
 ## </param>
 #
 interface(`kernel_udp_recvfrom',`
-	gen_require(`
-		type kernel_t;
-	')
-
-	allow $1 kernel_t:udp_socket recvfrom;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -294,6 +281,42 @@ interface(`kernel_load_module',`
 
 ########################################
 ## <summary>
+##	Allow search the kernel key ring.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_search_key',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	allow $1 kernel_t:key search;
+')
+
+########################################
+## <summary>
+##	Allow link to the kernel key ring.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_link_key',`
+	gen_require(`
+		type kernel_t;
+	')
+
+	allow $1 kernel_t:key link;
+')
+
+########################################
+## <summary>
 ##	Allows caller to read the ring buffer.
 ## </summary>
 ## <param name="domain">
@@ -301,6 +324,7 @@ interface(`kernel_load_module',`
 ##	The process type allowed to read the ring buffer.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_ring_buffer',`
 	gen_require(`
@@ -337,6 +361,7 @@ interface(`kernel_dontaudit_read_ring_buffer',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_change_ring_buffer_level',`
 	gen_require(`
@@ -355,6 +380,7 @@ interface(`kernel_change_ring_buffer_level',`
 ##	The process type clearing the buffer.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_clear_ring_buffer',`
 	gen_require(`
@@ -630,6 +656,7 @@ interface(`kernel_read_proc_symlinks',`
 ##	The process type reading the system state information.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_system_state',`
 	gen_require(`
@@ -650,6 +677,7 @@ interface(`kernel_read_system_state',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 # cjp: this should probably go away.  any
 # file thats writable in proc should really
@@ -711,6 +739,7 @@ interface(`kernel_dontaudit_read_proc_symlinks',`
 ##	The process type reading software raid state.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_software_raid_state',`
 	gen_require(`
@@ -887,7 +916,7 @@ interface(`kernel_search_network_state',`
 ##	The process type reading the state.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_read_network_state',`
 	gen_require(`
@@ -909,7 +938,6 @@ interface(`kernel_read_network_state',`
 ##	The process type reading the state.
 ##	</summary>
 ## </param>
-##
 #
 interface(`kernel_read_network_state_symlinks',`
 	gen_require(`
@@ -1027,6 +1055,24 @@ interface(`kernel_write_xen_state',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to list all proc directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_list_all_proc',`
+	gen_require(`
+		attribute proc_type;
+	')
+
+	dontaudit $1 proc_type:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts by caller to search
 ##	the base directory of sysctls.
 ## </summary>
@@ -1073,6 +1119,7 @@ interface(`kernel_read_sysctl',`
 ##	The process type to allow to read the device sysctls.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_device_sysctls',`
 	gen_require(`
@@ -1094,6 +1141,7 @@ interface(`kernel_read_device_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_device_sysctls',`
 	gen_require(`
@@ -1114,7 +1162,6 @@ interface(`kernel_rw_device_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
 #
 interface(`kernel_search_vm_sysctl',`
 	gen_require(`
@@ -1133,7 +1180,7 @@ interface(`kernel_search_vm_sysctl',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_read_vm_sysctls',`
 	gen_require(`
@@ -1154,6 +1201,7 @@ interface(`kernel_read_vm_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_vm_sysctls',`
 	gen_require(`
@@ -1214,7 +1262,7 @@ interface(`kernel_dontaudit_search_network_sysctl',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_read_net_sysctls',`
 	gen_require(`
@@ -1236,6 +1284,7 @@ interface(`kernel_read_net_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_net_sysctls',`
 	gen_require(`
@@ -1258,6 +1307,7 @@ interface(`kernel_rw_net_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_unix_sysctls',`
 	gen_require(`
@@ -1280,6 +1330,7 @@ interface(`kernel_read_unix_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_unix_sysctls',`
 	gen_require(`
@@ -1301,6 +1352,7 @@ interface(`kernel_rw_unix_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_hotplug_sysctls',`
 	gen_require(`
@@ -1322,6 +1374,7 @@ interface(`kernel_read_hotplug_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_hotplug_sysctls',`
 	gen_require(`
@@ -1343,6 +1396,7 @@ interface(`kernel_rw_hotplug_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_modprobe_sysctls',`
 	gen_require(`
@@ -1364,6 +1418,7 @@ interface(`kernel_read_modprobe_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_modprobe_sysctls',`
 	gen_require(`
@@ -1442,6 +1497,7 @@ interface(`kernel_dontaudit_write_kernel_sysctl',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_kernel_sysctl',`
 	gen_require(`
@@ -1463,6 +1519,7 @@ interface(`kernel_rw_kernel_sysctl',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_fs_sysctls',`
 	gen_require(`
@@ -1484,6 +1541,7 @@ interface(`kernel_read_fs_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_fs_sysctls',`
 	gen_require(`
@@ -1505,6 +1563,7 @@ interface(`kernel_rw_fs_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_irq_sysctls',`
 	gen_require(`
@@ -1525,7 +1584,7 @@ interface(`kernel_read_irq_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_rw_irq_sysctls',`
 	gen_require(`
@@ -1546,7 +1605,7 @@ interface(`kernel_rw_irq_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_read_rpc_sysctls',`
 	gen_require(`
@@ -1568,7 +1627,7 @@ interface(`kernel_read_rpc_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
-##
+## <rolecap/>
 #
 interface(`kernel_rw_rpc_sysctls',`
 	gen_require(`
@@ -1583,6 +1642,24 @@ interface(`kernel_rw_rpc_sysctls',`
 
 ########################################
 ## <summary>
+##	Do not audit attempts to list all sysctl directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
+interface(`kernel_dontaudit_list_all_sysctls',`
+	gen_require(`
+		attribute sysctl_type;
+	')
+
+	dontaudit $1 sysctl_type:dir list_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Allow caller to read all sysctls.
 ## </summary>
 ## <param name="domain">
@@ -1590,6 +1667,7 @@ interface(`kernel_rw_rpc_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_read_all_sysctls',`
 	gen_require(`
@@ -1613,6 +1691,7 @@ interface(`kernel_read_all_sysctls',`
 ##	Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`kernel_rw_all_sysctls',`
 	gen_require(`

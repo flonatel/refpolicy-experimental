@@ -51,6 +51,8 @@ template(`rpc_domain_template', `
 	kernel_rw_rpc_sysctls($1_t)
 
 	dev_read_sysfs($1_t)
+	dev_read_urand($1_t)
+	dev_read_rand($1_t)
 
 	corenet_non_ipsec_sendrecv($1_t)
 	corenet_tcp_sendrecv_all_if($1_t)
@@ -118,7 +120,7 @@ template(`rpc_domain_template', `
 
 ########################################
 ## <summary>
-##      Send UDP network traffic to rpc and recieve UDP traffic from rpc.
+##      Send UDP network traffic to rpc and recieve UDP traffic from rpc.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -127,12 +129,7 @@ template(`rpc_domain_template', `
 ## </param>
 #
 interface(`rpc_udp_send',`
-	gen_require(`
-		type rpc_t;
-	')
-
-	allow $1 rpc_t:udp_socket sendto;
-	allow rpc_t $1:udp_socket recvfrom;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -222,6 +219,7 @@ interface(`rpc_domtrans_nfsd',`
 ##      Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`rpc_read_nfs_content',`
 	gen_require(`
@@ -242,6 +240,7 @@ interface(`rpc_read_nfs_content',`
 ##      Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`rpc_manage_nfs_rw_content',`
 	gen_require(`
@@ -262,6 +261,7 @@ interface(`rpc_manage_nfs_rw_content',`
 ##      Domain allowed access.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`rpc_manage_nfs_ro_content',`
 	gen_require(`
@@ -289,12 +289,11 @@ interface(`rpc_udp_rw_nfs_sockets',`
 	')
 
 	allow $1 nfsd_t:udp_socket rw_socket_perms;
-
 ')
 
 ########################################
 ## <summary>
-##	Send UDP traffic to NFSd.
+##	Send UDP traffic to NFSd.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -303,12 +302,7 @@ interface(`rpc_udp_rw_nfs_sockets',`
 ## </param>
 #
 interface(`rpc_udp_send_nfs',`
-	gen_require(`
-		type nfsd_t;
-	')
-
-	allow $1 nfsd_t:udp_socket sendto;
-	allow nfsd_t $1:udp_socket recvfrom;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

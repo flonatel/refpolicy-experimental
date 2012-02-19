@@ -54,6 +54,7 @@ interface(`portage_domtrans',`
 ##	The type of the terminal allow for portage to use.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`portage_run',`
 	gen_require(`
@@ -115,7 +116,6 @@ interface(`portage_compile_domain',`
 	allow $1 self:udp_socket create_socket_perms;
 	# misc networking stuff (esp needed for compiling perl):
 	allow $1 self:rawip_socket { create ioctl };
-	allow $1 self:udp_socket recvfrom;
 	# needed for merging dbus:
 	allow $1 self:netlink_selinux_socket { bind create read };
 	allow $1 self:dbus send_msg;
@@ -395,6 +395,7 @@ interface(`portage_domtrans_gcc_config',`
 ##	The type of the terminal allow for gcc_config to use.
 ##	</summary>
 ## </param>
+## <rolecap/>
 #
 interface(`portage_run_gcc_config',`
 	gen_require(`

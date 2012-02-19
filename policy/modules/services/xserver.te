@@ -1,5 +1,5 @@
 
-policy_module(xserver,1.1.12)
+policy_module(xserver,1.1.15)
 
 ########################################
 #
@@ -81,20 +81,28 @@ optional_policy(`
 #
 
 allow xdm_t self:capability { setgid setuid sys_resource kill sys_tty_config mknod chown dac_override dac_read_search fowner fsetid ipc_owner sys_nice sys_rawio net_bind_service };
-allow xdm_t self:process { setexec setpgid setsched setrlimit signal_perms setkeycreate };
+allow xdm_t self:process { setexec setpgid getsched setsched setrlimit signal_perms setkeycreate };
 allow xdm_t self:fifo_file rw_file_perms;
 allow xdm_t self:shm create_shm_perms;
 allow xdm_t self:sem create_sem_perms;
 allow xdm_t self:unix_stream_socket { connectto create_stream_socket_perms };
+allow xdm_t self:netlink_route_socket r_netlink_socket_perms;
 allow xdm_t self:unix_dgram_socket create_socket_perms;
 allow xdm_t self:tcp_socket create_stream_socket_perms;
 allow xdm_t self:udp_socket create_socket_perms;
-allow xdm_t self:key write;
+allow xdm_t self:socket create_socket_perms;
+allow xdm_t self:appletalk_socket create_socket_perms;
+allow xdm_t self:key { search link write };
 
 # Supress permission check on .ICE-unix
 dontaudit xdm_t ice_tmp_t:dir { getattr setattr };
 
 allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
+
+allow xdm_t xdm_tmp_t:dir manage_dir_perms;
+allow xdm_t xdm_tmp_t:file manage_file_perms;
+allow xdm_t xdm_tmp_t:sock_file manage_file_perms;
+files_tmp_filetrans(xdm_t, xdm_tmp_t, { file dir sock_file })
 
 # Allow gdm to run gdm-binary
 can_exec(xdm_t, xdm_exec_t)
@@ -106,6 +114,8 @@ allow xdm_t xdm_rw_etc_t:file create_file_perms;
 
 kernel_read_system_state(xdm_t)
 kernel_read_kernel_sysctls(xdm_t)
+kernel_read_net_sysctls(xdm_t)
+kernel_read_network_state(xdm_t)
 
 corecmd_exec_shell(xdm_t)
 corecmd_exec_bin(xdm_t)
@@ -154,6 +164,7 @@ domain_use_interactive_fds(xdm_t)
 domain_dontaudit_read_all_domains_state(xdm_t)
 
 files_read_etc_files(xdm_t)
+files_read_var_files(xdm_t)
 files_read_etc_runtime_files(xdm_t)
 files_exec_etc_files(xdm_t)
 files_list_mnt(xdm_t)
@@ -180,6 +191,8 @@ term_setattr_unallocated_ttys(xdm_t)
 
 auth_manage_pam_pid(xdm_t)
 auth_manage_pam_console_data(xdm_t)
+auth_rw_faillog(xdm_t)
+auth_write_login_records(xdm_t)
 
 init_use_script_ptys(xdm_t)
 # Run telinit->init to shutdown.
@@ -209,11 +222,6 @@ userdom_signal_all_users(xdm_t)
 ifdef(`strict_policy',`
 	allow xdm_t xdm_lock_t:file create_file_perms;
 	files_lock_filetrans(xdm_t,xdm_lock_t,file)
-
-	allow xdm_t xdm_tmp_t:dir manage_dir_perms;
-	allow xdm_t xdm_tmp_t:file manage_file_perms;
-	allow xdm_t xdm_tmp_t:sock_file manage_file_perms;
-	files_tmp_filetrans(xdm_t, xdm_tmp_t, { file dir sock_file })
 
 	allow xdm_t xdm_tmpfs_t:dir manage_dir_perms;
 	allow xdm_t xdm_tmpfs_t:file manage_file_perms;
@@ -257,7 +265,7 @@ ifdef(`strict_policy',`
 	allow xdm_t xdm_xserver_tmp_t:sock_file unlink;
 	allow xdm_t xdm_xserver_tmp_t:file unlink;
 
-	allow xdm_t xserver_log_t:dir { rw_dir_perms setattr };
+	allow xdm_t xserver_log_t:dir manage_dir_perms;
 	allow xdm_t xserver_log_t:file manage_file_perms;
 	allow xdm_t xserver_log_t:fifo_file manage_file_perms;
 	logging_log_filetrans(xdm_t,xserver_log_t,file)
@@ -284,11 +292,17 @@ ifdef(`strict_policy',`
 ')
 
 ifdef(`targeted_policy',`
-	allow xdm_t self:process { execheap execmem };
 	unconfined_domain(xdm_t)
 	unconfined_domtrans(xdm_t)
 	userdom_generic_user_home_dir_filetrans_generic_user_home_content(xdm_t, {file dir })
 
+	ifndef(`distro_redhat',`
+		allow xdm_t self:process { execheap execmem };
+	')
+
+	ifdef(`distro_rhel4',`
+		allow xdm_t self:process { execheap execmem };
+	')
 ')
 
 tunable_policy(`use_nfs_home_dirs',`
@@ -412,10 +426,16 @@ ifdef(`strict_policy',`
 ')
 
 ifdef(`targeted_policy',`
-	allow xdm_xserver_t self:process { execheap execmem };
-
 	unconfined_domain_noaudit(xdm_xserver_t)
 	unconfined_domtrans(xdm_xserver_t)
+
+	ifndef(`distro_redhat',`
+		allow xdm_xserver_t self:process { execheap execmem };
+	')
+
+	ifdef(`distro_rhel4',`
+		allow xdm_xserver_t self:process { execheap execmem };
+	')
 ')
 
 optional_policy(`

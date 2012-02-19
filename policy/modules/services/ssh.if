@@ -185,7 +185,7 @@ template(`ssh_basic_client_template',`
 
 #######################################
 ## <summary>
-##	The per user domain template for the ssh module.
+##	The per role template for the ssh module.
 ## </summary>
 ## <desc>
 ##	<p>
@@ -216,7 +216,7 @@ template(`ssh_basic_client_template',`
 ##	</summary>
 ## </param>
 #
-template(`ssh_per_userdomain_template',`
+template(`ssh_per_role_template',`
 	gen_require(`
 		type ssh_agent_exec_t, ssh_keysign_exec_t;
 	')
@@ -663,7 +663,7 @@ interface(`ssh_dontaudit_rw_tcp_sockets',`
 
 ########################################
 ## <summary>
-##	Connect to SSH daemons over TCP sockets.
+##	Connect to SSH daemons over TCP sockets.  (Deprecated)
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -672,13 +672,7 @@ interface(`ssh_dontaudit_rw_tcp_sockets',`
 ## </param>
 #
 interface(`ssh_tcp_connect',`
-	gen_require(`
-		type sshd_t;
-	')
-
-	allow $1 sshd_t:tcp_socket { connectto recvfrom };
-	allow sshd_t $1:tcp_socket { acceptfrom recvfrom };
-	kernel_tcp_recvfrom($1)
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -698,6 +692,27 @@ interface(`ssh_exec',`
 
 	corecmd_search_bin($1)
 	can_exec($1,ssh_exec_t)
+')
+
+########################################
+## <summary>
+##	Execute the ssh key generator in the ssh keygen domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`ssh_domtrans_keygen',`
+	gen_require(`
+		type ssh_keygen_t, ssh_keygen_exec_t;
+	')
+
+	domain_auto_trans($1,ssh_keygen_exec_t,ssh_keygen_t)
+	allow ssh_keygen_t $1:fd use;
+	allow ssh_keygen_t $1:fifo_file rw_file_perms;
+	allow ssh_keygen_t $1:process sigchld;
 ')
 
 ########################################

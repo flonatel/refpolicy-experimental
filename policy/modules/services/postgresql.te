@@ -1,5 +1,5 @@
 
-policy_module(postgresql,1.1.2)
+policy_module(postgresql,1.1.4)
 
 #################################
 #
@@ -83,7 +83,6 @@ kernel_read_system_state(postgresql_t)
 kernel_list_proc(postgresql_t)
 kernel_read_all_sysctls(postgresql_t)
 kernel_read_proc_symlinks(postgresql_t)
-kernel_tcp_recvfrom(postgresql_t)
 
 corenet_non_ipsec_sendrecv(postgresql_t)
 corenet_tcp_sendrecv_all_if(postgresql_t)
@@ -135,6 +134,7 @@ miscfiles_read_localization(postgresql_t)
 seutil_dontaudit_search_config(postgresql_t)
 
 sysnet_read_config(postgresql_t)
+sysnet_use_ldap(postgresql_t)
 
 userdom_dontaudit_search_sysadm_home_dirs(postgresql_t)
 userdom_dontaudit_use_sysadm_ttys(postgresql_t)

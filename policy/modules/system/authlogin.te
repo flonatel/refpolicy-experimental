@@ -1,5 +1,5 @@
 
-policy_module(authlogin,1.3.10)
+policy_module(authlogin,1.3.14)
 
 ########################################
 #
@@ -53,9 +53,6 @@ neverallow ~can_read_shadow_passwords shadow_t:file read;
 neverallow ~can_write_shadow_passwords shadow_t:file { create write };
 neverallow ~can_relabelto_shadow_passwords shadow_t:file relabelto;
 
-authlogin_common_auth_domain_template(system)
-role system_r types system_chkpwd_t;
-
 type utempter_t;
 domain_type(utempter_t)
 
@@ -71,6 +68,10 @@ files_type(var_auth_t)
 
 type wtmp_t;
 logging_log_file(wtmp_t)
+
+# reorder to work around require-then-decare bug
+authlogin_common_auth_domain_template(system)
+role system_r types system_chkpwd_t;
 
 ########################################
 #
@@ -93,9 +94,10 @@ allow pam_t self:msg { send receive };
 
 allow pam_t pam_var_run_t:dir { search getattr read write remove_name };
 allow pam_t pam_var_run_t:file { getattr read unlink };
+files_list_pids(pam_t)
 
-allow pam_t pam_tmp_t:dir create_dir_perms;
-allow pam_t pam_tmp_t:file create_file_perms;
+allow pam_t pam_tmp_t:dir manage_dir_perms;
+allow pam_t pam_tmp_t:file manage_file_perms;
 files_tmp_filetrans(pam_t, pam_tmp_t, { file dir })
 
 kernel_read_system_state(pam_t)
@@ -108,7 +110,6 @@ term_use_all_user_ptys(pam_t)
 init_dontaudit_rw_utmp(pam_t)
 
 files_read_etc_files(pam_t)
-files_list_pids(pam_t)
 
 libs_use_ld_so(pam_t)
 libs_use_shared_libs(pam_t)
@@ -140,10 +141,10 @@ dontaudit pam_console_t self:capability sys_tty_config;
 allow pam_console_t self:process { sigchld sigkill sigstop signull signal };
 
 # for /var/run/console.lock checking
-allow pam_console_t pam_var_console_t:dir r_dir_perms;;
+allow pam_console_t pam_var_console_t:dir list_dir_perms;
+allow pam_console_t pam_var_console_t:lnk_file { getattr read };
 allow pam_console_t pam_var_console_t:file r_file_perms;
 dontaudit pam_console_t pam_var_console_t:file write;
-allow pam_console_t pam_var_console_t:lnk_file { getattr read };
 
 kernel_read_kernel_sysctls(pam_console_t)
 kernel_use_fds(pam_console_t)
@@ -175,7 +176,7 @@ dev_getattr_xserver_misc_dev(pam_console_t)
 dev_setattr_xserver_misc_dev(pam_console_t)
 dev_read_urand(pam_console_t)
 
-fs_search_auto_mountpoints(pam_console_t)
+fs_list_auto_mountpoints(pam_console_t)
 
 mls_file_read_up(pam_console_t)
 mls_file_write_down(pam_console_t)
@@ -220,13 +221,7 @@ seutil_read_file_contexts(pam_console_t)
 
 userdom_dontaudit_use_unpriv_user_fds(pam_console_t)
 
-# cjp: with the old daemon_(base_)domain being broken up into
-# a daemon and system interface, this probably is not needed:
-ifdef(`direct_sysadm_daemon', `
-	userdom_dontaudit_use_sysadm_terms(pam_console_t)
-')
-
-ifdef(`targeted_policy', `
+ifdef(`targeted_policy',`
 	term_dontaudit_use_unallocated_ttys(pam_console_t)
 	term_dontaudit_use_generic_ptys(pam_console_t)
 	files_dontaudit_read_root_files(pam_console_t)
@@ -240,10 +235,6 @@ optional_policy(`
 optional_policy(`
 	hotplug_use_fds(pam_console_t)
 	hotplug_dontaudit_search_config(pam_console_t)
-')
-
-optional_policy(`
-	nscd_socket_use(pam_console_t)
 ')
 
 optional_policy(`
@@ -275,6 +266,7 @@ term_dontaudit_use_unallocated_ttys(system_chkpwd_t)
 term_dontaudit_use_generic_ptys(system_chkpwd_t)
 
 userdom_dontaudit_use_unpriv_users_ttys(system_chkpwd_t)
+userdom_dontaudit_use_unpriv_users_ptys(system_chkpwd_t)
 
 ########################################
 #

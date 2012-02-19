@@ -3,7 +3,7 @@
 /dev/.*				gen_context(system_u:object_r:device_t,s0)
 
 /dev/.*mouse.*		-c	gen_context(system_u:object_r:mouse_device_t,s0)
-/dev/adsp		-c	gen_context(system_u:object_r:sound_device_t,s0)
+/dev/adsp.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/(misc/)?agpgart	-c	gen_context(system_u:object_r:agp_device_t,s0)
 /dev/aload.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/amidi.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
@@ -12,7 +12,6 @@
 /dev/atibm		-c	gen_context(system_u:object_r:mouse_device_t,s0)
 /dev/audio.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/beep		-c	gen_context(system_u:object_r:sound_device_t,s0)
-/dev/console		-c	gen_context(system_u:object_r:console_device_t,s0)
 /dev/dsp.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/efirtc		-c	gen_context(system_u:object_r:clock_device_t,s0)
 /dev/event.*		-c	gen_context(system_u:object_r:event_device_t,s0)
@@ -37,7 +36,7 @@
 /dev/mpu401.*		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/null		-c	gen_context(system_u:object_r:null_device_t,s0)
 /dev/nvidia.*		-c	gen_context(system_u:object_r:xserver_misc_device_t,s0)
-/dev/nvram		-c	gen_context(system_u:object_r:memory_device_t,s15:c0.c255)
+/dev/nvram		-c	gen_context(system_u:object_r:nvram_device_t,s15:c0.c255)
 /dev/par.*		-c	gen_context(system_u:object_r:printer_device_t,s0)
 /dev/patmgr[01]		-c	gen_context(system_u:object_r:sound_device_t,s0)
 /dev/pmu		-c	gen_context(system_u:object_r:power_device_t,s0)
@@ -98,6 +97,17 @@ ifdef(`distro_suse', `
 /dev/usb/scanner.*	-c	gen_context(system_u:object_r:scanner_device_t,s0)
 
 /dev/xen/evtchn		-c	gen_context(system_u:object_r:xen_device_t,s0)
+
+ifdef(`distro_debian',`
+# used by udev init script as temporary mount point
+/lib/udev/devices	-d		gen_context(system_u:object_r:device_t,s0)
+')
+
+ifdef(`distro_gentoo',`
+# used by init scripts to initally populate udev /dev
+/lib/udev/devices/null	-c	gen_context(system_u:object_r:null_device_t,s0)
+/lib/udev/devices/zero	-c	gen_context(system_u:object_r:zero_device_t,s0)
+')
 
 ifdef(`distro_redhat',`
 # originally from named.fc

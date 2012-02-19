@@ -54,13 +54,16 @@ ifdef(`distro_redhat',`
 /etc/rc\.d/init\.d/functions	--	gen_context(system_u:object_r:bin_t,s0)
 
 /etc/sysconfig/network-scripts/ifup-.*	-- gen_context(system_u:object_r:bin_t,s0)
+/etc/sysconfig/network-scripts/ifup-.*	-l gen_context(system_u:object_r:bin_t,s0)
 /etc/sysconfig/network-scripts/ifdown-.* -- gen_context(system_u:object_r:bin_t,s0)
+/etc/sysconfig/network-scripts/ifdown-.* -l gen_context(system_u:object_r:bin_t,s0)
 
 /etc/X11/xdm/GiveConsole	--	gen_context(system_u:object_r:bin_t,s0)
 /etc/X11/xdm/TakeConsole	--	gen_context(system_u:object_r:bin_t,s0)
 /etc/X11/xdm/Xsetup_0		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/X11/xinit(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 
+/etc/xen/qemu-ifup		--	gen_context(system_u:object_r:bin_t,s0)
 /etc/xen/scripts(/.*)?			gen_context(system_u:object_r:bin_t,s0)
 
 ifdef(`distro_debian',`
@@ -103,6 +106,8 @@ ifdef(`distro_gentoo',`
 /opt/(.*/)?sbin(/.*)?			gen_context(system_u:object_r:sbin_t,s0)
 
 ifdef(`distro_gentoo',`
+/opt/RealPlayer/realplay(\.bin)?	gen_context(system_u:object_r:bin_t,s0)
+/opt/RealPlayer/postint(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /opt/vmware/workstation/lib/lib/wrapper-gtk24\.sh -- gen_context(system_u:object_r:bin_t,s0)
 ')
 
@@ -120,6 +125,7 @@ ifdef(`distro_gentoo',`
 /usr/lib/ccache/bin(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib/pgsql/test/regress/.*\.sh --	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib/qt.*/bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+/usr/lib/vte/gnome-pty-helper --	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/apt/methods.+	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/courier(/.*)?		gen_context(system_u:object_r:bin_t,s0)

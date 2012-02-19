@@ -1,5 +1,5 @@
 
-policy_module(ntp,1.1.4)
+policy_module(ntp,1.1.5)
 
 ########################################
 #
@@ -38,9 +38,8 @@ allow ntpd_t self:process { signal_perms setcap setsched setrlimit };
 allow ntpd_t self:fifo_file { read write getattr };
 allow ntpd_t self:unix_dgram_socket create_socket_perms;
 allow ntpd_t self:unix_stream_socket create_socket_perms;
-allow ntpd_t self:netlink_route_socket r_netlink_socket_perms;
 allow ntpd_t self:tcp_socket create_stream_socket_perms;
-allow ntpd_t self:udp_socket { create_socket_perms sendto recvfrom };
+allow ntpd_t self:udp_socket create_socket_perms;
 
 allow ntpd_t ntp_drift_t:dir rw_dir_perms;
 allow ntpd_t ntp_drift_t:file create_file_perms;
@@ -136,18 +135,6 @@ optional_policy(`
 
 optional_policy(`
 	logrotate_exec(ntpd_t)
-')
-
-optional_policy(`
-	nis_use_ypbind(ntpd_t)
-')
-
-optional_policy(`
-	nscd_socket_use(ntpd_t)
-')
-
-optional_policy(`
-	samba_stream_connect_winbind(ntpd_t)
 ')
 
 optional_policy(`

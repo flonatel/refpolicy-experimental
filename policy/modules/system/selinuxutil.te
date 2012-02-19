@@ -1,5 +1,5 @@
 
-policy_module(selinuxutil,1.2.10)
+policy_module(selinuxutil,1.2.15)
 
 ifdef(`strict_policy',`
 	gen_require(`
@@ -355,6 +355,8 @@ kernel_relabelfrom_unlabeled_files(restorecon_t)
 kernel_relabelfrom_unlabeled_symlinks(restorecon_t)
 kernel_relabelfrom_unlabeled_pipes(restorecon_t)
 kernel_relabelfrom_unlabeled_sockets(restorecon_t)
+kernel_dontaudit_list_all_proc(restorecon_t)
+kernel_dontaudit_list_all_sysctls(restorecon_t)
 
 dev_relabel_all_dev_nodes(restorecon_t)
 # cjp: why is this needed?
@@ -458,9 +460,15 @@ init_dontaudit_use_script_ptys(restorecond_t)
 libs_use_ld_so(restorecond_t)
 libs_use_shared_libs(restorecond_t)
 
+locallogin_dontaudit_use_fds(restorecond_t)
+
 logging_send_syslog_msg(restorecond_t)
 
 miscfiles_read_localization(restorecond_t)
+
+optional_policy(`
+	rpm_use_script_fds(restorecond_t)
+')
 
 optional_policy(`
 	# restorecond watches for users logging in, 
@@ -550,7 +558,6 @@ allow semanage_t self:capability { dac_override audit_write };
 allow semanage_t self:unix_stream_socket create_stream_socket_perms;
 allow semanage_t self:unix_dgram_socket create_socket_perms;
 allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
-allow semanage_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow semanage_t policy_config_t:file { read write };
 
@@ -566,7 +573,10 @@ corecmd_exec_sbin(semanage_t)
 
 dev_read_urand(semanage_t)
 
+domain_use_interactive_fds(semanage_t)
+
 files_read_etc_files(semanage_t)
+files_read_etc_runtime_files(semanage_t)
 files_read_usr_files(semanage_t)
 files_list_pids(semanage_t)
 
@@ -593,7 +603,6 @@ logging_send_syslog_msg(semanage_t)
 
 miscfiles_read_localization(semanage_t)
 
-seutil_search_default_contexts(semanage_t)
 seutil_manage_file_contexts(semanage_t)
 seutil_manage_selinux_config(semanage_t)
 seutil_domtrans_setfiles(semanage_t)
@@ -604,6 +613,8 @@ seutil_use_newrole_fds(semanage_t)
 seutil_manage_module_store(semanage_t)
 seutil_get_semanage_trans_lock(semanage_t)
 seutil_get_semanage_read_lock(semanage_t)
+# netfilter_contexts:
+seutil_manage_default_contexts(semanage_t)
 
 userdom_search_sysadm_home_dirs(semanage_t)
 
@@ -611,10 +622,6 @@ ifdef(`targeted_policy',`
 	# Handle pp files created in homedir and /tmp
 	files_read_generic_tmp_files(semanage_t)
 	userdom_read_generic_user_home_content_files(semanage_t)
-')
-
-optional_policy(`
-	nscd_socket_use(semanage_t)
 ')
 
 ########################################

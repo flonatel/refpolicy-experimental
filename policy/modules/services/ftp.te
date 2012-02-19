@@ -1,5 +1,5 @@
 
-policy_module(ftp,1.2.7)
+policy_module(ftp,1.2.8)
 
 ########################################
 #
@@ -50,7 +50,6 @@ allow ftpd_t self:unix_dgram_socket { sendto create_socket_perms };
 allow ftpd_t self:unix_stream_socket create_stream_socket_perms;
 allow ftpd_t self:tcp_socket create_stream_socket_perms;
 allow ftpd_t self:udp_socket create_socket_perms;
-allow ftpd_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow ftpd_t ftpd_etc_t:file r_file_perms;
 
@@ -241,10 +240,6 @@ optional_policy(`
 			tcpd_domtrans(tcpd_t)
 		')
 	')
-')
-
-optional_policy(`
-	nscd_socket_use(ftpd_t)
 ')
 
 optional_policy(`
