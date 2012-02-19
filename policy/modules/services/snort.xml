@@ -1,3 +1,0 @@
-<module name="snort" filename="policy/modules/services/snort.if">
-<summary>Snort network intrusion detection system</summary>
-</module>

@@ -1,3 +1,0 @@
-<module name="pxe" filename="policy/modules/services/pxe.if">
-<summary>Server for the PXE network boot protocol</summary>
-</module>
