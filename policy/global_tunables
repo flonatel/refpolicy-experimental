@@ -19,6 +19,14 @@ gen_tunable(allow_cvs_read_shadow,false)
 
 ## <desc>
 ## <p>
+## Allow zebra daemon to write it configuration files
+## </p>
+## </desc>
+#
+gen_tunable(allow_zebra_write_config,false)
+
+## <desc>
+## <p>
 ## Allow making the heap executable.
 ## </p>
 ## </desc>
@@ -58,6 +66,22 @@ gen_tunable(allow_ftpd_anon_write,false)
 
 ## <desc>
 ## <p>
+## Allow ftp servers to use cifs
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(allow_ftpd_use_cifs,false)
+
+## <desc>
+## <p>
+## Allow ftp servers to use nfs
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(allow_ftpd_use_nfs,false)
+
+## <desc>
+## <p>
 ## Allow gssd to read temp directory.
 ## </p>
 ## </desc>
@@ -73,6 +97,13 @@ gen_tunable(allow_httpd_anon_write,false)
 
 ## <desc>
 ## <p>
+## Allow Apache to use mod_auth_pam
+## </p>
+## </desc>
+gen_tunable(allow_httpd_mod_auth_pam,false)
+
+## <desc>
+## <p>
 ## Allow java executable stack
 ## </p>
 ## </desc>
@@ -84,6 +115,14 @@ gen_tunable(allow_java_execstack,false)
 ## </p>
 ## </desc>
 gen_tunable(allow_kerberos,false)
+
+## <desc>
+## <p>
+## Allow nfs servers to modify public files
+## used for public file transfer services.
+## </p>
+## </desc>
+gen_tunable(allow_nfsd_anon_write,false)
 
 ## <desc>
 ## <p>
@@ -108,12 +147,6 @@ gen_tunable(allow_saslauthd_read_shadow,false)
 ## </desc>
 gen_tunable(allow_smbd_anon_write,false)
 
-## <desc>
-## <p>
-## Allow sysadm to ptrace all processes
-## </p>
-## </desc>
-gen_tunable(allow_ptrace,false)
 
 ## <desc>
 ## <p>
@@ -266,13 +299,6 @@ gen_tunable(read_default_t,false)
 
 ## <desc>
 ## <p>
-## Allow ssh to run from inetd instead of as a daemon.
-## </p>
-## </desc>
-gen_tunable(run_ssh_inetd,false)
-
-## <desc>
-## <p>
 ## Allow samba to export user home directories.
 ## </p>
 ## </desc>
@@ -287,25 +313,11 @@ gen_tunable(samba_share_nfs,false)
 
 ## <desc>
 ## <p>
-## Allow spamassassin to do DNS lookups
-## </p>
-## </desc>
-gen_tunable(spamassasin_can_network,false)
-
-## <desc>
-## <p>
 ## Allow squid to connect to all ports, not just
 ## HTTP, FTP, and Gopher ports.
 ## </p>
 ## </desc>
 gen_tunable(squid_connect_any,false)
-
-## <desc>
-## <p>
-## Allow ssh logins as sysadm_r:sysadm_t
-## </p>
-## </desc>
-gen_tunable(ssh_sysadm_login,false)
 
 ## <desc>
 ## <p>
@@ -329,6 +341,12 @@ gen_tunable(use_nfs_home_dirs,false)
 ## </desc>
 gen_tunable(use_samba_home_dirs,false)
 
+########################################
+#
+# Strict policy specific
+#
+
+ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Control users use of ping and traceroute
@@ -336,12 +354,6 @@ gen_tunable(use_samba_home_dirs,false)
 ## </desc>
 gen_tunable(user_ping,false)
 
-########################################
-#
-# Strict policy specific
-#
-
-ifdef(`strict_policy',`
 ## <desc>
 ## <p>
 ## Allow gpg executable stack
@@ -355,6 +367,13 @@ gen_tunable(allow_gpg_execstack,false)
 ## </p>
 ## </desc>
 gen_tunable(allow_mplayer_execstack,false)
+
+## <desc>
+## <p>
+## Allow sysadm to ptrace all processes
+## </p>
+## </desc>
+gen_tunable(allow_ptrace,false)
 
 ## <desc>
 ## <p>
@@ -458,10 +477,24 @@ gen_tunable(read_untrusted_content,false)
 
 ## <desc>
 ## <p>
+## Allow ssh to run from inetd instead of as a daemon.
+## </p>
+## </desc>
+gen_tunable(run_ssh_inetd,false)
+
+## <desc>
+## <p>
 ## Allow user spamassassin clients to use the network.
 ## </p>
 ## </desc>
 gen_tunable(spamassassin_can_network,false)
+
+## <desc>
+## <p>
+## Allow ssh logins as sysadm_r:sysadm_t
+## </p>
+## </desc>
+gen_tunable(ssh_sysadm_login,false)
 
 ## <desc>
 ## <p>
@@ -547,6 +580,13 @@ gen_tunable(xdm_sysadm_login,false)
 #
 
 ifdef(`targeted_policy',`
+## <desc>
+## <p>
+## Allow mount to mount any file
+## </p>
+## </desc>
+gen_tunable(allow_mount_anyfile,false)
+
 ## <desc>
 ## <p>
 ## Allow spammd to read/write user home directories.

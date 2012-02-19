@@ -76,12 +76,13 @@ ifdef(`targeted_policy',`
 #
 
 /lib/udev/[^/]*			--	gen_context(system_u:object_r:bin_t,s0)
+/lib/udev/scsi_id		--	gen_context(system_u:object_r:sbin_t,s0)
 
 ifdef(`distro_gentoo',`
 /lib/rcscripts/addons(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /lib/rcscripts/sh(/.*)?			gen_context(system_u:object_r:bin_t,s0)
-/lib/rcscripts/net.modules.d/helpers.d/dhclient-.* -- gen_context(system_u:object_r:bin_t,s0)
-/lib/rcscripts/net.modules.d/helpers.d/udhcpc-.* -- gen_context(system_u:object_r:bin_t,s0)
+/lib/rcscripts/net\.modules\.d/helpers\.d/dhclient-.* -- gen_context(system_u:object_r:bin_t,s0)
+/lib/rcscripts/net\.modules\.d/helpers\.d/udhcpc-.* -- gen_context(system_u:object_r:bin_t,s0)
 ')
 
 #
@@ -102,7 +103,7 @@ ifdef(`distro_gentoo',`
 /opt/(.*/)?sbin(/.*)?			gen_context(system_u:object_r:sbin_t,s0)
 
 ifdef(`distro_gentoo',`
-/opt/vmware/workstation/lib/lib/wrapper-gtk24.sh -- gen_context(system_u:object_r:bin_t,s0)
+/opt/vmware/workstation/lib/lib/wrapper-gtk24\.sh -- gen_context(system_u:object_r:bin_t,s0)
 ')
 
 #
@@ -119,11 +120,6 @@ ifdef(`distro_gentoo',`
 /usr/lib/ccache/bin(/.*)?		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib/pgsql/test/regress/.*\.sh --	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib/qt.*/bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
-# these two lines are separate because of a
-# sorting issue with the java module
-/usr/lib/jvm/java.*/bin -d		gen_context(system_u:object_r:bin_t,s0)
-/usr/lib/jvm/java.*/bin/.*		gen_context(system_u:object_r:bin_t,s0)
-
 /usr/lib(64)?/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/apt/methods.+	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/courier(/.*)?		gen_context(system_u:object_r:bin_t,s0)
@@ -134,6 +130,7 @@ ifdef(`distro_gentoo',`
 /usr/lib(64)?/emacsen-common/.*		gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/ipsec/.*		--	gen_context(system_u:object_r:sbin_t,s0)
 /usr/lib(64)?/mailman/bin(/.*)?		gen_context(system_u:object_r:bin_t,s0)
+/usr/lib(64)?/mailman/mail(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/misc/sftp-server	--	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/nagios/plugins(/.*)?	gen_context(system_u:object_r:bin_t,s0)
 /usr/lib(64)?/netsaint/plugins(/.*)?	gen_context(system_u:object_r:bin_t,s0)
@@ -162,6 +159,8 @@ ifdef(`distro_gentoo',`
 
 /usr/sbin/sesh			--	gen_context(system_u:object_r:shell_exec_t,s0)
 
+/usr/share/apr-0/build/[^/]+\.sh --	gen_context(system_u:object_r:bin_t,s0)
+/usr/share/apr-0/build/libtool --	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/debconf/.+		--	gen_context(system_u:object_r:bin_t,s0)
 /usr/share/gnucash/finance-quote-check -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/gnucash/finance-quote-helper -- gen_context(system_u:object_r:bin_t,s0)
@@ -195,7 +194,7 @@ ifdef(`distro_redhat', `
 /usr/share/system-config-httpd/system-config-httpd -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/system-config-keyboard/system-config-keyboard -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/system-config-language/system-config-language -- gen_context(system_u:object_r:bin_t,s0)
-/usr/share/system-config-lvm/system-config-lvm.py -- gen_context(system_u:object_r:bin_t,s0)
+/usr/share/system-config-lvm/system-config-lvm\.py -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/system-config-mouse/system-config-mouse -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/system-config-netboot/system-config-netboot\.py -- gen_context(system_u:object_r:bin_t,s0)
 /usr/share/system-config-netboot/pxeos\.py -- gen_context(system_u:object_r:bin_t,s0)

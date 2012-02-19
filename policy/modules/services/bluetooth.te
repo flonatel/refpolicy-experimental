@@ -1,5 +1,5 @@
 
-policy_module(bluetooth,1.2.4)
+policy_module(bluetooth,1.2.9)
 
 ########################################
 #
@@ -49,7 +49,7 @@ allow bluetooth_t self:shm create_shm_perms;
 allow bluetooth_t self:socket create_stream_socket_perms;
 allow bluetooth_t self:unix_dgram_socket create_socket_perms;
 allow bluetooth_t self:unix_stream_socket create_stream_socket_perms;
-allow bluetooth_t self:tcp_socket { create_stream_socket_perms connect };
+allow bluetooth_t self:tcp_socket create_stream_socket_perms;
 allow bluetooth_t self:udp_socket create_socket_perms;
 
 allow bluetooth_t bluetooth_conf_t:dir rw_dir_perms;
@@ -87,6 +87,7 @@ files_pid_filetrans(bluetooth_t, bluetooth_var_run_t, { file sock_file })
 kernel_read_kernel_sysctls(bluetooth_t)
 kernel_read_system_state(bluetooth_t)
 
+corenet_non_ipsec_sendrecv(bluetooth_t)
 corenet_tcp_sendrecv_all_if(bluetooth_t)
 corenet_udp_sendrecv_all_if(bluetooth_t)
 corenet_raw_sendrecv_all_if(bluetooth_t)
@@ -95,9 +96,6 @@ corenet_udp_sendrecv_all_nodes(bluetooth_t)
 corenet_raw_sendrecv_all_nodes(bluetooth_t)
 corenet_tcp_sendrecv_all_ports(bluetooth_t)
 corenet_udp_sendrecv_all_ports(bluetooth_t)
-corenet_non_ipsec_sendrecv(bluetooth_t)
-corenet_tcp_bind_all_nodes(bluetooth_t)
-corenet_udp_bind_all_nodes(bluetooth_t)
 
 dev_read_sysfs(bluetooth_t)
 dev_rw_usbfs(bluetooth_t)
@@ -126,6 +124,8 @@ init_use_script_ptys(bluetooth_t)
 
 libs_use_ld_so(bluetooth_t)
 libs_use_shared_libs(bluetooth_t)
+
+locallogin_dontaudit_use_fds(bluetooth_helper_t)
 
 logging_send_syslog_msg(bluetooth_t)
 
@@ -173,6 +173,7 @@ allow bluetooth_helper_t self:fifo_file rw_file_perms;
 allow bluetooth_helper_t self:shm create_shm_perms;
 allow bluetooth_helper_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow bluetooth_helper_t self:tcp_socket create_socket_perms;
+allow bluetooth_helper_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow bluetooth_helper_t bluetooth_t:socket { read write };
 
@@ -211,6 +212,7 @@ sysnet_read_config(bluetooth_helper_t)
 
 ifdef(`targeted_policy',`
 	files_rw_generic_tmp_sockets(bluetooth_helper_t)
+	files_manage_generic_tmp_files(bluetooth_helper_t)
 
 	fs_rw_tmpfs_files(bluetooth_helper_t)
 
@@ -218,10 +220,16 @@ ifdef(`targeted_policy',`
 
 	unconfined_stream_connect(bluetooth_helper_t)
 
-	userdom_read_all_users_home_content_files(bluetooth_helper_t)
+	userdom_manage_generic_user_home_content_files(bluetooth_helper_t)
 
 	optional_policy(`
+	        corenet_tcp_connect_xserver_port(bluetooth_helper_t)
+
 		xserver_stream_connect_xdm(bluetooth_helper_t)
+		xserver_use_xdm_fds(bluetooth_helper_t)
+		xserver_rw_xdm_pipes(bluetooth_helper_t)
+		# when started via startx 
+		xserver_stream_connect_xdm_xserver(bluetooth_helper_t)
 	')
 ')
 

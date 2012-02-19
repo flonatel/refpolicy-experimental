@@ -1,5 +1,33 @@
 ## <summary>Run shells with substitute user and group</summary>
 
+#######################################
+## <summary>
+##	Restricted su domain template.
+## </summary>
+## <desc>
+##	<p>
+##	This template creates a derived domain which is allowed
+##	to change the linux user id, to run shells as a different
+##	user.
+##	</p>
+## </desc>
+## <param name="userdomain_prefix">
+##	<summary>
+##	The prefix of the user domain (e.g., user
+##	is the prefix for user_t).
+##	</summary>
+## </param>
+## <param name="user_domain">
+##	<summary>
+##	The type of the user domain.
+##	</summary>
+## </param>
+## <param name="user_role">
+##	<summary>
+##	The role associated with the user domain.
+##	</summary>
+## </param>
+#
 template(`su_restricted_domain_template', `
 	gen_require(`
 		type su_exec_t;
@@ -42,6 +70,9 @@ template(`su_restricted_domain_template', `
 	files_read_etc_runtime_files($1_su_t)
 	files_search_var_lib($1_su_t)
 	files_dontaudit_getattr_tmp_dirs($1_su_t)
+
+	# for the rootok check
+	selinux_compute_access_vector($1_su_t)
 
 	auth_domtrans_chk_passwd($1_su_t)
 	auth_dontaudit_read_shadow($1_su_t)
@@ -286,11 +317,9 @@ template(`su_per_userdomain_template',`
 	ifdef(`TODO',`
 	allow $1_su_t $1_home_t:file create_file_perms;
 
-	ifdef(`ssh.te', `
 	# Access sshd cookie files.
 	allow $1_su_t sshd_tmp_t:file rw_file_perms;
 	file_type_auto_trans($1_su_t, sshd_tmp_t, $1_tmp_t)
-	')
 	') dnl end TODO
 ')
 

@@ -11,6 +11,7 @@
 ifdef(`distro_redhat',`
 /\.autofsck		--	gen_context(system_u:object_r:etc_runtime_t,s0)
 /\.autorelabel		--	gen_context(system_u:object_r:etc_runtime_t,s0)
+/\.suspended		--	gen_context(system_u:object_r:etc_runtime_t,s0)
 /fastboot 		--	gen_context(system_u:object_r:etc_runtime_t,s0)
 /forcefsck 		--	gen_context(system_u:object_r:etc_runtime_t,s0)
 /fsckoptions 		--	gen_context(system_u:object_r:etc_runtime_t,s0)
@@ -35,11 +36,8 @@ ifdef(`distro_suse',`
 #
 # /emul
 #
-
-ifdef(`distro_redhat',`
 /emul			-d	gen_context(system_u:object_r:usr_t,s0)
 /emul/.*			gen_context(system_u:object_r:usr_t,s0)
-')
 
 #
 # /etc

@@ -99,18 +99,25 @@ interface(`mount_use_fds',`
 ##	Allow the mount domain to send nfs requests for mounting
 ##	network drives
 ## </summary>
+## <desc>
+##	<p>
+##	Allow the mount domain to send nfs requests for mounting
+##	network drives
+##	</p>
+##	<p>
+##	This interface has been deprecated as these rules were
+##	a side effect of leaked mount file descriptors.  This
+##	interface has no effect.
+##	</p>
+## </desc>
 ## <param name="domain">
 ##	<summary>
-##	The type of the process performing this action.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
 interface(`mount_send_nfs_client_request',`
-	gen_require(`
-		type mount_t;
-	')
-
-	allow $1 mount_t:udp_socket rw_socket_perms;
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -136,6 +143,6 @@ interface(`mount_domtrans_unconfined',`
 		allow unconfined_mount_t $1:fifo_file rw_file_perms;
 		allow unconfined_mount_t $1:process sigchld;
 	',`
-		errprint(`Warning: $0($1) has no effect in strict policy.'__endline__)
+		refpolicywarn(`$0($1) has no effect in strict policy.')
 	')
 ')

@@ -252,6 +252,7 @@ class process
 	execmem
 	execstack
 	execheap
+	setkeycreate
 }
 
 
@@ -610,3 +611,21 @@ inherits socket
 
 class appletalk_socket
 inherits socket
+
+class packet
+{
+	send
+	recv
+	relabelto
+}
+
+class key
+{
+	view
+	read
+	write
+	search
+	link
+	setattr
+	create
+}

@@ -1,5 +1,5 @@
 
-policy_module(avahi,1.2.1)
+policy_module(avahi,1.2.4)
 
 ########################################
 #
@@ -38,19 +38,19 @@ kernel_list_proc(avahi_t)
 kernel_read_proc_symlinks(avahi_t)
 kernel_read_network_state(avahi_t)
 
+corenet_non_ipsec_sendrecv(avahi_t)
 corenet_tcp_sendrecv_all_if(avahi_t)
-corenet_raw_sendrecv_all_if(avahi_t)
 corenet_udp_sendrecv_all_if(avahi_t)
 corenet_tcp_sendrecv_all_nodes(avahi_t)
-corenet_raw_sendrecv_all_nodes(avahi_t)
 corenet_udp_sendrecv_all_nodes(avahi_t)
 corenet_tcp_sendrecv_all_ports(avahi_t)
 corenet_udp_sendrecv_all_ports(avahi_t)
-corenet_non_ipsec_sendrecv(avahi_t)
 corenet_tcp_bind_all_nodes(avahi_t)
 corenet_udp_bind_all_nodes(avahi_t)
 corenet_tcp_bind_howl_port(avahi_t)
 corenet_udp_bind_howl_port(avahi_t)
+corenet_send_howl_client_packets(avahi_t)
+corenet_receive_howl_server_packets(avahi_t)
 
 dev_read_sysfs(avahi_t)
 dev_read_urand(avahi_t)
@@ -78,6 +78,7 @@ logging_send_syslog_msg(avahi_t)
 miscfiles_read_localization(avahi_t)
 
 sysnet_read_config(avahi_t)
+sysnet_use_ldap(avahi_t)
 
 userdom_dontaudit_use_unpriv_user_fds(avahi_t)
 userdom_dontaudit_search_sysadm_home_dirs(avahi_t)

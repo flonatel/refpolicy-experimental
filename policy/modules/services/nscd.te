@@ -1,5 +1,5 @@
 
-policy_module(nscd,1.2.2)
+policy_module(nscd,1.2.8)
 
 gen_require(`
 	class nscd all_nscd_perms;
@@ -28,7 +28,7 @@ logging_log_file(nscd_log_t)
 # Local policy
 #
 
-allow nscd_t self:capability { kill setgid setuid };
+allow nscd_t self:capability { kill setgid setuid audit_write };
 dontaudit nscd_t self:capability sys_tty_config;
 allow nscd_t self:process { getattr setsched signal_perms };
 allow nscd_t self:fifo_file { read write };
@@ -68,18 +68,15 @@ term_dontaudit_use_console(nscd_t)
 # for when /etc/passwd has just been updated and has the wrong type
 auth_getattr_shadow(nscd_t)
 
+corenet_non_ipsec_sendrecv(nscd_t)
 corenet_tcp_sendrecv_all_if(nscd_t)
 corenet_udp_sendrecv_all_if(nscd_t)
-corenet_raw_sendrecv_all_if(nscd_t)
 corenet_tcp_sendrecv_all_nodes(nscd_t)
 corenet_udp_sendrecv_all_nodes(nscd_t)
-corenet_raw_sendrecv_all_nodes(nscd_t)
 corenet_tcp_sendrecv_all_ports(nscd_t)
 corenet_udp_sendrecv_all_ports(nscd_t)
-corenet_non_ipsec_sendrecv(nscd_t)
-corenet_tcp_bind_all_nodes(nscd_t)
-corenet_udp_bind_all_nodes(nscd_t)
 corenet_tcp_connect_all_ports(nscd_t)
+corenet_sendrecv_all_client_packets(nscd_t)
 corenet_rw_tun_tap_dev(nscd_t)
 
 selinux_get_fs_mount(nscd_t)
@@ -108,6 +105,7 @@ seutil_read_config(nscd_t)
 seutil_read_default_contexts(nscd_t)
 seutil_sigchld_newrole(nscd_t)
 
+sysnet_dns_name_resolve(nscd_t)
 sysnet_read_config(nscd_t)
 
 userdom_dontaudit_use_unpriv_user_fds(nscd_t)
@@ -132,4 +130,9 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(nscd_t)
+')
+
+optional_policy(`
+	xen_dontaudit_rw_unix_stream_sockets(nscd_t)
+	xen_append_log(nscd_t)
 ')

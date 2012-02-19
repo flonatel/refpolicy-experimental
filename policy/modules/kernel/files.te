@@ -1,5 +1,5 @@
 
-policy_module(files,1.2.9)
+policy_module(files,1.2.13)
 
 ########################################
 #
@@ -180,6 +180,10 @@ allow file_type self:filesystem associate;
 
 fs_associate(file_type)
 fs_associate_noxattr(file_type)
+
+ifdef(`targeted_policy', `
+	fs_associate_tmpfs(file_type)
+')
 
 ########################################
 #

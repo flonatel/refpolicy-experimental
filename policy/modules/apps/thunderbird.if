@@ -87,11 +87,6 @@ template(`thunderbird_per_userdomain_template',`
 	allow $2 $1_thunderbird_t:dir { search getattr read };
 	allow $2 $1_thunderbird_t:{ file lnk_file } { read getattr };
 	allow $2 $1_thunderbird_t:process getattr;
-	# We need to suppress this denial because procps tries to access
-	# /proc/pid/environ and this now triggers a ptrace check in recent kernels
-	# (2.4 and 2.6).  Might want to change procps to not do this, or only if
-	# running in a privileged domain.
-	dontaudit $2 $1_thunderbird_t:process ptrace;
 
 	# Access ~/.thunderbird
 	allow $2 $1_thunderbird_home_t:dir manage_dir_perms;
@@ -106,24 +101,27 @@ template(`thunderbird_per_userdomain_template',`
 	# Startup shellscript
 	corecmd_exec_bin($1_thunderbird_t)
 
+	corenet_non_ipsec_sendrecv($1_thunderbird_t)
 	corenet_tcp_sendrecv_generic_if($1_thunderbird_t)
-	corenet_raw_sendrecv_generic_if($1_thunderbird_t)
+	corenet_tcp_sendrecv_all_nodes($1_thunderbird_t)
 	corenet_tcp_sendrecv_ipp_port($1_thunderbird_t)
 	corenet_tcp_sendrecv_ldap_port($1_thunderbird_t)
 	corenet_tcp_sendrecv_innd_port($1_thunderbird_t)
 	corenet_tcp_sendrecv_smtp_port($1_thunderbird_t)
 	corenet_tcp_sendrecv_pop_port($1_thunderbird_t)
 	corenet_tcp_sendrecv_http_port($1_thunderbird_t)
-	corenet_tcp_sendrecv_all_nodes($1_thunderbird_t)
-	corenet_raw_sendrecv_all_nodes($1_thunderbird_t)
-	corenet_non_ipsec_sendrecv($1_thunderbird_t)
-	corenet_tcp_bind_all_nodes($1_thunderbird_t)
 	corenet_tcp_connect_ipp_port($1_thunderbird_t)
 	corenet_tcp_connect_ldap_port($1_thunderbird_t)
 	corenet_tcp_connect_innd_port($1_thunderbird_t)
 	corenet_tcp_connect_smtp_port($1_thunderbird_t)
 	corenet_tcp_connect_pop_port($1_thunderbird_t)
 	corenet_tcp_connect_http_port($1_thunderbird_t)
+	corenet_sendrecv_ipp_client_packets($1_thunderbird_t)
+	corenet_sendrecv_ldap_client_packets($1_thunderbird_t)
+	corenet_sendrecv_innd_client_packets($1_thunderbird_t)
+	corenet_sendrecv_smtp_client_packets($1_thunderbird_t)
+	corenet_sendrecv_pop_client_packets($1_thunderbird_t)
+	corenet_sendrecv_http_client_packets($1_thunderbird_t)
 
 	files_list_tmp($1_thunderbird_t)
 	files_read_usr_files($1_thunderbird_t)
@@ -205,8 +203,7 @@ template(`thunderbird_per_userdomain_template',`
 		userdom_read_user_home_content_files($1,$1_thunderbird_t)
 		userdom_read_user_home_content_symlinks($1,$1_thunderbird_t)
 		
-		ifdef(`mls_policy',`
-		',`
+		ifndef(`enable_mls',`
 			fs_search_removable($1_thunderbird_t)
 			fs_read_removable_files($1_thunderbird_t)
 			fs_read_removable_symlinks($1_thunderbird_t)

@@ -33,10 +33,6 @@ interface(`kernel_domtrans_to',`
 	allow $1 kernel_t:fd use;
 	allow $1 kernel_t:fifo_file rw_file_perms;
 	allow $1 kernel_t:process sigchld;
-
-	ifdef(`enable_mls',`
-		allow kernel_t $1:process noatsecure;
-	')
 ')
 
 ########################################
@@ -1413,7 +1409,7 @@ interface(`kernel_read_kernel_sysctls',`
 		type proc_t, sysctl_t, sysctl_kernel_t;
 	')
 
-	allow $1 proc_t:dir search;
+	allow $1 proc_t:dir search_dir_perms;
 	allow $1 sysctl_t:dir r_dir_perms;
 	allow $1 sysctl_kernel_t:dir r_dir_perms;
 	allow $1 sysctl_kernel_t:file r_file_perms;
@@ -1542,8 +1538,15 @@ interface(`kernel_rw_irq_sysctls',`
 ')
 
 ########################################
-#
-# kernel_read_rpc_sysctls(domain)
+## <summary>
+##	Read RPC sysctls.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+##
 #
 interface(`kernel_read_rpc_sysctls',`
 	gen_require(`
@@ -1557,8 +1560,15 @@ interface(`kernel_read_rpc_sysctls',`
 ')
 
 ########################################
-#
-# kernel_rw_rpc_sysctls(domain)
+## <summary>
+##	Read and write RPC sysctls.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+##
 #
 interface(`kernel_rw_rpc_sysctls',`
 	gen_require(`
@@ -1918,7 +1928,7 @@ interface(`kernel_dontaudit_getattr_unlabeled_chr_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type relabeling the objects.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1936,7 +1946,7 @@ interface(`kernel_relabelfrom_unlabeled_dirs',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type relabeling the objects.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1955,7 +1965,7 @@ interface(`kernel_relabelfrom_unlabeled_files',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type relabeling the objects.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1974,7 +1984,7 @@ interface(`kernel_relabelfrom_unlabeled_symlinks',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type relabeling the objects.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -1993,7 +2003,7 @@ interface(`kernel_relabelfrom_unlabeled_pipes',`
 ## </summary>
 ## <param name="domain">
 ##	<summary>
-##	The process type relabeling the objects.
+##	Domain allowed access.
 ##	</summary>
 ## </param>
 #
@@ -2037,6 +2047,39 @@ interface(`kernel_sendrecv_unlabeled_association',`
 	')
 
 	allow $1 unlabeled_t:association { sendto recvfrom };
+
+	# temporary hack until labeling on packets is supported
+	allow $1 unlabeled_t:packet { send recv };
+')
+
+########################################
+## <summary>
+##	Send and receive unlabeled packets.
+## </summary>
+## <desc>
+##	<p>
+##	Send and receive unlabeled packets.
+##	These packets do not match any netfilter
+##	SECMARK rules.
+##	</p>
+##	<p>
+##	The corenetwork interface
+##	corenet_sendrecv_unlabeled_packets() should
+##	be used instead of this one.
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`kernel_sendrecv_unlabeled_packets',`
+	gen_require(`
+		type unlabeled_t;
+	')
+
+	allow $1 unlabeled_t:packet { send recv };
 ')
 
 ########################################

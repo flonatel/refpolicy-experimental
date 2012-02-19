@@ -86,6 +86,25 @@ interface(`rpm_run',`
 
 ########################################
 ## <summary>
+##	Execute the rpm client in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`rpm_exec',`
+	gen_require(`
+		type rpm_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1,rpm_exec_t)
+')
+
+########################################
+## <summary>
 ##	Inherit and use file descriptors from RPM.
 ## </summary>
 ## <param name="domain">
@@ -192,7 +211,7 @@ interface(`rpm_read_db',`
 
 	files_search_var_lib($1)
 	allow $1 rpm_var_lib_t:dir r_dir_perms;
-	allow $1 rpm_var_lib_t:file { getattr read };
+	allow $1 rpm_var_lib_t:file r_file_perms;
 	allow $1 rpm_var_lib_t:lnk_file r_file_perms;
 ')
 
@@ -213,8 +232,8 @@ interface(`rpm_manage_db',`
 
 	files_search_var_lib($1)
 	allow $1 rpm_var_lib_t:dir rw_dir_perms;
-	allow $1 rpm_var_lib_t:file { getattr create read write append unlink };
-	allow $1 rpm_var_lib_t:lnk_file { getattr read write unlink };
+	allow $1 rpm_var_lib_t:file manage_file_perms;
+	allow $1 rpm_var_lib_t:lnk_file create_lnk_perms;
 ')
 
 ########################################

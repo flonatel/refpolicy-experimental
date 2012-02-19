@@ -1,5 +1,5 @@
 
-policy_module(clamav,1.0.0)
+policy_module(clamav,1.0.5)
 
 ########################################
 #
@@ -14,10 +14,6 @@ init_daemon_domain(clamd_t, clamd_exec_t)
 # configuration files
 type clamd_etc_t;
 files_type(clamd_etc_t)
-
-# named socket type
-type clamd_sock_t;
-files_type(clamd_sock_t)
 
 # tmp files
 type clamd_tmp_t;
@@ -34,6 +30,15 @@ files_type(clamd_var_lib_t)
 # pid files
 type clamd_var_run_t;
 files_pid_file(clamd_var_run_t)
+typealias clamd_var_run_t alias clamd_sock_t;
+
+type clamscan_t;
+type clamscan_exec_t;
+init_daemon_domain(clamscan_t, clamscan_exec_t)
+
+# tmp files
+type clamscan_tmp_t;
+files_tmp_file(clamscan_tmp_t)
 
 type freshclam_t;
 type freshclam_exec_t;
@@ -59,12 +64,6 @@ allow clamd_t clamd_etc_t:dir r_dir_perms;
 allow clamd_t clamd_etc_t:file r_file_perms;
 allow clamd_t clamd_etc_t:lnk_file { getattr read };
 
-# socket file
-allow clamd_t clamd_sock_t:file manage_file_perms;
-allow clamd_t clamd_sock_t:sock_file manage_file_perms;
-allow clamd_t clamd_sock_t:dir rw_dir_perms;
-files_pid_filetrans(clamd_t,clamd_sock_t,sock_file)
-
 # tmp files
 allow clamd_t clamd_tmp_t:file create_file_perms;
 allow clamd_t clamd_tmp_t:dir create_dir_perms;
@@ -72,14 +71,10 @@ files_tmp_filetrans(clamd_t,clamd_tmp_t,{ file dir })
 
 # var/lib files for clamd
 allow clamd_t clamd_var_lib_t:file create_file_perms;
-allow clamd_t clamd_var_lib_t:sock_file create_file_perms;
 allow clamd_t clamd_var_lib_t:dir create_dir_perms;
-files_var_filetrans(clamd_t,clamd_var_lib_t,{ file dir sock_file })
-files_var_lib_filetrans(clamd_t,clamd_var_lib_t,file)
 
 # log files
 allow clamd_t clamd_var_log_t:file create_file_perms;
-allow clamd_t clamd_var_log_t:sock_file create_file_perms;
 allow clamd_t clamd_var_log_t:dir { rw_dir_perms setattr };
 logging_log_filetrans(clamd_t,clamd_var_log_t,file)
 
@@ -91,13 +86,14 @@ files_pid_filetrans(clamd_t,clamd_var_run_t,file)
 
 kernel_dontaudit_list_proc(clamd_t)
 
+corenet_non_ipsec_sendrecv(clamd_t)
 corenet_tcp_sendrecv_all_if(clamd_t)
 corenet_tcp_sendrecv_all_nodes(clamd_t)
 corenet_tcp_sendrecv_all_ports(clamd_t)
 corenet_tcp_sendrecv_clamd_port(clamd_t)
-corenet_non_ipsec_sendrecv(clamd_t)
-corenet_tcp_bind_clamd_port(clamd_t)
 corenet_tcp_bind_all_nodes(clamd_t)
+corenet_tcp_bind_clamd_port(clamd_t)
+corenet_sendrecv_clamd_server_packets(clamd_t)
 
 dev_read_rand(clamd_t)
 dev_read_urand(clamd_t)
@@ -106,12 +102,15 @@ domain_use_interactive_fds(clamd_t)
 
 files_read_etc_files(clamd_t)
 files_read_etc_runtime_files(clamd_t)
+files_search_spool(clamd_t)
 
 init_use_fds(clamd_t)
 init_use_script_ptys(clamd_t)
 
 libs_use_ld_so(clamd_t)
 libs_use_shared_libs(clamd_t)
+
+logging_send_syslog_msg(clamd_t)
 
 miscfiles_read_localization(clamd_t)
 
@@ -121,8 +120,14 @@ cron_use_fds(clamd_t)
 cron_use_system_job_fds(clamd_t)
 cron_rw_pipes(clamd_t)
 
+ifdef(`targeted_policy',`
+	term_dontaudit_use_generic_ptys(clamd_t)
+')
+
 optional_policy(`
 	amavis_read_lib_files(clamd_t)
+	amavis_read_spool_files(clamd_t)
+	amavis_spool_filetrans(clamd_t,clamd_var_run_t,sock_file)
 ')
 
 ########################################
@@ -143,10 +148,7 @@ allow freshclam_t clamd_etc_t:lnk_file { getattr read };
 
 # var/lib files together with clamd
 allow freshclam_t clamd_var_lib_t:file create_file_perms;
-allow freshclam_t clamd_var_lib_t:sock_file create_file_perms;
 allow freshclam_t clamd_var_lib_t:dir create_dir_perms;
-files_var_filetrans(freshclam_t,clamd_var_lib_t,{ file dir sock_file })
-files_var_lib_filetrans(freshclam_t,clamd_var_lib_t,file)
 
 # pidfiles- var/run together with clamd
 allow freshclam_t clamd_var_run_t:file manage_file_perms;
@@ -156,19 +158,17 @@ files_pid_filetrans(freshclam_t,clamd_var_run_t,file)
 
 # log files (own logfiles only)
 allow freshclam_t freshclam_var_log_t:file create_file_perms;
-allow freshclam_t freshclam_var_log_t:sock_file create_file_perms;
 allow freshclam_t freshclam_var_log_t:dir { rw_dir_perms setattr };
 allow freshclam_t clamd_var_log_t:dir search;
 logging_log_filetrans(freshclam_t,freshclam_var_log_t,file)
 
+corenet_non_ipsec_sendrecv(freshclam_t)
 corenet_tcp_sendrecv_all_if(freshclam_t)
 corenet_tcp_sendrecv_all_nodes(freshclam_t)
 corenet_tcp_sendrecv_all_ports(freshclam_t)
 corenet_tcp_sendrecv_clamd_port(freshclam_t)
-corenet_non_ipsec_sendrecv(freshclam_t)
 corenet_tcp_connect_http_port(freshclam_t)
-corenet_tcp_bind_all_ports(freshclam_t)
-corenet_tcp_bind_all_nodes(freshclam_t)
+corenet_sendrecv_http_client_packets(freshclam_t)
 
 dev_read_rand(freshclam_t)
 dev_read_urand(freshclam_t)
@@ -193,3 +193,46 @@ clamav_stream_connect(freshclam_t)
 cron_use_fds(freshclam_t)
 cron_use_system_job_fds(freshclam_t)
 cron_rw_pipes(freshclam_t)
+
+########################################
+#
+# clamscam local policy
+#
+
+allow clamscan_t self:capability { setgid setuid dac_override };
+allow clamscan_t self:fifo_file rw_file_perms;
+allow clamscan_t self:unix_stream_socket create_stream_socket_perms;
+allow clamscan_t self:unix_dgram_socket create_socket_perms;
+allow clamscan_t self:tcp_socket { listen accept };
+
+# configuration files
+allow clamscan_t clamd_etc_t:dir r_dir_perms;
+allow clamscan_t clamd_etc_t:file r_file_perms;
+allow clamscan_t clamd_etc_t:lnk_file { getattr read };
+
+# tmp files
+allow clamscan_t clamscan_tmp_t:file manage_file_perms;
+allow clamscan_t clamscan_tmp_t:dir manage_dir_perms;
+files_tmp_filetrans(clamscan_t,clamscan_tmp_t,{ file dir })
+
+# var/lib files together with clamd
+allow clamscan_t clamd_var_lib_t:file r_file_perms;
+allow clamscan_t clamd_var_lib_t:dir r_dir_perms;
+
+kernel_read_kernel_sysctls(clamscan_t)
+
+files_read_etc_files(clamscan_t)
+files_read_etc_runtime_files(clamscan_t)
+files_search_var_lib(clamscan_t)
+
+libs_use_ld_so(clamscan_t)
+libs_use_shared_libs(clamscan_t)
+
+miscfiles_read_localization(clamscan_t)
+miscfiles_read_public_files(clamscan_t)
+
+clamav_stream_connect(clamscan_t)
+
+optional_policy(`
+	apache_read_sys_content(clamscan_t)
+')

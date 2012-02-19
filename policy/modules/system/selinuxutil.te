@@ -1,8 +1,10 @@
 
-policy_module(selinuxutil,1.2.5)
+policy_module(selinuxutil,1.2.10)
 
-gen_require(`
-	bool secure_mode;
+ifdef(`strict_policy',`
+	gen_require(`
+		bool secure_mode;
+	')
 ')
 
 ########################################
@@ -92,7 +94,11 @@ role system_r types restorecond_t;
 type restorecond_var_run_t;
 files_pid_file(restorecond_var_run_t)
 
-type run_init_t;
+# real declaration moved to mls until
+# range transitions work in modules
+gen_require(`
+	type run_init_t;
+')
 type run_init_exec_t;
 domain_type(run_init_t)
 domain_entry_file(run_init_t,run_init_exec_t)
@@ -100,6 +106,7 @@ domain_system_change_exemption(run_init_t)
 
 type semanage_t;
 domain_type(semanage_t)
+domain_interactive_fd(semanage_t)
 
 type semanage_exec_t;
 domain_entry_file(semanage_t, semanage_exec_t)
@@ -110,6 +117,9 @@ files_type(semanage_store_t)
 
 type semanage_read_lock_t;
 files_type(semanage_read_lock_t)
+
+type semanage_tmp_t; 
+files_tmp_file(semanage_tmp_t)
 
 type semanage_trans_lock_t; 
 files_type(semanage_trans_lock_t)
@@ -306,14 +316,7 @@ userdom_use_unpriv_users_fds(newrole_t)
 # for some PAM modules and for cwd
 userdom_dontaudit_search_all_users_home_content(newrole_t)
 
-ifdef(`targeted_policy',`
-	# newrole does not make any sense in
-	# the targeted policy.  This is to
-	# make sediff easier.
-	if(!secure_mode) {
-		unconfined_domtrans(newrole_t)
-	}
-',`
+ifdef(`strict_policy',`
 	# if secure mode is enabled, then newrole
 	# can only transition to unprivileged users
 	if(secure_mode) {
@@ -423,18 +426,17 @@ optional_policy(`
 
 allow restorecond_t self:capability { dac_override dac_read_search fowner };
 allow restorecond_t self:fifo_file rw_file_perms;
+allow restorecond_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow restorecond_t restorecond_var_run_t:file create_file_perms;
 files_pid_filetrans(restorecond_t,restorecond_var_run_t, file)
-
-auth_relabel_all_files_except_shadow(restorecond_t )
-auth_read_all_files_except_shadow(restorecond_t)
-fs_relabelfrom_noxattr_fs(restorecond_t)
 
 kernel_use_fds(restorecond_t)
 kernel_rw_pipes(restorecond_t)
 kernel_read_system_state(restorecond_t)
 
+fs_relabelfrom_noxattr_fs(restorecond_t)
+fs_dontaudit_list_nfs(restorecond_t)
 fs_getattr_xattr_fs(restorecond_t)
 fs_list_inotifyfs(restorecond_t)
 
@@ -447,14 +449,24 @@ selinux_compute_user_contexts(restorecond_t)
 
 term_dontaudit_use_generic_ptys(restorecond_t)
 
+auth_relabel_all_files_except_shadow(restorecond_t )
+auth_read_all_files_except_shadow(restorecond_t)
+
 init_use_fds(restorecond_t)
+init_dontaudit_use_script_ptys(restorecond_t)
 
 libs_use_ld_so(restorecond_t)
 libs_use_shared_libs(restorecond_t)
 
 logging_send_syslog_msg(restorecond_t)
 
-miscfiles_read_localization(run_init_t)
+miscfiles_read_localization(restorecond_t)
+
+optional_policy(`
+	# restorecond watches for users logging in, 
+	# so it getspwnam when a user logs in to find his homedir
+	nis_use_ypbind(restorecond_t)
+')
 
 #################################
 #
@@ -467,6 +479,8 @@ selinux_compute_access_vector(run_init_t)
 selinux_compute_create_context(run_init_t)
 selinux_compute_relabel_context(run_init_t)
 selinux_compute_user_contexts(run_init_t)
+
+mls_rangetrans_source(run_init_t)
 
 ifdef(`direct_sysadm_daemon',`',`
 	ifdef(`distro_gentoo',`
@@ -532,15 +546,25 @@ ifdef(`targeted_policy',`',`
 # semodule local policy
 #
 
+allow semanage_t self:capability { dac_override audit_write };
 allow semanage_t self:unix_stream_socket create_stream_socket_perms;
+allow semanage_t self:unix_dgram_socket create_socket_perms;
+allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
+allow semanage_t self:netlink_route_socket r_netlink_socket_perms;
 
 allow semanage_t policy_config_t:file { read write };
+
+allow semanage_t semanage_tmp_t:dir create_dir_perms;
+allow semanage_t semanage_tmp_t:file create_file_perms;
+files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
 
 kernel_read_system_state(semanage_t)
 kernel_read_kernel_sysctls(semanage_t)
 
 corecmd_exec_bin(semanage_t)
 corecmd_exec_sbin(semanage_t)
+
+dev_read_urand(semanage_t)
 
 files_read_etc_files(semanage_t)
 files_read_usr_files(semanage_t)
@@ -551,12 +575,23 @@ mls_rangetrans_target(semanage_t)
 mls_file_read_up(semanage_t)
 
 selinux_get_enforce_mode(semanage_t)
+# for setsebool:
+selinux_set_boolean(semanage_t)
 
 term_use_all_terms(semanage_t)
+
+# Running genhomedircon requires this for finding all users
+auth_use_nsswitch(semanage_t)
 
 libs_use_ld_so(semanage_t)
 libs_use_shared_libs(semanage_t)
 libs_use_lib_files(semanage_t)
+
+locallogin_use_fds(semanage_t)
+
+logging_send_syslog_msg(semanage_t)
+
+miscfiles_read_localization(semanage_t)
 
 seutil_search_default_contexts(semanage_t)
 seutil_manage_file_contexts(semanage_t)
@@ -569,6 +604,14 @@ seutil_use_newrole_fds(semanage_t)
 seutil_manage_module_store(semanage_t)
 seutil_get_semanage_trans_lock(semanage_t)
 seutil_get_semanage_read_lock(semanage_t)
+
+userdom_search_sysadm_home_dirs(semanage_t)
+
+ifdef(`targeted_policy',`
+	# Handle pp files created in homedir and /tmp
+	files_read_generic_tmp_files(semanage_t)
+	userdom_read_generic_user_home_content_files(semanage_t)
+')
 
 optional_policy(`
 	nscd_socket_use(semanage_t)

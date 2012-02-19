@@ -67,15 +67,13 @@ template(`mta_base_mail_template',`
 
 	kernel_read_kernel_sysctls($1_mail_t)
 
-	corenet_tcp_sendrecv_all_if($1_mail_t)
-	corenet_raw_sendrecv_all_if($1_mail_t)
-	corenet_tcp_sendrecv_all_nodes($1_mail_t)
-	corenet_raw_sendrecv_all_nodes($1_mail_t)
-	corenet_tcp_sendrecv_all_ports($1_mail_t)
 	corenet_non_ipsec_sendrecv($1_mail_t)
-	corenet_tcp_bind_all_nodes($1_mail_t)
+	corenet_tcp_sendrecv_all_if($1_mail_t)
+	corenet_tcp_sendrecv_all_nodes($1_mail_t)
+	corenet_tcp_sendrecv_all_ports($1_mail_t)
 	corenet_tcp_connect_all_ports($1_mail_t)
 	corenet_tcp_connect_smtp_port($1_mail_t)
+	corenet_sendrecv_smtp_client_packets($1_mail_t)
 
 	corecmd_exec_bin($1_mail_t)
 	corecmd_search_sbin($1_mail_t)
@@ -300,9 +298,15 @@ template(`mta_admin_template',`
 	')
 ')
 
-#######################################
-#
-# mta_mailserver(domain,entrypointtype)
+########################################
+## <summary>
+##	Make the specified domain usable for a mail server.
+## </summary>
+## <param name="type">
+##	<summary>
+##	Type to be used as a mail server domain.
+##	</summary>
+## </param>
 #
 interface(`mta_mailserver',`
 	gen_require(`
@@ -439,9 +443,15 @@ interface(`mta_mailserver_user_agent',`
 	')
 ')
 
-#######################################
-#
-# mta_send_mail(domain)
+########################################
+## <summary>
+##	Send mail from the system.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_send_mail',`
 	gen_require(`
@@ -462,11 +472,52 @@ interface(`mta_send_mail',`
 	allow mta_user_agent $1:fifo_file { read write };
 ')
 
-#######################################
+########################################
+## <summary>
+##	Execute send mail in a specified domain.
+## </summary>
+## <desc>
+##      <p>
+##	Execute send mail in a specified domain.
+##      </p>
+##      <p>
+##      No interprocess communication (signals, pipes,
+##      etc.) is provided by this interface since
+##      the domains are not owned by this module.
+##      </p>
+## </desc>
+## <param name="source_domain">
+##	<summary>
+##	Domain to transition from.
+##	</summary>
+## </param>
+## <param name="target_domain">
+##	<summary>
+##	Domain to transition to.
+##	</summary>
+## </param>
 #
-# mta_exec(domain)
+interface(`mta_sendmail_domtrans',`
+	gen_require(`
+		type sendmail_exec_t;
+	')
+
+	files_search_usr($1)
+	corecmd_read_sbin_symlinks($1)
+	domain_auto_trans($1,sendmail_exec_t,$2)
+')
+
+########################################
+## <summary>
+##	Execute sendmail in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
-interface(`mta_exec',`
+interface(`mta_sendmail_exec',`
 	gen_require(`
 		type sendmail_exec_t;
 	')
@@ -533,9 +584,15 @@ interface(`mta_etc_filetrans_aliases',`
 	files_etc_filetrans($1,etc_aliases_t, file)
 ')
 
-#######################################
-#
-# mta_rw_aliases(domain)
+########################################
+## <summary>
+##	Read and write mail aliases.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_rw_aliases',`
 	gen_require(`
@@ -604,9 +661,15 @@ interface(`mta_dontaudit_read_spool_symlinks',`
 	dontaudit $1 mail_spool_t:lnk_file read;
 ')
 
-#######################################
-#
-# mta_getattr_spool(domain)
+########################################
+## <summary>
+##	Get the attributes of mail spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_getattr_spool',`
 	gen_require(`
@@ -619,6 +682,17 @@ interface(`mta_getattr_spool',`
 	allow $1 mail_spool_t:file getattr;
 ')
 
+########################################
+## <summary>
+##	Do not audit attempts to get the attributes
+##	of mail spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to not audit.
+##	</summary>
+## </param>
+#
 interface(`mta_dontaudit_getattr_spool_files',`
 	gen_require(`
 		type mail_spool_t;
@@ -661,9 +735,15 @@ interface(`mta_spool_filetrans',`
 	type_transition $1 mail_spool_t:$3 $2;
 ')
 
-#######################################
-#
-# mta_rw_spool(domain)
+########################################
+## <summary>
+##	Read and write the mail spool.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_rw_spool',`
 	gen_require(`
@@ -717,9 +797,15 @@ interface(`mta_delete_spool',`
 	allow $1 mail_spool_t:file unlink;
 ')
 
-#######################################
-#
-# mta_manage_spool(domain)
+########################################
+## <summary>
+##	Create, read, write, and delete mail spool files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_manage_spool',`
 	gen_require(`
@@ -751,9 +837,16 @@ interface(`mta_dontaudit_rw_queue',`
 	dontaudit $1 mqueue_spool_t:file { getattr read write };
 ')
 
-#######################################
-#
-# mta_manage_queue(domain)
+########################################
+## <summary>
+##	Create, read, write, and delete
+##	mail queue files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
 #
 interface(`mta_manage_queue',`
 	gen_require(`

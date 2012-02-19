@@ -12,6 +12,13 @@
 define(`shiftn',`ifelse($1,0,`shift($*)',`shiftn(decr($1),shift(shift($*)))')')
 
 #
+# ifndef(expr,true_block,false_block)
+#
+# m4 does not have this.
+#
+define(`ifndef',`ifdef(`$1',`$3',`$2')')
+
+#
 # __endline__
 #
 # dummy macro to insert a newline.  used for 
@@ -20,6 +27,21 @@ define(`shiftn',`ifelse($1,0,`shift($*)',`shiftn(decr($1),shift(shift($*)))')')
 #
 define(`__endline__',`
 ')
+
+#
+# refpolwarn(message)
+#
+# print a warning message
+#
+define(`refpolicywarn',`errprint(__file__:__line__: Warning: `$1'__endline__)')
+
+#
+# refpolerr(message)
+#
+# print an error message.  does not
+# make anything fail.
+#
+define(`refpolicyerr',`errprint(__file__:__line__: Error: `$1'__endline__)')
 
 ########################################
 #
@@ -37,7 +59,7 @@ user $1 roles { $3 }`'ifdef(`enable_mls', ` level $4 range $5')`'ifdef(`enable_m
 #
 # gen_context(context,mls_sensitivity,[mcs_categories])
 #
-define(`gen_context',`$1`'ifdef(`enable_mls',`:$2')`'ifdef(`enable_mcs',`:s0`'ifelse(`$3',,,`:$3')')') dnl
+define(`gen_context',`$1`'ifdef(`enable_mls',`:$2')`'ifdef(`enable_mcs',`:s0`'ifelse(`$3',,,`:$3')')')dnl
 
 ########################################
 #
