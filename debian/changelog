@@ -1,3 +1,10 @@
+refpolicy (2:2.20110726-4) UNRELEASED; urgency=low
+
+  * debian/control:
+    - Bump Standards-Version to 3.9.2
+
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 19 Feb 2012 19:08:44 +0100
+
 refpolicy (2:2.20110726-3) unstable; urgency=low
 
   * Label /run/mdadm/map .

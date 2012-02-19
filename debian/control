@@ -6,7 +6,7 @@ Section: admin
 Homepage: http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
 Maintainer: Russell Coker <russell@coker.com.au>
 Uploaders: Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
-Standards-Version: 3.8.3.0
+Standards-Version: 3.9.2
 Build-Depends-Indep: policycoreutils (>= 2.1.0), checkpolicy (>= 2.1.0),
                      python, m4, bzip2, gawk, libsepol1 (>=2.1.0)
 
@@ -123,5 +123,3 @@ Description: Documentation for the SELinux reference policy
   + Multi-Level Security
  .
  This package contains the documentation for the reference policy.
-
-
