@@ -106,7 +106,6 @@ optional_policy(`
 # CVSWeb policy
 #
 
-apache_script_exec_domain(cvs)
 optional_policy(`
 	apache_content_template(cvs)
 

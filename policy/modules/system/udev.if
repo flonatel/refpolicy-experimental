@@ -168,24 +168,6 @@ interface(`udev_dontaudit_search_db',`
 
 ########################################
 ## <summary>
-##     Allow process to remove udev table files
-## </summary>
-## <param name="domain">
-##     <summary>
-##     The type of the process performing this action.
-##     </summary>
-## </param>
-#
-interface(`udev_unlink_table',`
-	gen_require(`
-		type udev_tbl_t;
-	')
-
-	allow $1 udev_tbl_t:file unlink;
-')
-
-########################################
-## <summary>
 ##	Read the udev device table.
 ## </summary>
 ## <desc>

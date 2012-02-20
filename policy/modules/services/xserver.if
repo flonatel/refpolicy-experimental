@@ -116,24 +116,6 @@ interface(`xserver_restricted_role',`
 
 ########################################
 ## <summary>
-##	Allow domain to send sigchld to xdm_t
-##	and environment.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`xdm_sigchld',`
-	gen_require(`
-		type xdm_t;
-	')
-	allow $1 xdm_t:process sigchld;
-')
-
-########################################
-## <summary>
 ##	Rules required for using the X Windows server
 ##	and environment.
 ## </summary>
@@ -298,7 +280,7 @@ interface(`xserver_non_drawing_client',`
 ## </param>
 #
 interface(`xserver_user_client',`
-	refpolicyerr(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
+	refpolicywarn(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
 	gen_require(`
 		type xdm_t, xdm_tmp_t;
 		type xauth_home_t, iceauth_home_t, xserver_t, xserver_tmpfs_t;
@@ -595,18 +577,18 @@ interface(`xserver_user_home_dir_filetrans_user_xauth',`
 ## </param>
 #
 interface(`xserver_use_all_users_fonts',`
-	refpolicyerr(`$0() has been deprecated, please use xserver_use_user_fonts.')
+	refpolicywarn(`$0() has been deprecated, please use xserver_use_user_fonts.')
 	xserver_use_user_fonts($1)
 ')
 
 ########################################
 ## <summary>
-##    Read all users .Xauthority.
+##	Read all users .Xauthority.
 ## </summary>
 ## <param name="domain">
-##    <summary>
-##    Domain allowed access.
-##    </summary>
+##	<summary>
+##	Domain allowed access.
+##	</summary>
 ## </param>
 #
 interface(`xserver_read_user_xauth',`
@@ -747,7 +729,6 @@ interface(`xserver_stream_connect_xdm',`
 
 	files_search_tmp($1)
 	stream_connect_pattern($1, xdm_tmp_t, xdm_tmp_t, xdm_t)
-	stream_connect_pattern($1, xdm_var_run_t, xdm_var_run_t, xdm_t)
 ')
 
 ########################################

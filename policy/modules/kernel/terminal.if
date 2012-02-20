@@ -909,7 +909,7 @@ interface(`term_relabel_all_ptys',`
 ## <rolecap/>
 #
 interface(`term_getattr_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
 	term_getattr_all_ptys($1)
 ')
 
@@ -926,7 +926,7 @@ interface(`term_getattr_all_user_ptys',`
 ## </param>
 #
 interface(`term_dontaudit_getattr_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
 	term_dontaudit_getattr_all_ptys($1)
 ')
 
@@ -943,7 +943,7 @@ interface(`term_dontaudit_getattr_all_user_ptys',`
 ## <rolecap/>
 #
 interface(`term_setattr_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
 	term_setattr_all_ptys($1)
 ')
 
@@ -958,7 +958,7 @@ interface(`term_setattr_all_user_ptys',`
 ## </param>
 #
 interface(`term_relabelto_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
 	term_relabelto_all_ptys($1)
 ')
 
@@ -973,7 +973,7 @@ interface(`term_relabelto_all_user_ptys',`
 ## </param>
 #
 interface(`term_write_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_write_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_write_all_ptys() instead.')
 	term_write_all_ptys($1)
 ')
 
@@ -989,7 +989,7 @@ interface(`term_write_all_user_ptys',`
 ## <rolecap/>
 #
 interface(`term_use_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_use_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_use_all_ptys() instead.')
 	term_use_all_ptys($1)
 ')
 
@@ -1005,7 +1005,7 @@ interface(`term_use_all_user_ptys',`
 ## </param>
 #
 interface(`term_dontaudit_use_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
 	term_dontaudit_use_all_ptys($1)
 ')
 
@@ -1021,7 +1021,7 @@ interface(`term_dontaudit_use_all_user_ptys',`
 ## </param>
 #
 interface(`term_relabel_all_user_ptys',`
-	refpolicyerr(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
+	refpolicywarn(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
 	term_relabel_all_ptys($1)
 ')
 
@@ -1393,7 +1393,7 @@ interface(`term_dontaudit_use_all_ttys',`
 ## <rolecap/>
 #
 interface(`term_getattr_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_getattr_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_getattr_all_ttys() instead.')
 	term_getattr_all_ttys($1)
 ')
 
@@ -1410,7 +1410,7 @@ interface(`term_getattr_all_user_ttys',`
 ## </param>
 #
 interface(`term_dontaudit_getattr_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
 	term_dontaudit_getattr_all_ttys($1)
 ')
 
@@ -1427,7 +1427,7 @@ interface(`term_dontaudit_getattr_all_user_ttys',`
 ## <rolecap/>
 #
 interface(`term_setattr_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_setattr_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_setattr_all_ttys() instead.')
 	term_setattr_all_ttys($1)
 ')
 
@@ -1443,7 +1443,7 @@ interface(`term_setattr_all_user_ttys',`
 ## </param>
 #
 interface(`term_relabel_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_relabel_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_relabel_all_ttys() instead.')
 	term_relabel_all_ttys($1)
 ')
 
@@ -1458,7 +1458,7 @@ interface(`term_relabel_all_user_ttys',`
 ## </param>
 #
 interface(`term_write_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_write_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_write_all_ttys() instead.')
 	term_write_all_ttys($1)
 ')
 
@@ -1474,7 +1474,7 @@ interface(`term_write_all_user_ttys',`
 ## <rolecap/>
 #
 interface(`term_use_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_use_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_use_all_ttys() instead.')
 	term_use_all_ttys($1)
 ')
 
@@ -1490,6 +1490,6 @@ interface(`term_use_all_user_ttys',`
 ## </param>
 #
 interface(`term_dontaudit_use_all_user_ttys',`
-	refpolicyerr(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
+	refpolicywarn(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
 	term_dontaudit_use_all_ttys($1)
 ')

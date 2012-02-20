@@ -13,13 +13,17 @@ role system_r types webalizer_t;
 type webalizer_etc_t;
 files_config_file(webalizer_etc_t)
 
+type webalizer_usage_t;
+files_type(webalizer_usage_t)
+
 type webalizer_tmp_t;
 files_tmp_file(webalizer_tmp_t)
 
 type webalizer_var_lib_t;
 files_type(webalizer_var_lib_t)
 
-typealias webalizer_var_lib_t alias { webalizer_write_t webalizer_usage_t };
+type webalizer_write_t;
+files_type(webalizer_write_t)
 
 ########################################
 #
@@ -67,7 +71,6 @@ fs_rw_anon_inodefs_files(webalizer_t)
 
 files_read_etc_files(webalizer_t)
 files_read_etc_runtime_files(webalizer_t)
-files_read_usr_files(webalizer_t)
 
 logging_list_logs(webalizer_t)
 logging_send_syslog_msg(webalizer_t)

@@ -21,15 +21,6 @@ type unconfined_execmem_exec_t;
 init_system_domain(unconfined_execmem_t, unconfined_execmem_exec_t)
 role unconfined_r types unconfined_execmem_t;
 
-## <desc>
-## <p>
-## Enabling this allows some daemons to access unconfined_home_dir_t and
-## unconfined_home_t as if they were regular home directories.  This does
-## reduce the protection...
-## </p>
-## </desc>
-gen_bool(daemon_access_unconfined_home,true)
-
 ########################################
 #
 # Local policy
@@ -39,9 +30,10 @@ domtrans_pattern(unconfined_t, unconfined_execmem_exec_t, unconfined_execmem_t)
 
 files_create_boot_flag(unconfined_t)
 
-allow unconfined_r system_r;
+mcs_killall(unconfined_t)
+mcs_ptrace_all(unconfined_t)
 
-init_run_daemon(unconfined_t, unconfined_r, { unconfined_devpts_t unconfined_tty_device_t })
+init_run_daemon(unconfined_t, unconfined_r)
 
 libs_run_ldconfig(unconfined_t, unconfined_r)
 
@@ -57,9 +49,6 @@ unconfined_domain(unconfined_t)
 
 userdom_user_home_dir_filetrans_user_home_content(unconfined_t, { dir file lnk_file fifo_file sock_file })
 
-ifdef(`distro_debian',`
-	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
-')
 ifdef(`distro_gentoo',`
 	seutil_run_runinit(unconfined_t, unconfined_r)
 	seutil_init_script_run_runinit(unconfined_t, unconfined_r)

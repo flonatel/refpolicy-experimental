@@ -5,7 +5,6 @@ policy_module(w3c, 1.0.0)
 # Declarations
 #
 
-apache_script_exec_domain(w3c_validator)
 apache_content_template(w3c_validator)
 
 ########################################

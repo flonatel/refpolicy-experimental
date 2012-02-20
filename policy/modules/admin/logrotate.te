@@ -103,11 +103,8 @@ files_manage_generic_spool(logrotate_t)
 files_manage_generic_spool_dirs(logrotate_t)
 files_getattr_generic_locks(logrotate_t)
 
-# logrotate has to restart some daemons
+# cjp: why is this needed?
 init_domtrans_script(logrotate_t)
-
-# for runlevel
-init_dontaudit_write_utmp(logrotate_t)
 
 logging_manage_all_logs(logrotate_t)
 logging_send_syslog_msg(logrotate_t)
@@ -125,7 +122,7 @@ userdom_use_unpriv_users_fds(logrotate_t)
 
 cron_system_entry(logrotate_t, logrotate_exec_t)
 cron_search_spool(logrotate_t)
- 
+
 mta_send_mail(logrotate_t)
 
 ifdef(`distro_debian', `
@@ -142,10 +139,6 @@ ifdef(`distro_debian', `
 
 optional_policy(`
 	abrt_cache_manage(logrotate_t)
-')
-
-optional_policy(`
-	unconfined_dontaudit_search_home_dirs(logrotate_t)
 ')
 
 optional_policy(`
@@ -166,10 +159,6 @@ optional_policy(`
 
 optional_policy(`
 	bind_manage_cache(logrotate_t)
-')
-
-optional_policy(`
-	webalizer_domtrans(logrotate_t)
 ')
 
 optional_policy(`

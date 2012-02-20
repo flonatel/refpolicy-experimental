@@ -54,7 +54,7 @@ corenet_tcp_connect_all_ports(watchdog_t)
 corenet_sendrecv_all_client_packets(watchdog_t)
 
 dev_read_sysfs(watchdog_t)
-dev_rw_watchdog(watchdog_t)
+dev_write_watchdog(watchdog_t)
 # do not care about saving the random seed
 dev_dontaudit_read_rand(watchdog_t)
 dev_dontaudit_read_urand(watchdog_t)

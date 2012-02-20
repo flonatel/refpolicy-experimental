@@ -184,7 +184,7 @@ interface(`squid_manage_logs',`
 ## </param>
 #
 interface(`squid_use',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

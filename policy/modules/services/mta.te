@@ -5,18 +5,11 @@ policy_module(mta, 2.3.0)
 # Declarations
 #
 
-# attribute used for domains that act on behalf of the user to deliver mail
-# to the queue
 attribute mailcontent_type;
 attribute mta_exec_type;
 attribute mta_user_agent;
-
-# attribute used for domains that deliver mail locally
 attribute mailserver_delivery;
-
 attribute mailserver_domain;
-
-# attribute used for domains that send mail externally (smtp or lmtp)
 attribute mailserver_sender;
 
 attribute user_mail_domain;

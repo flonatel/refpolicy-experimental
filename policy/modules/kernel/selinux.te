@@ -19,7 +19,6 @@ attribute selinux_unconfined_type;
 type security_t, boolean_type;
 fs_type(security_t)
 mls_trusted_object(security_t)
-mcs_trusted_object(security_t)
 sid security gen_context(system_u:object_r:security_t,mls_systemhigh)
 genfscon selinuxfs / gen_context(system_u:object_r:security_t,s0)
 genfscon securityfs / gen_context(system_u:object_r:security_t,s0)

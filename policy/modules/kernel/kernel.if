@@ -299,7 +299,7 @@ interface(`kernel_dgram_send',`
 ## </param>
 #
 interface(`kernel_tcp_recvfrom',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -313,7 +313,7 @@ interface(`kernel_tcp_recvfrom',`
 ## </param>
 #
 interface(`kernel_udp_send',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -327,7 +327,7 @@ interface(`kernel_udp_send',`
 ## </param>
 #
 interface(`kernel_udp_recvfrom',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

@@ -83,9 +83,6 @@ type xend_var_lib_t;
 files_type(xend_var_lib_t)
 # for mounting an NFS store
 files_mountpoint(xend_var_lib_t)
-fs_getattr_xattr_fs(xend_t)
-# for /var/lib/python-support/python2.5/.path
-files_read_var_lib_files(xend_t)
 
 # log files
 type xend_var_log_t;
@@ -323,9 +320,7 @@ locallogin_dontaudit_use_fds(xend_t)
 
 logging_send_syslog_msg(xend_t)
 
-optional_policy(`
-	lvm_domtrans(xend_t)
-')
+lvm_domtrans(xend_t)
 
 miscfiles_read_localization(xend_t)
 miscfiles_read_hwdata(xend_t)
@@ -346,13 +341,6 @@ xen_stream_connect_xenstore(xend_t)
 
 netutils_domtrans(xend_t)
 
-unconfined_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
-ifdef(`distro_debian', `
-# xend uses LD_PRELOAD or similar for libxenctrl.so
-allow xend_t { xenconsoled_t xenstored_t }:process noatsecure;
-')
-allow xend_t xenstored_var_run_t:file manage_file_perms;
-
 optional_policy(`
 	brctl_domtrans(xend_t)
 ')
@@ -366,16 +354,12 @@ optional_policy(`
 # Xen console local policy
 #
 
-allow xenconsoled_t self:capability { dac_override fsetid ipc_lock sys_tty_config };
+allow xenconsoled_t self:capability { dac_override fsetid ipc_lock };
 allow xenconsoled_t self:process setrlimit;
 allow xenconsoled_t self:unix_stream_socket create_stream_socket_perms;
 allow xenconsoled_t self:fifo_file rw_fifo_file_perms;
-allow xenconsoled_t self:unix_dgram_socket create_socket_perms;
 
-# for /usr/lib/pt_chown
-libs_exec_lib_files(xenconsoled_t)
-
-allow xenconsoled_t xen_devpts_t:chr_file { setattr rw_term_perms };
+allow xenconsoled_t xen_devpts_t:chr_file rw_term_perms;
 
 # pid file
 manage_files_pattern(xenconsoled_t, xenconsoled_var_run_t, xenconsoled_var_run_t)
@@ -393,7 +377,6 @@ dev_rw_sysfs(xenconsoled_t)
 domain_dontaudit_ptrace_all_domains(xenconsoled_t)
 
 files_read_etc_files(xenconsoled_t)
-corecmd_search_bin(xenconsoled_t)
 files_read_usr_files(xenconsoled_t)
 
 fs_list_tmpfs(xenconsoled_t)
@@ -445,10 +428,6 @@ manage_dirs_pattern(xenstored_t, xenstored_var_lib_t, xenstored_var_lib_t)
 manage_files_pattern(xenstored_t, xenstored_var_lib_t, xenstored_var_lib_t)
 manage_sock_files_pattern(xenstored_t, xenstored_var_lib_t, xenstored_var_lib_t)
 files_var_lib_filetrans(xenstored_t, xenstored_var_lib_t, { file dir sock_file })
-allow xend_t xenstored_var_lib_t:dir rw_dir_perms;
-allow xend_t xenstored_var_lib_t:file unlink;
-corecmd_search_bin(xenstored_t)
-fs_manage_xenfs_dirs(xenstored_t)
 
 stream_connect_pattern(xenstored_t, evtchnd_var_run_t, evtchnd_var_run_t, evtchnd_t)
 
@@ -493,7 +472,6 @@ manage_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 manage_fifo_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 manage_sock_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
 files_search_var_lib(xm_t)
-files_read_kernel_img(xm_t)
 
 allow xm_t xen_image_t:dir rw_dir_perms;
 allow xm_t xen_image_t:file read_file_perms;

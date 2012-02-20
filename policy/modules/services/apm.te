@@ -190,9 +190,6 @@ optional_policy(`
 	optional_policy(`
 		networkmanager_dbus_chat(apmd_t)
 	')
-        optional_policy(`
-                hal_dbus_chat(apmd_t)
-        ')
 ')
 
 optional_policy(`

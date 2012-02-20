@@ -151,6 +151,12 @@ typealias xauth_tmp_t alias { auditadm_xauth_tmp_t secadm_xauth_tmp_t };
 files_tmp_file(xauth_tmp_t)
 ubac_constrained(xauth_tmp_t)
 
+# this is not actually a device, its a pipe
+type xconsole_device_t;
+files_type(xconsole_device_t)
+fs_associate_tmpfs(xconsole_device_t)
+files_associate_tmp(xconsole_device_t)
+
 type xdm_t;
 type xdm_exec_t;
 auth_login_pgm_domain(xdm_t)
@@ -311,8 +317,7 @@ allow xdm_t self:socket create_socket_perms;
 allow xdm_t self:appletalk_socket create_socket_perms;
 allow xdm_t self:key { search link write };
 
-#allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
-logging_r_xconsole(xdm_t)
+allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
 
 # Allow gdm to run gdm-binary
 can_exec(xdm_t, xdm_exec_t)
@@ -784,7 +789,6 @@ optional_policy(`
 optional_policy(`
 	unconfined_domain_noaudit(xserver_t)
 	unconfined_domtrans(xserver_t)
-        unconfined_dbus_send(xserver_t)
 ')
 
 optional_policy(`

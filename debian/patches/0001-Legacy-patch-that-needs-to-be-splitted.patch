@@ -1,0 +1,5926 @@
+Subject: Legacy patch that needs to be splitted
+From: Russell Coker <russell@coker.com.au>
+
+--- a/build.conf
++++ b/build.conf
+@@ -50,7 +50,7 @@
+ 
+ # User-based access control (UBAC)
+ # Enable UBAC for role separations.
+-UBAC = y
++UBAC = n
+ 
+ # Custom build options.  This field enables custom
+ # build options.  Putting foo here will enable
+--- a/policy/mcs
++++ b/policy/mcs
+@@ -71,32 +71,59 @@
+ mlsconstrain file { read ioctl lock execute execute_no_trans }
+ 	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t2 == domain ));
+ 
+-mlsconstrain file { write setattr append unlink link rename }
++mlsconstrain file { write setattr append link rename }
++ifdef(`distro_debian', `
++	((( h1 dom h2 ) and ( l1 domby l2 )) or ( t1 == mcswriteall ) or (t2 == mcstrustedobject) or ( t2 == domain ));
++', `
+ 	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t2 == domain ));
++')
++
++mlsconstrain file { unlink }
++ifdef(`distro_debian', `
++	((( h1 dom h2 ) and ( l1 domby l2 )) or (( t1 == mcswriteall ) or ( t1 == mcsdeleteall )) or (t2 == mcstrustedobject) or ( t2 == domain ));
++', `
++	(( h1 dom h2 ) or (( t1 == mcswriteall ) or ( t1 == mcsdeleteall )) or ( t2 == domain ));
++')
+ 
+ mlsconstrain dir { search read ioctl lock }
+-	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t2 == domain ));
++	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t1 == mcsdeleteall ) or ( t2 == domain ));
+ 
+-mlsconstrain dir { write setattr append unlink link rename add_name remove_name }
++mlsconstrain dir { setattr append link rename add_name }
+ 	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t2 == domain ));
+ 
++mlsconstrain dir { write unlink remove_name }
++	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t1 == mcsdeleteall ) or ( t2 == domain ));
++
+ # New filesystem object labels must be dominated by the relabeling subject
+ # clearance, also the objects are single-level.
+ mlsconstrain file { create relabelto }
++ifdef(`distro_debian', `
++	(( h1 dom h2 ) and ( l2 eq h2 ) and ((l1 domby l2) or (t2 == mcstrustedobject)));
++', `
+ 	(( h1 dom h2 ) and ( l2 eq h2 ));
++')
+ 
+ # new file labels must be dominated by the relabeling subject clearance
+ mlsconstrain { dir file lnk_file chr_file blk_file sock_file fifo_file } { relabelfrom }
+ 	( h1 dom h2 );
+ 
++# not mandatory at this time - can write down
+ mlsconstrain { dir file lnk_file chr_file blk_file sock_file fifo_file } { create relabelto }
+ 	(( h1 dom h2 ) and ( l2 eq h2 ));
+ 
+ mlsconstrain process { transition dyntransition }
++ifdef(`distro_debian', `
++	(( ( h1 dom h2 ) and ((l1 domby l2) or (t1 == mcssetlow)) ) or ( t1 == mcssetcats ));
++', `
+ 	(( h1 dom h2 ) or ( t1 == mcssetcats ));
++')
+ 
+ mlsconstrain process { ptrace }
++ifdef(`distro_debian', `
++	( (h1 dom h2) and ((l1 domby l2) or ( t1 == mcsptraceall )) );
++', `
+ 	(( h1 dom h2) or ( t1 == mcsptraceall ));
++')
+ 
+ mlsconstrain process { sigkill sigstop }
+ 	(( h1 dom h2 ) or ( t1 == mcskillall ));
+--- a/policy/constraints
++++ b/policy/constraints
+@@ -28,7 +28,7 @@
+ define(`basic_ubac_conditions',`
+ 	ifdef(`enable_ubac',`
+ 		u1 == u2
+-		or u1 == system_u
++		or u1 == system_u or u1 == unconfined_u
+ 		or u2 == system_u
+ 		or t1 != ubac_constrained_type
+ 		or t2 != ubac_constrained_type
+--- a/policy/users
++++ b/policy/users
+@@ -29,7 +29,7 @@
+ gen_user(sysadm_u, sysadm, sysadm_r, s0, s0 - mls_systemhigh, mcs_allcats)
+ 
+ # Until order dependence is fixed for users:
+-gen_user(unconfined_u, unconfined, unconfined_r, s0, s0 - mls_systemhigh, mcs_allcats)
++gen_user(unconfined_u, unconfined, unconfined_r system_r, s0, s0 - mls_systemhigh, mcs_allcats)
+ 
+ #
+ # The following users correspond to Unix identities.
+--- a/policy/global_tunables
++++ b/policy/global_tunables
+@@ -111,3 +111,10 @@
+ ## </p>
+ ## </desc>
+ gen_tunable(user_tcp_server,false)
++
++## <desc>
++## <p>
++## Allow users to manage files on dosfs_t devices, usually removable media
++## </p>
++## </desc>
++gen_tunable(user_manage_dos_files,true)
+--- a/policy/support/loadable_module.spt
++++ b/policy/support/loadable_module.spt
+@@ -95,7 +95,7 @@
+ #
+ define(`optional_policy',`
+ 	ifelse(regexp(`$1',`\W'),`-1',`
+-		refpolicywarn(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
++		refpolicyerr(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
+ 		optional_policy(shift($*))
+ 	',`
+ 		optional {`'pushdef(`__in_optional_policy')
+--- a/policy/support/obj_perm_sets.spt
++++ b/policy/support/obj_perm_sets.spt
+@@ -54,47 +54,47 @@
+ # 
+ # Permissions for getting file attributes.
+ #
+-define(`stat_file_perms', `{ getattr } refpolicywarn(`$0 is deprecated please use getattr_file_perms instead.')')
++define(`stat_file_perms', `{ getattr } refpolicyerr(`$0 is deprecated please use getattr_file_perms instead.')')
+ 
+ # 
+ # Permissions for executing files.
+ #
+-define(`x_file_perms', `{ getattr open execute } refpolicywarn(`$0 is deprecated please use { getattr execute } instead.')')
++define(`x_file_perms', `{ getattr open execute } refpolicyerr(`$0 is deprecated please use { getattr execute } instead.')')
+ 
+ # 
+ # Permissions for reading files and their attributes.
+ #
+-define(`r_file_perms', `{ open read getattr lock ioctl } refpolicywarn(`$0 is deprecated please use read_file_perms instead.')')
++define(`r_file_perms', `{ open read getattr lock ioctl } refpolicyerr(`$0 is deprecated please use read_file_perms instead.')')
+ 
+ # 
+ # Permissions for reading and executing files.
+ #
+-define(`rx_file_perms', `{ open read getattr lock execute ioctl } refpolicywarn(`$0 is deprecated please use { mmap_file_perms ioctl lock } instead.')')
++define(`rx_file_perms', `{ open read getattr lock execute ioctl } refpolicyerr(`$0 is deprecated please use { mmap_file_perms ioctl lock } instead.')')
+ 
+ # 
+ # Permissions for reading and appending to files.
+ #
+-define(`ra_file_perms', `{ open ioctl read getattr lock append } refpolicywarn(`$0 is deprecated please use { read_file_perms append_file_perms } instead.')')
++define(`ra_file_perms', `{ open ioctl read getattr lock append } refpolicyerr(`$0 is deprecated please use { read_file_perms append_file_perms } instead.')')
+ 
+ #
+ # Permissions for linking, unlinking and renaming files.
+ # 
+-define(`link_file_perms', `{ getattr link unlink rename } refpolicywarn(`$0 is deprecated please use { getattr link unlink rename } instead.')')
++define(`link_file_perms', `{ getattr link unlink rename } refpolicyerr(`$0 is deprecated please use { getattr link unlink rename } instead.')')
+ 
+ #
+ # Permissions for creating lnk_files.
+ #
+-define(`create_lnk_perms', `{ create read write getattr setattr link unlink rename } refpolicywarn(`$0 is deprecated please use manage_lnk_file_perms instead.')')
++define(`create_lnk_perms', `{ create read write getattr setattr link unlink rename } refpolicyerr(`$0 is deprecated please use manage_lnk_file_perms instead.')')
+ 
+ # 
+ # Permissions for reading directories and their attributes.
+ #
+-define(`r_dir_perms', `{ open read getattr lock search ioctl } refpolicywarn(`$0 is deprecated please use list_dir_perms instead.')')
++define(`r_dir_perms', `{ open read getattr lock search ioctl } refpolicyerr(`$0 is deprecated please use list_dir_perms instead.')')
+ 
+ # 
+ # Permissions for reading and adding names to directories.
+ #
+-define(`ra_dir_perms', `{ open read getattr lock search ioctl add_name write } refpolicywarn(`$0 is deprecated please use { list_dir_perms add_entry_dir_perms } instead.')')
++define(`ra_dir_perms', `{ open read getattr lock search ioctl add_name write } refpolicyerr(`$0 is deprecated please use { list_dir_perms add_entry_dir_perms } instead.')')
+ 
+ 
+ #
+--- a/policy/support/misc_patterns.spt
++++ b/policy/support/misc_patterns.spt
+@@ -51,7 +51,7 @@
+ # Other process permissions
+ #
+ define(`send_audit_msgs_pattern',`
+-	refpolicywarn(`$0($*) has been deprecated, please use logging_send_audit_msgs($1) instead.')
++	refpolicyerr(`$0($*) has been deprecated, please use logging_send_audit_msgs($1) instead.')
+ 	allow $1 self:capability audit_write;
+ 	allow $1 self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
+ ')
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -36,6 +36,9 @@
+ /sbin/swapon.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/tune2fs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ 
++# this is not ideal, but the best way to minimise privs for initrc_t
++/sbin/logsave		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++
+ /usr/bin/partition_uuid	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/raw		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/scsi_unique_id	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -178,6 +178,12 @@
+ 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
+ ')
+ 
++ifdef(`distro_debian',`
++	fs_rw_tmpfs_chr_files(init_t)
++	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
++')
++
++optional_policy(`
+ tunable_policy(`init_upstart',`
+ 	corecmd_shell_domtrans(init_t, initrc_t)
+ ',`
+@@ -185,6 +191,7 @@
+ 	# causes problems with upstart
+ 	sysadm_shell_domtrans(init_t)
+ ')
++')
+ 
+ optional_policy(`
+ 	auth_rw_login_records(init_t)
+@@ -240,7 +247,8 @@
+ manage_fifo_files_pattern(initrc_t, initrc_state_t, initrc_state_t)
+ 
+ allow initrc_t initrc_var_run_t:file manage_file_perms;
+-files_pid_filetrans(initrc_t, initrc_var_run_t, file)
++files_pid_filetrans(initrc_t,initrc_var_run_t,file)
++storage_var_run_filetrans_fixed_disk(initrc_t)
+ 
+ can_exec(initrc_t, initrc_tmp_t)
+ manage_files_pattern(initrc_t, initrc_tmp_t, initrc_tmp_t)
+@@ -287,6 +295,7 @@
+ dev_read_framebuffer(initrc_t)
+ dev_write_framebuffer(initrc_t)
+ dev_read_realtime_clock(initrc_t)
++clock_rw_adjtime(initrc_t)
+ dev_read_sound_mixer(initrc_t)
+ dev_write_sound_mixer(initrc_t)
+ dev_setattr_all_chr_files(initrc_t)
+@@ -294,8 +303,14 @@
+ dev_delete_lvm_control_dev(initrc_t)
+ dev_manage_generic_symlinks(initrc_t)
+ dev_manage_generic_files(initrc_t)
+-# Wants to remove udev.tbl:
+-dev_delete_generic_symlinks(initrc_t)
++
++optional_policy(`
++	# Wants to remove udev.tbl:
++	dev_delete_generic_symlinks(initrc_t)
++	udev_unlink_table(initrc_t)
++	dev_delete_generic_dirs(initrc_t)
++')
++
+ dev_getattr_all_blk_files(initrc_t)
+ dev_getattr_all_chr_files(initrc_t)
+ # Early devtmpfs
+@@ -391,6 +406,7 @@
+ logging_read_all_logs(initrc_t)
+ logging_append_all_logs(initrc_t)
+ logging_read_audit_config(initrc_t)
++logging_setattr_xconsole(initrc_t)
+ 
+ miscfiles_read_localization(initrc_t)
+ # slapd needs to read cert files from its initscript
+@@ -407,10 +423,18 @@
+ # started from init should be placed in their own domain.
+ userdom_use_user_terminals(initrc_t)
+ 
++# seed udev /dev
++dev_create_generic_dirs(initrc_t)
++
+ ifdef(`distro_debian',`
+-	dev_setattr_generic_dirs(initrc_t)
++	# to be able to create /dev/xconsole
++	dev_create_generic_pipes(initrc_t)
+ 
+-	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
++	# for /etc/network/run/ifstate
++	sysnet_manage_config(initrc_t)
++	fs_tmpfs_filetrans(initrc_t,initrc_var_run_t,dir)
++	allow initrc_t initrc_var_run_t:dir manage_dir_perms;
++	allow initrc_t initrc_var_run_t:lnk_file manage_lnk_file_perms;
+ 
+ 	# for storing state under /dev/shm
+ 	fs_setattr_tmpfs_dirs(initrc_t)
+@@ -418,6 +442,21 @@
+ 	storage_tmpfs_filetrans_fixed_disk(initrc_t)
+ 
+ 	files_setattr_etc_dirs(initrc_t)
++
++        selinux_get_fs_mount(init_t)
++
++        # for /lib/init/rw/.ramfs
++        fs_tmpfs_filetrans(initrc_t,initrc_state_t,file)
++
++        # for progress_state which is created by the initramfs
++        fs_allow_tmpfs_file_read(initrc_t)
++
++        # /etc/network/if-up.d/mountnfs wants to mkdir
++        # /var/run/network/mountnfs as a poor mans lock
++        allow initrc_t var_run_t:dir create;
++
++	# for lsb_release which calls apt-cache
++	apt_read_cache(initrc_t)
+ ')
+ 
+ ifdef(`distro_gentoo',`
+@@ -427,13 +466,11 @@
+ 	allow initrc_t self:process setfscreate;
+ 	dev_create_null_dev(initrc_t)
+ 	dev_create_zero_dev(initrc_t)
+-	dev_create_generic_dirs(initrc_t)
+ 	term_create_console_dev(initrc_t)
+ 
+ 	# unfortunately /sbin/rc does stupid tricks
+ 	# with /dev/.rcboot to decide if we are in
+ 	# early init
+-	dev_create_generic_dirs(initrc_t)
+ 	dev_delete_generic_dirs(initrc_t)
+ 
+ 	# allow bootmisc to create /var/lock/.keep.
+@@ -735,6 +772,7 @@
+ 
+ optional_policy(`
+ 	postfix_list_spool(initrc_t)
++	postfix_read_config(initrc_t)
+ ')
+ 
+ optional_policy(`
+@@ -844,9 +882,6 @@
+ ')
+ 
+ optional_policy(`
+-	# Set device ownerships/modes.
+-	xserver_setattr_console_pipes(initrc_t)
+-
+ 	# init script wants to check if it needs to update windowmanagerlist
+ 	xserver_read_xdm_rw_config(initrc_t)
+ ')
+--- /dev/null
++++ b/policy/modules/system/iodine.te
+@@ -0,0 +1,26 @@
++policy_module(iodine,1.0.0)
++
++# policy for the iodine IP over DNS tunneling daemon
++type iodine_t;
++type iodine_exec_t;
++files_type(iodine_exec_t)
++init_daemon_domain(iodine_t, iodine_exec_t)
++
++logging_send_syslog_msg(iodine_t)
++kernel_search_network_sysctl(iodine_t)
++kernel_read_network_state(iodine_t)
++kernel_request_load_module(iodine_t)
++kernel_read_system_state(iodine_t)
++files_read_etc_files(iodine_t)
++corecmd_exec_shell(iodine_t)
++allow iodine_t self:capability { setgid setuid net_bind_service net_admin net_raw sys_chroot };
++sysnet_domtrans_ifconfig(iodine_t)
++
++allow iodine_t self:rawip_socket { write read create };
++allow iodine_t self:unix_dgram_socket { create connect };
++corenet_raw_receive_generic_node(iodine_t)
++corenet_rw_tun_tap_dev(iodine_t)
++corenet_udp_bind_dns_port(iodine_t)
++corenet_udp_bind_generic_node(iodine_t)
++allow iodine_t self:udp_socket connected_socket_perms;
++allow iodine_t self:tun_socket create;
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -14,6 +14,8 @@
+ domain_interactive_fd(udev_t)
+ init_daemon_domain(udev_t, udev_exec_t)
+ 
++init_domtrans_script(udev_t)
++
+ type udev_etc_t alias etc_udev_t;
+ files_config_file(udev_etc_t)
+ 
+@@ -52,8 +54,8 @@
+ allow udev_t self:unix_stream_socket connectto;
+ allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow udev_t self:rawip_socket create_socket_perms;
++fs_read_anon_inodefs_files(udev_t)
+ 
+-allow udev_t udev_exec_t:file write;
+ can_exec(udev_t, udev_exec_t)
+ 
+ allow udev_t udev_helper_exec_t:dir list_dir_perms;
+@@ -64,10 +66,13 @@
+ 
+ # create udev database in /dev/.udevdb
+ allow udev_t udev_tbl_t:file manage_file_perms;
+-dev_filetrans(udev_t, udev_tbl_t, file)
++allow udev_t udev_tbl_t:lnk_file manage_lnk_file_perms;
++allow udev_t udev_tbl_t:dir manage_dir_perms;
++dev_filetrans(udev_t,udev_tbl_t,file)
+ 
+ list_dirs_pattern(udev_t, udev_rules_t, udev_rules_t)
+ read_files_pattern(udev_t, udev_rules_t, udev_rules_t)
++read_lnk_files_pattern(udev_t, udev_rules_t, udev_rules_t)
+ 
+ manage_dirs_pattern(udev_t, udev_var_run_t, udev_var_run_t)
+ manage_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
+@@ -97,6 +102,7 @@
+ 
+ dev_rw_sysfs(udev_t)
+ dev_manage_all_dev_nodes(udev_t)
++dev_create_generic_symlinks(udev_t)
+ dev_rw_generic_files(udev_t)
+ dev_delete_generic_files(udev_t)
+ dev_search_usbfs(udev_t)
+@@ -110,7 +116,11 @@
+ domain_dontaudit_ptrace_all_domains(udev_t) #pidof triggers these
+ 
+ files_read_usr_files(udev_t)
++ifdef(`distro_debian', `
++files_manage_etc_runtime_files(udev_t)
++', `
+ files_read_etc_runtime_files(udev_t)
++')
+ files_read_etc_files(udev_t)
+ files_exec_etc_files(udev_t)
+ files_dontaudit_search_isid_type_dirs(udev_t)
+@@ -161,22 +171,29 @@
+ seutil_domtrans_setfiles(udev_t)
+ 
+ sysnet_domtrans_ifconfig(udev_t)
++sysnet_manage_config(udev_t)
+ sysnet_domtrans_dhcpc(udev_t)
+ sysnet_rw_dhcp_config(udev_t)
+ sysnet_read_dhcpc_pid(udev_t)
+ sysnet_delete_dhcpc_pid(udev_t)
+ sysnet_signal_dhcpc(udev_t)
+-sysnet_manage_config(udev_t)
+ sysnet_etc_filetrans_config(udev_t)
+ 
+ userdom_dontaudit_search_user_home_content(udev_t)
+ 
++fstools_getattr_swap_files(udev_t)
++
+ ifdef(`distro_gentoo',`
+ 	# during boot, init scripts use /dev/.rcsysinit
+ 	# existance to determine if we are in early booting
+ 	init_getattr_script_status_files(udev_t)
+ ')
+ 
++ifdef(`distro_debian',`
++	fs_manage_tmpfs_dirs(udev_t)
++	fs_manage_tmpfs_chr_files(udev_t)
++')
++
+ ifdef(`distro_redhat',`
+ 	fs_manage_tmpfs_dirs(udev_t)
+ 	fs_manage_tmpfs_files(udev_t)
+@@ -285,6 +302,7 @@
+ 	kernel_read_xen_state(udev_t)
+ 	xen_manage_log(udev_t)
+ 	xen_read_image_files(udev_t)
++	fs_manage_xenfs_files(udev_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -23,20 +23,26 @@
+ type mount_tmp_t;
+ files_tmp_file(mount_tmp_t)
+ 
++dev_read_sysfs(mount_t)
++
+ # causes problems with interfaces when
+ # this is optionally declared in monolithic
+ # policy--duplicate type declaration
+ type unconfined_mount_t;
+ application_domain(unconfined_mount_t, mount_exec_t)
+ 
++kernel_request_load_module(mount_t)
+ ########################################
+ #
+ # mount local policy
+ #
+ 
++kernel_setsched(mount_t)
++
+ # setuid/setgid needed to mount cifs 
+ allow mount_t self:capability { ipc_lock sys_rawio sys_admin dac_override chown sys_tty_config setuid setgid };
+ 
++dev_read_urand(mount_t)
+ allow mount_t mount_loopback_t:file read_file_perms;
+ 
+ allow mount_t mount_tmp_t:file manage_file_perms;
+@@ -50,6 +56,7 @@
+ kernel_read_kernel_sysctls(mount_t)
+ kernel_dontaudit_getattr_core_if(mount_t)
+ kernel_dontaudit_write_debugfs_dirs(mount_t)
++kernel_search_debugfs(mount_t)
+ kernel_dontaudit_write_proc_dirs(mount_t)
+ # To load binfmt_misc kernel module
+ kernel_request_load_module(mount_t)
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -253,6 +253,7 @@
+ allow ifconfig_t self:sem create_sem_perms;
+ allow ifconfig_t self:msgq create_msgq_perms;
+ allow ifconfig_t self:msg { send receive };
++term_read_console(ifconfig_t)
+ # Create UDP sockets, necessary when called from dhcpc
+ allow ifconfig_t self:udp_socket create_socket_perms;
+ # for /sbin/ip
+--- a/policy/modules/system/setrans.te
++++ b/policy/modules/system/setrans.te
+@@ -50,7 +50,7 @@
+ files_pid_filetrans(setrans_t, setrans_var_run_t, { file dir })
+ 
+ kernel_read_kernel_sysctls(setrans_t)
+-kernel_read_proc_symlinks(setrans_t)
++kernel_read_system_state(setrans_t)
+ 
+ # allow performing getpidcon() on all processes
+ domain_read_all_domains_state(setrans_t)
+--- a/policy/modules/system/xen.te
++++ b/policy/modules/system/xen.te
+@@ -83,6 +83,9 @@
+ files_type(xend_var_lib_t)
+ # for mounting an NFS store
+ files_mountpoint(xend_var_lib_t)
++fs_getattr_xattr_fs(xend_t)
++# for /var/lib/python-support/python2.5/.path
++files_read_var_lib_files(xend_t)
+ 
+ # log files
+ type xend_var_log_t;
+@@ -320,7 +323,9 @@
+ 
+ logging_send_syslog_msg(xend_t)
+ 
+-lvm_domtrans(xend_t)
++optional_policy(`
++	lvm_domtrans(xend_t)
++')
+ 
+ miscfiles_read_localization(xend_t)
+ miscfiles_read_hwdata(xend_t)
+@@ -341,6 +346,13 @@
+ 
+ netutils_domtrans(xend_t)
+ 
++unconfined_dontaudit_search_home_dirs({ xend_t xenconsoled_t xenstored_t })
++ifdef(`distro_debian', `
++# xend uses LD_PRELOAD or similar for libxenctrl.so
++allow xend_t { xenconsoled_t xenstored_t }:process noatsecure;
++')
++allow xend_t xenstored_var_run_t:file manage_file_perms;
++
+ optional_policy(`
+ 	brctl_domtrans(xend_t)
+ ')
+@@ -354,12 +366,16 @@
+ # Xen console local policy
+ #
+ 
+-allow xenconsoled_t self:capability { dac_override fsetid ipc_lock };
++allow xenconsoled_t self:capability { dac_override fsetid ipc_lock sys_tty_config };
+ allow xenconsoled_t self:process setrlimit;
+ allow xenconsoled_t self:unix_stream_socket create_stream_socket_perms;
+ allow xenconsoled_t self:fifo_file rw_fifo_file_perms;
++allow xenconsoled_t self:unix_dgram_socket create_socket_perms;
++
++# for /usr/lib/pt_chown
++libs_exec_lib_files(xenconsoled_t)
+ 
+-allow xenconsoled_t xen_devpts_t:chr_file rw_term_perms;
++allow xenconsoled_t xen_devpts_t:chr_file { setattr rw_term_perms };
+ 
+ # pid file
+ manage_files_pattern(xenconsoled_t, xenconsoled_var_run_t, xenconsoled_var_run_t)
+@@ -377,6 +393,7 @@
+ domain_dontaudit_ptrace_all_domains(xenconsoled_t)
+ 
+ files_read_etc_files(xenconsoled_t)
++corecmd_search_bin(xenconsoled_t)
+ files_read_usr_files(xenconsoled_t)
+ 
+ fs_list_tmpfs(xenconsoled_t)
+@@ -428,6 +445,10 @@
+ manage_files_pattern(xenstored_t, xenstored_var_lib_t, xenstored_var_lib_t)
+ manage_sock_files_pattern(xenstored_t, xenstored_var_lib_t, xenstored_var_lib_t)
+ files_var_lib_filetrans(xenstored_t, xenstored_var_lib_t, { file dir sock_file })
++allow xend_t xenstored_var_lib_t:dir rw_dir_perms;
++allow xend_t xenstored_var_lib_t:file unlink;
++corecmd_search_bin(xenstored_t)
++fs_manage_xenfs_dirs(xenstored_t)
+ 
+ stream_connect_pattern(xenstored_t, evtchnd_var_run_t, evtchnd_var_run_t, evtchnd_t)
+ 
+@@ -472,6 +493,7 @@
+ manage_fifo_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
+ manage_sock_files_pattern(xm_t, xend_var_lib_t, xend_var_lib_t)
+ files_search_var_lib(xm_t)
++files_read_kernel_img(xm_t)
+ 
+ allow xm_t xen_image_t:dir rw_dir_perms;
+ allow xm_t xen_image_t:file read_file_perms;
+--- a/policy/modules/system/authlogin.if
++++ b/policy/modules/system/authlogin.if
+@@ -426,7 +426,7 @@
+ 
+ 	corecmd_search_bin($1)
+ 	domtrans_pattern($1, chkpwd_exec_t, chkpwd_t)
+-	dontaudit $1 shadow_t:file { getattr read };
++	dontaudit $1 shadow_t:file { open getattr read };
+ 	auth_domtrans_upd_passwd($1)
+ ')
+ 
+--- a/policy/modules/system/sysnetwork.fc
++++ b/policy/modules/system/sysnetwork.fc
+@@ -28,6 +28,9 @@
+ /etc/sysconfig/network-scripts(/.*)? gen_context(system_u:object_r:net_conf_t,s0)
+ ')
+ 
++ifdef(`distro_debian', `
++/dev/shm/network(/.*)?			gen_context(system_u:object_r:net_conf_t,s0)
++')
+ #
+ # /sbin
+ #
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -61,6 +61,11 @@
+ type syslog_conf_t;
+ files_config_file(syslog_conf_t)
+ 
++ifdef(`distro_debian', `
++# for xconsole detection
++    allow initrc_t syslog_conf_t:file read_file_perms;
++')
++
+ type syslogd_t;
+ type syslogd_exec_t;
+ init_daemon_domain(syslogd_t, syslogd_exec_t)
+@@ -81,6 +86,13 @@
+ logging_log_file(var_log_t)
+ files_mountpoint(var_log_t)
+ 
++# this is not actually a device, its a pipe
++type xconsole_device_t;
++files_type(xconsole_device_t)
++dev_associate(xconsole_device_t)
++files_associate_tmp(xconsole_device_t)
++allow syslogd_t xconsole_device_t:fifo_file rw_file_perms;
++
+ ifdef(`enable_mls',`
+ 	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
+ 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
+@@ -93,6 +105,7 @@
+ 
+ allow auditctl_t self:capability { fsetid dac_read_search dac_override };
+ allow auditctl_t self:netlink_audit_socket nlmsg_readpriv;
++dev_read_urand(auditctl_t)
+ 
+ read_files_pattern(auditctl_t, auditd_etc_t, auditd_etc_t)
+ allow auditctl_t auditd_etc_t:dir list_dir_perms;
+@@ -132,6 +145,7 @@
+ allow auditd_t self:unix_dgram_socket create_socket_perms;
+ allow auditd_t self:fifo_file rw_fifo_file_perms;
+ allow auditd_t self:tcp_socket create_stream_socket_perms;
++dev_read_urand(auditd_t)
+ 
+ allow auditd_t auditd_etc_t:dir list_dir_perms;
+ allow auditd_t auditd_etc_t:file read_file_perms;
+@@ -224,6 +238,7 @@
+ allow audisp_t self:fifo_file rw_fifo_file_perms;
+ allow audisp_t self:unix_stream_socket create_stream_socket_perms;
+ allow audisp_t self:unix_dgram_socket create_socket_perms;
++dev_read_urand(audisp_t)
+ 
+ allow audisp_t auditd_t:unix_stream_socket rw_socket_perms;
+ 
+@@ -354,11 +369,11 @@
+ # chown fsetid for syslog-ng
+ # sys_admin for the integrated klog of syslog-ng and metalog
+ # cjp: why net_admin!
+-allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin chown fsetid };
++allow syslogd_t self:capability { chown dac_override fsetid net_admin sys_admin sys_nice sys_resource sys_tty_config };
+ dontaudit syslogd_t self:capability sys_tty_config;
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+-allow syslogd_t self:process { signal_perms setpgid setrlimit };
++allow syslogd_t self:process { signal_perms setpgid setrlimit getsched setsched };
+ # receive messages to be logged
+ allow syslogd_t self:unix_dgram_socket create_socket_perms;
+ allow syslogd_t self:unix_stream_socket create_stream_socket_perms;
+@@ -377,6 +392,9 @@
+ manage_files_pattern(syslogd_t, var_log_t, var_log_t)
+ rw_fifo_files_pattern(syslogd_t, var_log_t, var_log_t)
+ 
++# for rsyslogd, this access is harmless so making it unconditional
++allow syslogd_t proc_t:file { getattr read };
++
+ # Allow access for syslog-ng
+ allow syslogd_t var_log_t:dir { create setattr };
+ 
+@@ -506,8 +524,3 @@
+ optional_policy(`
+ 	udev_read_db(syslogd_t)
+ ')
+-
+-optional_policy(`
+-	# log to the xconsole
+-	xserver_rw_console(syslogd_t)
+-')
+--- a/policy/modules/system/hostname.te
++++ b/policy/modules/system/hostname.te
+@@ -25,6 +25,8 @@
+ kernel_read_proc_symlinks(hostname_t)
+ 
+ dev_read_sysfs(hostname_t)
++dev_read_urand(hostname_t)
++
+ # Early devtmpfs, before udev relabel
+ dev_dontaudit_rw_generic_chr_files(hostname_t)
+ 
+--- a/policy/modules/system/modutils.te
++++ b/policy/modules/system/modutils.te
+@@ -20,6 +20,8 @@
+ mls_file_write_all_levels(insmod_t)
+ role system_r types insmod_t;
+ 
++kernel_request_load_module(insmod_t)
++
+ # module loading config
+ type modules_conf_t;
+ files_type(modules_conf_t)
+@@ -75,6 +77,12 @@
+ files_list_home(depmod_t)
+ userdom_read_user_home_content_files(depmod_t)
+ 
++ifdef(`distro_debian',`
++	optional_policy(`
++		unconfined_run_to(depmod_t, depmod_exec_t)
++	')
++')
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(depmod_t)
+@@ -104,11 +112,14 @@
+ # insmod local policy
+ #
+ 
+-allow insmod_t self:capability { dac_override net_raw sys_nice sys_tty_config };
++allow insmod_t self:capability { dac_override net_raw sys_admin sys_nice sys_tty_config };
+ allow insmod_t self:process { execmem sigchld sigkill sigstop signull signal };
+ 
+ allow insmod_t self:udp_socket create_socket_perms;
+ allow insmod_t self:rawip_socket create_socket_perms;
++fs_mount_rpc_pipefs(insmod_t)
++fs_list_rpc(insmod_t)
++term_read_console(insmod_t)
+ 
+ # Read module config and dependency information
+ list_dirs_pattern(insmod_t, modules_conf_t, modules_conf_t)
+--- a/policy/modules/system/logging.fc
++++ b/policy/modules/system/logging.fc
+@@ -1,4 +1,5 @@
+ /dev/log		-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
++/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
+ 
+ /etc/rsyslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+ /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+--- a/policy/modules/system/clock.te
++++ b/policy/modules/system/clock.te
+@@ -24,6 +24,7 @@
+ dontaudit hwclock_t self:capability sys_tty_config;
+ allow hwclock_t self:process signal_perms;
+ allow hwclock_t self:fifo_file rw_fifo_file_perms;
++dev_read_urand(hwclock_t)
+ 
+ # Allow hwclock to store & retrieve correction factors.
+ allow hwclock_t adjtime_t:file { rw_file_perms setattr };
+--- a/policy/modules/system/sysnetwork.if
++++ b/policy/modules/system/sysnetwork.if
+@@ -423,6 +423,7 @@
+ 		type net_conf_t;
+ 	')
+ 
++	allow $1 net_conf_t:dir manage_dir_perms;
+ 	allow $1 net_conf_t:file manage_file_perms;
+ 
+ 	ifdef(`distro_redhat',`
+--- a/policy/modules/system/libraries.fc
++++ b/policy/modules/system/libraries.fc
+@@ -6,6 +6,8 @@
+ /emul/ia32-linux/usr(/.*)?/lib(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
+ /emul/ia32-linux/lib(/.*)?			gen_context(system_u:object_r:lib_t,s0)
+ /emul/ia32-linux/lib(/.*)?/ld-[^/]*\.so(\.[^/]*)* -- gen_context(system_u:object_r:ld_so_t,s0)
++/lib64				-d		gen_context(system_u:object_r:lib_t,s0)
++/lib64/.*					gen_context(system_u:object_r:lib_t,s0)
+ ')
+ 
+ ifdef(`distro_gentoo',`
+@@ -37,13 +39,20 @@
+ #
+ /lib					-d	gen_context(system_u:object_r:lib_t,s0)
+ /lib/.*						gen_context(system_u:object_r:lib_t,s0)
++ifdef(`distro_debian', `
++/lib32					-d	gen_context(system_u:object_r:lib_t,s0)
++/lib32/.*					gen_context(system_u:object_r:lib_t,s0)
++/lib32/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
++/lib32/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
++', `
+ /lib64					-d	gen_context(system_u:object_r:lib_t,s0)
+ /lib64/.*					gen_context(system_u:object_r:lib_t,s0)
+-/lib/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
+ /lib64/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
++/lib64/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
++')
++/lib/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
+ 
+ /lib/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+-/lib64/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+ 
+ ifdef(`distro_debian',`
+ /lib32					-l	gen_context(system_u:object_r:lib_t,s0)
+@@ -62,7 +71,11 @@
+ #
+ /opt/.*\.so					gen_context(system_u:object_r:lib_t,s0)
+ /opt/(.*/)?lib(/.*)?				gen_context(system_u:object_r:lib_t,s0)
++ifdef(`distro_debian',`
++/opt/(.*/)?lib32(/.*)?				gen_context(system_u:object_r:lib_t,s0)
++', `
+ /opt/(.*/)?lib64(/.*)?				gen_context(system_u:object_r:lib_t,s0)
++')
+ /opt/(.*/)?java/.+\.jar			--	gen_context(system_u:object_r:lib_t,s0)
+ /opt/(.*/)?jre.*/.+\.so(\.[^/]*)*	--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+ /opt/(.*/)?jre/.+\.jar			--	gen_context(system_u:object_r:lib_t,s0)
+@@ -119,9 +132,14 @@
+ /usr/(.*/)?java/.+\.jsa			--	gen_context(system_u:object_r:lib_t,s0)
+ 
+ /usr/(.*/)?lib(/.*)?				gen_context(system_u:object_r:lib_t,s0)
++ifdef(`distro_debian',`
++/usr/(.*/)?lib32(/.*)?				gen_context(system_u:object_r:lib_t,s0)
++/usr/(.*/)?lib(32)?(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
++', `
+ /usr/(.*/)?lib64(/.*)?				gen_context(system_u:object_r:lib_t,s0)
+-
+ /usr/(.*/)?lib(64)?(/.*)?/ld-[^/]*\.so(\.[^/]*)* gen_context(system_u:object_r:ld_so_t,s0)
++')
++
+ 
+ /usr/(.*/)?nvidia/.+\.so(\..*)?		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
+ 
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -87,6 +87,7 @@
+ 	files_read_etc_files($1_t)
+ 	files_read_etc_runtime_files($1_t)
+ 	files_read_usr_files($1_t)
++	files_exec_usr_files($1_t)
+ 	# Read directories and files with the readable_t type.
+ 	# This type is a general type for "world"-readable files.
+ 	files_list_world_readable($1_t)
+@@ -117,6 +118,19 @@
+ 		# Allow making the stack executable via mprotect.
+ 		allow $1_t self:process execstack;
+ 	')
++
++	tunable_policy(`user_manage_dos_files',`
++		fs_manage_dos_dirs($1_t)
++		fs_manage_dos_files($1_t)
++	')
++
++	ifdef(`distro_debian', `
++		# allow reading /var/lib/apt/lists
++		apt_read_db($1_t)
++		# allow reading /var/cache/apt - should not be needed but
++		# does not really matter
++		apt_read_cache($1_t)
++	')
+ ')
+ 
+ #######################################
+@@ -349,6 +363,7 @@
+ interface(`userdom_manage_tmpfs_role',`
+ 	gen_require(`
+ 		type user_tmpfs_t;
++		type user_hugetlbfs_t;
+ 	')
+ 
+ 	manage_dirs_pattern($2, user_tmpfs_t, user_tmpfs_t)
+@@ -357,6 +372,8 @@
+ 	manage_sock_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
+ 	manage_fifo_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
+ 	fs_tmpfs_filetrans($2, user_tmpfs_t, { dir file lnk_file sock_file fifo_file })
++	manage_files_pattern($2, user_hugetlbfs_t, user_hugetlbfs_t)
++	fs_hugetlbfs_filetrans($2, user_hugetlbfs_t, { file })
+ ')
+ 
+ #######################################
+@@ -532,6 +549,7 @@
+ 	files_read_var_symlinks($1_t)
+ 	files_read_generic_spool($1_t)
+ 	files_read_var_lib_files($1_t)
++	files_read_var_lib_symlinks($1_t)
+ 	# Stat lost+found.
+ 	files_getattr_lost_found_dirs($1_t)
+ 
+@@ -655,6 +673,10 @@
+ 	')
+ 
+ 	optional_policy(`
++		pythonsupport_compiled_read($1_t)
++	')
++
++	optional_policy(`
+ 		pcscd_read_pub_files($1_t)
+ 		pcscd_stream_connect($1_t)
+ 	')
+@@ -961,7 +983,6 @@
+ 	# Need the following rule to allow users to run vpnc
+ 	corenet_tcp_bind_xserver_port($1_t)
+ 
+-	files_exec_usr_files($1_t)
+ 	# cjp: why?
+ 	files_read_kernel_symbol_table($1_t)
+ 
+@@ -1006,10 +1027,49 @@
+ 	optional_policy(`
+ 		setroubleshoot_stream_connect($1_t)
+ 	')
++
++	optional_policy(`
++		mysqld_exec($1_t)
++	')
+ ')
+ 
+ #######################################
+ ## <summary>
++##	The template for creating a user with network access.
++## </summary>
++## <desc>
++##	<p>
++##	This template creates a user domain, types, and
++##	rules for the user's tty, pty, home directories,
++##	tmp, and tmpfs files.
++##	</p>
++##	<p>
++##	This differs from the unpriv_user_template by allowing non-privileged network access.
++##	</p>
++## </desc>
++## <param name="userdomain_prefix">
++##	<summary>
++##	The prefix of the user domain (e.g., sysadm
++##	is the prefix for sysadm_t).
++##	</summary>
++## </param>
++#
++template(`network_user_template',`
++	##############################
++	#
++	# Declarations
++	#
++
++	# Inherit rules for ordinary users.
++	userdom_unpriv_user_template($1)
++	# like user_tcp_server
++	corenet_tcp_bind_generic_port($1_t)
++	sysnet_dns_name_resolve($1_t)
++	allow $1_t self:tcp_socket create_stream_socket_perms;
++	allow $1_t self:udp_socket create_stream_socket_perms;
++')
++#######################################
++## <summary>
+ ##	The template for creating an administrative user.
+ ## </summary>
+ ## <desc>
+--- a/policy/modules/system/init.fc
++++ b/policy/modules/system/init.fc
+@@ -64,6 +64,13 @@
+ /var/run/random-seed	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ /var/run/setmixer_flag	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ 
++ifdef(`distro_debian',`
++/var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++/var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++/etc/network/if-down.d/.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
++/etc/network/if-up.d/.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
++')
++
+ ifdef(`distro_gentoo', `
+ /var/lib/init\.d(/.*)?		gen_context(system_u:object_r:initrc_state_t,s0)
+ /var/run/svscan\.pid	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+--- a/policy/modules/system/authlogin.fc
++++ b/policy/modules/system/authlogin.fc
+@@ -1,11 +1,12 @@
+ 
+ /bin/login		--	gen_context(system_u:object_r:login_exec_t,s0)
+ 
+-/etc/\.pwd\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
+-/etc/group\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
+ /etc/gshadow.*		--	gen_context(system_u:object_r:shadow_t,s0)
+-/etc/passwd\.lock	--	gen_context(system_u:object_r:shadow_t,s0)
++/etc/\.group\.edit\.swp	--	gen_context(system_u:object_r:shadow_t,s0)
++/etc/\.gshadow\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
+ /etc/shadow.*		--	gen_context(system_u:object_r:shadow_t,s0)
++/etc/\.passwd\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
++/etc/\.shadow\.edit\.swp --	gen_context(system_u:object_r:shadow_t,s0)
+ 
+ /sbin/pam_console_apply	 --	gen_context(system_u:object_r:pam_console_exec_t,s0)
+ /sbin/pam_timestamp_check --	gen_context(system_u:object_r:pam_exec_t,s0)
+--- /dev/null
++++ b/policy/modules/system/pythonsupport.if
+@@ -0,0 +1,83 @@
++## <summary>Support for precompiling python modules</summary>
++## <desc>
++##	<p>
++##		Debians python-support will precompile installed python
++##		packages for installed python versions. This way,
++##		the python2.3-foobar and python2.4-foobar (and 2.5) packages
++##		could be merged into one python-foobar while keeping the
++##		dependency information useful.
++##	</p>
++## </desc>
++#
++
++########################################
++## <summary>
++##	Execute the python-support utility to precompile modules.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`pythonsupport_domtrans',`
++	gen_require(`
++		type pythoncompile_t, pythoncompile_exec_t;
++	')
++
++	domain_auto_trans($1,pythoncompile_exec_t,pythoncompile_t)
++
++	allow $1 pythoncompile_t:fd use;
++	allow pythoncompile_t $1:fd use;
++	allow $1 pythoncompile_t:fifo_file rw_file_perms;
++	allow $1 pythoncompile_t:process sigchld;
++')
++
++########################################
++## <summary>
++##      Role access for python.
++## </summary>
++## <param name="role">
++##      <summary>
++##      Role allowed access.
++##      </summary>
++## </param>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++## <rolecap/>
++#
++interface(`python_role',`
++        gen_require(`
++                type pythoncompile_t, pythoncompile_exec_t;
++        ')
++
++        domtrans_pattern($2, pythoncompile_exec_t, pythoncompile_t)
++        role $1 types pythoncompile_t;
++
++        allow $2 pythoncompile_t:process { signal_perms };
++        ps_process_pattern($2, pythoncompile_t)
++')
++
++########################################
++## <summary>
++##	Read compiled python modules
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to read the compiled python modules.
++##	</summary>
++## </param>
++#
++interface(`pythonsupport_compiled_read',`
++	gen_require(`
++		type python_compiled_t;
++	')
++
++	files_search_var_lib($1)
++	allow $1 python_compiled_t:dir list_dir_perms;
++	allow $1 python_compiled_t:file read_file_perms;
++	allow $1 python_compiled_t:lnk_file read_lnk_file_perms;
++')
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -901,6 +901,41 @@
+ 
+ ########################################
+ ## <summary>
++##	Set the attributes of the xconsole named pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logging_setattr_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file setattr;
++')
++
++########################################
++## <summary>
++##	Read the xconsole named pipe.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logging_r_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file { getattr read };
++')
++########################################
++## <summary>
+ ##	Create, read, write, and delete
+ ##	generic log files.
+ ## </summary>
+--- a/policy/modules/system/getty.te
++++ b/policy/modules/system/getty.te
+@@ -37,6 +37,7 @@
+ dontaudit getty_t self:capability sys_tty_config;
+ allow getty_t self:process { getpgid setpgid getsession signal_perms };
+ allow getty_t self:fifo_file rw_fifo_file_perms;
++dev_read_urand(getty_t)
+ 
+ read_files_pattern(getty_t, getty_etc_t, getty_etc_t)
+ read_lnk_files_pattern(getty_t, getty_etc_t, getty_etc_t)
+--- a/policy/modules/system/unconfined.fc
++++ b/policy/modules/system/unconfined.fc
+@@ -1,7 +1,4 @@
+ # Add programs here which should not be confined by SELinux
+-# e.g.:
+-# /usr/local/bin/appsrv		--	gen_context(system_u:object_r:unconfined_exec_t,s0)
+-# For the time being until someone writes a sane policy, we need initrc to transition to unconfined_t
+ /usr/bin/valgrind 		--	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+ /usr/bin/vncserver		--	gen_context(system_u:object_r:unconfined_exec_t,s0)
+ 
+@@ -9,6 +6,9 @@
+ /usr/lib/openoffice\.org.*/program/.+\.bin -- gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+ 
+ /usr/local/RealPlayer/realplay\.bin --	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++/usr/bin/gcj-dbtool-4.1		--	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++/usr/bin/gij-4.1		--	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++/usr/lib/openoffice/program/soffice.bin -- gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+ 
+ ifdef(`distro_gentoo',`
+ /usr/lib32/openoffice/program/[^/]+\.bin -- gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -107,6 +107,9 @@
+ type setfiles_exec_t alias restorecon_exec_t;
+ init_system_domain(setfiles_t, setfiles_exec_t)
+ domain_obj_id_change_exemption(setfiles_t)
++term_read_console(setfiles_t)
++dev_read_urand(setfiles_t)
++dev_rw_generic_chr_files(setfiles_t)
+ 
+ ########################################
+ #
+@@ -159,6 +162,7 @@
+ read_files_pattern(load_policy_t,{ policy_src_t policy_config_t },policy_config_t)
+ 
+ domain_use_interactive_fds(load_policy_t)
++dev_read_urand(load_policy_t)
+ 
+ # for mcs.conf
+ files_read_etc_files(load_policy_t)
+@@ -304,6 +308,7 @@
+ 
+ allow restorecond_t self:capability { dac_override dac_read_search fowner };
+ allow restorecond_t self:fifo_file rw_fifo_file_perms;
++dev_read_urand(restorecond_t)
+ 
+ allow restorecond_t restorecond_var_run_t:file manage_file_perms;
+ files_pid_filetrans(restorecond_t, restorecond_var_run_t, file)
+@@ -424,6 +429,7 @@
+ allow semanage_t self:unix_stream_socket create_stream_socket_perms;
+ allow semanage_t self:unix_dgram_socket create_socket_perms;
+ allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
++fs_getattr_xattr_fs(semanage_t)
+ 
+ allow semanage_t policy_config_t:file rw_file_perms;
+ 
+@@ -431,6 +437,10 @@
+ allow semanage_t semanage_tmp_t:file manage_file_perms;
+ files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
+ 
++ifdef(`targeted_policy',`
++	allow semanage_t initrc_t:fd use;
++')
++
+ kernel_read_system_state(semanage_t)
+ kernel_read_kernel_sysctls(semanage_t)
+ 
+@@ -448,6 +458,7 @@
+ mls_file_write_all_levels(semanage_t)
+ mls_file_read_all_levels(semanage_t)
+ 
++selinux_get_fs_mount(semanage_t)
+ selinux_validate_context(semanage_t)
+ selinux_get_enforce_mode(semanage_t)
+ selinux_getattr_fs(semanage_t)
+@@ -493,6 +504,10 @@
+ 	')
+ ')
+ 
++optional_policy(`
++	pythonsupport_compiled_read(semanage_t)
++')
++
+ ########################################
+ #
+ # Setfiles local policy
+--- a/policy/modules/system/raid.fc
++++ b/policy/modules/system/raid.fc
+@@ -1,4 +1,5 @@
+ /dev/.mdadm.map		--	gen_context(system_u:object_r:mdadm_map_t,s0)
++/run/mdadm/map		--	gen_context(system_u:object_r:mdadm_map_t,s0)
+ 
+ /sbin/mdadm		--	gen_context(system_u:object_r:mdadm_exec_t,s0)
+ /sbin/mdmpd		--	gen_context(system_u:object_r:mdadm_exec_t,s0)
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -96,6 +96,7 @@
+ 	optional_policy(`
+ 		xserver_unconfined($1)
+ 	')
++
+ ')
+ 
+ ########################################
+@@ -319,6 +320,38 @@
+ 
+ ########################################
+ ## <summary>
++##	Allow a domain to be in role unconfined_r
++## </summary>
++## <desc>
++##	<p>
++##	Allow the specified domain to be run in the role unconfined_r
++##	This is suitable for domains that are entered indirectly from
++##	unconfined_t
++##	</p>
++##	<p>
++##	Also allow the domain to send sigchld to unconfined_t and use fds
++##	</p>
++## </desc>
++## <param name="domain">
++##	<summary>
++##	Domain to be in unconfined_r
++##	</summary>
++## </param>
++#
++interface(`in_unconfined_r',`
++	gen_require(`
++		type unconfined_t;
++		role unconfined_r;
++	')
++
++	role unconfined_r types $1;
++	allow $1 unconfined_t:process sigchld;
++	allow $1 unconfined_t:fd use;
++	allow $1 unconfined_t:fifo_file { read write getattr };
++')
++
++########################################
++## <summary>
+ ##	Inherit file descriptors from the unconfined domain.
+ ## </summary>
+ ## <param name="domain">
+@@ -337,6 +370,24 @@
+ 
+ ########################################
+ ## <summary>
++##	rw access to a semaphore created by the unconfined domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_sem_rw',`
++	gen_require(`
++		type unconfined_t;
++	')
++
++	allow $1 unconfined_t:sem rw_sem_perms;
++')
++
++########################################
++## <summary>
+ ##	Send a SIGCHLD signal to the unconfined domain.
+ ## </summary>
+ ## <param name="domain">
+@@ -587,3 +638,82 @@
+ 
+ 	allow $1 unconfined_t:dbus acquire_svc;
+ ')
++
++########################################
++## <summary>
++##	Read files in unconfined users home directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_read_home_content_files',`
++	gen_require(`
++		type unconfined_home_dir_t, unconfined_home_t;
++	')
++
++	files_search_home($1)
++	allow $1 { unconfined_home_dir_t unconfined_home_t }:dir list_dir_perms;
++	read_files_pattern($1, { unconfined_home_dir_t unconfined_home_t }, unconfined_home_t)
++	read_lnk_files_pattern($1, { unconfined_home_dir_t unconfined_home_t }, unconfined_home_t)
++')
++
++########################################
++## <summary>
++##      Do not audit attempts to search the unconfined
++##      users home directory.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain to not audit.
++##      </summary>
++## </param>
++#
++interface(`unconfined_dontaudit_search_home_dirs',`
++        gen_require(`
++                type unconfined_home_dir_t;
++        ')
++
++        dontaudit $1 unconfined_home_dir_t:dir search_dir_perms;
++')
++
++########################################
++## <summary>
++##	Read unconfined users temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_read_tmp_files',`
++	gen_require(`
++		type unconfined_tmp_t;
++	')
++
++	files_search_tmp($1)
++	allow $1 unconfined_tmp_t:dir list_dir_perms;
++	read_files_pattern($1, unconfined_tmp_t, unconfined_tmp_t)
++	read_lnk_files_pattern($1, unconfined_tmp_t, unconfined_tmp_t)
++')
++
++########################################
++## <summary>
++##	Write unconfined users temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_write_tmp_files',`
++	gen_require(`
++		type unconfined_tmp_t;
++	')
++
++	allow $1 unconfined_tmp_t:file { getattr write append };
++')
+--- a/policy/modules/system/udev.fc
++++ b/policy/modules/system/udev.fc
+@@ -11,7 +11,12 @@
+ 
+ /lib/udev/udev-acl --	gen_context(system_u:object_r:udev_exec_t,s0)
+ 
++ifdef(`distro_debian', `
++/lib/udev/create_static_nodes -- gen_context(system_u:object_r:udev_exec_t,s0)
++/var/run/xen-hotplug -d gen_context(system_u:object_r:udev_var_run_t,s0)
++', `
+ /sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
++')
+ /sbin/udev	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /sbin/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /sbin/udevd	--	gen_context(system_u:object_r:udev_exec_t,s0)
+--- a/policy/modules/system/userdomain.fc
++++ b/policy/modules/system/userdomain.fc
+@@ -1,4 +1,5 @@
+ HOME_DIR	-d	gen_context(system_u:object_r:user_home_dir_t,s0-mls_systemhigh)
+ HOME_DIR/.+		gen_context(system_u:object_r:user_home_t,s0)
++HOME_DIR/\.gnupg/gpg.conf -- gen_context(system_u:object_r:user_home_t,s0)
+ 
+ /tmp/gconfd-USER -d	gen_context(system_u:object_r:user_tmp_t,s0)
+--- a/policy/modules/system/userdomain.te
++++ b/policy/modules/system/userdomain.te
+@@ -91,6 +91,9 @@
+ files_tmpfs_file(user_tmpfs_t)
+ userdom_user_home_content(user_tmpfs_t)
+ 
++type user_hugetlbfs_t;
++files_hugetlbfs_file(user_hugetlbfs_t)
++
+ type user_tty_device_t alias { staff_tty_device_t sysadm_tty_device_t secadm_tty_device_t auditadm_tty_device_t unconfined_tty_device_t };
+ dev_node(user_tty_device_t)
+ ubac_constrained(user_tty_device_t)
+--- a/policy/modules/system/libraries.te
++++ b/policy/modules/system/libraries.te
+@@ -97,6 +97,11 @@
+ userdom_use_user_terminals(ldconfig_t)
+ userdom_use_all_users_fds(ldconfig_t)
+ 
++optional_policy(`
++	# This is needed for apt to get and install packages silently
++        apt_dontaudit_use_fds(ldconfig_t)   
++')
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(ldconfig_t)
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -346,6 +346,8 @@
+ 
+ 	domtrans_pattern(initrc_t, $2, $1)
+ 
++	init_use_fds($1)
++
+ 	ifdef(`hide_broken_symptoms',`
+ 		# RHEL4 systems seem to have a stray
+ 		# fds open from the initrd
+--- /dev/null
++++ b/policy/modules/system/pythonsupport.te
+@@ -0,0 +1,41 @@
++policy_module(pythonsupport,0.0.1)
++
++########################################
++#
++# Declarations
++#
++
++type pythoncompile_t;
++type pythoncompile_exec_t;
++domain_type(pythoncompile_t)
++domain_entry_file(pythoncompile_t, pythoncompile_exec_t)
++
++type python_compiled_t;
++files_type(python_compiled_t)
++
++########################################
++#
++# python-support local policy
++#
++
++kernel_read_system_state(pythoncompile_t)
++kernel_read_kernel_sysctls(pythoncompile_t)
++
++corecmd_exec_bin(pythoncompile_t)
++corecmd_exec_sbin(pythoncompile_t)
++
++files_read_etc_files(pythoncompile_t)
++files_read_usr_files(pythoncompile_t)
++
++libs_use_ld_so(pythoncompile_t)
++libs_use_shared_libs(pythoncompile_t)
++libs_use_lib_files(pythoncompile_t)
++
++miscfiles_read_localization(pythoncompile_t)
++
++
++# create compiled python modules
++allow pythoncompile_t python_compiled_t:dir manage_dir_perms;
++allow pythoncompile_t python_compiled_t:file manage_file_perms;
++allow pythoncompile_t python_compiled_t:lnk_file manage_lnk_file_perms;
++files_var_lib_filetrans(pythoncompile_t, python_compiled_t, dir)
+--- /dev/null
++++ b/policy/modules/system/iodine.if
+@@ -0,0 +1 @@
++## <summary></summary>
+--- a/policy/modules/system/unconfined.te
++++ b/policy/modules/system/unconfined.te
+@@ -21,6 +21,15 @@
+ init_system_domain(unconfined_execmem_t, unconfined_execmem_exec_t)
+ role unconfined_r types unconfined_execmem_t;
+ 
++## <desc>
++## <p>
++## Enabling this allows some daemons to access unconfined_home_dir_t and
++## unconfined_home_t as if they were regular home directories.  This does
++## reduce the protection...
++## </p>
++## </desc>
++gen_bool(daemon_access_unconfined_home,true)
++
+ ########################################
+ #
+ # Local policy
+@@ -30,10 +39,9 @@
+ 
+ files_create_boot_flag(unconfined_t)
+ 
+-mcs_killall(unconfined_t)
+-mcs_ptrace_all(unconfined_t)
++allow unconfined_r system_r;
+ 
+-init_run_daemon(unconfined_t, unconfined_r)
++init_run_daemon(unconfined_t, unconfined_r, { unconfined_devpts_t unconfined_tty_device_t })
+ 
+ libs_run_ldconfig(unconfined_t, unconfined_r)
+ 
+@@ -49,6 +57,9 @@
+ 
+ userdom_user_home_dir_filetrans_user_home_content(unconfined_t, { dir file lnk_file fifo_file sock_file })
+ 
++ifdef(`distro_debian',`
++	seutil_run_runinit(unconfined_t, unconfined_r, { unconfined_tty_device_t unconfined_devpts_t })
++')
+ ifdef(`distro_gentoo',`
+ 	seutil_run_runinit(unconfined_t, unconfined_r)
+ 	seutil_init_script_run_runinit(unconfined_t, unconfined_r)
+--- a/policy/modules/system/iptables.te
++++ b/policy/modules/system/iptables.te
+@@ -27,6 +27,7 @@
+ # Iptables local policy
+ #
+ 
++kernel_request_load_module(iptables_t)
+ allow iptables_t self:capability { dac_read_search dac_override net_admin net_raw };
+ dontaudit iptables_t self:capability sys_tty_config;
+ allow iptables_t self:fifo_file rw_fifo_file_perms;
+--- a/policy/modules/system/udev.if
++++ b/policy/modules/system/udev.if
+@@ -168,6 +168,24 @@
+ 
+ ########################################
+ ## <summary>
++##     Allow process to remove udev table files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     The type of the process performing this action.
++##     </summary>
++## </param>
++#
++interface(`udev_unlink_table',`
++	gen_require(`
++		type udev_tbl_t;
++	')
++
++	allow $1 udev_tbl_t:file unlink;
++')
++
++########################################
++## <summary>
+ ##	Read the udev device table.
+ ## </summary>
+ ## <desc>
+--- a/policy/modules/system/lvm.te
++++ b/policy/modules/system/lvm.te
+@@ -41,6 +41,11 @@
+ type lvm_tmp_t;
+ files_tmp_file(lvm_tmp_t)
+ 
++allow lvm_t self:sem create_sem_perms;
++optional_policy(`
++	unconfined_sem_rw(lvm_t)
++')
++
+ ########################################
+ #
+ # Cluster LVM daemon local policy
+@@ -178,6 +183,7 @@
+ 
+ allow lvm_t self:unix_stream_socket { connectto create_stream_socket_perms };
+ allow lvm_t clvmd_t:unix_stream_socket { connectto rw_socket_perms };
++term_dontaudit_use_generic_ptys(lvm_t)
+ 
+ manage_dirs_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
+ manage_files_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
+--- /dev/null
++++ b/policy/modules/system/pythonsupport.fc
+@@ -0,0 +1,2 @@
++/usr/sbin/update-python-modules	--	gen_context(system_u:object_r:pythoncompile_exec_t,s0)
++/var/lib/python-support(/.*)?		gen_context(system_u:object_r:python_compiled_t,s0)
+--- /dev/null
++++ b/policy/modules/system/iodine.fc
+@@ -0,0 +1 @@
++/usr/sbin/iodine.*	-- gen_context(system_u:object_r:iodine_exec_t,s0)
+--- a/policy/modules/services/perdition.if
++++ b/policy/modules/services/perdition.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`perdition_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- a/policy/modules/services/snmp.te
++++ b/policy/modules/services/snmp.te
+@@ -24,7 +24,7 @@
+ #
+ # Local policy
+ #
+-allow snmpd_t self:capability { chown dac_override kill ipc_lock sys_ptrace net_admin sys_nice sys_tty_config };
++allow snmpd_t self:capability { chown dac_override setgid setuid kill ipc_lock sys_ptrace net_admin sys_nice sys_tty_config };
+ dontaudit snmpd_t self:capability { sys_module sys_tty_config };
+ allow snmpd_t self:process { signal_perms getsched setsched };
+ allow snmpd_t self:fifo_file rw_fifo_file_perms;
+--- a/policy/modules/services/mta.if
++++ b/policy/modules/services/mta.if
+@@ -96,6 +96,8 @@
+ 
+ 	miscfiles_read_localization($1_mail_t)
+ 
++        kernel_read_system_state($1_mail_t)
++
+ 	optional_policy(`
+ 		exim_read_log($1_mail_t)
+ 		exim_append_log($1_mail_t)
+@@ -104,6 +106,8 @@
+ 
+ 	optional_policy(`
+ 		postfix_domtrans_user_mail_handler($1_mail_t)
++		# for postalias - role stops unpriv user from doing it
++		postfix_domtrans_master($1_mail_t)
+ 	')
+ 
+ 	optional_policy(`
+@@ -585,7 +589,7 @@
+ ## </param>
+ #
+ interface(`mta_tcp_connect_all_mailservers',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ #######################################
+@@ -899,3 +903,20 @@
+ 
+ 	allow $1 user_mail_domain:unix_stream_socket rw_socket_perms;
+ ')
++
++########################################
++## <summary>
++##	Allow system_mail_t to access files of specified types
++## </summary>
++## <param name="private type">
++##	<summary>
++##	File type that system_mail_t can access
++##	</summary>
++## </param>
++#
++interface(`system_mail_file_access',`
++	gen_require(`
++		type system_mail_t;
++	')
++	allow system_mail_t $1:file { read write };
++')
+--- a/policy/modules/services/milter.fc
++++ b/policy/modules/services/milter.fc
+@@ -8,6 +8,8 @@
+ /var/run/milter-greylist(/.*)?		gen_context(system_u:object_r:greylist_milter_data_t,s0)
+ /var/run/milter-greylist\.pid	--	gen_context(system_u:object_r:greylist_milter_data_t,s0)
+ /var/run/spamass-milter(/.*)?		gen_context(system_u:object_r:spamass_milter_data_t,s0)
++/var/run/spamass(/.*)?			gen_context(system_u:object_r:spamass_milter_data_t,s0)
+ /var/run/spamass-milter\.pid	--	gen_context(system_u:object_r:spamass_milter_data_t,s0)
+ 
+ /var/spool/milter-regex(/.*)?		gen_context(system_u:object_r:regex_milter_data_t,s0)
++/var/spool/postfix/spamass(/.*)? gen_context(system_u:object_r:spamass_milter_data_t,s0)
+--- a/policy/modules/services/ftp.if
++++ b/policy/modules/services/ftp.if
+@@ -29,7 +29,7 @@
+ ## </param>
+ #
+ interface(`ftp_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/bind.if
++++ b/policy/modules/services/bind.if
+@@ -336,7 +336,7 @@
+ ## </param>
+ #
+ interface(`bind_udp_chat_named',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/portslave.te
++++ b/policy/modules/services/portslave.te
+@@ -13,6 +13,9 @@
+ type portslave_etc_t;
+ files_config_file(portslave_etc_t)
+ 
++# for filters
++can_exec(portslave_t, { portslave_etc_t portslave_exec_t })
++
+ type portslave_lock_t;
+ files_lock_file(portslave_lock_t)
+ 
+@@ -62,8 +65,10 @@
+ corenet_udp_sendrecv_generic_node(portslave_t)
+ corenet_tcp_sendrecv_all_ports(portslave_t)
+ corenet_udp_sendrecv_all_ports(portslave_t)
++corenet_udp_bind_all_nodes(portslave_t)
+ corenet_rw_ppp_dev(portslave_t)
+ 
++miscfiles_read_localization(portslave_t)
+ dev_read_sysfs(portslave_t)
+ # for ssh
+ dev_read_urand(portslave_t)
+@@ -102,6 +107,7 @@
+ # instead of exec.
+ ppp_read_rw_config(portslave_t)
+ ppp_exec(portslave_t)
++ppp_script_exec(portslave_t)
+ ppp_read_secrets(portslave_t)
+ ppp_manage_pid_files(portslave_t)
+ ppp_pid_filetrans(portslave_t)
+--- a/policy/modules/services/dbus.fc
++++ b/policy/modules/services/dbus.fc
+@@ -6,7 +6,12 @@
+ /lib64/dbus-1/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
+ 
+ /usr/bin/dbus-daemon(-1)? --	gen_context(system_u:object_r:dbusd_exec_t,s0)
++ifdef(`distro_redhat', `
+ /usr/libexec/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
++')
++ifdef(`distro_debian', `
++/usr/lib/dbus-1.0/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
++')
+ 
+ /var/lib/dbus(/.*)?		gen_context(system_u:object_r:system_dbusd_var_lib_t,s0)
+ 
+--- a/policy/modules/services/inetd.te
++++ b/policy/modules/services/inetd.te
+@@ -40,7 +40,7 @@
+ 
+ allow inetd_t self:capability { setuid setgid };
+ dontaudit inetd_t self:capability sys_tty_config;
+-allow inetd_t self:process { setsched setexec };
++allow inetd_t self:process { setrlimit setsched setexec };
+ allow inetd_t self:fifo_file rw_fifo_file_perms;
+ allow inetd_t self:tcp_socket create_stream_socket_perms;
+ allow inetd_t self:udp_socket create_socket_perms;
+@@ -77,6 +77,7 @@
+ corenet_udp_bind_generic_node(inetd_t)
+ corenet_tcp_connect_all_ports(inetd_t)
+ corenet_sendrecv_all_client_packets(inetd_t)
++allow inetd_t self:netlink_route_socket r_netlink_socket_perms;
+ 
+ # listen on service ports:
+ corenet_tcp_bind_amanda_port(inetd_t)
+--- a/policy/modules/services/ricci.te
++++ b/policy/modules/services/ricci.te
+@@ -213,7 +213,9 @@
+ 
+ mount_domtrans(ricci_modcluster_t)
+ 
+-consoletype_exec(ricci_modcluster_t)
++optional_policy(`
++	consoletype_exec(ricci_modcluster_t)
++')
+ 
+ ricci_stream_connect_modclusterd(ricci_modcluster_t)
+ 
+@@ -394,7 +396,9 @@
+ # Needed for running chkconfig
+ files_manage_etc_symlinks(ricci_modservice_t)
+ 
+-consoletype_exec(ricci_modservice_t)
++optional_policy(`
++	consoletype_exec(ricci_modservice_t)
++')
+ 
+ init_domtrans_script(ricci_modservice_t)
+ 
+@@ -456,7 +460,9 @@
+ 
+ modutils_read_module_deps(ricci_modstorage_t)
+ 
+-consoletype_exec(ricci_modstorage_t)
++optional_policy(`
++	consoletype_exec(ricci_modstorage_t)
++')
+ 
+ mount_domtrans(ricci_modstorage_t)
+ 
+--- a/policy/modules/services/postfix.if
++++ b/policy/modules/services/postfix.if
+@@ -163,6 +163,7 @@
+ 	allow postfix_$1_t self:capability dac_override;
+ 
+ 	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
++	in_unconfined_r(postfix_$1_t)
+ 
+ 	domain_use_interactive_fds(postfix_$1_t)
+ ')
+@@ -374,6 +375,7 @@
+ 	')
+ 
+ 	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
++	domain_system_change_exemption($1)
+ ')
+ 
+ ########################################
+@@ -454,7 +456,7 @@
+ 
+ #######################################
+ ## <summary>
+-##	Execute the master postqueue in the caller domain.
++##	Allow the master postqueue to use a fifo of the caller and send sigchld
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -462,12 +464,14 @@
+ ##	</summary>
+ ## </param>
+ #
+-interface(`posftix_exec_postqueue',`
++interface(`posftix_run_postqueue',`
+ 	gen_require(`
+-		type postfix_postqueue_exec_t;
++		type postfix_postqueue_t;
+ 	')
+ 
+-	can_exec($1, postfix_postqueue_exec_t)
++	allow postfix_postqueue_t $1:fd use;
++	allow postfix_postqueue_t $1:fifo_file rw_file_perms;
++	allow postfix_postqueue_t $1:process sigchld;
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
+@@ -9,11 +9,7 @@
+ HOME_DIR/\.serverauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+-
+-#
+-# /dev
+-#
+-/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
++HOME_DIR/\.xsession-errors --	gen_context(system_u:object_r:xauth_home_t,s0)
+ 
+ #
+ # /etc
+@@ -21,10 +17,10 @@
+ 
+ /etc/init\.d/xfree86-common --	gen_context(system_u:object_r:xserver_exec_t,s0)
+ 
+-/etc/kde3?/kdm/Xstartup	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/Xreset	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/Xsession	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/backgroundrc	gen_context(system_u:object_r:xdm_var_run_t,s0)
++/etc/kde[34]?/kdm/Xstartup	--	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/Xreset	--	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/Xsession	--	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/backgroundrc	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
+ /etc/X11/[wx]dm/Xreset.* --	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/X11/[wxg]dm/Xsession --	gen_context(system_u:object_r:xsession_exec_t,s0)
+@@ -33,10 +29,9 @@
+ /etc/X11/wdm/Xstartup.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/X11/Xsession[^/]*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ 
+-ifdef(`distro_redhat',`
++/etc/gdm/Xsession	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/gdm/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/gdm/PreSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-')
+ 
+ #
+ # /opt
+@@ -65,13 +60,12 @@
+ /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)
+ /usr/bin/xauth		--	gen_context(system_u:object_r:xauth_exec_t,s0)
+ /usr/bin/Xorg		--	gen_context(system_u:object_r:xserver_exec_t,s0)
+-ifdef(`distro_debian', `
+-/usr/sbin/gdm		--	gen_context(system_u:object_r:xdm_exec_t,s0)
+-')
+ 
+ /usr/lib(64)?/qt-.*/etc/settings(/.*)?	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
++ifndef(`distro_debian', `
+ /usr/var/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
++')
+ 
+ /usr/X11R6/bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
+ /usr/X11R6/bin/iceauth	--	gen_context(system_u:object_r:iceauth_exec_t,s0)
+@@ -88,18 +82,17 @@
+ # /var
+ #
+ 
+-/var/[xgk]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+-
+-/var/lib/[xkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
++/var/lib/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
+ /var/lib/xkb(/.*)?		gen_context(system_u:object_r:xkb_var_lib_t,s0)
+ 
+-/var/log/[kw]dm\.log	--	gen_context(system_u:object_r:xserver_log_t,s0)
++/var/log/[kw]dm\.log.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/gdm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/XFree86.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/Xorg.*		--	gen_context(system_u:object_r:xserver_log_t,s0)
+ 
+ /var/run/[gx]dm\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/xdmctl(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
++/var/run/xauth(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
+ ifdef(`distro_suse',`
+ /var/lib/pam_devperm/:0	--	gen_context(system_u:object_r:xdm_var_lib_t,s0)
+--- /dev/null
++++ b/policy/modules/services/epmd.if
+@@ -0,0 +1,29 @@
++## <summary>Erlang Port Mapper Daemon (epmd).</summary>
++
++########################################
++## <summary>
++##	Execute epmd in the epmd domain, and
++##	allow the specified role the epmd domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the epmd domain.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`run_epmd',`
++	gen_require(`
++		type epmd_t, epmd_exec_t;
++	')
++
++        domtrans_pattern($1, epmd_exec_t, epmd_t)
++	role $2 types epmd_t;
++	corenet_tcp_connect_epmd_port($1)
++')
++
+--- a/policy/modules/services/exim.te
++++ b/policy/modules/services/exim.te
+@@ -52,6 +52,11 @@
+ # exim local policy
+ #
+ 
++ifdef(`distro_debian', `
++# for /var/lib/exim4/config.autogenerated
++files_read_var_lib_files(exim_t)
++')
++
+ allow exim_t self:capability { chown dac_override dac_read_search fowner setuid setgid sys_resource };
+ allow exim_t self:process { setrlimit setpgid };
+ allow exim_t self:fifo_file rw_fifo_file_perms;
+--- /dev/null
++++ b/policy/modules/services/lda.if
+@@ -0,0 +1,41 @@
++## <summary>mail delivery agent</summary>
++
++########################################
++## <summary>
++##	Execute lda with a domain transition.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`lda_domtrans',`
++	gen_require(`
++		type lda_exec_t, lda_t;
++	')
++
++	files_search_usr($1)
++	corecmd_search_bin($1)
++	domtrans_pattern($1,lda_exec_t,lda_t)
++')
++
++########################################
++## <summary>
++##	Execute lda in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`lda_exec',`
++	gen_require(`
++		type lda_exec_t;
++	')
++
++	files_search_usr($1)
++	corecmd_search_bin($1)
++	can_exec($1,lda_exec_t)
++')
+--- a/policy/modules/services/finger.if
++++ b/policy/modules/services/finger.if
+@@ -29,5 +29,5 @@
+ ## </param>
+ #
+ interface(`finger_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- a/policy/modules/services/w3c.te
++++ b/policy/modules/services/w3c.te
+@@ -5,6 +5,7 @@
+ # Declarations
+ #
+ 
++apache_script_exec_domain(w3c_validator)
+ apache_content_template(w3c_validator)
+ 
+ ########################################
+--- a/policy/modules/services/cvs.te
++++ b/policy/modules/services/cvs.te
+@@ -106,6 +106,7 @@
+ # CVSWeb policy
+ #
+ 
++apache_script_exec_domain(cvs)
+ optional_policy(`
+ 	apache_content_template(cvs)
+ 
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -44,6 +44,11 @@
+ 	init_ranged_daemon_domain(sshd_t, sshd_exec_t, s0 - mcs_systemhigh)
+ ')
+ 
++ifdef(`distro_debian', `
++# for key blacklist related to openssl bug
++	allow sshd_t usr_t:file read_file_perms;
++')
++
+ type ssh_t;
+ type ssh_exec_t;
+ typealias ssh_t alias { user_ssh_t staff_ssh_t sysadm_ssh_t };
+@@ -238,6 +243,8 @@
+ manage_sock_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
+ files_tmp_filetrans(sshd_t, sshd_tmp_t, { dir file sock_file })
+ 
++allow sshd_t self:process { getcap setcap };
++
+ kernel_search_key(sshd_t)
+ kernel_link_key(sshd_t)
+ 
+@@ -291,6 +298,10 @@
+ 	xserver_domtrans_xauth(sshd_t)
+ ')
+ 
++optional_policy(`
++	gitosis_read_lib_files(sshd_t)
++')
++
+ ifdef(`TODO',`
+ tunable_policy(`ssh_sysadm_login',`
+ 	# Relabel and access ptys created by sshd
+--- a/policy/modules/services/rpc.if
++++ b/policy/modules/services/rpc.if
+@@ -133,7 +133,7 @@
+ ## </param>
+ #
+ interface(`rpc_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -374,7 +374,7 @@
+ ## </param>
+ #
+ interface(`rpc_udp_send_nfs',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/nagios.fc
++++ b/policy/modules/services/nagios.fc
+@@ -1,7 +1,9 @@
+ /etc/nagios(/.*)?					gen_context(system_u:object_r:nagios_etc_t,s0)
+ /etc/nagios/nrpe\.cfg				--	gen_context(system_u:object_r:nrpe_etc_t,s0)
++ifndef(`distro_debian', `
+ /etc/rc\.d/init\.d/nagios			--	gen_context(system_u:object_r:nagios_initrc_exec_t,s0)
+ /etc/rc\.d/init\.d/nrpe				--	gen_context(system_u:object_r:nagios_initrc_exec_t,s0)
++')
+ 
+ /usr/s?bin/nagios				--	gen_context(system_u:object_r:nagios_exec_t,s0)
+ /usr/s?bin/nrpe					--	gen_context(system_u:object_r:nrpe_exec_t,s0)
+@@ -17,9 +19,12 @@
+ /var/spool/nagios(/.*)?					gen_context(system_u:object_r:nagios_spool_t,s0)
+ 
+ ifdef(`distro_debian',`
+-/usr/sbin/nagios				--	gen_context(system_u:object_r:nagios_exec_t,s0)
+-')
++/usr/sbin/nagios.*				--	gen_context(system_u:object_r:nagios_exec_t,s0)
++/usr/lib/cgi-bin/nagios.?/.+   --      gen_context(system_u:object_r:nagios_cgi_exec_t,s0)
++/usr/lib/nagios3/cgi/.+        --      gen_context(system_u:object_r:nagios_cgi_exec_t,s0)
++', `
+ /usr/lib(64)?/cgi-bin/nagios(/.+)?			gen_context(system_u:object_r:httpd_nagios_script_exec_t,s0)
++')
+ /usr/lib(64)?/nagios/cgi-bin(/.*)?			gen_context(system_u:object_r:httpd_nagios_script_exec_t,s0)
+ 
+ # admin plugins
+--- a/policy/modules/services/jabber.fc
++++ b/policy/modules/services/jabber.fc
+@@ -1,6 +1,9 @@
+ /etc/rc\.d/init\.d/jabber --	gen_context(system_u:object_r:jabberd_initrc_exec_t,s0)
+ 
+ /usr/sbin/jabberd	--	gen_context(system_u:object_r:jabberd_exec_t,s0)
++/usr/sbin/ejabberd	--	gen_context(system_u:object_r:jabberd_exec_t,s0)
+ 
+ /var/lib/jabber(/.*)?		gen_context(system_u:object_r:jabberd_var_lib_t,s0)
++/var/lib/ejabberd(/.*)?		gen_context(system_u:object_r:jabberd_var_lib_t,s0)
+ /var/log/jabber(/.*)?		gen_context(system_u:object_r:jabberd_log_t,s0)
++/var/log/ejabberd(/.*)?		gen_context(system_u:object_r:jabberd_log_t,s0)
+--- a/policy/modules/services/cups.if
++++ b/policy/modules/services/cups.if
+@@ -75,7 +75,7 @@
+ ## </param>
+ #
+ interface(`cups_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/dcc.fc
++++ b/policy/modules/services/dcc.fc
+@@ -5,16 +5,26 @@
+ /usr/bin/cdcc			--	gen_context(system_u:object_r:cdcc_exec_t,s0)
+ /usr/bin/dccproc		--	gen_context(system_u:object_r:dcc_client_exec_t,s0)
+ 
++ifdef(`distro_redhat',`
+ /usr/libexec/dcc/dbclean	--	gen_context(system_u:object_r:dcc_dbclean_exec_t,s0)
+ /usr/libexec/dcc/dccd		--	gen_context(system_u:object_r:dccd_exec_t,s0)
+ /usr/libexec/dcc/dccifd		--	gen_context(system_u:object_r:dccifd_exec_t,s0)
+ /usr/libexec/dcc/dccm		--	gen_context(system_u:object_r:dccm_exec_t,s0)
++')
++ifdef(`distro_debian',`
++/usr/sbin/dbclean               --	gen_context(system_u:object_r:dcc_dbclean_exec_t,s0)
++/usr/sbin/dccd		        --	gen_context(system_u:object_r:dccd_exec_t,s0)
++/usr/sbin/dccifd		--	gen_context(system_u:object_r:dccifd_exec_t,s0)
++/usr/sbin/dccm		        --	gen_context(system_u:object_r:dccm_exec_t,s0)
++')
+ 
++ifdef(`distro_redhat',`
+ /var/dcc(/.*)?				gen_context(system_u:object_r:dcc_var_t,s0)
+ /var/dcc/map			--	gen_context(system_u:object_r:dcc_client_map_t,s0)
+-
++', `
+ /var/lib/dcc(/.*)?			gen_context(system_u:object_r:dcc_var_t,s0)
+ /var/lib/dcc/map		--	gen_context(system_u:object_r:dcc_client_map_t,s0)
++')
+ 
+ /var/run/dcc(/.*)?			gen_context(system_u:object_r:dcc_var_run_t,s0)
+ /var/run/dcc/map		--	gen_context(system_u:object_r:dcc_client_map_t,s0)
+--- a/policy/modules/services/xserver.if
++++ b/policy/modules/services/xserver.if
+@@ -116,6 +116,24 @@
+ 
+ ########################################
+ ## <summary>
++##	Allow domain to send sigchld to xdm_t
++##	and environment.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`xdm_sigchld',`
++	gen_require(`
++		type xdm_t;
++	')
++	allow $1 xdm_t:process sigchld;
++')
++
++########################################
++## <summary>
+ ##	Rules required for using the X Windows server
+ ##	and environment.
+ ## </summary>
+@@ -280,7 +298,7 @@
+ ## </param>
+ #
+ interface(`xserver_user_client',`
+-	refpolicywarn(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
++	refpolicyerr(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
+ 	gen_require(`
+ 		type xdm_t, xdm_tmp_t;
+ 		type xauth_home_t, iceauth_home_t, xserver_t, xserver_tmpfs_t;
+@@ -577,18 +595,18 @@
+ ## </param>
+ #
+ interface(`xserver_use_all_users_fonts',`
+-	refpolicywarn(`$0() has been deprecated, please use xserver_use_user_fonts.')
++	refpolicyerr(`$0() has been deprecated, please use xserver_use_user_fonts.')
+ 	xserver_use_user_fonts($1)
+ ')
+ 
+ ########################################
+ ## <summary>
+-##	Read all users .Xauthority.
++##    Read all users .Xauthority.
+ ## </summary>
+ ## <param name="domain">
+-##	<summary>
+-##	Domain allowed access.
+-##	</summary>
++##    <summary>
++##    Domain allowed access.
++##    </summary>
+ ## </param>
+ #
+ interface(`xserver_read_user_xauth',`
+@@ -729,6 +747,7 @@
+ 
+ 	files_search_tmp($1)
+ 	stream_connect_pattern($1, xdm_tmp_t, xdm_tmp_t, xdm_t)
++	stream_connect_pattern($1, xdm_var_run_t, xdm_var_run_t, xdm_t)
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/jabber.if
++++ b/policy/modules/services/jabber.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`jabber_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/gpm.te
++++ b/policy/modules/services/gpm.te
+@@ -27,7 +27,7 @@
+ #
+ 
+ allow gpm_t self:capability { setpcap setuid dac_override sys_admin sys_tty_config };
+-allow gpm_t self:process { getcap setcap };
++allow gpm_t self:process { signal signull getcap setcap };
+ allow gpm_t self:unix_stream_socket create_stream_socket_perms;
+ 
+ allow gpm_t gpm_conf_t:dir list_dir_perms;
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -421,6 +421,11 @@
+ 	')
+ 
+ 	optional_policy(`
++		run_gpg_agent($1_ssh_agent_t)
++	')
++
++	optional_policy(`
++		xdm_sigchld($1_ssh_agent_t)
+ 		xserver_use_xdm_fds($1_ssh_agent_t)
+ 		xserver_rw_xdm_pipes($1_ssh_agent_t)
+ 	')
+@@ -563,7 +568,7 @@
+ ## </param>
+ #
+ interface(`ssh_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -26,6 +26,9 @@
+ postfix_server_domain_template(local)
+ mta_mailserver_delivery(postfix_local_t)
+ 
++# allow postfix_local_t to run programs like vacation that send mail
++mta_sendmail_domtrans(postfix_local_t, postfix_postdrop_t)
++
+ # Program for creating database files
+ type postfix_map_t;
+ type postfix_map_exec_t;
+@@ -183,9 +186,11 @@
+ ifdef(`distro_redhat',`
+ 	# for newer main.cf that uses /etc/aliases
+ 	mta_manage_aliases(postfix_master_t)
+-	mta_etc_filetrans_aliases(postfix_master_t)
+ ')
+ 
++mta_etc_filetrans_aliases(postfix_master_t)
++allow postfix_master_t etc_aliases_t:file manage_file_perms;
++
+ optional_policy(`
+ 	cyrus_stream_connect(postfix_master_t)
+ ')
+@@ -201,6 +206,8 @@
+ 
+ optional_policy(`
+ 	mysql_stream_connect(postfix_master_t)
++	mysql_stream_connect(postfix_smtpd_t)
++	mysql_stream_connect(postfix_cleanup_t)
+ ')
+ 
+ optional_policy(`
+@@ -231,6 +238,11 @@
+ manage_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
+ manage_lnk_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
+ 
++# for milters - may be a bug in postfix
++allow postfix_cleanup_t postfix_smtpd_t:fd use;
++allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write shutdown };
++allow postfix_cleanup_t postfix_smtpd_t:tcp_socket { read write getattr getopt };
++
+ ########################################
+ #
+ # Postfix cleanup local policy
+@@ -240,6 +252,7 @@
+ 
+ # connect to master process
+ stream_connect_pattern(postfix_cleanup_t, postfix_private_t, postfix_private_t, postfix_master_t)
++write_sock_files_pattern(postfix_virtual_t,postfix_private_t,postfix_private_t)
+ 
+ rw_fifo_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
+ write_sock_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
+@@ -273,6 +286,9 @@
+ # for .forward - maybe we need a new type for it?
+ rw_sock_files_pattern(postfix_local_t, postfix_private_t, postfix_private_t)
+ 
++# so it can write to the lock file
++mta_rw_spool(postfix_local_t)
++
+ allow postfix_local_t postfix_spool_t:file rw_file_perms;
+ 
+ corecmd_exec_shell(postfix_local_t)
+@@ -304,7 +320,7 @@
+ ')
+ 
+ optional_policy(`
+-	procmail_domtrans(postfix_local_t)
++	lda_domtrans(postfix_local_t)
+ ')
+ 
+ ########################################
+@@ -405,11 +421,17 @@
+ 	dovecot_domtrans_deliver(postfix_pipe_t)
+ ')
+ 
++corecmd_exec_bin(postfix_pipe_t)
++
+ optional_policy(`
+ 	procmail_domtrans(postfix_pipe_t)
+ ')
+ 
+ optional_policy(`
++	lda_domtrans(postfix_pipe_t)
++')
++
++optional_policy(`
+ 	mailman_domtrans_queue(postfix_pipe_t)
+ ')
+ 
+@@ -565,7 +587,7 @@
+ ')
+ 
+ optional_policy(`
+-	milter_stream_connect_all(postfix_smtp_t)
++	milter_stream_connect_all(postfix_smtpd_t)
+ ')
+ 
+ ########################################
+@@ -603,6 +625,15 @@
+ ')
+ 
+ optional_policy(`
++	clamav_stream_connect(postfix_smtpd_t)
++')
++
++optional_policy(`
++	dkim_stream_connect(postfix_smtpd_t)
++	dkim_stream_connect(postfix_cleanup_t)
++')
++
++optional_policy(`
+ 	sasl_connect(postfix_smtpd_t)
+ ')
+ 
+@@ -630,3 +661,8 @@
+ # For reading spamassasin
+ mta_read_config(postfix_virtual_t)
+ mta_manage_spool(postfix_virtual_t)
++
++# for talking to spamass-milter
++optional_policy(`
++	spamassassin_connect_unix_sock(postfix_smtpd_t)
++')
+--- a/policy/modules/services/apcupsd.te
++++ b/policy/modules/services/apcupsd.te
+@@ -107,6 +107,7 @@
+ # apcupsd_cgi Declarations
+ #
+ 
++apache_script_exec_domain(apcupsd_cgi)
+ optional_policy(`
+ 	apache_content_template(apcupsd_cgi)
+ 
+--- a/policy/modules/services/mysql.te
++++ b/policy/modules/services/mysql.te
+@@ -58,10 +58,13 @@
+ allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
+ allow mysqld_t self:fifo_file rw_fifo_file_perms;
+ allow mysqld_t self:shm create_shm_perms;
+-allow mysqld_t self:unix_stream_socket create_stream_socket_perms;
++allow mysqld_t self:unix_stream_socket { create_stream_socket_perms connectto };
+ allow mysqld_t self:tcp_socket create_stream_socket_perms;
+ allow mysqld_t self:udp_socket create_socket_perms;
+ 
++corecmd_exec_shell(mysqld_t)
++corecmd_exec_bin(mysqld_t)
++
+ manage_dirs_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+ manage_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+ manage_lnk_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+@@ -180,6 +183,7 @@
+ files_dontaudit_getattr_all_dirs(mysqld_safe_t)
+ 
+ logging_log_filetrans(mysqld_safe_t, mysqld_log_t, file)
++logging_send_syslog_msg(mysqld_safe_t)
+ 
+ hostname_exec(mysqld_safe_t)
+ 
+--- a/policy/modules/services/networkmanager.te
++++ b/policy/modules/services/networkmanager.te
+@@ -270,6 +270,7 @@
+ # wpa_cli local policy
+ #
+ 
++domain_auto_trans(NetworkManager_t, wpa_cli_exec_t, wpa_cli_t)
+ allow wpa_cli_t self:capability dac_override;
+ allow wpa_cli_t self:unix_dgram_socket create_socket_perms;
+ 
+--- a/policy/modules/services/prelude.te
++++ b/policy/modules/services/prelude.te
+@@ -278,6 +278,7 @@
+ # prewikka_cgi Declarations
+ #
+ 
++apache_script_exec_domain(prewikka)
+ optional_policy(`
+ 	apache_content_template(prewikka)
+ 
+--- a/policy/modules/services/portmap.te
++++ b/policy/modules/services/portmap.te
+@@ -32,6 +32,8 @@
+ allow portmap_t self:unix_stream_socket create_stream_socket_perms;
+ allow portmap_t self:tcp_socket create_stream_socket_perms;
+ allow portmap_t self:udp_socket create_socket_perms;
++dev_read_urand(portmap_t)
++term_read_console(portmap_t)
+ 
+ manage_dirs_pattern(portmap_t, portmap_tmp_t, portmap_tmp_t)
+ manage_files_pattern(portmap_t, portmap_tmp_t, portmap_tmp_t)
+@@ -112,6 +114,8 @@
+ 
+ allow portmap_helper_t portmap_var_run_t:file manage_file_perms;
+ files_pid_filetrans(portmap_helper_t, portmap_var_run_t, file)
++dev_read_urand(portmap_helper_t)
++term_read_console(portmap_helper_t)
+ 
+ corenet_all_recvfrom_unlabeled(portmap_helper_t)
+ corenet_all_recvfrom_netlabel(portmap_helper_t)
+--- a/policy/modules/services/jabber.te
++++ b/policy/modules/services/jabber.te
+@@ -28,10 +28,11 @@
+ 
+ allow jabberd_t self:capability dac_override;
+ dontaudit jabberd_t self:capability sys_tty_config;
+-allow jabberd_t self:process signal_perms;
+-allow jabberd_t self:fifo_file read_fifo_file_perms;
++allow jabberd_t self:process { signal_perms getsched setsched };
++allow jabberd_t self:fifo_file rw_fifo_file_perms;
+ allow jabberd_t self:tcp_socket create_stream_socket_perms;
+ allow jabberd_t self:udp_socket create_socket_perms;
++corenet_udp_bind_generic_node(jabberd_t)
+ 
+ manage_files_pattern(jabberd_t, jabberd_var_lib_t, jabberd_var_lib_t)
+ files_var_lib_filetrans(jabberd_t, jabberd_var_lib_t, file)
+@@ -44,7 +45,7 @@
+ 
+ kernel_read_kernel_sysctls(jabberd_t)
+ kernel_list_proc(jabberd_t)
+-kernel_read_proc_symlinks(jabberd_t)
++kernel_read_system_state(jabberd_t)
+ 
+ corenet_all_recvfrom_unlabeled(jabberd_t)
+ corenet_all_recvfrom_netlabel(jabberd_t)
+@@ -55,14 +56,19 @@
+ corenet_tcp_sendrecv_all_ports(jabberd_t)
+ corenet_udp_sendrecv_all_ports(jabberd_t)
+ corenet_tcp_bind_generic_node(jabberd_t)
++corenet_tcp_connect_generic_port(jabberd_t)
+ corenet_tcp_bind_jabber_client_port(jabberd_t)
+ corenet_tcp_bind_jabber_interserver_port(jabberd_t)
+ corenet_sendrecv_jabber_client_server_packets(jabberd_t)
+ corenet_sendrecv_jabber_interserver_server_packets(jabberd_t)
+ 
++corecmd_exec_bin(jabberd_t)
++corecmd_exec_shell(jabberd_t)
++
+ dev_read_sysfs(jabberd_t)
+ # For SSL
+ dev_read_rand(jabberd_t)
++dev_read_urand(jabberd_t)
+ 
+ domain_use_interactive_fds(jabberd_t)
+ 
+@@ -82,6 +88,10 @@
+ userdom_dontaudit_search_user_home_dirs(jabberd_t)
+ 
+ optional_policy(`
++	run_epmd(jabberd_t, system_r)
++')
++
++optional_policy(`
+ 	nis_use_ypbind(jabberd_t)
+ ')
+ 
+--- a/policy/modules/services/soundserver.if
++++ b/policy/modules/services/soundserver.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`soundserver_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/perdition.te
++++ b/policy/modules/services/perdition.te
+@@ -20,13 +20,16 @@
+ # Local policy
+ #
+ 
+-allow perdition_t self:capability { setgid setuid };
++allow perdition_t self:netlink_route_socket create_netlink_socket_perms;
++allow perdition_t self:capability { chown fowner setgid setuid };
++dev_read_urand(perdition_t)
+ dontaudit perdition_t self:capability sys_tty_config;
+ allow perdition_t self:process signal_perms;
+ allow perdition_t self:tcp_socket create_stream_socket_perms;
+ allow perdition_t self:udp_socket create_socket_perms;
+ 
+ allow perdition_t perdition_etc_t:file read_file_perms;
++allow perdition_t perdition_etc_t:dir r_dir_perms;
+ files_search_etc(perdition_t)
+ 
+ manage_files_pattern(perdition_t, perdition_var_run_t, perdition_var_run_t)
+@@ -46,6 +49,8 @@
+ corenet_udp_sendrecv_all_ports(perdition_t)
+ corenet_tcp_bind_generic_node(perdition_t)
+ corenet_tcp_bind_pop_port(perdition_t)
++corenet_tcp_bind_sieve_port(perdition_t)
++corenet_tcp_connect_pop_port(perdition_t)
+ corenet_sendrecv_pop_server_packets(perdition_t)
+ 
+ dev_read_sysfs(perdition_t)
+@@ -73,3 +78,7 @@
+ optional_policy(`
+ 	udev_read_db(perdition_t)
+ ')
++optional_policy(`
++	mysql_tcp_connect(perdition_t)
++	mysql_stream_connect(perdition_t)
++')
+--- a/policy/modules/services/devicekit.te
++++ b/policy/modules/services/devicekit.te
+@@ -203,7 +203,9 @@
+ corecmd_exec_bin(devicekit_power_t)
+ corecmd_exec_shell(devicekit_power_t)
+ 
+-consoletype_exec(devicekit_power_t)
++optional_policy(`
++	consoletype_exec(devicekit_power_t)
++')
+ 
+ domain_read_all_domains_state(devicekit_power_t)
+ 
+--- /dev/null
++++ b/policy/modules/services/lda.fc
+@@ -0,0 +1,9 @@
++
++/usr/bin/procmail	--	gen_context(system_u:object_r:lda_exec_t,s0)
++/usr/bin/maildrop	--	gen_context(system_u:object_r:lda_exec_t,s0)
++/usr/sbin/deliverquota.maildrop	--	gen_context(system_u:object_r:lda_exec_t,s0)
++/usr/lib/dovecot/deliver --	gen_context(system_u:object_r:lda_exec_t,s0)
++/usr/bin/mailbot	--	gen_context(system_u:object_r:lda_exec_t,s0)
++
++/etc/courier/maildroprc	--	gen_context(system_u:object_r:lda_etc_t,s0)
++/var/log/maildrop.log	--	gen_context(system_u:object_r:lda_log_t,s0)
+--- a/policy/modules/services/portmap.fc
++++ b/policy/modules/services/portmap.fc
+@@ -4,6 +4,7 @@
+ ifdef(`distro_debian',`
+ /sbin/pmap_dump		--	gen_context(system_u:object_r:portmap_helper_exec_t,s0)
+ /sbin/pmap_set		--	gen_context(system_u:object_r:portmap_helper_exec_t,s0)
++/var/run/portmap_mapping --	gen_context(system_u:object_r:portmap_var_run_t,s0)
+ ', `
+ /usr/sbin/pmap_dump	--	gen_context(system_u:object_r:portmap_helper_exec_t,s0)
+ /usr/sbin/pmap_set	--	gen_context(system_u:object_r:portmap_helper_exec_t,s0)
+--- a/policy/modules/services/watchdog.te
++++ b/policy/modules/services/watchdog.te
+@@ -54,7 +54,7 @@
+ corenet_sendrecv_all_client_packets(watchdog_t)
+ 
+ dev_read_sysfs(watchdog_t)
+-dev_write_watchdog(watchdog_t)
++dev_rw_watchdog(watchdog_t)
+ # do not care about saving the random seed
+ dev_dontaudit_read_rand(watchdog_t)
+ dev_dontaudit_read_urand(watchdog_t)
+--- a/policy/modules/services/bluetooth.if
++++ b/policy/modules/services/bluetooth.if
+@@ -126,7 +126,7 @@
+ ## </param>
+ #
+ interface(`bluetooth_domtrans_helper',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -152,7 +152,7 @@
+ ## <rolecap/>
+ #
+ interface(`bluetooth_run_helper',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/git.te
++++ b/policy/modules/services/git.te
+@@ -5,4 +5,5 @@
+ # Declarations
+ #
+ 
++apache_script_exec_domain(git)
+ apache_content_template(git)
+--- a/policy/modules/services/kerberos.if
++++ b/policy/modules/services/kerberos.if
+@@ -237,8 +237,10 @@
+ 
+  	allow $2 $1_keytab_t:file read_file_perms;
+ 
+-	kerberos_read_keytab($2)
+-	kerberos_use($2)
++	optional_policy(`
++		kerberos_read_keytab($2)
++		kerberos_use($2)
++	')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/courier.te
++++ b/policy/modules/services/courier.te
+@@ -24,12 +24,21 @@
+ 
+ type courier_var_run_t;
+ files_pid_file(courier_var_run_t)
++files_pid_filetrans(courier_authdaemon_t, courier_var_run_t, { file sock_file })
+ 
+ type courier_exec_t;
+ mta_agent_executable(courier_exec_t)
+ 
++type courier_sqwebmail_cache_t;
++files_type(courier_sqwebmail_cache_t)
++
+ courier_domain_template(sqwebmail)
+ typealias courier_sqwebmail_exec_t alias sqwebmail_cron_exec_t;
++files_pid_filetrans(courier_sqwebmail_t, courier_var_run_t, { file sock_file })
++
++manage_files_pattern(courier_sqwebmail_t, courier_sqwebmail_cache_t, courier_sqwebmail_cache_t)
++
++dev_read_urand(courier_sqwebmail_t)
+ 
+ ########################################
+ #
+@@ -45,12 +54,9 @@
+ allow courier_authdaemon_t courier_tcpd_t:tcp_socket rw_stream_socket_perms;
+ allow courier_authdaemon_t courier_tcpd_t:fifo_file rw_fifo_file_perms;
+ 
+-allow courier_authdaemon_t courier_tcpd_t:tcp_socket rw_stream_socket_perms;
+ allow courier_authdaemon_t courier_tcpd_t:unix_stream_socket rw_stream_socket_perms;
+ allow courier_authdaemon_t courier_tcpd_t:process sigchld;
+ allow courier_authdaemon_t courier_tcpd_t:fd use;
+-allow courier_authdaemon_t courier_tcpd_t:tcp_socket rw_stream_socket_perms;
+-allow courier_authdaemon_t courier_tcpd_t:fifo_file rw_file_perms;
+ 
+ create_dirs_pattern(courier_authdaemon_t, courier_var_lib_t, courier_var_lib_t)
+ manage_sock_files_pattern(courier_authdaemon_t, courier_spool_t, courier_spool_t)
+@@ -89,10 +95,17 @@
+ # POP3/IMAP local policy
+ #
+ 
+-allow courier_pop_t courier_authdaemon_t:tcp_socket rw_stream_socket_perms;
++allow courier_pop_t self:capability { setgid setuid }; 
++allow courier_pop_t courier_authdaemon_t:{ unix_stream_socket tcp_socket } { connectto rw_stream_socket_perms };
+ allow courier_pop_t courier_authdaemon_t:process sigchld;
+ 
+ allow courier_pop_t courier_tcpd_t:{ unix_stream_socket tcp_socket } rw_stream_socket_perms;
++dev_read_urand(courier_pop_t)
++
++# for FAM with IMAP
++sysnet_use_portmap(courier_pop_t)
++corenet_tcp_bind_all_rpc_ports(courier_pop_t)
++corenet_tcp_bind_all_nodes(courier_pop_t)
+ 
+ # inherits file handle - should it?
+ allow courier_pop_t courier_var_lib_t:file { read write };
+--- a/policy/modules/services/apache.if
++++ b/policy/modules/services/apache.if
+@@ -11,12 +11,29 @@
+ ##	</summary>
+ ## </param>
+ #
++template(`apache_script_exec_domain',`
++	type httpd_$1_script_exec_t; # customizable;
++	fs_associate(httpd_$1_script_exec_t)
++')
++
++########################################
++## <summary>
++##	Create a set of derived types for apache
++##	web content.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	The prefix to be used for deriving type names.
++##	</summary>
++## </param>
++#
+ template(`apache_content_template',`
+ 	gen_require(`
+ 		attribute httpdcontent;
+ 		attribute httpd_exec_scripts;
+ 		attribute httpd_script_exec_type;
+ 		type httpd_t, httpd_suexec_t, httpd_log_t;
++		type httpd_$1_script_exec_t;
+ 	')
+ 	# allow write access to public file transfer
+ 	# services files.
+@@ -37,7 +54,9 @@
+ 	role system_r types httpd_$1_script_t;
+ 
+ 	# This type is used for executable scripts files
+-	type httpd_$1_script_exec_t, httpd_script_exec_type; # customizable;
++	# must be defined by the caller
++	# type httpd_$1_script_exec_t, httpd_script_exec_type; # customizable;
++	typeattribute httpd_$1_script_exec_t httpd_script_exec_type;
+ 	corecmd_shell_entry_type(httpd_$1_script_t)
+ 	domain_entry_file(httpd_$1_script_t, httpd_$1_script_exec_t)
+ 
+@@ -50,6 +69,7 @@
+ 	files_type(httpd_$1_ra_content_t)
+ 
+ 	read_files_pattern(httpd_t, httpd_$1_content_t, httpd_$1_htaccess_t)
++	read_lnk_files_pattern(httpd_t, httpd_$1_content_t, httpd_$1_htaccess_t)
+ 
+ 	domtrans_pattern(httpd_suexec_t, httpd_$1_script_exec_t, httpd_$1_script_t)
+ 
+@@ -108,6 +128,10 @@
+ 
+ 	seutil_dontaudit_search_config(httpd_$1_script_t)
+ 
++	allow httpd_t httpd_$1_content_t:dir list_dir_perms;
++	read_files_pattern(httpd_t,httpd_$1_content_t,httpd_$1_content_t)
++	read_lnk_files_pattern(httpd_t,httpd_$1_content_t,httpd_$1_content_t)
++
+ 	tunable_policy(`httpd_enable_cgi && httpd_unified',`
+ 		allow httpd_$1_script_t httpdcontent:file entrypoint;
+ 
+@@ -121,7 +145,7 @@
+ 		miscfiles_manage_public_files(httpd_$1_script_t)
+ 	')
+ 
+-	# Allow the web server to run scripts and serve pages
++	# Allow the web server to run scripts
+ 	tunable_policy(`httpd_builtin_scripting',`
+ 		manage_dirs_pattern(httpd_t, httpd_$1_rw_content_t, httpd_$1_rw_content_t)
+ 		manage_files_pattern(httpd_t, httpd_$1_rw_content_t, httpd_$1_rw_content_t)
+@@ -222,6 +246,13 @@
+ 
+ 	manage_dirs_pattern($2, httpd_user_content_t, httpd_user_content_t)
+ 	manage_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
++	manage_lnk_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
++	relabel_dirs_pattern($2, httpd_user_content_t, httpd_user_content_t)
++	relabel_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
++	relabel_lnk_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
++
++	manage_dirs_pattern($2, httpd_user_content_t, httpd_user_content_t)
++	manage_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
+ 	manage_lnk_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
+ 	relabel_dirs_pattern($2, httpd_user_content_t, httpd_user_content_t)
+ 	relabel_files_pattern($2, httpd_user_content_t, httpd_user_content_t)
+--- a/policy/modules/services/snmp.if
++++ b/policy/modules/services/snmp.if
+@@ -30,7 +30,7 @@
+ ## </param>
+ #
+ interface(`snmp_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -44,7 +44,7 @@
+ ## </param>
+ #
+ interface(`snmp_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/dkim.te
++++ b/policy/modules/services/dkim.te
+@@ -11,12 +11,18 @@
+ type dkim_milter_private_key_t;
+ files_type(dkim_milter_private_key_t)
+ 
++type dkim_milter_tmp_t;
++files_tmp_file(dkim_milter_tmp_t)
++ubac_constrained(dkim_milter_tmp_t)
++files_tmp_filetrans(dkim_milter_t, dkim_milter_tmp_t, file)
++
+ ########################################
+ #
+ # Local policy
+ #
+ 
+ allow dkim_milter_t self:capability { setgid setuid };
++kernel_read_system_state(dkim_milter_t)
+ 
+ read_files_pattern(dkim_milter_t, dkim_milter_private_key_t, dkim_milter_private_key_t)
+ 
+--- a/policy/modules/services/ppp.if
++++ b/policy/modules/services/ppp.if
+@@ -228,6 +228,24 @@
+ 
+ ########################################
+ ## <summary>
++##	 Execute domain in the ppp caller.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	 Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ppp_script_exec',`
++	gen_require(`
++		type pppd_script_exec_t;
++	')
++
++	can_exec($1, pppd_script_exec_t)
++')
++
++########################################
++## <summary>
+ ##	Read PPP-writable configuration files.
+ ## </summary>
+ ## <param name="domain">
+--- a/policy/modules/services/asterisk.te
++++ b/policy/modules/services/asterisk.te
+@@ -45,7 +45,7 @@
+ allow asterisk_t self:fifo_file rw_fifo_file_perms;
+ allow asterisk_t self:sem create_sem_perms;
+ allow asterisk_t self:shm create_shm_perms;
+-allow asterisk_t self:unix_stream_socket connectto;
++allow asterisk_t self:unix_stream_socket { connectto rw_stream_socket_perms };
+ allow asterisk_t self:tcp_socket create_stream_socket_perms;
+ allow asterisk_t self:udp_socket create_socket_perms;
+ 
+--- a/policy/modules/services/spamassassin.if
++++ b/policy/modules/services/spamassassin.if
+@@ -225,3 +225,23 @@
+ 
+ 	dontaudit $1 spamd_tmp_t:sock_file getattr;
+ ')
++
++########################################
++## <summary>
++##	Connect to spamd via unix socket
++## </summary>
++## <param name="domain">
++##      <summary>
++##	Domain to connect
++##      </summary>
++## </param>
++#
++interface(`spamassassin_connect_unix_sock',`
++	gen_require(`
++		type spamd_t, spamd_var_run_t;
++	')
++
++	allow $1 spamd_var_run_t:dir search_dir_perms;
++	allow $1 spamd_var_run_t:sock_file write;
++	allow $1 spamd_t:unix_stream_socket connectto;
++')
+--- a/policy/modules/services/munin.te
++++ b/policy/modules/services/munin.te
+@@ -122,6 +122,7 @@
+ userdom_dontaudit_use_unpriv_user_fds(munin_t)
+ userdom_dontaudit_search_user_home_dirs(munin_t)
+ 
++apache_script_exec_domain(munin)
+ optional_policy(`
+ 	apache_content_template(munin)
+ 
+--- a/policy/modules/services/radius.if
++++ b/policy/modules/services/radius.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`radius_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/mysql.if
++++ b/policy/modules/services/mysql.if
+@@ -353,3 +353,23 @@
+ 
+ 	admin_pattern($1, mysqld_tmp_t)
+ ')
++
++########################################
++## <summary>
++##	Execute mysqld in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++## 	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`mysqld_exec',`
++	gen_require(`
++		type mysqld_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	can_exec($1, mysqld_exec_t)
++')
+--- a/policy/modules/services/squid.te
++++ b/policy/modules/services/squid.te
+@@ -177,6 +177,7 @@
+ 	corenet_tcp_bind_netport_port(squid_t)
+ ')
+ 
++apache_script_exec_domain(squid)
+ optional_policy(`
+ 	apache_content_template(squid)
+ 
+--- a/policy/modules/services/fetchmail.fc
++++ b/policy/modules/services/fetchmail.fc
+@@ -17,3 +17,4 @@
+ 
+ /var/run/fetchmail/.*		--	gen_context(system_u:object_r:fetchmail_var_run_t,s0)
+ /var/mail/\.fetchmail-UIDL-cache --	gen_context(system_u:object_r:fetchmail_uidl_cache_t,s0)
++/var/lib/fetchmail(/.*)?		gen_context(system_u:object_r:fetchmail_uidl_cache_t,s0)
+--- a/policy/modules/services/clamav.fc
++++ b/policy/modules/services/clamav.fc
+@@ -8,13 +8,32 @@
+ /usr/sbin/clamd			--	gen_context(system_u:object_r:clamd_exec_t,s0)
+ /usr/sbin/clamav-milter		--	gen_context(system_u:object_r:clamd_exec_t,s0)
+ 
++/var/run/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_run_t,s0)
++/var/run/clamd\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
++/var/run/clamav\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
++/var/spool/postfix/clamav(/.*)?		gen_context(system_u:object_r:clamd_var_run_t,s0)
++
+ /var/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
+ /var/lib/clamav(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
+ /var/log/clamav.*			gen_context(system_u:object_r:clamd_var_log_t,s0)
+ /var/log/clamav/freshclam.*	--	gen_context(system_u:object_r:freshclam_var_log_t,s0)
+ /var/log/clamd.*			gen_context(system_u:object_r:clamd_var_log_t,s0)
+ /var/run/amavis(d)?/clamd\.pid	--	gen_context(system_u:object_r:clamd_var_run_t,s0)
+-/var/run/clamav.*			gen_context(system_u:object_r:clamd_var_run_t,s0)
+-/var/run/clamd.*			gen_context(system_u:object_r:clamd_var_run_t,s0)
+ /var/spool/amavisd/clamd\.sock	-s	gen_context(system_u:object_r:clamd_var_run_t,s0)
++
++/etc/amavis\.conf		--	gen_context(system_u:object_r:clamd_etc_t,s0)
++/etc/amavisd(/.*)?		--	gen_context(system_u:object_r:clamd_etc_t,s0)
++
++/usr/sbin/amavisd.*		--	gen_context(system_u:object_r:clamd_exec_t,s0)
++
++ifdef(`distro_debian',`
++/usr/sbin/amavisd-new-cronjob  --      gen_context(system_u:object_r:clamd_exec_t,s0)
++')
++
++/var/amavis(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/lib/amavis(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/log/amavisd\.log		--	gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/run/amavis(d)?(/.*)?		gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/spool/amavisd(/.*)?		gen_context(system_u:object_r:clamd_spool_t,s0)
++/var/virusmails(/.*)?			gen_context(system_u:object_r:clamd_spool_t,s0)
+ /var/spool/MailScanner(/.*)?		gen_context(system_u:object_r:clamd_var_run_t,s0)
+--- a/policy/modules/services/milter.te
++++ b/policy/modules/services/milter.te
+@@ -20,6 +20,10 @@
+ type spamass_milter_state_t;
+ files_type(spamass_milter_state_t)
+ 
++files_pid_file(spamass_milter_data_t)
++files_pid_filetrans(spamass_milter_t, spamass_milter_data_t, { file sock_file })
++allow spamass_milter_t spamass_milter_data_t:{ file sock_file } manage_file_perms;
++
+ ########################################
+ #
+ # milter-greylist local policy
+@@ -94,3 +98,7 @@
+ optional_policy(`
+ 	spamassassin_domtrans_client(spamass_milter_t)
+ ')
++
++optional_policy(`
++	postfix_search_spool(spamass_milter_t)
++')
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -69,6 +69,9 @@
+ allow named_t self:tcp_socket create_stream_socket_perms;
+ allow named_t self:udp_socket create_socket_perms;
+ 
++# because lwresd calls access(".", W_OK)
++files_dontaudit_rw_root_dir(named_t)
++
+ allow named_t dnssec_t:file read_file_perms;
+ 
+ # read configuration
+@@ -199,6 +202,7 @@
+ allow ndc_t self:unix_stream_socket { connect create_stream_socket_perms };
+ allow ndc_t self:tcp_socket create_socket_perms;
+ allow ndc_t self:netlink_route_socket r_netlink_socket_perms;
++dev_read_urand(ndc_t)
+ 
+ allow ndc_t dnssec_t:file read_file_perms;
+ allow ndc_t dnssec_t:lnk_file { getattr read };
+--- a/policy/modules/services/cron.te
++++ b/policy/modules/services/cron.te
+@@ -136,8 +136,8 @@
+ # Cron daemon local policy
+ #
+ 
+-allow crond_t self:capability { dac_override setgid setuid sys_nice dac_read_search };
+-dontaudit crond_t self:capability { sys_resource sys_tty_config };
++allow crond_t self:capability { dac_override setgid setuid sys_nice sys_resource dac_read_search };
++dontaudit crond_t self:capability { sys_tty_config };
+ allow crond_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
+ allow crond_t self:process { setexec setfscreate };
+ allow crond_t self:fd use;
+@@ -222,6 +222,7 @@
+ userdom_list_user_home_dirs(crond_t)
+ 
+ mta_send_mail(crond_t)
++system_mail_file_access(crond_tmp_t)
+ 
+ ifdef(`distro_debian',`
+ 	# pam_limits is used
+@@ -260,6 +261,8 @@
+ 
+ optional_policy(`
+ 	amavis_search_lib(crond_t)
++	# for bayes maintainance scripts
++	amavis_domtrans(crond_t)
+ ')
+ 
+ optional_policy(`
+@@ -468,7 +471,8 @@
+ ')
+ 
+ optional_policy(`
+-	mysql_read_config(system_cronjob_t)
++	mysql_read_config(system_crond_t)
++        mysql_stream_connect(system_crond_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/services/dkim.if
++++ b/policy/modules/services/dkim.if
+@@ -1 +1,20 @@
+ ## <summary>DomainKeys Identified Mail milter.</summary>
++
++########################################
++## <summary>
++##      Connect to dkim-milter.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed to connect.
++##      </summary>
++## </param>
++#
++interface(`dkim_stream_connect',`
++	gen_require(`
++		type dkim_milter_t, dkim_milter_data_t;
++	')
++
++	stream_connect_pattern($1,dkim_milter_data_t,dkim_milter_data_t,dkim_milter_t)
++')
++
+--- a/policy/modules/services/nessus.if
++++ b/policy/modules/services/nessus.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`nessus_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- a/policy/modules/services/sasl.te
++++ b/policy/modules/services/sasl.te
+@@ -99,6 +99,7 @@
+ optional_policy(`
+ 	mysql_search_db(saslauthd_t)
+ 	mysql_stream_connect(saslauthd_t)
++	mysql_tcp_connect(saslauthd_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/services/nagios.te
++++ b/policy/modules/services/nagios.te
+@@ -143,6 +143,7 @@
+ #
+ # Nagios CGI local policy
+ #
++apache_script_exec_domain(nagios)
+ optional_policy(`
+ 	apache_content_template(nagios)
+ 	typealias httpd_nagios_script_t alias nagios_cgi_t;
+@@ -191,8 +192,15 @@
+ files_search_etc(nrpe_t)
+ 
+ manage_files_pattern(nrpe_t, nrpe_var_run_t, nrpe_var_run_t)
++manage_files_pattern(nrpe_t, nagios_var_run_t, nagios_var_run_t)
+ files_pid_filetrans(nrpe_t, nrpe_var_run_t, file)
+ 
++type nrpe_tmp_t;
++files_tmp_file(nrpe_tmp_t)
++manage_dirs_pattern(nrpe_t, nrpe_tmp_t, nrpe_tmp_t)
++manage_files_pattern(nrpe_t, nrpe_tmp_t, nrpe_tmp_t)
++files_tmp_filetrans(nrpe_t, nrpe_tmp_t, { file dir })
++
+ kernel_read_system_state(nrpe_t)
+ kernel_read_kernel_sysctls(nrpe_t)
+ 
+@@ -202,6 +210,16 @@
+ corenet_tcp_bind_generic_node(nrpe_t)
+ corenet_tcp_bind_inetd_child_port(nrpe_t)
+ corenet_sendrecv_unlabeled_packets(nrpe_t)
++corenet_all_recvfrom_unlabeled(nrpe_t)
++corenet_all_recvfrom_netlabel(nrpe_t)
++corenet_tcp_sendrecv_all_if(nrpe_t)
++corenet_tcp_sendrecv_all_nodes(nrpe_t)
++corenet_tcp_sendrecv_generic_port(nrpe_t)
++corenet_tcp_bind_all_nodes(nrpe_t)
++corenet_tcp_bind_nrpe_port(nrpe_t)
++sysnet_dns_name_resolve(nrpe_t)
++
++allow nrpe_t self:netlink_route_socket create_netlink_socket_perms;
+ 
+ dev_read_sysfs(nrpe_t)
+ dev_read_urand(nrpe_t)
+@@ -223,6 +241,15 @@
+ 
+ userdom_dontaudit_use_unpriv_user_fds(nrpe_t)
+ 
++domain_read_all_domains_state(nrpe_t)
++fs_getattr_all_fs(nrpe_t)
++storage_getattr_fixed_disk_dev(nrpe_t)
++init_read_utmp(nrpe_t)
++
++term_dontaudit_getattr_all_user_ttys(nrpe_t)
++term_dontaudit_getattr_unallocated_ttys(nrpe_t)
++term_dontaudit_getattr_all_user_ptys(nrpe_t)
++
+ optional_policy(`
+ 	inetd_tcp_service_domain(nrpe_t, nrpe_exec_t)
+ ')
+@@ -270,6 +297,7 @@
+ #
+ 
+ allow nagios_mail_plugin_t self:capability { setuid setgid dac_override };
++dontaudit nagios_mail_plugin_t self:capability { sys_resource };
+ 
+ allow nagios_mail_plugin_t self:netlink_route_socket r_netlink_socket_perms;
+ allow nagios_mail_plugin_t self:tcp_socket create_stream_socket_perms;
+@@ -289,17 +317,25 @@
+ 
+ sysnet_read_config(nagios_mail_plugin_t)
+ 
++files_read_usr_files(nagios_mail_plugin_t)
++
+ optional_policy(`
+ 	mta_send_mail(nagios_mail_plugin_t)
+ ')
+ 
+ optional_policy(`
++	can_exec_sudo(nagios_mail_plugin_t)
++')
++
++optional_policy(`
+ 	nscd_dontaudit_search_pid(nagios_mail_plugin_t)
+ ')
+ 
+ optional_policy(`
+ 	postfix_stream_connect_master(nagios_mail_plugin_t)
+-	posftix_exec_postqueue(nagios_mail_plugin_t)
++	posftix_run_postqueue(nagios_mail_plugin_t)
++	postfix_list_spool(nagios_mail_plugin_t)
++	postfix_read_spool_files(nagios_mail_plugin_t)
+ ')
+ 
+ ######################################
+@@ -313,6 +349,7 @@
+ files_read_etc_runtime_files(nagios_checkdisk_plugin_t)
+ 
+ fs_getattr_all_fs(nagios_checkdisk_plugin_t)
++files_getattr_all_mountpoints(nagios_checkdisk_plugin_t)
+ 
+ storage_raw_read_fixed_disk(nagios_checkdisk_plugin_t)
+ 
+@@ -343,6 +380,8 @@
+ ')
+ 
+ optional_policy(`
++	mysql_read_config(nagios_services_plugin_t)
++	mysql_tcp_connect(nagios_services_plugin_t)
+ 	mysql_stream_connect(nagios_services_plugin_t)
+ ')
+ 
+@@ -389,3 +428,14 @@
+ optional_policy(`
+ 	unconfined_domain(nagios_unconfined_plugin_t)
+ ')
++
++optional_policy(`
++        mysql_tcp_connect(nrpe_t)
++        mysql_stream_connect(nrpe_t)
++       mysql_read_config(nrpe_t)
++')
++
++optional_policy(`
++        postgresql_tcp_connect(nrpe_t)
++        postgresql_stream_connect(nrpe_t)
++')
+--- a/policy/modules/services/devicekit.fc
++++ b/policy/modules/services/devicekit.fc
+@@ -2,7 +2,12 @@
+ /usr/libexec/devkit-disks-daemon --	gen_context(system_u:object_r:devicekit_disk_exec_t,s0)
+ /usr/libexec/devkit-power-daemon --	gen_context(system_u:object_r:devicekit_power_exec_t,s0)
+ /usr/libexec/udisks-daemon	--	gen_context(system_u:object_r:devicekit_disk_exec_t,s0)
++/usr/lib/udisks/udisks-daemon	--	gen_context(system_u:object_r:devicekit_disk_exec_t,s0)
++ifdef(`distro_debian',`
++/usr/lib/upower/upowerd		--	gen_context(system_u:object_r:devicekit_power_exec_t,s0)
++', `
+ /usr/libexec/upowerd		--	gen_context(system_u:object_r:devicekit_power_exec_t,s0)
++')
+ 
+ /var/lib/DeviceKit-.*			gen_context(system_u:object_r:devicekit_var_lib_t,s0)
+ /var/lib/upower(/.*)?			gen_context(system_u:object_r:devicekit_var_lib_t,s0)
+--- a/policy/modules/services/xserver.te
++++ b/policy/modules/services/xserver.te
+@@ -151,12 +151,6 @@
+ files_tmp_file(xauth_tmp_t)
+ ubac_constrained(xauth_tmp_t)
+ 
+-# this is not actually a device, its a pipe
+-type xconsole_device_t;
+-files_type(xconsole_device_t)
+-fs_associate_tmpfs(xconsole_device_t)
+-files_associate_tmp(xconsole_device_t)
+-
+ type xdm_t;
+ type xdm_exec_t;
+ auth_login_pgm_domain(xdm_t)
+@@ -317,7 +311,8 @@
+ allow xdm_t self:appletalk_socket create_socket_perms;
+ allow xdm_t self:key { search link write };
+ 
+-allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
++#allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
++logging_r_xconsole(xdm_t)
+ 
+ # Allow gdm to run gdm-binary
+ can_exec(xdm_t, xdm_exec_t)
+@@ -789,6 +784,7 @@
+ optional_policy(`
+ 	unconfined_domain_noaudit(xserver_t)
+ 	unconfined_domtrans(xserver_t)
++        unconfined_dbus_send(xserver_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/services/courier.if
++++ b/policy/modules/services/courier.if
+@@ -29,7 +29,7 @@
+ 	allow courier_$1_t self:capability dac_override;
+ 	dontaudit courier_$1_t self:capability sys_tty_config;
+ 	allow courier_$1_t self:process { setpgid signal_perms };
+-	allow courier_$1_t self:fifo_file { read write getattr };
++	allow courier_$1_t self:fifo_file rw_fifo_file_perms;
+ 	allow courier_$1_t self:tcp_socket create_stream_socket_perms;
+ 	allow courier_$1_t self:udp_socket create_socket_perms;
+ 
+@@ -105,6 +105,25 @@
+ ')
+ 
+ ########################################
++## <summary>
++##	Act as a client for the courier authdaemon
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`courier_authdaemon_client',`
++	gen_require(`
++		type courier_authdaemon_t, courier_etc_t, courier_var_run_t;
++	')
++	allow $1 courier_authdaemon_t:unix_stream_socket connectto;
++	allow $1 courier_etc_t:dir search;
++	allow $1 courier_var_run_t:sock_file write;
++')
++
++########################################
+ ## <summary>
+ ##	Execute the courier POP3 and IMAP server with
+ ##	a domain transition.
+--- a/policy/modules/services/dovecot.fc
++++ b/policy/modules/services/dovecot.fc
+@@ -9,6 +9,12 @@
+ /etc/pki/dovecot(/.*)?			gen_context(system_u:object_r:dovecot_cert_t,s0)
+ /etc/rc\.d/init\.d/dovecot	--	gen_context(system_u:object_r:dovecot_initrc_exec_t,s0)
+ 
++# Debian uses /etc/dovecot/
++ifdef(`distro_debian', `
++/etc/dovecot(/.*)?                     gen_context(system_u:object_r:dovecot_etc_t,s0)
++/etc/dovecot/passwd.*                  gen_context(system_u:object_r:dovecot_passwd_t,s0)
++')
++
+ #
+ # /usr
+ #
+@@ -18,8 +24,7 @@
+ /usr/share/ssl/private/dovecot\.pem --	gen_context(system_u:object_r:dovecot_cert_t,s0)
+ 
+ ifdef(`distro_debian', `
+-/usr/lib/dovecot/dovecot-auth	--	gen_context(system_u:object_r:dovecot_auth_exec_t,s0)
+-/usr/lib/dovecot/deliver	--	gen_context(system_u:object_r:dovecot_deliver_exec_t,s0)
++/usr/lib/dovecot/dovecot-auth 	--	gen_context(system_u:object_r:dovecot_auth_exec_t,s0)
+ ')
+ 
+ ifdef(`distro_redhat', `
+@@ -33,7 +38,10 @@
+ # /var
+ #
+ /var/run/dovecot(-login)?(/.*)?		gen_context(system_u:object_r:dovecot_var_run_t,s0)
+-/var/run/dovecot/login/ssl-parameters.dat -- gen_context(system_u:object_r:dovecot_var_lib_t,s0)
++ifdef(`distro_redhat', `
++# this is a hard link to /var/lib/dovecot/ssl-parameters.dat
++/var/run/dovecot/login/ssl-parameters.dat	gen_context(system_u:object_r:dovecot_var_lib_t,s0)
++')
+ 
+ /var/lib/dovecot(/.*)?			gen_context(system_u:object_r:dovecot_var_lib_t,s0)
+ 
+--- /dev/null
++++ b/policy/modules/services/epmd.fc
+@@ -0,0 +1 @@
++/usr/lib/erlang/erts-[^/]*/bin/epmd -- gen_context(system_u:object_r:epmd_exec_t,s0)
+--- a/policy/modules/services/mailman.te
++++ b/policy/modules/services/mailman.te
+@@ -61,6 +61,8 @@
+ # Mailman mail local policy
+ #
+ 
++dev_read_urand(mailman_mail_t)
++files_read_usr_files(mailman_mail_t)
+ allow mailman_mail_t self:unix_dgram_socket create_socket_perms;
+ allow mailman_mail_t self:process { signal signull };
+ allow mailman_mail_t self:capability { kill dac_override setuid setgid sys_tty_config };
+@@ -125,4 +127,5 @@
+ 
+ optional_policy(`
+ 	su_exec(mailman_queue_t)
+-')
+\ No newline at end of file
++')
++
+--- a/policy/modules/services/spamassassin.te
++++ b/policy/modules/services/spamassassin.te
+@@ -43,6 +43,7 @@
+ typealias spamc_t alias { auditadm_spamc_t secadm_spamc_t };
+ application_domain(spamc_t, spamc_exec_t)
+ ubac_constrained(spamc_t)
++role system_r types spamc_t;
+ 
+ type spamc_tmp_t;
+ typealias spamc_tmp_t alias { user_spamc_tmp_t staff_spamc_tmp_t sysadm_spamc_tmp_t };
+@@ -52,7 +53,8 @@
+ 
+ type spamd_t;
+ type spamd_exec_t;
+-init_daemon_domain(spamd_t, spamd_exec_t)
++init_daemon_domain(spamd_t,spamd_exec_t)
++can_exec(spamd_t,spamc_exec_t)
+ 
+ type spamd_spool_t;
+ files_type(spamd_spool_t)
+@@ -66,6 +68,7 @@
+ 
+ type spamd_var_run_t;
+ files_pid_file(spamd_var_run_t)
++manage_sock_files_pattern(spamd_t,spamd_var_run_t,spamd_var_run_t)
+ 
+ ##############################
+ #
+@@ -205,6 +208,7 @@
+ allow spamc_t self:unix_stream_socket connectto;
+ allow spamc_t self:tcp_socket create_stream_socket_perms;
+ allow spamc_t self:udp_socket create_socket_perms;
++allow spamc_t self:netlink_route_socket { read write bind create getattr nlmsg_read };
+ 
+ manage_dirs_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)
+ manage_files_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)
+@@ -286,7 +290,7 @@
+ # setuids to the user running spamc.  Comment this if you are not
+ # using this ability.
+ 
+-allow spamd_t self:capability { setuid setgid dac_override sys_tty_config };
++allow spamd_t self:capability { kill setgid setuid dac_override sys_tty_config };
+ dontaudit spamd_t self:capability sys_tty_config;
+ allow spamd_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
+ allow spamd_t self:fd use;
+@@ -333,6 +337,7 @@
+ corenet_udp_sendrecv_all_ports(spamd_t)
+ corenet_tcp_bind_generic_node(spamd_t)
+ corenet_tcp_bind_spamd_port(spamd_t)
++corenet_tcp_connect_spamd_port(spamd_t)
+ corenet_tcp_connect_razor_port(spamd_t)
+ corenet_tcp_connect_smtp_port(spamd_t)
+ corenet_sendrecv_razor_client_packets(spamd_t)
+@@ -421,6 +426,7 @@
+ 
+ optional_policy(`
+ 	postfix_read_config(spamd_t)
++	postfix_search_spool(spamd_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/services/cron.fc
++++ b/policy/modules/services/cron.fc
+@@ -5,6 +5,7 @@
+ 
+ /usr/bin/at			--	gen_context(system_u:object_r:crontab_exec_t,s0)
+ /usr/bin/(f)?crontab		--	gen_context(system_u:object_r:crontab_exec_t,s0)
++/usr/sbin/fcronsighup           --      gen_context(system_u:object_r:crontab_exec_t,s0)
+ 
+ /usr/sbin/anacron		--	gen_context(system_u:object_r:anacron_exec_t,s0)
+ /usr/sbin/atd			--	gen_context(system_u:object_r:crond_exec_t,s0)
+@@ -18,6 +19,11 @@
+ /var/run/fcron\.fifo		-s	gen_context(system_u:object_r:crond_var_run_t,s0)
+ /var/run/fcron\.pid		--	gen_context(system_u:object_r:crond_var_run_t,s0)
+ 
++ifdef(`distro_debian', `
++/var/spool/cron/atspool        -d      gen_context(system_u:object_r:cron_spool_t,s0)
++/var/spool/cron/atjobs         -d      gen_context(system_u:object_r:cron_spool_t,s0)
++/var/spool/cron/atjobs/[^/]*   --      <<none>>
++')
+ /var/spool/anacron(/.*)?		gen_context(system_u:object_r:system_cron_spool_t,s0)
+ /var/spool/at(/.*)?			gen_context(system_u:object_r:user_cron_spool_t,s0)
+ 
+@@ -45,3 +51,5 @@
+ /var/spool/fcron/systab\.orig	--	gen_context(system_u:object_r:system_cron_spool_t,s0)
+ /var/spool/fcron/systab		--	gen_context(system_u:object_r:system_cron_spool_t,s0)
+ /var/spool/fcron/new\.systab	--	gen_context(system_u:object_r:system_cron_spool_t,s0)
++
++/var/log/prelink.log		--	gen_context(system_u:object_r:cron_log_t,s0)
+--- a/policy/modules/services/cron.if
++++ b/policy/modules/services/cron.if
+@@ -35,7 +35,8 @@
+ 	allow $1_t self:fifo_file rw_fifo_file_perms;
+ 
+ 	allow $1_t $1_tmp_t:file manage_file_perms;
+-	files_tmp_filetrans($1_t, $1_tmp_t, file)
++	allow $1_t $1_tmp_t:dir manage_dir_perms;
++	files_tmp_filetrans($1_t, $1_tmp_t, { file dir })
+ 
+ 	# create files in /var/spool/cron
+ 	manage_files_pattern($1_t, { cron_spool_t user_cron_spool_t }, user_cron_spool_t)
+@@ -207,7 +208,7 @@
+ 		class passwd crontab;
+ 	')
+ 
+-	role $1 types { cronjob_t admin_crontab_t admin_crontab_tmp_t };
++	role $1 types { cronjob_t admin_crontab_t };
+ 
+ 	# cronjob shows up in user ps
+ 	ps_process_pattern($2, cronjob_t)
+@@ -257,11 +258,12 @@
+ #
+ interface(`cron_system_entry',`
+ 	gen_require(`
+-		type crond_t, system_cronjob_t;
++		type crond_t, system_cronjob_t, crond_tmp_t;
+ 	')
+ 
+ 	domtrans_pattern(system_cronjob_t, $2, $1)
+ 	domtrans_pattern(crond_t, $2, $1)
++	allow $1 crond_tmp_t:file { read write ioctl };
+ 
+ 	role system_r types $1;
+ ')
+@@ -631,3 +633,22 @@
+ 
+ 	dontaudit $1 system_cronjob_tmp_t:file write_file_perms;
+ ')
++
++########################################
++## <summary>
++##	Allow crond to search directories that are home directories for
++##	accounts used or parent directories of home directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Type of directory that crond_t may search.
++##	</summary>
++## </param>
++#
++interface(`crond_search_dir',`
++	gen_require(`
++		type crond_t;
++	')
++
++	allow crond_t $1:dir search;
++')
+--- a/policy/modules/services/i18n_input.if
++++ b/policy/modules/services/i18n_input.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`i18n_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- a/policy/modules/services/dictd.if
++++ b/policy/modules/services/dictd.if
+@@ -12,7 +12,7 @@
+ ## </param>
+ #
+ interface(`dictd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/automount.if
++++ b/policy/modules/services/automount.if
+@@ -49,7 +49,7 @@
+ ## </param>
+ #
+ interface(`automount_exec_config',`
+-	refpolicywarn(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
++	refpolicyerr(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
+ 	files_exec_etc_files($1)
+ ')
+ 
+--- a/policy/modules/services/openvpn.fc
++++ b/policy/modules/services/openvpn.fc
+@@ -15,3 +15,4 @@
+ #
+ /var/log/openvpn.*		gen_context(system_u:object_r:openvpn_var_log_t,s0)
+ /var/run/openvpn(/.*)?		gen_context(system_u:object_r:openvpn_var_run_t,s0)
++/var/run/openvpn.client.* --    gen_context(system_u:object_r:openvpn_var_run_t,s0)
+--- a/policy/modules/services/policykit.fc
++++ b/policy/modules/services/policykit.fc
+@@ -3,6 +3,8 @@
+ /usr/lib/policykit/polkit-resolve-exe-helper.* -- gen_context(system_u:object_r:policykit_resolve_exec_t,s0)
+ /usr/lib/policykit/polkitd		--	gen_context(system_u:object_r:policykit_exec_t,s0)
+ 
++/usr/lib/policykit-1/polkitd		--	gen_context(system_u:object_r:policykit_exec_t,s0)
++
+ /usr/libexec/polkit-read-auth-helper	--	gen_context(system_u:object_r:policykit_auth_exec_t,s0)
+ /usr/libexec/polkit-grant-helper.*	--	gen_context(system_u:object_r:policykit_grant_exec_t,s0)
+ /usr/libexec/polkit-resolve-exe-helper.* --	gen_context(system_u:object_r:policykit_resolve_exec_t,s0)
+--- a/policy/modules/services/dcc.te
++++ b/policy/modules/services/dcc.te
+@@ -91,6 +91,9 @@
+ allow cdcc_t dcc_client_map_t:file rw_file_perms;
+ 
+ # Access files in /var/dcc. The map file can be updated
++ifdef(`distro_debian',`
++files_search_var_lib(cdcc_t)
++')
+ allow cdcc_t dcc_var_t:dir list_dir_perms;
+ read_files_pattern(cdcc_t, dcc_var_t, dcc_var_t)
+ read_lnk_files_pattern(cdcc_t, dcc_var_t, dcc_var_t)
+@@ -128,6 +131,9 @@
+ files_tmp_filetrans(dcc_client_t, dcc_client_tmp_t, { file dir })
+ 
+ # Access files in /var/dcc. The map file can be updated
++ifdef(`distro_debian',`
++files_search_var_lib(dcc_client_t)
++')
+ allow dcc_client_t dcc_var_t:dir list_dir_perms;
+ manage_files_pattern(dcc_client_t, dcc_var_t, dcc_var_t)
+ read_lnk_files_pattern(dcc_client_t, dcc_var_t, dcc_var_t)
+@@ -176,6 +182,9 @@
+ manage_files_pattern(dcc_dbclean_t, dcc_dbclean_tmp_t, dcc_dbclean_tmp_t)
+ files_tmp_filetrans(dcc_dbclean_t, dcc_dbclean_tmp_t, { file dir })
+ 
++ifdef(`distro_debian',`
++files_search_var_lib(dcc_dbclean_t)
++')
+ manage_dirs_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
+ manage_files_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
+ manage_lnk_files_pattern(dcc_dbclean_t, dcc_var_t, dcc_var_t)
+@@ -214,6 +223,9 @@
+ allow dccd_t dcc_client_map_t:file rw_file_perms;
+ 
+ # Access files in /var/dcc. The map file can be updated
++ifdef(`distro_debian',`
++files_search_var_lib(dccd_t)
++')
+ allow dccd_t dcc_var_t:dir list_dir_perms;
+ read_files_pattern(dccd_t, dcc_var_t, dcc_var_t)
+ read_lnk_files_pattern(dccd_t, dcc_var_t, dcc_var_t)
+@@ -288,6 +300,9 @@
+ allow dccifd_t dcc_client_map_t:file rw_file_perms;
+ 
+ # Updating dcc_db, flod, ...
++ifdef(`distro_debian',`
++files_search_var_lib(dccifd_t)
++')
+ manage_dirs_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+ manage_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+ manage_lnk_files_pattern(dccifd_t, dcc_var_t, dcc_var_t)
+@@ -352,6 +367,9 @@
+ 
+ allow dccm_t dcc_client_map_t:file rw_file_perms;
+ 
++ifdef(`distro_debian',`
++files_search_var_lib(dccm_t)
++')
+ manage_dirs_pattern(dccm_t, dcc_var_t, dcc_var_t)
+ manage_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
+ manage_lnk_files_pattern(dccm_t, dcc_var_t, dcc_var_t)
+--- a/policy/modules/services/portmap.if
++++ b/policy/modules/services/portmap.if
+@@ -57,7 +57,7 @@
+ ## </param>
+ #
+ interface(`portmap_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -71,7 +71,7 @@
+ ## </param>
+ #
+ interface(`portmap_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -85,5 +85,5 @@
+ ## </param>
+ #
+ interface(`portmap_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- /dev/null
++++ b/policy/modules/services/epmd.te
+@@ -0,0 +1,52 @@
++
++policy_module(epmd, 1.7.1)
++
++########################################
++#
++# Declarations
++#
++
++## <desc>
++## <p>
++## Allow the Erlang Port mapper to coordinate all nodes in distributed
++## computing.  It also wants to run on single nodes so any daemon written in
++## Erlang will need it.
++## </p>
++## </desc>
++
++type epmd_t;
++type epmd_exec_t;
++init_daemon_domain(epmd_t,epmd_exec_t)
++role system_r types epmd_t;
++
++########################################
++#
++# epmd local policy
++#
++
++allow epmd_t self:tcp_socket create_stream_socket_perms;
++#allow epmd_t self:udp_socket create_socket_perms;
++
++corenet_all_recvfrom_unlabeled(epmd_t)
++corenet_all_recvfrom_netlabel(epmd_t)
++corenet_tcp_bind_epmd_port(epmd_t)
++corenet_tcp_sendrecv_all_if(epmd_t)
++#corenet_udp_sendrecv_all_if(epmd_t)
++corenet_tcp_sendrecv_all_nodes(epmd_t)
++#corenet_udp_sendrecv_all_nodes(epmd_t)
++corenet_tcp_sendrecv_all_ports(epmd_t)
++#corenet_udp_sendrecv_all_ports(epmd_t)
++corenet_tcp_bind_all_nodes(epmd_t)
++#corenet_udp_bind_all_nodes(epmd_t)
++#corenet_tcp_connect_all_ports(epmd_t)
++#corenet_udp_bind_all_unreserved_ports(epmd_t)
++
++files_read_etc_files(epmd_t)
++
++libs_use_ld_so(epmd_t)
++libs_use_shared_libs(epmd_t)
++
++logging_send_syslog_msg(epmd_t)
++
++miscfiles_read_localization(epmd_t)
++
+--- a/policy/modules/services/dovecot.te
++++ b/policy/modules/services/dovecot.te
+@@ -20,11 +20,13 @@
+ type dovecot_cert_t;
+ files_type(dovecot_cert_t)
+ 
++ifdef(`distro_redhat', `
+ type dovecot_deliver_t;
+ type dovecot_deliver_exec_t;
+ domain_type(dovecot_deliver_t)
+ domain_entry_file(dovecot_deliver_t, dovecot_deliver_exec_t)
+ role system_r types dovecot_deliver_t;
++')
+ 
+ type dovecot_etc_t;
+ files_config_file(dovecot_etc_t)
+@@ -72,6 +74,7 @@
+ read_files_pattern(dovecot_t, dovecot_cert_t, dovecot_cert_t)
+ read_lnk_files_pattern(dovecot_t, dovecot_cert_t, dovecot_cert_t)
+ 
++allow dovecot_t dovecot_etc_t:dir list_dir_perms;
+ allow dovecot_t dovecot_etc_t:file read_file_perms;
+ files_search_etc(dovecot_t)
+ 
+@@ -180,6 +183,10 @@
+ # dovecot auth local policy
+ #
+ 
++logging_search_logs(dovecot_auth_t)
++allow dovecot_auth_t dovecot_etc_t:dir list_dir_perms;
++allow dovecot_auth_t dovecot_etc_t:file read_file_perms;
++manage_sock_files_pattern(dovecot_auth_t,dovecot_var_run_t,dovecot_var_run_t)
+ allow dovecot_auth_t self:capability { chown dac_override setgid setuid };
+ allow dovecot_auth_t self:process { signal_perms getcap setcap };
+ allow dovecot_auth_t self:fifo_file rw_fifo_file_perms;
+@@ -236,6 +243,8 @@
+ optional_policy(`
+ 	mysql_search_db(dovecot_auth_t)
+ 	mysql_stream_connect(dovecot_auth_t)
++	mysql_tcp_connect(dovecot_auth_t)
++	mysql_read_config(dovecot_auth_t)
+ ')
+ 
+ optional_policy(`
+@@ -250,10 +259,12 @@
+ #
+ # dovecot deliver local policy
+ #
++ifdef(`distro_redhat', `
+ allow dovecot_deliver_t self:unix_dgram_socket create_socket_perms;
+ 
+ allow dovecot_deliver_t dovecot_t:process signull;
+ 
++allow dovecot_deliver_t dovecot_etc_t:dir list_dir_perms;
+ allow dovecot_deliver_t dovecot_etc_t:file read_file_perms;
+ allow dovecot_deliver_t dovecot_var_run_t:dir list_dir_perms;
+ 
+@@ -266,7 +277,6 @@
+ auth_use_nsswitch(dovecot_deliver_t)
+ 
+ logging_send_syslog_msg(dovecot_deliver_t)
+-logging_search_logs(dovecot_auth_t)
+ 
+ miscfiles_read_localization(dovecot_deliver_t)
+ 
+@@ -304,3 +314,15 @@
+ optional_policy(`
+ 	mta_manage_spool(dovecot_deliver_t)
+ ')
++# end ifdef distro_redhat
++')
++
++optional_policy(`
++       mysql_tcp_connect(dovecot_auth_t)
++       mysql_stream_connect(dovecot_auth_t)
++')
++
++optional_policy(`
++       postgresql_tcp_connect(dovecot_auth_t)
++       postgresql_stream_connect(dovecot_auth_t)
++')
+--- a/policy/modules/services/nis.if
++++ b/policy/modules/services/nis.if
+@@ -205,7 +205,7 @@
+ ## </param>
+ #
+ interface(`nis_udp_send_ypbind',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -219,7 +219,7 @@
+ ## </param>
+ #
+ interface(`nis_tcp_connect_ypbind',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/apm.te
++++ b/policy/modules/services/apm.te
+@@ -190,6 +190,9 @@
+ 	optional_policy(`
+ 		networkmanager_dbus_chat(apmd_t)
+ 	')
++        optional_policy(`
++                hal_dbus_chat(apmd_t)
++        ')
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/services/mysql.fc
++++ b/policy/modules/services/mysql.fc
+@@ -16,6 +16,8 @@
+ /usr/libexec/mysqld	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
+ 
+ /usr/sbin/mysqld(-max)?	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
++/usr/sbin/ndbd		--	gen_context(system_u:object_r:mysqld_exec_t,s0)
++/usr/bin/mysql_upgrade	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
+ /usr/sbin/mysqlmanager	--	gen_context(system_u:object_r:mysqlmanagerd_exec_t,s0)
+ 
+ #
+--- a/policy/modules/services/openvpn.te
++++ b/policy/modules/services/openvpn.te
+@@ -64,6 +64,10 @@
+ manage_files_pattern(openvpn_t, openvpn_var_run_t, openvpn_var_run_t)
+ files_pid_filetrans(openvpn_t, openvpn_var_run_t, { file dir })
+ 
++# for the list of vulnerable keys
++files_read_usr_files(openvpn_t)
++files_read_var_lib_files(openvpn_t)
++
+ kernel_read_kernel_sysctls(openvpn_t)
+ kernel_read_net_sysctls(openvpn_t)
+ kernel_read_network_state(openvpn_t)
+--- a/policy/modules/services/apache.te
++++ b/policy/modules/services/apache.te
+@@ -215,6 +215,7 @@
+ files_tmp_file(httpd_suexec_tmp_t)
+ 
+ # setup the system domain for system CGI scripts
++apache_script_exec_domain(sys)
+ apache_content_template(sys)
+ typealias httpd_sys_content_t alias ntop_http_content_t;
+ 
+@@ -224,6 +225,7 @@
+ type httpd_tmpfs_t;
+ files_tmpfs_file(httpd_tmpfs_t)
+ 
++apache_script_exec_domain(user)
+ apache_content_template(user)
+ ubac_constrained(httpd_user_script_t)
+ userdom_user_home_content(httpd_user_content_t)
+@@ -469,6 +471,14 @@
+ tunable_policy(`httpd_enable_homedirs',`
+ 	userdom_read_user_home_content_files(httpd_t)
+ ')
++optional_policy(`
++	gen_require(`
++		bool daemon_access_unconfined_home;
++	')
++	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
++			unconfined_read_home_content_files(httpd_t)
++	')
++')
+ 
+ tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
+ 	fs_read_nfs_files(httpd_t)
+@@ -517,7 +527,10 @@
+ ')
+ 
+ optional_policy(`
++# for cron jobs to restart Apache
+ 	cron_system_entry(httpd_t, httpd_exec_t)
++# For cron jobs to run from accounts with home directories in the web store
++	crond_search_dir(httpd_sys_content_t)
+ ')
+ 
+ optional_policy(`
+@@ -542,8 +555,11 @@
+ 	')
+ ')
+ 
+-optional_policy(`
+ 	kerberos_keytab_template(httpd, httpd_t)
++
++optional_policy(`
++        # read munin files
++        munin_search_lib(httpd_t)
+ ')
+ 
+ optional_policy(`
+@@ -739,6 +755,14 @@
+ 	corenet_tcp_connect_all_ports(httpd_suexec_t)
+ 	corenet_sendrecv_all_client_packets(httpd_suexec_t)
+ ')
++optional_policy(`
++	gen_require(`
++		bool daemon_access_unconfined_home;
++	')
++	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
++			unconfined_read_home_content_files(httpd_suexec_t)
++	')
++')
+ 
+ tunable_policy(`httpd_enable_cgi && httpd_unified',`
+ 	allow httpd_sys_script_t httpdcontent:file entrypoint;
+@@ -824,6 +848,14 @@
+ tunable_policy(`httpd_enable_homedirs',`
+ 	userdom_read_user_home_content_files(httpd_sys_script_t)
+ ')
++optional_policy(`
++	gen_require(`
++		bool daemon_access_unconfined_home;
++	')
++	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
++			unconfined_read_home_content_files(httpd_sys_script_t)
++	')
++')
+ 
+ tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
+ 	fs_read_nfs_files(httpd_sys_script_t)
+--- /dev/null
++++ b/policy/modules/services/lda.te
+@@ -0,0 +1,162 @@
++
++policy_module(lda, 1.9.0)
++
++########################################
++#
++# Declarations
++#
++
++type lda_t;
++typealias lda_t alias procmail_t;
++type lda_exec_t;
++typealias lda_exec_t alias procmail_exec_t;
++application_domain(lda_t,lda_exec_t)
++role system_r types lda_t;
++
++type lda_tmp_t;
++typealias lda_tmp_t alias procmail_tmp_t;
++files_tmp_file(lda_tmp_t)
++
++type lda_etc_t;
++files_config_file(lda_etc_t)
++
++type lda_log_t;
++logging_log_file(lda_log_t)
++manage_files_pattern(lda_t,lda_log_t,lda_log_t)
++logging_log_filetrans(lda_t,lda_log_t,file)
++
++
++########################################
++#
++# Local policy
++#
++
++allow lda_t self:capability { sys_nice chown setuid setgid dac_override };
++allow lda_t self:process { setsched signal signull };
++allow lda_t self:fifo_file rw_fifo_file_perms;
++allow lda_t self:unix_stream_socket create_socket_perms;
++allow lda_t self:unix_dgram_socket create_socket_perms;
++allow lda_t self:tcp_socket create_stream_socket_perms;
++allow lda_t self:udp_socket create_socket_perms;
++read_files_pattern(lda_t,lda_etc_t,lda_etc_t)
++read_lnk_files_pattern(lda_t,lda_etc_t,lda_etc_t)
++
++can_exec(lda_t,lda_exec_t)
++
++allow lda_t lda_tmp_t:file manage_file_perms;
++files_tmp_filetrans(lda_t, lda_tmp_t, file)
++
++kernel_read_system_state(lda_t)
++kernel_read_kernel_sysctls(lda_t)
++
++corenet_all_recvfrom_unlabeled(lda_t)
++corenet_all_recvfrom_netlabel(lda_t)
++corenet_tcp_sendrecv_all_if(lda_t)
++corenet_udp_sendrecv_all_if(lda_t)
++corenet_tcp_sendrecv_all_nodes(lda_t)
++corenet_udp_sendrecv_all_nodes(lda_t)
++corenet_tcp_sendrecv_all_ports(lda_t)
++corenet_udp_sendrecv_all_ports(lda_t)
++corenet_udp_bind_all_nodes(lda_t)
++corenet_tcp_connect_spamd_port(lda_t)
++corenet_sendrecv_spamd_client_packets(lda_t)
++corenet_sendrecv_comsat_client_packets(lda_t)
++
++dev_read_urand(lda_t)
++
++fs_getattr_xattr_fs(lda_t)
++fs_search_auto_mountpoints(lda_t)
++fs_rw_anon_inodefs_files(lda_t)
++
++auth_use_nsswitch(lda_t)
++
++corecmd_exec_bin(lda_t)
++corecmd_exec_shell(lda_t)
++
++files_read_etc_files(lda_t)
++files_read_etc_runtime_files(lda_t)
++files_search_pids(lda_t)
++# for spamassasin
++files_read_usr_files(lda_t)
++
++libs_use_ld_so(lda_t)
++libs_use_shared_libs(lda_t)
++
++logging_send_syslog_msg(lda_t)
++
++miscfiles_read_localization(lda_t)
++
++# only works until we define a different type for maildir
++userdom_manage_user_home_content_dirs(lda_t)
++userdom_manage_user_home_content_files(lda_t)
++userdom_user_home_dir_filetrans_user_home_content(lda_t, { dir file })
++
++optional_policy(`
++	gen_require(`
++		bool daemon_access_unconfined_home;
++	')
++#	tunable_policy(`daemon_access_unconfined_home', `
++#		unconfined_write_home_content_files(lda_t)
++#	')
++')
++
++mta_manage_spool(lda_t)
++
++ifdef(`hide_broken_symptoms',`
++	mta_dontaudit_rw_queue(lda_t)
++')
++
++tunable_policy(`use_nfs_home_dirs',`
++	fs_manage_nfs_dirs(lda_t)
++	fs_manage_nfs_files(lda_t)
++	fs_manage_nfs_symlinks(lda_t)
++')
++
++tunable_policy(`use_samba_home_dirs',`
++	fs_manage_cifs_dirs(lda_t)
++	fs_manage_cifs_files(lda_t)
++	fs_manage_cifs_symlinks(lda_t)
++')
++
++optional_policy(`
++	clamav_domtrans_clamscan(lda_t)
++	clamav_search_lib(lda_t)
++')
++
++optional_policy(`
++	courier_authdaemon_client(lda_t)
++')
++
++optional_policy(`
++	munin_dontaudit_search_lib(lda_t)
++')
++
++optional_policy(`
++	# for a bug in the postfix local program
++	postfix_dontaudit_rw_local_tcp_sockets(lda_t)
++	postfix_dontaudit_use_fds(lda_t)
++	postfix_read_spool_files(lda_t)
++	postfix_read_local_state(lda_t)
++	postfix_read_master_state(lda_t)
++')
++
++optional_policy(`
++	pyzor_domtrans(lda_t)
++')
++
++optional_policy(`
++	mta_read_config(lda_t)
++	sendmail_domtrans(lda_t)
++	sendmail_rw_tcp_sockets(lda_t)
++	sendmail_rw_unix_stream_sockets(lda_t)
++')
++
++optional_policy(`
++	corenet_udp_bind_generic_port(lda_t)
++	corenet_dontaudit_udp_bind_all_ports(lda_t)
++
++	spamassassin_exec(lda_t)
++	spamassassin_exec_client(lda_t)
++	spamassassin_read_lib_files(lda_t)
++')
++
+--- a/policy/modules/services/fetchmail.te
++++ b/policy/modules/services/fetchmail.te
+@@ -19,6 +19,11 @@
+ type fetchmail_uidl_cache_t;
+ files_type(fetchmail_uidl_cache_t)
+ 
++type fetchmail_tmp_t;
++files_tmp_file(fetchmail_tmp_t)
++ubac_constrained(fetchmail_tmp_t)
++files_tmp_filetrans(fetchmail_t, fetchmail_tmp_t, file)
++
+ ########################################
+ #
+ # Local policy
+@@ -33,13 +38,16 @@
+ allow fetchmail_t self:udp_socket create_socket_perms;
+ 
+ allow fetchmail_t fetchmail_etc_t:file read_file_perms;
++files_read_usr_files(fetchmail_t)
+ 
++allow fetchmail_t fetchmail_uidl_cache_t:dir manage_dir_perms;
+ allow fetchmail_t fetchmail_uidl_cache_t:file manage_file_perms;
+ mta_spool_filetrans(fetchmail_t, fetchmail_uidl_cache_t, file)
+ 
+ manage_dirs_pattern(fetchmail_t, fetchmail_var_run_t, fetchmail_var_run_t)
+ manage_files_pattern(fetchmail_t, fetchmail_var_run_t, fetchmail_var_run_t)
+ files_pid_filetrans(fetchmail_t, fetchmail_var_run_t, { dir file })
++files_search_var_lib(fetchmail_t)
+ 
+ kernel_read_kernel_sysctls(fetchmail_t)
+ kernel_list_proc(fetchmail_t)
+--- a/policy/modules/services/dbus.if
++++ b/policy/modules/services/dbus.if
+@@ -194,6 +194,8 @@
+ 	files_search_pids($1)
+ 	stream_connect_pattern($1, system_dbusd_var_run_t, system_dbusd_var_run_t, system_dbusd_t)
+ 	dbus_read_config($1)
++        allow system_dbusd_t $1:dir search;
++        allow system_dbusd_t $1:file read_file_perms;
+ ')
+ 
+ #######################################
+--- a/policy/modules/services/inetd.if
++++ b/policy/modules/services/inetd.if
+@@ -150,7 +150,7 @@
+ ## </param>
+ #
+ interface(`inetd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -183,7 +183,7 @@
+ ## </param>
+ #
+ interface(`inetd_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/ldap.if
++++ b/policy/modules/services/ldap.if
+@@ -50,7 +50,7 @@
+ ## </param>
+ #
+ interface(`ldap_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/apache.fc
++++ b/policy/modules/services/apache.fc
+@@ -32,8 +32,12 @@
+ /usr/lib(64)?/httpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
+ /usr/lib(64)?/lighttpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
+ 
++ifdef(`distro_debian', `
++/usr/lib/apache2/mpm-.*/.*$	--	gen_context(system_u:object_r:httpd_exec_t,s0)
++', `
+ /usr/sbin/apache(2)?		--	gen_context(system_u:object_r:httpd_exec_t,s0)
+ /usr/sbin/apache-ssl(2)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
++')
+ /usr/sbin/httpd(\.worker)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
+ /usr/sbin/lighttpd		--	gen_context(system_u:object_r:httpd_exec_t,s0)
+ /usr/sbin/rotatelogs		--	gen_context(system_u:object_r:httpd_rotatelogs_exec_t,s0)
+@@ -79,7 +83,8 @@
+ /var/lib/httpd(/.*)?			gen_context(system_u:object_r:httpd_var_lib_t,s0)
+ /var/lib/php/session(/.*)?		gen_context(system_u:object_r:httpd_var_run_t,s0)
+ /var/lib/squirrelmail/prefs(/.*)?	gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
+-
++/var/lib/squirrelmail/data(/.*)?        gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
++ 
+ /var/log/apache(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
+ /var/log/apache-ssl(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
+ /var/log/cacti(/.*)?			gen_context(system_u:object_r:httpd_log_t,s0)
+--- a/policy/modules/services/squid.if
++++ b/policy/modules/services/squid.if
+@@ -184,7 +184,7 @@
+ ## </param>
+ #
+ interface(`squid_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/services/hal.fc
++++ b/policy/modules/services/hal.fc
+@@ -19,7 +19,7 @@
+ /var/lib/hal(/.*)?				gen_context(system_u:object_r:hald_var_lib_t,s0)
+ 
+ /var/log/pm(/.*)?				gen_context(system_u:object_r:hald_log_t,s0)
+-/var/log/pm-.*\.log				gen_context(system_u:object_r:hald_log_t,s0)
++/var/log/pm-.*\.log.*				gen_context(system_u:object_r:hald_log_t,s0)
+ 
+ /var/run/hald(/.*)?				gen_context(system_u:object_r:hald_var_run_t,s0)
+ /var/run/haldaemon\.pid	--	 		gen_context(system_u:object_r:hald_var_run_t,s0)
+--- a/policy/modules/services/nsd.if
++++ b/policy/modules/services/nsd.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`nsd_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -25,5 +25,5 @@
+ ## </param>
+ #
+ interface(`nsd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+--- a/policy/modules/services/clamav.te
++++ b/policy/modules/services/clamav.te
+@@ -36,6 +36,10 @@
+ type clamd_var_lib_t;
+ files_type(clamd_var_lib_t)
+ 
++# spool files
++type clamd_spool_t;
++files_type(clamd_spool_t)
++
+ # pid files
+ type clamd_var_run_t;
+ files_pid_file(clamd_var_run_t)
+@@ -53,6 +57,8 @@
+ type freshclam_exec_t;
+ init_daemon_domain(freshclam_t, freshclam_exec_t)
+ 
++allow freshclam_t self:netlink_route_socket r_netlink_socket_perms;
++
+ # log files
+ type freshclam_var_log_t;
+ logging_log_file(freshclam_var_log_t)
+@@ -62,12 +68,22 @@
+ # clamd local policy
+ #
+ 
++allow clamd_t self:process signull;
+ allow clamd_t self:capability { kill setgid setuid dac_override };
+ dontaudit clamd_t self:capability sys_tty_config;
+ allow clamd_t self:fifo_file rw_fifo_file_perms;
+ allow clamd_t self:unix_stream_socket { create_stream_socket_perms connectto };
+ allow clamd_t self:unix_dgram_socket create_socket_perms;
+ allow clamd_t self:tcp_socket { listen accept };
++allow clamd_t self:fd use;
++corecmd_exec_bin(clamd_t)
++corecmd_read_bin_symlinks(clamd_t)
++files_read_usr_files(clamd_t)
++
++optional_policy(`
++# to allow creating the unix domain socket
++	postfix_search_spool(clamd_t)
++')
+ 
+ # configuration files
+ allow clamd_t clamd_etc_t:dir list_dir_perms;
+@@ -83,6 +99,10 @@
+ manage_dirs_pattern(clamd_t, clamd_var_lib_t, clamd_var_lib_t)
+ manage_files_pattern(clamd_t, clamd_var_lib_t, clamd_var_lib_t)
+ 
++# spool files
++manage_dirs_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
++manage_files_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
++
+ # log files
+ manage_dirs_pattern(clamd_t, clamd_var_log_t, clamd_var_log_t)
+ manage_files_pattern(clamd_t, clamd_var_log_t, clamd_var_log_t)
+@@ -100,17 +120,22 @@
+ 
+ corecmd_exec_shell(clamd_t)
+ 
++# for /proc/meminfo
++allow clamd_t proc_t:file { getattr read };
++
+ corenet_all_recvfrom_unlabeled(clamd_t)
+ corenet_all_recvfrom_netlabel(clamd_t)
+ corenet_tcp_sendrecv_generic_if(clamd_t)
+ corenet_tcp_sendrecv_generic_node(clamd_t)
+ corenet_tcp_sendrecv_all_ports(clamd_t)
+ corenet_tcp_sendrecv_clamd_port(clamd_t)
++corenet_tcp_sendrecv_amavisd_send_port(clamd_t)
+ corenet_tcp_bind_generic_node(clamd_t)
+ corenet_tcp_bind_clamd_port(clamd_t)
+ corenet_tcp_bind_generic_port(clamd_t)
+ corenet_tcp_connect_generic_port(clamd_t)
+ corenet_sendrecv_clamd_server_packets(clamd_t)
++corenet_udp_bind_all_nodes(clamd_t)
+ 
+ dev_read_rand(clamd_t)
+ dev_read_urand(clamd_t)
+@@ -120,6 +145,7 @@
+ files_read_etc_files(clamd_t)
+ files_read_etc_runtime_files(clamd_t)
+ files_search_spool(clamd_t)
++files_search_var_lib(clamd_t)
+ 
+ auth_use_nsswitch(clamd_t)
+ 
+@@ -130,6 +156,7 @@
+ cron_use_fds(clamd_t)
+ cron_use_system_job_fds(clamd_t)
+ cron_rw_pipes(clamd_t)
++crond_search_dir(clamd_var_lib_t)
+ 
+ mta_read_config(clamd_t)
+ mta_send_mail(clamd_t)
+@@ -147,8 +174,10 @@
+ 
+ tunable_policy(`clamd_use_jit',`
+ 	allow clamd_t self:process execmem;
++	allow freshclam_t self:process execmem;
+ ', `
+ 	dontaudit clamd_t self:process execmem;
++	dontaudit freshclam_t self:process execmem;
+ ')
+ 
+ ########################################
+@@ -156,6 +185,8 @@
+ # Freshclam local policy
+ #
+ 
++files_search_var_lib(freshclam_t)
++
+ allow freshclam_t self:capability { setgid setuid dac_override };
+ allow freshclam_t self:fifo_file rw_fifo_file_perms;
+ allow freshclam_t self:unix_stream_socket create_stream_socket_perms;
+@@ -189,6 +220,7 @@
+ corenet_tcp_sendrecv_all_ports(freshclam_t)
+ corenet_tcp_sendrecv_clamd_port(freshclam_t)
+ corenet_tcp_connect_http_port(freshclam_t)
++corenet_tcp_connect_http_cache_port(freshclam_t)
+ corenet_sendrecv_http_client_packets(freshclam_t)
+ 
+ dev_read_rand(freshclam_t)
+@@ -204,6 +236,7 @@
+ logging_send_syslog_msg(freshclam_t)
+ 
+ miscfiles_read_localization(freshclam_t)
++kernel_read_system_state(freshclam_t)
+ 
+ clamav_stream_connect(freshclam_t)
+ 
+--- a/policy/modules/services/courier.fc
++++ b/policy/modules/services/courier.fc
+@@ -7,6 +7,7 @@
+ /usr/sbin/couriertcpd			--	gen_context(system_u:object_r:courier_tcpd_exec_t,s0)
+ 
+ /usr/lib(64)?/courier/(courier-)?authlib/.*	--	gen_context(system_u:object_r:courier_authdaemon_exec_t,s0)
++/usr/sbin/authdaemond			--	gen_context(system_u:object_r:courier_authdaemon_exec_t,s0)
+ /usr/lib(64)?/courier/courier/.*	--	gen_context(system_u:object_r:courier_exec_t,s0)
+ /usr/lib(64)?/courier/courier/courierpop.* --	gen_context(system_u:object_r:courier_pop_exec_t,s0)
+ /usr/lib(64)?/courier/courier/imaplogin --	gen_context(system_u:object_r:courier_pop_exec_t,s0)
+@@ -14,7 +15,8 @@
+ /usr/lib(64)?/courier/imapd		--	gen_context(system_u:object_r:courier_pop_exec_t,s0)
+ /usr/lib(64)?/courier/pop3d		--	gen_context(system_u:object_r:courier_pop_exec_t,s0)
+ /usr/lib(64)?/courier/rootcerts(/.*)?		gen_context(system_u:object_r:courier_etc_t,s0)
+-/usr/lib(64)?/courier/sqwebmail/cleancache\.pl -- gen_context(system_u:object_r:sqwebmail_cron_exec_t,s0)
++/usr/lib(64)?/courier/sqwebmail/cleancache\.pl -- gen_context(system_u:object_r:courier_sqwebmail_exec_t,s0)
++/var/cache/sqwebmail(/.*)?			gen_context(system_u:object_r:courier_sqwebmail_cache_t,s0)
+ 
+ ifdef(`distro_gentoo',`
+ /usr/lib(64)?/courier-imap/couriertcpd	--	gen_context(system_u:object_r:courier_tcpd_exec_t,s0)
+--- a/policy/modules/services/mta.te
++++ b/policy/modules/services/mta.te
+@@ -5,11 +5,18 @@
+ # Declarations
+ #
+ 
++# attribute used for domains that act on behalf of the user to deliver mail
++# to the queue
+ attribute mailcontent_type;
+ attribute mta_exec_type;
+ attribute mta_user_agent;
++
++# attribute used for domains that deliver mail locally
+ attribute mailserver_delivery;
++
+ attribute mailserver_domain;
++
++# attribute used for domains that send mail externally (smtp or lmtp)
+ attribute mailserver_sender;
+ 
+ attribute user_mail_domain;
+--- a/policy/modules/roles/sysadm.te
++++ b/policy/modules/roles/sysadm.te
+@@ -156,6 +156,10 @@
+ ')
+ 
+ optional_policy(`
++	python_role(sysadm_r, sysadm_t)
++')
++
++optional_policy(`
+ 	# allow system administrator to use the ipsec script to look
+ 	# at things (e.g., ipsec auto --status)
+ 	# probably should create an ipsec_admin role for this kind of thing
+--- a/policy/modules/roles/unprivuser.te
++++ b/policy/modules/roles/unprivuser.te
+@@ -27,6 +27,9 @@
+ optional_policy(`
+ 	xserver_role(user_r, user_t)
+ ')
++optional_policy(`
++	consolekit_dbus_chat(user_t)
++')
+ 
+ ifndef(`distro_redhat',`
+ 	optional_policy(`
+@@ -67,6 +70,7 @@
+ 
+ 	optional_policy(`
+ 		gpg_role(user_r, user_t)
++		gpg_agent_domtrans_user(user_t, user_home_t)
+ 	')
+ 
+ 	optional_policy(`
+--- a/policy/modules/roles/staff.te
++++ b/policy/modules/roles/staff.te
+@@ -41,6 +41,9 @@
+ optional_policy(`
+ 	sudo_role_template(staff, staff_r, staff_t)
+ ')
++optional_policy(`
++	consolekit_dbus_chat(staff_t)
++')
+ 
+ optional_policy(`
+ 	sysadm_role_change(staff_r)
+--- a/policy/modules/kernel/mcs.if
++++ b/policy/modules/kernel/mcs.if
+@@ -45,6 +45,26 @@
+ 
+ ########################################
+ ## <summary>
++##	This domain is allowed to delete files and directories
++##	regardless of their MCS category set.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain target for user exemption.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`mcs_file_delete_all',`
++	gen_require(`
++		attribute mcsdeleteall;
++	')
++
++	typeattribute $1 mcsdeleteall;
++')
++
++########################################
++## <summary>
+ ##	This domain is allowed to sigkill and sigstop 
+ ##	all domains regardless of their MCS category set.
+ ## </summary>
+@@ -102,3 +122,53 @@
+ 
+ 	typeattribute $1 mcssetcats;
+ ')
++
++########################################
++## <summary>
++##     Make specified domain MCS trusted
++##     for setting the low level of its range for the processes it executes,
++##      IE MCS will not be mandatory for it.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain target for user exemption.
++##     </summary>
++## </param>
++#
++interface(`mcs_process_set_low',`
++	gen_require(`
++		attribute mcssetlow;
++	')
++
++	typeattribute $1 mcssetlow;
++')
++
++########################################
++## <summary>
++##      Make specified object MCS trusted.
++## </summary>
++## <desc>
++##      <p>
++##      Make specified object MCS trusted.  This
++##      allows all levels to read and write the
++##      object.
++##      </p>
++##      <p>
++##      This currently only applies to filesystem
++##      objects, for example, files and directories.
++##      </p>
++## </desc>
++## <param name="domain">
++##      <summary>
++##      The type of the object.
++##      </summary>
++## </param>
++#
++interface(`mcs_trusted_object',`
++	gen_require(`
++		attribute mcstrustedobject;
++	')
++
++	typeattribute $1 mcstrustedobject;
++')
++
+--- a/policy/modules/kernel/selinux.te
++++ b/policy/modules/kernel/selinux.te
+@@ -19,6 +19,7 @@
+ type security_t, boolean_type;
+ fs_type(security_t)
+ mls_trusted_object(security_t)
++mcs_trusted_object(security_t)
+ sid security gen_context(system_u:object_r:security_t,mls_systemhigh)
+ genfscon selinuxfs / gen_context(system_u:object_r:security_t,s0)
+ genfscon securityfs / gen_context(system_u:object_r:security_t,s0)
+--- a/policy/modules/kernel/filesystem.te
++++ b/policy/modules/kernel/filesystem.te
+@@ -95,6 +95,8 @@
+ type hugetlbfs_t;
+ fs_type(hugetlbfs_t)
+ files_mountpoint(hugetlbfs_t)
++files_type(hugetlbfs_t)
++files_poly_parent(hugetlbfs_t)
+ fs_use_trans hugetlbfs gen_context(system_u:object_r:hugetlbfs_t,s0);
+ 
+ type ibmasmfs_t;
+--- a/policy/modules/kernel/selinux.if
++++ b/policy/modules/kernel/selinux.if
+@@ -544,6 +544,7 @@
+ 
+ 	allow $1 security_t:dir list_dir_perms;
+ 	allow $1 security_t:file rw_file_perms;
++	allow $1 security_t:filesystem getattr;
+ 	allow $1 security_t:security check_context;
+ ')
+ 
+--- a/policy/modules/kernel/mcs.te
++++ b/policy/modules/kernel/mcs.te
+@@ -5,8 +5,19 @@
+ # Declarations
+ #
+ 
++# process may kill all processes (init)
+ attribute mcskillall;
++# process may ptrace at all levels
+ attribute mcsptraceall;
++# process may run a child in any level
+ attribute mcssetcats;
++# process may set the low level for a child with no restriction
++attribute mcssetlow;
++# object may be accessed by any process at a higher level
++attribute mcstrustedobject;
++# process may write all files/dirs
+ attribute mcswriteall;
++# process may read all files/dirs
+ attribute mcsreadall;
++# process may delete all files and write dirs as appropriate
++attribute mcsdeleteall;
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -135,7 +135,6 @@
+ /lib/udev/scsi_id		--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/upstart(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+ 
+-
+ /lib64/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:bin_t,s0)
+ /lib64/udev/[^/]*		--	gen_context(system_u:object_r:bin_t,s0)
+ 
+@@ -187,6 +186,7 @@
+ /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/scponly		--	gen_context(system_u:object_r:shell_exec_t,s0)
++/usr/bin/tcsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ 
+ /usr/lib(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+ 
+@@ -296,6 +296,13 @@
+ 
+ /usr/X11R6/lib(64)?/X11/xkb/xkbcomp --	gen_context(system_u:object_r:bin_t,s0)
+ 
++ifdef(`distro_debian',`
++/usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/gnome-vfs-2.0/gnome-vfs-daemon -- gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/udisks/.*		--	gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/dovecot/.+             --      gen_context(system_u:object_r:bin_t,s0)
++')
++
+ ifdef(`distro_gentoo', `
+ /usr/.*-.*-linux-gnu/gcc-bin/.*(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+ /usr/.*-.*-linux-gnu/binutils-bin(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+--- a/policy/modules/kernel/devices.fc
++++ b/policy/modules/kernel/devices.fc
+@@ -1,5 +1,12 @@
+ 
+ /dev			-d	gen_context(system_u:object_r:device_t,s0)
++ifdef(`distro_debian',`
++# this is a static /dev dir "backup mount"
++# if you want to disable udev, you'll have to boot permissive and relabel!
++/dev/\.static	-d		gen_context(system_u:object_r:device_t,s0)
++/dev/\.static/dev	-d		gen_context(system_u:object_r:device_t,s0)
++/dev/\.static/dev/(.*)?		<<none>>
++')
+ /dev/.*				gen_context(system_u:object_r:device_t,s0)
+ 
+ /dev/.*mouse.*		-c	gen_context(system_u:object_r:mouse_device_t,s0)
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -4064,6 +4064,24 @@
+ 
+ ########################################
+ ## <summary>
++##     Allow reading tmpfs files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain to read files
++##     </summary>
++## </param>
++#
++interface(`fs_allow_tmpfs_file_read',`
++	gen_require(`
++		type tmpfs_t;
++	')
++
++	allow $1 tmpfs_t:file read;
++')
++
++########################################
++## <summary>
+ ##	Create, read, write, and delete
+ ##	auto moutpoints.
+ ## </summary>
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -413,6 +413,26 @@
+ 
+ ########################################
+ ## <summary>
++##	Transform the type into a file, for use on a
++##	virtual memory filesystem (hugetlbfs).
++## </summary>
++## <param name="type">
++##	<summary>
++##	The type to be transformed.
++##	</summary>
++## </param>
++#
++interface(`files_hugetlbfs_file',`
++	gen_require(`
++		attribute hugetlbfsfile;
++	')
++
++	files_type($1)
++	typeattribute $1 hugetlbfsfile;
++')
++
++########################################
++## <summary>
+ ##	Get the attributes of all directories.
+ ## </summary>
+ ## <param name="domain">
+@@ -3460,8 +3480,9 @@
+ 	gen_require(`
+ 		type mnt_t;
+ 	')
+-
+-	allow $1 mnt_t:dir search_dir_perms;
++        
++        allow $1 mnt_t:dir search_dir_perms;
++        allow $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ########################################
+@@ -3480,6 +3501,7 @@
+ 	')
+ 
+ 	dontaudit $1 mnt_t:dir search_dir_perms;
++	dontaudit $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ########################################
+@@ -3498,6 +3520,7 @@
+ 	')
+ 
+ 	allow $1 mnt_t:dir list_dir_perms;
++	allow $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ######################################
+@@ -5504,6 +5527,7 @@
+ 
+ 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
++	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 lockfile:dir list_dir_perms;
+ 	read_files_pattern($1, lockfile, lockfile)
+ 	read_lnk_files_pattern($1, lockfile, lockfile)
+@@ -5527,6 +5551,7 @@
+ 
+ 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
++	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	manage_dirs_pattern($1, lockfile, lockfile)
+ 	manage_files_pattern($1, lockfile, lockfile)
+ 	manage_lnk_files_pattern($1, lockfile, lockfile)
+@@ -5800,6 +5825,26 @@
+ ')
+ 
+ ########################################
++## <summary>
++##      Create directories under /var/run
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`files_manage_pid_dirs',`
++	gen_require(`
++		type var_t, var_run_t;
++	')
++
++	allow $1 var_t:dir search;
++	allow $1 var_run_t:lnk_file read_lnk_file_perms;
++	allow $1 var_run_t:dir manage_dir_perms;
++')
++
++########################################
+ ## <summary>
+ ##	Do not audit attempts to write to daemon runtime data files.
+ ## </summary>
+--- a/policy/modules/kernel/files.fc
++++ b/policy/modules/kernel/files.fc
+@@ -62,7 +62,7 @@
+ 
+ /etc/ipsec\.d/examples(/.*)?	gen_context(system_u:object_r:etc_t,s0)
+ 
+-/etc/network/ifstate	--	gen_context(system_u:object_r:etc_runtime_t,s0)
++/etc/network/run/ifstate --	gen_context(system_u:object_r:etc_runtime_t,s0)
+ 
+ /etc/ptal/ptal-printd-like -- 	gen_context(system_u:object_r:etc_runtime_t,s0)
+ 
+@@ -107,6 +107,12 @@
+ /lib/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
+ /lib64/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
+ 
++ifdef(`distro_debian',`
++# on Debian /lib/init/rw is a tmpfs used like /var/run but
++# before /var is mounted
++/lib/init/rw(/.*)?		gen_context(system_u:object_r:var_run_t,s0-mls_systemhigh)
++')
++
+ #
+ # /lost+found
+ #
+@@ -255,5 +261,5 @@
+ /var/tmp/vi\.recover	-d	gen_context(system_u:object_r:tmp_t,s0)
+ 
+ ifdef(`distro_debian',`
+-/var/run/motd		--	gen_context(system_u:object_r:etc_runtime_t,s0)
++/var/run/motd		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ ')
+--- a/policy/modules/kernel/files.te
++++ b/policy/modules/kernel/files.te
+@@ -31,6 +31,7 @@
+ 
+ attribute tmpfile;
+ attribute tmpfsfile;
++attribute hugetlbfsfile;
+ 
+ # this attribute is not currently used and will be removed in the future.
+ # unfortunately, this attribute can not be removed yet because it may cause
+@@ -213,6 +214,13 @@
+ 
+ ########################################
+ #
++# Rules for all hugetlbfs file types
++#
++
++fs_associate_hugetlbfs(hugetlbfsfile)
++
++########################################
++#
+ # Unconfined access to this module
+ #
+ 
+--- a/policy/modules/kernel/storage.if
++++ b/policy/modules/kernel/storage.if
+@@ -290,6 +290,24 @@
+ 
+ ########################################
+ ## <summary>
++##	Create block devices in a directory labelled as var_run_t
++## </summary>
++## <param name="domain">
++##	<summary>
++##	The type of the process performing this action.
++##	</summary>
++## </param>
++#
++interface(`storage_var_run_filetrans_fixed_disk',`
++	gen_require(`
++		type fixed_disk_device_t;
++	')
++
++	files_pid_filetrans($1,fixed_disk_device_t,blk_file)
++')
++
++########################################
++## <summary>
+ ##	Relabel fixed disk device nodes.
+ ## </summary>
+ ## <param name="domain">
+--- a/policy/modules/kernel/corenetwork.if.in
++++ b/policy/modules/kernel/corenetwork.if.in
+@@ -2145,7 +2145,7 @@
+ ## </param>
+ #
+ interface(`corenet_non_ipsec_sendrecv',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
+ 	corenet_all_recvfrom_unlabeled($1)
+ ')
+ 
+@@ -2173,7 +2173,7 @@
+ ## </param>
+ #
+ interface(`corenet_dontaudit_non_ipsec_sendrecv',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
+ 	corenet_dontaudit_all_recvfrom_unlabeled($1)
+ ')
+ 
+@@ -2188,7 +2188,7 @@
+ ## </param>
+ #
+ interface(`corenet_tcp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
+ 	corenet_tcp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2243,7 +2243,7 @@
+ ## </param>
+ #
+ interface(`corenet_dontaudit_tcp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
+ 	corenet_dontaudit_tcp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2299,7 +2299,7 @@
+ ## </param>
+ #
+ interface(`corenet_udp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
+ 	corenet_udp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2354,7 +2354,7 @@
+ ## </param>
+ #
+ interface(`corenet_dontaudit_udp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
+ 	corenet_dontaudit_udp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2410,7 +2410,7 @@
+ ## </param>
+ #
+ interface(`corenet_raw_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
+ 	corenet_raw_recvfrom_netlabel($1)
+ ')
+ 
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -140,7 +140,7 @@
+ interface(`dev_relabel_all_dev_nodes',`
+ 	gen_require(`
+ 		attribute device_node;
+-		type device_t;
++		type device_t, tmpfs_t;
+ 	')
+ 
+ 	relabelfrom_dirs_pattern($1, device_t, device_node)
+@@ -150,6 +150,7 @@
+ 	relabelfrom_sock_files_pattern($1, device_t, device_node)
+ 	relabel_blk_files_pattern($1, device_t, { device_t device_node })
+ 	relabel_chr_files_pattern($1, device_t, { device_t device_node })
++	allow $1 tmpfs_t:chr_file { read write };
+ ')
+ 
+ ########################################
+@@ -787,6 +788,26 @@
+ 
+ ########################################
+ ## <summary>
++##	Create FIFO pipes in device directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dev_create_generic_pipes',`
++	gen_require(`
++		type device_t;
++	')
++       allow $1 device_t:dir add_entry_dir_perms;
++       allow $1 device_t:fifo_file { getattr create };
++       allow $1 device_t:dir search_dir_perms;
++       allow $1 device_t:file setattr_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Create, delete, read, and write symbolic links in device directories.
+ ## </summary>
+ ## <param name="domain">
+@@ -2882,7 +2903,7 @@
+ ## </param>
+ #
+ interface(`dev_read_mtrr',`
+-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
++	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
+ 	dev_rw_mtrr($1)
+ ')
+ 
+@@ -2911,7 +2932,7 @@
+ ## </param>
+ #
+ interface(`dev_write_mtrr',`
+-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
++	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
+ 	dev_rw_mtrr($1)
+ ')
+ 
+@@ -4550,7 +4571,7 @@
+ 
+ ########################################
+ ## <summary>
+-##	Write to watchdog devices.
++##	Read/Write watchdog devices.
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -4558,12 +4579,12 @@
+ ##	</summary>
+ ## </param>
+ #
+-interface(`dev_write_watchdog',`
++interface(`dev_rw_watchdog',`
+ 	gen_require(`
+ 		type device_t, watchdog_device_t;
+ 	')
+ 
+-	write_chr_files_pattern($1, device_t, watchdog_device_t)
++	rw_chr_files_pattern($1, device_t, watchdog_device_t)
+ ')
+ 
+ ########################################
+--- a/policy/modules/kernel/terminal.if
++++ b/policy/modules/kernel/terminal.if
+@@ -909,7 +909,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_getattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
+ 	term_getattr_all_ptys($1)
+ ')
+ 
+@@ -926,7 +926,7 @@
+ ## </param>
+ #
+ interface(`term_dontaudit_getattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
+ 	term_dontaudit_getattr_all_ptys($1)
+ ')
+ 
+@@ -943,7 +943,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_setattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
+ 	term_setattr_all_ptys($1)
+ ')
+ 
+@@ -958,7 +958,7 @@
+ ## </param>
+ #
+ interface(`term_relabelto_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
+ 	term_relabelto_all_ptys($1)
+ ')
+ 
+@@ -973,7 +973,7 @@
+ ## </param>
+ #
+ interface(`term_write_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_write_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_write_all_ptys() instead.')
+ 	term_write_all_ptys($1)
+ ')
+ 
+@@ -989,7 +989,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_use_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_use_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_use_all_ptys() instead.')
+ 	term_use_all_ptys($1)
+ ')
+ 
+@@ -1005,7 +1005,7 @@
+ ## </param>
+ #
+ interface(`term_dontaudit_use_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
+ 	term_dontaudit_use_all_ptys($1)
+ ')
+ 
+@@ -1021,7 +1021,7 @@
+ ## </param>
+ #
+ interface(`term_relabel_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
+ 	term_relabel_all_ptys($1)
+ ')
+ 
+@@ -1393,7 +1393,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_getattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_getattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_getattr_all_ttys() instead.')
+ 	term_getattr_all_ttys($1)
+ ')
+ 
+@@ -1410,7 +1410,7 @@
+ ## </param>
+ #
+ interface(`term_dontaudit_getattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
+ 	term_dontaudit_getattr_all_ttys($1)
+ ')
+ 
+@@ -1427,7 +1427,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_setattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_setattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_setattr_all_ttys() instead.')
+ 	term_setattr_all_ttys($1)
+ ')
+ 
+@@ -1443,7 +1443,7 @@
+ ## </param>
+ #
+ interface(`term_relabel_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_relabel_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_relabel_all_ttys() instead.')
+ 	term_relabel_all_ttys($1)
+ ')
+ 
+@@ -1458,7 +1458,7 @@
+ ## </param>
+ #
+ interface(`term_write_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_write_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_write_all_ttys() instead.')
+ 	term_write_all_ttys($1)
+ ')
+ 
+@@ -1474,7 +1474,7 @@
+ ## <rolecap/>
+ #
+ interface(`term_use_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_use_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_use_all_ttys() instead.')
+ 	term_use_all_ttys($1)
+ ')
+ 
+@@ -1490,6 +1490,6 @@
+ ## </param>
+ #
+ interface(`term_dontaudit_use_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
+ 	term_dontaudit_use_all_ttys($1)
+ ')
+--- a/policy/modules/kernel/corenetwork.te.in
++++ b/policy/modules/kernel/corenetwork.te.in
+@@ -100,6 +100,7 @@
+ network_port(dict, tcp,2628,s0)
+ network_port(distccd, tcp,3632,s0)
+ network_port(dns, udp,53,s0, tcp,53,s0)
++network_port(epmd, tcp,4369,s0)
+ network_port(epmap, tcp,135,s0, udp,135,s0)
+ network_port(fingerd, tcp,79,s0)
+ network_port(ftp, tcp,21,s0, tcp,990,s0, udp,990,s0)
+@@ -118,7 +119,7 @@
+ network_port(http_cache, udp,3130,s0, tcp,8080,s0, tcp,8118,s0, tcp,10001-10010,s0) # 8118 is for privoxy
+ network_port(i18n_input, tcp,9010,s0)
+ network_port(imaze, tcp,5323,s0, udp,5323,s0)
+-network_port(inetd_child, tcp,1,s0, udp,1,s0, tcp,7,s0, udp,7,s0, tcp,9,s0, udp,9,s0, tcp,13,s0, udp,13,s0, tcp,19,s0, udp,19,s0, tcp,37,s0, udp,37,s0, tcp,512,s0, tcp,543,s0, tcp,544,s0, tcp,891,s0, udp,891,s0, tcp,892,s0, udp,892,s0, tcp,2105,s0, tcp,5666,s0)
++network_port(inetd_child, tcp,1,s0, udp,1,s0, tcp,7,s0, udp,7,s0, tcp,9,s0, udp,9,s0, tcp,13,s0, udp,13,s0, tcp,19,s0, udp,19,s0, tcp,37,s0, udp,37,s0, tcp,512,s0, tcp,543,s0, tcp,544,s0, tcp,891,s0, udp,891,s0, tcp,892,s0, udp,892,s0, tcp,2105,s0)
+ network_port(innd, tcp,119,s0)
+ network_port(ipmi, udp,623,s0, udp,664,s0)
+ network_port(ipp, tcp,631,s0, udp,631,s0, tcp,8610-8614,s0, udp,8610-8614,s0)
+@@ -155,6 +156,7 @@
+ network_port(nmbd, udp,137,s0, udp,138,s0)
+ network_port(ntop, tcp,3000-3001,s0, udp,3000-3001,s0)
+ network_port(ntp, udp,123,s0)
++network_port(nrpe, tcp,5666,s0)
+ network_port(oracledb, tcp, 1521,s0,udp, 1521,s0, tcp,2483,s0,udp,2483,s0, tcp,2484,s0, udp,2484,s0)
+ network_port(ocsp, tcp,9080,s0)
+ network_port(openvpn, tcp,1194,s0, udp,1194,s0)
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -299,7 +299,7 @@
+ ## </param>
+ #
+ interface(`kernel_tcp_recvfrom',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -313,7 +313,7 @@
+ ## </param>
+ #
+ interface(`kernel_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -327,7 +327,7 @@
+ ## </param>
+ #
+ interface(`kernel_udp_recvfrom',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+--- a/policy/modules/apps/mozilla.fc
++++ b/policy/modules/apps/mozilla.fc
+@@ -3,6 +3,7 @@
+ HOME_DIR/\.mozilla(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.netscape(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.phoenix(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/\.config/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+ 
+ #
+ # /bin
+@@ -14,6 +15,9 @@
+ /usr/bin/epiphany		--	gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/bin/mozilla-[0-9].*	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/bin/mozilla-bin-[0-9].*	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
++ifdef(`distro_debian', `
++/usr/lib/iceweasel/iceweasel	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
++')
+ 
+ #
+ # /lib
+@@ -27,3 +31,6 @@
+ /usr/lib(64)?/[^/]*firefox[^/]*/firefox-bin -- gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/lib/[^/]*firefox[^/]*/firefox --	gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/lib64/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:mozilla_exec_t,s0)
++/usr/lib/chromium(-browser)?/chromium(-browser)?-sandbox -- gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
++/usr/lib/chromium(-browser)?/chromium(-browser)? -- gen_context(system_u:object_r:chrome_browser_exec_t,s0)
++/usr/lib/xulrunner-1.9.1/xulrunner-stub -- gen_context(system_u:object_r:mozilla_exec_t,s0)
+--- a/policy/modules/apps/mozilla.te
++++ b/policy/modules/apps/mozilla.te
+@@ -19,6 +19,46 @@
+ application_domain(mozilla_t, mozilla_exec_t)
+ ubac_constrained(mozilla_t)
+ 
++type chrome_sandbox_t;
++type chrome_sandbox_exec_t;
++type chrome_browser_exec_t;
++application_domain(mozilla_t, chrome_browser_exec_t)
++domain_auto_trans(chrome_sandbox_t, chrome_browser_exec_t, mozilla_t)
++application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
++ubac_constrained(chrome_sandbox_t)
++fs_getattr_xattr_fs(chrome_sandbox_t)
++fs_getattr_xattr_fs(mozilla_t)
++
++allow chrome_sandbox_t mozilla_t:dir list_dir_perms;
++allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
++allow chrome_sandbox_t mozilla_t:file read_file_perms;
++allow chrome_sandbox_t mozilla_t:lnk_file read_lnk_file_perms;
++allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
++allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
++allow chrome_sandbox_t mozilla_t:fd use;
++allow chrome_sandbox_t mozilla_t:file write;
++allow chrome_sandbox_t proc_t:dir read;
++allow chrome_sandbox_t self:process setrlimit;
++type chrome_sandbox_tmp_t;
++files_tmp_file(chrome_sandbox_tmp_t)
++ubac_constrained(chrome_sandbox_tmp_t)
++files_tmp_filetrans(chrome_sandbox_t, chrome_sandbox_tmp_t, { file dir })
++allow chrome_sandbox_t chrome_sandbox_tmp_t:dir manage_dir_perms;
++allow mozilla_t self:unix_dgram_socket sendto;
++allow mozilla_t chrome_browser_exec_t:file execute_no_trans;
++# for V8
++allow mozilla_t self:process execmem;
++
++
++allow mozilla_t chrome_sandbox_t:shm { write unix_read getattr unix_write associate read };
++allow mozilla_t chrome_sandbox_t:unix_dgram_socket { read write };
++
++
++ifdef(`distro_debian', `
++# bug in chromium
++allow mozilla_t chrome_browser_exec_t:file execmod;
++')
++
+ type mozilla_conf_t;
+ files_config_file(mozilla_conf_t)
+ 
+@@ -55,6 +95,19 @@
+ # Local policy
+ #
+ 
++dontaudit chrome_sandbox_t domain:dir getattr;
++application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
++domain_auto_trans(mozilla_t, chrome_sandbox_exec_t, chrome_sandbox_t)
++allow mozilla_t mozilla_home_t:sock_file manage_sock_file_perms;
++allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
++allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
++allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
++allow chrome_sandbox_t self:capability { chown dac_override fsetid setgid setuid net_raw net_raw sys_chroot sys_ptrace sys_admin };
++allow chrome_sandbox_t mozilla_t:process { share sigchld };
++allow mozilla_t chrome_sandbox_t:fd use;
++allow mozilla_t chrome_sandbox_t:unix_stream_socket { read write };
++dev_read_sysfs(mozilla_t)
++
+ allow mozilla_t self:capability { sys_nice setgid setuid };
+ allow mozilla_t self:process { sigkill signal setsched getsched setrlimit };
+ allow mozilla_t self:fifo_file rw_fifo_file_perms;
+@@ -73,7 +126,7 @@
+ manage_dirs_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+ manage_files_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+ manage_lnk_files_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+-userdom_search_user_home_dirs(mozilla_t)
++userdom_search_user_home_content(mozilla_t)
+ userdom_user_home_dir_filetrans(mozilla_t, mozilla_home_t, dir)
+ 
+ # Mozpluggerrc
+@@ -81,6 +134,8 @@
+ 
+ manage_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
+ manage_dirs_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
++manage_lnk_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
++manage_sock_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
+ files_tmp_filetrans(mozilla_t, mozilla_tmp_t, { file dir })
+ 
+ manage_files_pattern(mozilla_t, mozilla_tmpfs_t, mozilla_tmpfs_t)
+--- a/policy/modules/apps/webalizer.te
++++ b/policy/modules/apps/webalizer.te
+@@ -13,17 +13,13 @@
+ type webalizer_etc_t;
+ files_config_file(webalizer_etc_t)
+ 
+-type webalizer_usage_t;
+-files_type(webalizer_usage_t)
+-
+ type webalizer_tmp_t;
+ files_tmp_file(webalizer_tmp_t)
+ 
+ type webalizer_var_lib_t;
+ files_type(webalizer_var_lib_t)
+ 
+-type webalizer_write_t;
+-files_type(webalizer_write_t)
++typealias webalizer_var_lib_t alias { webalizer_write_t webalizer_usage_t };
+ 
+ ########################################
+ #
+@@ -71,6 +67,7 @@
+ 
+ files_read_etc_files(webalizer_t)
+ files_read_etc_runtime_files(webalizer_t)
++files_read_usr_files(webalizer_t)
+ 
+ logging_list_logs(webalizer_t)
+ logging_send_syslog_msg(webalizer_t)
+--- a/policy/modules/apps/mono.te
++++ b/policy/modules/apps/mono.te
+@@ -45,6 +45,7 @@
+ 	unconfined_domain(mono_t)
+ 	unconfined_dbus_chat(mono_t)
+ 	unconfined_dbus_connect(mono_t)
++	in_unconfined_r(mono_t)
+ ')
+ 
+ optional_policy(`
+--- a/policy/modules/apps/gitosis.fc
++++ b/policy/modules/apps/gitosis.fc
+@@ -1,5 +1,9 @@
+ /usr/bin/gitosis-serve			--	gen_context(system_u:object_r:gitosis_exec_t,s0)
+ /usr/bin/gl-auth-command		--	gen_context(system_u:object_r:gitosis_exec_t,s0)
+ 
++ifdef(`distro_debian', `
++/srv/lib/gitosis(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
++', `
+ /var/lib/gitosis(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
++')
+ /var/lib/gitolite(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
+--- a/policy/modules/apps/awstats.te
++++ b/policy/modules/apps/awstats.te
+@@ -17,6 +17,7 @@
+ type awstats_var_lib_t;
+ files_type(awstats_var_lib_t)
+ 
++apache_script_exec_domain(awstats)
+ apache_content_template(awstats)
+ 
+ ########################################
+--- a/policy/modules/apps/gpg.fc
++++ b/policy/modules/apps/gpg.fc
+@@ -1,6 +1,8 @@
+ HOME_DIR/\.gnupg(/.+)?		gen_context(system_u:object_r:gpg_secret_t,s0)
++HOME_DIR/\.gnupg/log-socket	gen_context(system_u:object_r:gpg_agent_tmp_t,s0)
+ 
+ /usr/bin/gpg(2)?	--	gen_context(system_u:object_r:gpg_exec_t,s0)
++/usr/bin/gpgsm		--	gen_context(system_u:object_r:gpg_exec_t,s0)
+ /usr/bin/gpg-agent	--	gen_context(system_u:object_r:gpg_agent_exec_t,s0)
+ /usr/bin/kgpg		--	gen_context(system_u:object_r:gpg_exec_t,s0)
+ /usr/bin/pinentry.*	--	gen_context(system_u:object_r:pinentry_exec_t,s0)
+--- a/policy/modules/apps/gpg.if
++++ b/policy/modules/apps/gpg.if
+@@ -22,6 +22,7 @@
+ 		type gpg_agent_tmp_t;
+ 		type gpg_helper_t, gpg_pinentry_t;
+ 		type gpg_pinentry_tmp_t;
++		type gpg_secret_t;
+ 	')
+ 
+ 	role $1 types { gpg_t gpg_agent_t gpg_helper_t gpg_pinentry_t };
+@@ -54,6 +55,8 @@
+ 	manage_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
+ 	relabel_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
+ 
++	allow $2 gpg_secret_t:dir list_dir_perms;
++
+ 	optional_policy(`
+ 		gpg_pinentry_dbus_chat($2)
+ 	')
+@@ -67,6 +70,49 @@
+ 	')
+ ')
+ 
++############################################################
++## <summary>
++##	Transition to gpg_agent_t from another domain
++##	Used for ssh_agent_t to launch the gpg agent for X logins
++## </summary>
++## <param name="domain">
++##	<summary>
++##	domain to run the gpg agent
++##	</summary>
++## </param>
++#
++interface(`run_gpg_agent',`
++	gen_require(`
++		type gpg_agent_t, gpg_agent_exec_t;
++	')
++	domtrans_pattern($1, gpg_agent_exec_t, gpg_agent_t)
++')
++
++########################################
++## <summary>
++##	Transition to a user domain from gpg_agent_t
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to transition to
++##	</summary>
++## </param>
++## <param name="file_type">
++##	<summary>
++##	Type of file for log data - usually a home type
++##	</summary>
++## </param>
++#
++interface(`gpg_agent_domtrans_user',`
++	gen_require(`
++		type gpg_agent_t, shell_exec_t, bin_t;
++	')
++	allow $1 gpg_agent_t:fd use;
++	allow gpg_agent_t $1:process signull;
++	allow gpg_agent_t $2:file { getattr append };
++	domain_auto_trans(gpg_agent_t, { shell_exec_t bin_t }, $1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Transition to a user gpg domain.
+--- a/policy/modules/apps/webalizer.fc
++++ b/policy/modules/apps/webalizer.fc
+@@ -3,6 +3,7 @@
+ # /usr
+ #
+ /usr/bin/webalizer	--	gen_context(system_u:object_r:webalizer_exec_t,s0)
++/usr/bin/awffull	--	gen_context(system_u:object_r:webalizer_exec_t,s0)
+ 
+ #
+ # /var
+--- a/policy/modules/apps/gpg.te
++++ b/policy/modules/apps/gpg.te
+@@ -53,6 +53,7 @@
+ typealias gpg_pinentry_t alias { auditadm_gpg_pinentry_t secadm_gpg_pinentry_t };
+ application_domain(gpg_pinentry_t, pinentry_exec_t)
+ ubac_constrained(gpg_pinentry_t)
++files_read_var_lib_files(gpg_pinentry_t)
+ 
+ type gpg_pinentry_tmp_t;
+ files_tmp_file(gpg_pinentry_tmp_t)
+@@ -222,6 +223,9 @@
+ manage_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
+ manage_sock_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
+ files_tmp_filetrans(gpg_agent_t, gpg_agent_tmp_t, { file sock_file dir })
++filetrans_pattern(gpg_agent_t, gpg_secret_t, gpg_agent_tmp_t, sock_file)
++files_read_etc_files(gpg_agent_t)
++kernel_read_crypto_sysctls(gpg_agent_t)
+ 
+ # allow gpg to connect to the gpg agent
+ stream_connect_pattern(gpg_t, gpg_agent_tmp_t, gpg_agent_tmp_t, gpg_agent_t)
+@@ -272,6 +276,10 @@
+ 	mozilla_dontaudit_rw_user_home_files(gpg_agent_t)
+ ')
+ 
++optional_policy(`
++	xdm_sigchld(gpg_agent_t)
++')
++
+ ##############################
+ #
+ # Pinentry local policy
+--- a/policy/modules/apps/mozilla.if
++++ b/policy/modules/apps/mozilla.if
+@@ -17,16 +17,16 @@
+ #
+ interface(`mozilla_role',`
+ 	gen_require(`
+-		type mozilla_t, mozilla_exec_t, mozilla_home_t;
++		type mozilla_t, chrome_sandbox_t, mozilla_exec_t, chrome_browser_exec_t, mozilla_home_t;
+ 	')
+ 
+-	role $1 types mozilla_t;
++	role $1 types { mozilla_t chrome_sandbox_t };
+ 
+-	domain_auto_trans($2, mozilla_exec_t, mozilla_t)
++	domain_auto_trans($2, { mozilla_exec_t chrome_browser_exec_t }, mozilla_t)
+ 	# Unrestricted inheritance from the caller.
+ 	allow $2 mozilla_t:process { noatsecure siginh rlimitinh };
+-	allow mozilla_t $2:fd use;
+-	allow mozilla_t $2:process { sigchld signull };
++	allow { mozilla_t chrome_sandbox_t } $2:fd use;
++	allow { mozilla_t chrome_sandbox_t } $2:process { sigchld signull };
+ 	allow mozilla_t $2:unix_stream_socket connectto;
+ 
+ 	# Allow the user domain to signal/ps.
+@@ -179,10 +179,10 @@
+ #
+ interface(`mozilla_domtrans',`
+ 	gen_require(`
+-		type mozilla_t, mozilla_exec_t;
++		type mozilla_t, mozilla_exec_t, chrome_browser_exec_t;
+ 	')
+ 
+-	domtrans_pattern($1, mozilla_exec_t, mozilla_t)
++	domtrans_pattern($1, { mozilla_exec_t chrome_browser_exec_t }, mozilla_t)
+ ')
+ 
+ ########################################
+--- a/policy/modules/admin/dpkg.te
++++ b/policy/modules/admin/dpkg.te
+@@ -51,8 +51,8 @@
+ # dpkg Local policy
+ #
+ 
+-allow dpkg_t self:capability { chown dac_override fowner fsetid setgid setuid kill sys_tty_config sys_nice sys_resource mknod linux_immutable };
+-allow dpkg_t self:process { setpgid fork getsched setfscreate };
++allow dpkg_t self:capability { chown dac_override fowner fsetid setgid setuid kill sys_tty_config sys_nice sys_resource mknod linux_immutable ipc_lock };
++allow dpkg_t self:process { setrlimit setpgid fork getsched setfscreate };
+ allow dpkg_t self:fd use;
+ allow dpkg_t self:fifo_file rw_fifo_file_perms;
+ allow dpkg_t self:unix_dgram_socket create_socket_perms;
+@@ -66,6 +66,16 @@
+ allow dpkg_t self:msgq create_msgq_perms;
+ allow dpkg_t self:msg { send receive };
+ 
++# This is for se_aptitude et al, so that maintainer scripts can talk back.
++apt_use_fds(dpkg_script_t)
++apt_rw_pipes(dpkg_script_t)
++
++# This is for the maintainer scripts
++init_use_script_fds(dpkg_script_t)
++
++# se_apt-get needs this to run dpkg-preconfigure
++init_use_script_ptys(dpkg_t)
++
+ allow dpkg_t dpkg_lock_t:file manage_file_perms;
+ 
+ manage_dirs_pattern(dpkg_t, dpkg_tmp_t, dpkg_tmp_t)
+@@ -140,6 +150,8 @@
+ # for installing kernel packages
+ storage_raw_read_fixed_disk(dpkg_t)
+ 
++term_list_ptys(dpkg_t)
++
+ auth_relabel_all_files_except_auth_files(dpkg_t)
+ auth_manage_all_files_except_auth_files(dpkg_t)
+ auth_dontaudit_read_shadow(dpkg_t)
+@@ -147,7 +159,6 @@
+ files_exec_etc_files(dpkg_t)
+ 
+ init_domtrans_script(dpkg_t)
+-init_use_script_ptys(dpkg_t)
+ 
+ libs_exec_ld_so(dpkg_t)
+ libs_exec_lib_files(dpkg_t)
+@@ -163,11 +174,15 @@
+ 
+ userdom_use_user_terminals(dpkg_t)
+ userdom_use_unpriv_users_fds(dpkg_t)
++allow userdomain dpkg_var_lib_t:dir list_dir_perms;
++allow userdomain dpkg_var_lib_t:file read_file_perms;
+ 
+ # transition to dpkg script:
+ dpkg_domtrans_script(dpkg_t)
+-# since the scripts aren't labeled correctly yet...
++# since the scripts are not labeled correctly yet...
+ allow dpkg_t dpkg_var_lib_t:file mmap_file_perms;
++# This is used for running config files for debconf interactions
++allow dpkg_t dpkg_tmp_t:file { execute execute_no_trans };
+ 
+ optional_policy(`
+ 	apt_use_ptys(dpkg_t)
+@@ -289,7 +304,6 @@
+ auth_manage_all_files_except_auth_files(dpkg_script_t)
+ 
+ init_domtrans_script(dpkg_script_t)
+-init_use_script_fds(dpkg_script_t)
+ 
+ libs_exec_ld_so(dpkg_script_t)
+ libs_exec_lib_files(dpkg_script_t)
+--- a/policy/modules/admin/vbetool.te
++++ b/policy/modules/admin/vbetool.te
+@@ -30,6 +30,7 @@
+ dev_rw_sysfs(vbetool_t)
+ dev_rw_xserver_misc(vbetool_t)
+ dev_rw_mtrr(vbetool_t)
++fs_list_inotifyfs(vbetool_t)
+ 
+ domain_mmap_low(vbetool_t)
+ 
+--- a/policy/modules/admin/tmpreaper.fc
++++ b/policy/modules/admin/tmpreaper.fc
+@@ -1,2 +1,6 @@
+ /usr/sbin/tmpreaper		--	gen_context(system_u:object_r:tmpreaper_exec_t,s0)
+ /usr/sbin/tmpwatch		--	gen_context(system_u:object_r:tmpreaper_exec_t,s0)
++ifdef(`distro_debian', `
++/etc/init\.d/mountall-bootclean.sh --	gen_context(system_u:object_r:tmpreaper_exec_t,s0)
++/etc/init\.d/mountnfs-bootclean.sh --	gen_context(system_u:object_r:tmpreaper_exec_t,s0)
++')
+--- a/policy/modules/admin/logrotate.te
++++ b/policy/modules/admin/logrotate.te
+@@ -103,9 +103,12 @@
+ files_manage_generic_spool_dirs(logrotate_t)
+ files_getattr_generic_locks(logrotate_t)
+ 
+-# cjp: why is this needed?
++# logrotate has to restart some daemons
+ init_domtrans_script(logrotate_t)
+ 
++# for runlevel
++init_dontaudit_write_utmp(logrotate_t)
++
+ logging_manage_all_logs(logrotate_t)
+ logging_send_syslog_msg(logrotate_t)
+ logging_send_audit_msgs(logrotate_t)
+@@ -122,7 +125,7 @@
+ 
+ cron_system_entry(logrotate_t, logrotate_exec_t)
+ cron_search_spool(logrotate_t)
+-
++ 
+ mta_send_mail(logrotate_t)
+ 
+ ifdef(`distro_debian', `
+@@ -142,6 +145,10 @@
+ ')
+ 
+ optional_policy(`
++	unconfined_dontaudit_search_home_dirs(logrotate_t)
++')
++
++optional_policy(`
+ 	acct_domtrans(logrotate_t)
+ 	acct_manage_data(logrotate_t)
+ 	acct_exec_data(logrotate_t)
+@@ -162,6 +169,10 @@
+ ')
+ 
+ optional_policy(`
++	webalizer_domtrans(logrotate_t)
++')
++
++optional_policy(`
+ 	consoletype_exec(logrotate_t)
+ ')
+ 
+--- a/policy/modules/admin/alsa.fc
++++ b/policy/modules/admin/alsa.fc
+@@ -2,10 +2,16 @@
+ 
+ /bin/alsaunmute		--	gen_context(system_u:object_r:alsa_exec_t,s0)
+ 
+-/etc/alsa/asound\.state --	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
+-/etc/alsa/pcm(/.*)?		gen_context(system_u:object_r:alsa_etc_rw_t,s0)
+-/etc/asound(/.*)?		gen_context(system_u:object_r:alsa_etc_rw_t,s0)
+-/etc/asound\.state	--	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++/etc/alsa/pcm(/.*)?	        gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++/etc/asound(/.*)?               gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++ifdef(`distro_debian', `
++/var/lib/alsa/asound\.state --	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++/usr/share/alsa/alsa\.conf      gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++/usr/share/alsa/pcm(/.*)?       gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++', `
++/etc/alsa/asound\.state --      gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++/etc/asound\.state      --       gen_context(system_u:object_r:alsa_etc_rw_t,s0)
++')
+ 
+ /sbin/alsactl 		--	gen_context(system_u:object_r:alsa_exec_t,s0)
+ /sbin/salsa 		--	gen_context(system_u:object_r:alsa_exec_t,s0)
+--- a/policy/modules/admin/apt.te
++++ b/policy/modules/admin/apt.te
+@@ -142,6 +142,10 @@
+ #')
+ 
+ optional_policy(`
++	pythonsupport_domtrans(apt_t)
++')
++
++optional_policy(`
+ 	# dpkg interaction
+ 	dpkg_read_db(apt_t)
+ 	dpkg_domtrans(apt_t)
+--- a/policy/modules/admin/logrotate.if
++++ b/policy/modules/admin/logrotate.if
+@@ -84,6 +84,24 @@
+ 
+ ########################################
+ ## <summary>
++##	Search logrotate runtime directries
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logrotate_search_varlib',`
++	gen_require(`
++		type logrotate_var_lib_t;
++	')
++
++	allow $1 logrotate_var_lib_t:dir search;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to inherit logrotate file descriptors.
+ ## </summary>
+ ## <param name="domain">
+--- a/policy/modules/admin/quota.te
++++ b/policy/modules/admin/quota.te
+@@ -20,6 +20,7 @@
+ # Local policy
+ #
+ 
++kernel_request_load_module(quota_t)
+ allow quota_t self:capability { sys_admin dac_override };
+ dontaudit quota_t self:capability sys_tty_config;
+ allow quota_t self:process signal_perms;
+--- a/policy/modules/admin/apt.fc
++++ b/policy/modules/admin/apt.fc
+@@ -15,7 +15,7 @@
+ # aptitude lock
+ /var/lock/aptitude			gen_context(system_u:object_r:apt_lock_t,s0)
+ # aptitude log
+-/var/log/aptitude			gen_context(system_u:object_r:apt_var_log_t,s0)
++/var/log/aptitude.*			gen_context(system_u:object_r:apt_var_log_t,s0)
+ 
+ # dpkg terminal log
+ /var/log/apt(/.*)?			gen_context(system_u:object_r:apt_var_log_t,s0)
+--- a/policy/modules/admin/sudo.if
++++ b/policy/modules/admin/sudo.if
+@@ -177,3 +177,29 @@
+ 
+ 	allow $1 sudodomain:process sigchld;
+ ')
++
++#######################################
++## <summary>
++##	Execute sudo_exec_t without a domain transition
++## </summary>
++## <desc>
++##	<p>
++##	This interface allows a domain to execute sudo_exec_t without a
++##	domain transition.  It is for daemons that already have setuid
++##	access but are running as uid != 0.
++##	</p>
++## </desc>
++## <param name="domain">
++##	<summary>
++##	The domain that can execute sudo.
++##	</summary>
++## </param>
++#
++template(`can_exec_sudo',`
++
++	gen_require(`
++		type sudo_exec_t;
++	')
++
++	can_exec($1, sudo_exec_t)
++')
+--- a/policy/modules/admin/certwatch.if
++++ b/policy/modules/admin/certwatch.if
+@@ -48,31 +48,3 @@
+ 	role $2 types certwatch_t;
+ ')
+ 
+-########################################
+-## <summary>
+-##	Execute certwatch in the certwatch domain, and
+-##	allow the specified role the certwatch domain,
+-##	and use the caller's terminal. Has a sigchld
+-##	backchannel.  (Deprecated)
+-## </summary>
+-## <param name="domain">
+-##	<summary>
+-##	Domain allowed to transition.
+-##	</summary>
+-## </param>
+-## <param name="role">
+-##	<summary>
+-##	Role allowed access.
+-##	</summary>
+-## </param>
+-## <param name="terminal">
+-##	<summary>
+-##	The type of the terminal allow the certwatch domain to use.
+-##	</summary>
+-## </param>
+-## <rolecap/>
+-#
+-interface(`certwatach_run',`
+-	refpolicywarn(`$0($*) has been deprecated, please use certwatch_run() instead.')
+-	certwatch_run($*)
+-')
+--- a/policy/modules/admin/tmpreaper.te
++++ b/policy/modules/admin/tmpreaper.te
+@@ -30,8 +30,7 @@
+ files_getattr_all_dirs(tmpreaper_t)
+ files_getattr_all_files(tmpreaper_t)
+ 
+-mls_file_read_all_levels(tmpreaper_t)
+-mls_file_write_all_levels(tmpreaper_t)
++mcs_file_delete_all(tmpreaper_t)
+ 
+ logging_send_syslog_msg(tmpreaper_t)
+ 
+@@ -39,6 +38,7 @@
+ miscfiles_delete_man_pages(tmpreaper_t)
+ 
+ cron_system_entry(tmpreaper_t, tmpreaper_exec_t)
++init_system_domain(tmpreaper_t, tmpreaper_exec_t)
+ 
+ ifdef(`distro_redhat',`
+ 	userdom_list_user_home_content(tmpreaper_t)
+--- a/config/appconfig-mcs/seusers
++++ b/config/appconfig-mcs/seusers
+@@ -1,3 +1,3 @@
+ system_u:system_u:s0-mcs_systemhigh
+-root:root:s0-mcs_systemhigh
+-__default__:user_u:s0
++root:unconfined_u:s0-mcs_systemhigh
++__default__:unconfined_u:s0-mcs_systemhigh

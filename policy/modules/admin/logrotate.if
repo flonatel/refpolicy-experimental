@@ -84,24 +84,6 @@ interface(`logrotate_use_fds',`
 
 ########################################
 ## <summary>
-##	Search logrotate runtime directries
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`logrotate_search_varlib',`
-	gen_require(`
-		type logrotate_var_lib_t;
-	')
-
-	allow $1 logrotate_var_lib_t:dir search;
-')
-
-########################################
-## <summary>
 ##	Do not audit attempts to inherit logrotate file descriptors.
 ## </summary>
 ## <param name="domain">

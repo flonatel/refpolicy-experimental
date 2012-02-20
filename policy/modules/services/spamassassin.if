@@ -225,23 +225,3 @@ interface(`spamassassin_dontaudit_getattr_spamd_tmp_sockets',`
 
 	dontaudit $1 spamd_tmp_t:sock_file getattr;
 ')
-
-########################################
-## <summary>
-##	Connect to spamd via unix socket
-## </summary>
-## <param name="domain">
-##      <summary>
-##	Domain to connect
-##      </summary>
-## </param>
-#
-interface(`spamassassin_connect_unix_sock',`
-	gen_require(`
-		type spamd_t, spamd_var_run_t;
-	')
-
-	allow $1 spamd_var_run_t:dir search_dir_perms;
-	allow $1 spamd_var_run_t:sock_file write;
-	allow $1 spamd_t:unix_stream_socket connectto;
-')

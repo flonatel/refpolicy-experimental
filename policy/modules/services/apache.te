@@ -215,7 +215,6 @@ type httpd_suexec_tmp_t;
 files_tmp_file(httpd_suexec_tmp_t)
 
 # setup the system domain for system CGI scripts
-apache_script_exec_domain(sys)
 apache_content_template(sys)
 typealias httpd_sys_content_t alias ntop_http_content_t;
 
@@ -225,7 +224,6 @@ files_tmp_file(httpd_tmp_t)
 type httpd_tmpfs_t;
 files_tmpfs_file(httpd_tmpfs_t)
 
-apache_script_exec_domain(user)
 apache_content_template(user)
 ubac_constrained(httpd_user_script_t)
 userdom_user_home_content(httpd_user_content_t)
@@ -471,14 +469,6 @@ tunable_policy(`httpd_enable_ftp_server',`
 tunable_policy(`httpd_enable_homedirs',`
 	userdom_read_user_home_content_files(httpd_t)
 ')
-optional_policy(`
-	gen_require(`
-		bool daemon_access_unconfined_home;
-	')
-	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
-			unconfined_read_home_content_files(httpd_t)
-	')
-')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`
 	fs_read_nfs_files(httpd_t)
@@ -527,10 +517,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-# for cron jobs to restart Apache
 	cron_system_entry(httpd_t, httpd_exec_t)
-# For cron jobs to run from accounts with home directories in the web store
-	crond_search_dir(httpd_sys_content_t)
 ')
 
 optional_policy(`
@@ -555,11 +542,8 @@ optional_policy(`
 	')
 ')
 
-	kerberos_keytab_template(httpd, httpd_t)
-
 optional_policy(`
-        # read munin files
-        munin_search_lib(httpd_t)
+	kerberos_keytab_template(httpd, httpd_t)
 ')
 
 optional_policy(`
@@ -755,14 +739,6 @@ tunable_policy(`httpd_can_network_connect',`
 	corenet_tcp_connect_all_ports(httpd_suexec_t)
 	corenet_sendrecv_all_client_packets(httpd_suexec_t)
 ')
-optional_policy(`
-	gen_require(`
-		bool daemon_access_unconfined_home;
-	')
-	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
-			unconfined_read_home_content_files(httpd_suexec_t)
-	')
-')
 
 tunable_policy(`httpd_enable_cgi && httpd_unified',`
 	allow httpd_sys_script_t httpdcontent:file entrypoint;
@@ -847,14 +823,6 @@ tunable_policy(`httpd_enable_cgi && httpd_can_network_connect',`
 
 tunable_policy(`httpd_enable_homedirs',`
 	userdom_read_user_home_content_files(httpd_sys_script_t)
-')
-optional_policy(`
-	gen_require(`
-		bool daemon_access_unconfined_home;
-	')
-	tunable_policy(`httpd_enable_homedirs && daemon_access_unconfined_home', `
-			unconfined_read_home_content_files(httpd_sys_script_t)
-	')
 ')
 
 tunable_policy(`httpd_enable_homedirs && use_nfs_home_dirs',`

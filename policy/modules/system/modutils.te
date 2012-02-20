@@ -20,8 +20,6 @@ application_domain(insmod_t, insmod_exec_t)
 mls_file_write_all_levels(insmod_t)
 role system_r types insmod_t;
 
-kernel_request_load_module(insmod_t)
-
 # module loading config
 type modules_conf_t;
 files_type(modules_conf_t)
@@ -77,12 +75,6 @@ userdom_use_user_terminals(depmod_t)
 files_list_home(depmod_t)
 userdom_read_user_home_content_files(depmod_t)
 
-ifdef(`distro_debian',`
-	optional_policy(`
-		unconfined_run_to(depmod_t, depmod_exec_t)
-	')
-')
-
 ifdef(`distro_ubuntu',`
 	optional_policy(`
 		unconfined_domain(depmod_t)
@@ -112,14 +104,11 @@ optional_policy(`
 # insmod local policy
 #
 
-allow insmod_t self:capability { dac_override net_raw sys_admin sys_nice sys_tty_config };
+allow insmod_t self:capability { dac_override net_raw sys_nice sys_tty_config };
 allow insmod_t self:process { execmem sigchld sigkill sigstop signull signal };
 
 allow insmod_t self:udp_socket create_socket_perms;
 allow insmod_t self:rawip_socket create_socket_perms;
-fs_mount_rpc_pipefs(insmod_t)
-fs_list_rpc(insmod_t)
-term_read_console(insmod_t)
 
 # Read module config and dependency information
 list_dirs_pattern(insmod_t, modules_conf_t, modules_conf_t)

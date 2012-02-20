@@ -544,7 +544,6 @@ interface(`selinux_validate_context',`
 
 	allow $1 security_t:dir list_dir_perms;
 	allow $1 security_t:file rw_file_perms;
-	allow $1 security_t:filesystem getattr;
 	allow $1 security_t:security check_context;
 ')
 

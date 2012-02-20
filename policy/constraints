@@ -28,7 +28,7 @@
 define(`basic_ubac_conditions',`
 	ifdef(`enable_ubac',`
 		u1 == u2
-		or u1 == system_u or u1 == unconfined_u
+		or u1 == system_u
 		or u2 == system_u
 		or t1 != ubac_constrained_type
 		or t2 != ubac_constrained_type

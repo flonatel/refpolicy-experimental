@@ -177,7 +177,6 @@ tunable_policy(`squid_use_tproxy',`
 	corenet_tcp_bind_netport_port(squid_t)
 ')
 
-apache_script_exec_domain(squid)
 optional_policy(`
 	apache_content_template(squid)
 

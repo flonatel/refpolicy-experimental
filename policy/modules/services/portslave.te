@@ -13,9 +13,6 @@ init_daemon_domain(portslave_t, portslave_exec_t)
 type portslave_etc_t;
 files_config_file(portslave_etc_t)
 
-# for filters
-can_exec(portslave_t, { portslave_etc_t portslave_exec_t })
-
 type portslave_lock_t;
 files_lock_file(portslave_lock_t)
 
@@ -65,10 +62,8 @@ corenet_tcp_sendrecv_generic_node(portslave_t)
 corenet_udp_sendrecv_generic_node(portslave_t)
 corenet_tcp_sendrecv_all_ports(portslave_t)
 corenet_udp_sendrecv_all_ports(portslave_t)
-corenet_udp_bind_all_nodes(portslave_t)
 corenet_rw_ppp_dev(portslave_t)
 
-miscfiles_read_localization(portslave_t)
 dev_read_sysfs(portslave_t)
 # for ssh
 dev_read_urand(portslave_t)
@@ -107,7 +102,6 @@ mta_send_mail(portslave_t)
 # instead of exec.
 ppp_read_rw_config(portslave_t)
 ppp_exec(portslave_t)
-ppp_script_exec(portslave_t)
 ppp_read_secrets(portslave_t)
 ppp_manage_pid_files(portslave_t)
 ppp_pid_filetrans(portslave_t)

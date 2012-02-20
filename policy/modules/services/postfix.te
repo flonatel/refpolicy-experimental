@@ -26,9 +26,6 @@ application_executable_file(postfix_exec_t)
 postfix_server_domain_template(local)
 mta_mailserver_delivery(postfix_local_t)
 
-# allow postfix_local_t to run programs like vacation that send mail
-mta_sendmail_domtrans(postfix_local_t, postfix_postdrop_t)
-
 # Program for creating database files
 type postfix_map_t;
 type postfix_map_exec_t;
@@ -186,10 +183,8 @@ mta_getattr_spool(postfix_master_t)
 ifdef(`distro_redhat',`
 	# for newer main.cf that uses /etc/aliases
 	mta_manage_aliases(postfix_master_t)
+	mta_etc_filetrans_aliases(postfix_master_t)
 ')
-
-mta_etc_filetrans_aliases(postfix_master_t)
-allow postfix_master_t etc_aliases_t:file manage_file_perms;
 
 optional_policy(`
 	cyrus_stream_connect(postfix_master_t)
@@ -206,8 +201,6 @@ optional_policy(`
 
 optional_policy(`
 	mysql_stream_connect(postfix_master_t)
-	mysql_stream_connect(postfix_smtpd_t)
-	mysql_stream_connect(postfix_cleanup_t)
 ')
 
 optional_policy(`
@@ -238,11 +231,6 @@ manage_dirs_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_boun
 manage_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
 manage_lnk_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
 
-# for milters - may be a bug in postfix
-allow postfix_cleanup_t postfix_smtpd_t:fd use;
-allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write shutdown };
-allow postfix_cleanup_t postfix_smtpd_t:tcp_socket { read write getattr getopt };
-
 ########################################
 #
 # Postfix cleanup local policy
@@ -252,7 +240,6 @@ allow postfix_cleanup_t self:process setrlimit;
 
 # connect to master process
 stream_connect_pattern(postfix_cleanup_t, postfix_private_t, postfix_private_t, postfix_master_t)
-write_sock_files_pattern(postfix_virtual_t,postfix_private_t,postfix_private_t)
 
 rw_fifo_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
 write_sock_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
@@ -286,9 +273,6 @@ stream_connect_pattern(postfix_local_t, postfix_public_t, postfix_public_t, post
 # for .forward - maybe we need a new type for it?
 rw_sock_files_pattern(postfix_local_t, postfix_private_t, postfix_private_t)
 
-# so it can write to the lock file
-mta_rw_spool(postfix_local_t)
-
 allow postfix_local_t postfix_spool_t:file rw_file_perms;
 
 corecmd_exec_shell(postfix_local_t)
@@ -320,7 +304,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	lda_domtrans(postfix_local_t)
+	procmail_domtrans(postfix_local_t)
 ')
 
 ########################################
@@ -421,14 +405,8 @@ optional_policy(`
 	dovecot_domtrans_deliver(postfix_pipe_t)
 ')
 
-corecmd_exec_bin(postfix_pipe_t)
-
 optional_policy(`
 	procmail_domtrans(postfix_pipe_t)
-')
-
-optional_policy(`
-	lda_domtrans(postfix_pipe_t)
 ')
 
 optional_policy(`
@@ -587,7 +565,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	milter_stream_connect_all(postfix_smtpd_t)
+	milter_stream_connect_all(postfix_smtp_t)
 ')
 
 ########################################
@@ -625,15 +603,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	clamav_stream_connect(postfix_smtpd_t)
-')
-
-optional_policy(`
-	dkim_stream_connect(postfix_smtpd_t)
-	dkim_stream_connect(postfix_cleanup_t)
-')
-
-optional_policy(`
 	sasl_connect(postfix_smtpd_t)
 ')
 
@@ -661,8 +630,3 @@ mta_delete_spool(postfix_virtual_t)
 # For reading spamassasin
 mta_read_config(postfix_virtual_t)
 mta_manage_spool(postfix_virtual_t)
-
-# for talking to spamass-milter
-optional_policy(`
-	spamassassin_connect_unix_sock(postfix_smtpd_t)
-')

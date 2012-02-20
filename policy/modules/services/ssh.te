@@ -44,11 +44,6 @@ ifdef(`enable_mcs',`
 	init_ranged_daemon_domain(sshd_t, sshd_exec_t, s0 - mcs_systemhigh)
 ')
 
-ifdef(`distro_debian', `
-# for key blacklist related to openssl bug
-	allow sshd_t usr_t:file read_file_perms;
-')
-
 type ssh_t;
 type ssh_exec_t;
 typealias ssh_t alias { user_ssh_t staff_ssh_t sysadm_ssh_t };
@@ -243,8 +238,6 @@ manage_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
 manage_sock_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
 files_tmp_filetrans(sshd_t, sshd_tmp_t, { dir file sock_file })
 
-allow sshd_t self:process { getcap setcap };
-
 kernel_search_key(sshd_t)
 kernel_link_key(sshd_t)
 
@@ -296,10 +289,6 @@ optional_policy(`
 
 optional_policy(`
 	xserver_domtrans_xauth(sshd_t)
-')
-
-optional_policy(`
-	gitosis_read_lib_files(sshd_t)
 ')
 
 ifdef(`TODO',`

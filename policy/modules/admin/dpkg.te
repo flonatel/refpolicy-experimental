@@ -51,8 +51,8 @@ files_tmpfs_file(dpkg_script_tmpfs_t)
 # dpkg Local policy
 #
 
-allow dpkg_t self:capability { chown dac_override fowner fsetid setgid setuid kill sys_tty_config sys_nice sys_resource mknod linux_immutable ipc_lock };
-allow dpkg_t self:process { setrlimit setpgid fork getsched setfscreate };
+allow dpkg_t self:capability { chown dac_override fowner fsetid setgid setuid kill sys_tty_config sys_nice sys_resource mknod linux_immutable };
+allow dpkg_t self:process { setpgid fork getsched setfscreate };
 allow dpkg_t self:fd use;
 allow dpkg_t self:fifo_file rw_fifo_file_perms;
 allow dpkg_t self:unix_dgram_socket create_socket_perms;
@@ -65,16 +65,6 @@ allow dpkg_t self:shm create_shm_perms;
 allow dpkg_t self:sem create_sem_perms;
 allow dpkg_t self:msgq create_msgq_perms;
 allow dpkg_t self:msg { send receive };
-
-# This is for se_aptitude et al, so that maintainer scripts can talk back.
-apt_use_fds(dpkg_script_t)
-apt_rw_pipes(dpkg_script_t)
-
-# This is for the maintainer scripts
-init_use_script_fds(dpkg_script_t)
-
-# se_apt-get needs this to run dpkg-preconfigure
-init_use_script_ptys(dpkg_t)
 
 allow dpkg_t dpkg_lock_t:file manage_file_perms;
 
@@ -150,8 +140,6 @@ storage_raw_write_fixed_disk(dpkg_t)
 # for installing kernel packages
 storage_raw_read_fixed_disk(dpkg_t)
 
-term_list_ptys(dpkg_t)
-
 auth_relabel_all_files_except_auth_files(dpkg_t)
 auth_manage_all_files_except_auth_files(dpkg_t)
 auth_dontaudit_read_shadow(dpkg_t)
@@ -159,6 +147,7 @@ auth_dontaudit_read_shadow(dpkg_t)
 files_exec_etc_files(dpkg_t)
 
 init_domtrans_script(dpkg_t)
+init_use_script_ptys(dpkg_t)
 
 libs_exec_ld_so(dpkg_t)
 libs_exec_lib_files(dpkg_t)
@@ -174,15 +163,11 @@ sysnet_read_config(dpkg_t)
 
 userdom_use_user_terminals(dpkg_t)
 userdom_use_unpriv_users_fds(dpkg_t)
-allow userdomain dpkg_var_lib_t:dir list_dir_perms;
-allow userdomain dpkg_var_lib_t:file read_file_perms;
 
 # transition to dpkg script:
 dpkg_domtrans_script(dpkg_t)
-# since the scripts are not labeled correctly yet...
+# since the scripts aren't labeled correctly yet...
 allow dpkg_t dpkg_var_lib_t:file mmap_file_perms;
-# This is used for running config files for debconf interactions
-allow dpkg_t dpkg_tmp_t:file { execute execute_no_trans };
 
 optional_policy(`
 	apt_use_ptys(dpkg_t)
@@ -304,6 +289,7 @@ auth_dontaudit_getattr_shadow(dpkg_script_t)
 auth_manage_all_files_except_auth_files(dpkg_script_t)
 
 init_domtrans_script(dpkg_script_t)
+init_use_script_fds(dpkg_script_t)
 
 libs_exec_ld_so(dpkg_script_t)
 libs_exec_lib_files(dpkg_script_t)

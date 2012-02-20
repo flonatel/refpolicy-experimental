@@ -194,8 +194,6 @@ interface(`dbus_system_bus_client',`
 	files_search_pids($1)
 	stream_connect_pattern($1, system_dbusd_var_run_t, system_dbusd_var_run_t, system_dbusd_t)
 	dbus_read_config($1)
-        allow system_dbusd_t $1:dir search;
-        allow system_dbusd_t $1:file read_file_perms;
 ')
 
 #######################################

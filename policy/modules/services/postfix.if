@@ -163,7 +163,6 @@ template(`postfix_user_domain_template',`
 	allow postfix_$1_t self:capability dac_override;
 
 	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
-	in_unconfined_r(postfix_$1_t)
 
 	domain_use_interactive_fds(postfix_$1_t)
 ')
@@ -375,7 +374,6 @@ interface(`postfix_domtrans_master',`
 	')
 
 	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
-	domain_system_change_exemption($1)
 ')
 
 ########################################
@@ -456,7 +454,7 @@ interface(`postfix_domtrans_postqueue',`
 
 #######################################
 ## <summary>
-##	Allow the master postqueue to use a fifo of the caller and send sigchld
+##	Execute the master postqueue in the caller domain.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -464,14 +462,12 @@ interface(`postfix_domtrans_postqueue',`
 ##	</summary>
 ## </param>
 #
-interface(`posftix_run_postqueue',`
+interface(`posftix_exec_postqueue',`
 	gen_require(`
-		type postfix_postqueue_t;
+		type postfix_postqueue_exec_t;
 	')
 
-	allow postfix_postqueue_t $1:fd use;
-	allow postfix_postqueue_t $1:fifo_file rw_file_perms;
-	allow postfix_postqueue_t $1:process sigchld;
+	can_exec($1, postfix_postqueue_exec_t)
 ')
 
 ########################################

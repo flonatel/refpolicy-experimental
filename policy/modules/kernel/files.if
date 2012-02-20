@@ -413,26 +413,6 @@ interface(`files_tmpfs_file',`
 
 ########################################
 ## <summary>
-##	Transform the type into a file, for use on a
-##	virtual memory filesystem (hugetlbfs).
-## </summary>
-## <param name="type">
-##	<summary>
-##	The type to be transformed.
-##	</summary>
-## </param>
-#
-interface(`files_hugetlbfs_file',`
-	gen_require(`
-		attribute hugetlbfsfile;
-	')
-
-	files_type($1)
-	typeattribute $1 hugetlbfsfile;
-')
-
-########################################
-## <summary>
 ##	Get the attributes of all directories.
 ## </summary>
 ## <param name="domain">
@@ -3480,9 +3460,8 @@ interface(`files_search_mnt',`
 	gen_require(`
 		type mnt_t;
 	')
-        
-        allow $1 mnt_t:dir search_dir_perms;
-        allow $1 mnt_t:lnk_file read_lnk_file_perms;
+
+	allow $1 mnt_t:dir search_dir_perms;
 ')
 
 ########################################
@@ -3501,7 +3480,6 @@ interface(`files_dontaudit_search_mnt',`
 	')
 
 	dontaudit $1 mnt_t:dir search_dir_perms;
-	dontaudit $1 mnt_t:lnk_file read_lnk_file_perms;
 ')
 
 ########################################
@@ -3520,7 +3498,6 @@ interface(`files_list_mnt',`
 	')
 
 	allow $1 mnt_t:dir list_dir_perms;
-	allow $1 mnt_t:lnk_file read_lnk_file_perms;
 ')
 
 ######################################
@@ -5527,7 +5504,6 @@ interface(`files_read_all_locks',`
 
 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
-	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	allow $1 lockfile:dir list_dir_perms;
 	read_files_pattern($1, lockfile, lockfile)
 	read_lnk_files_pattern($1, lockfile, lockfile)
@@ -5551,7 +5527,6 @@ interface(`files_manage_all_locks',`
 
 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
-	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
 	manage_dirs_pattern($1, lockfile, lockfile)
 	manage_files_pattern($1, lockfile, lockfile)
 	manage_lnk_files_pattern($1, lockfile, lockfile)
@@ -5822,26 +5797,6 @@ interface(`files_dontaudit_getattr_all_pids',`
 
 	dontaudit $1 var_run_t:lnk_file read_lnk_file_perms;
 	dontaudit $1 pidfile:file getattr;
-')
-
-########################################
-## <summary>
-##      Create directories under /var/run
-## </summary>
-## <param name="domain">
-##      <summary>
-##      Domain allowed access.
-##      </summary>
-## </param>
-#
-interface(`files_manage_pid_dirs',`
-	gen_require(`
-		type var_t, var_run_t;
-	')
-
-	allow $1 var_t:dir search;
-	allow $1 var_run_t:lnk_file read_lnk_file_perms;
-	allow $1 var_run_t:dir manage_dir_perms;
 ')
 
 ########################################

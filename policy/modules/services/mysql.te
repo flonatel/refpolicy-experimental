@@ -58,12 +58,9 @@ dontaudit mysqld_t self:capability sys_tty_config;
 allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
 allow mysqld_t self:fifo_file rw_fifo_file_perms;
 allow mysqld_t self:shm create_shm_perms;
-allow mysqld_t self:unix_stream_socket { create_stream_socket_perms connectto };
+allow mysqld_t self:unix_stream_socket create_stream_socket_perms;
 allow mysqld_t self:tcp_socket create_stream_socket_perms;
 allow mysqld_t self:udp_socket create_socket_perms;
-
-corecmd_exec_shell(mysqld_t)
-corecmd_exec_bin(mysqld_t)
 
 manage_dirs_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
 manage_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
@@ -183,7 +180,6 @@ files_read_usr_files(mysqld_safe_t)
 files_dontaudit_getattr_all_dirs(mysqld_safe_t)
 
 logging_log_filetrans(mysqld_safe_t, mysqld_log_t, file)
-logging_send_syslog_msg(mysqld_safe_t)
 
 hostname_exec(mysqld_safe_t)
 

@@ -353,23 +353,3 @@ interface(`mysql_admin',`
 
 	admin_pattern($1, mysqld_tmp_t)
 ')
-
-########################################
-## <summary>
-##	Execute mysqld in the caller domain.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-## 	</summary>
-## </param>
-## <rolecap/>
-#
-interface(`mysqld_exec',`
-	gen_require(`
-		type mysqld_exec_t;
-	')
-
-	corecmd_search_bin($1)
-	can_exec($1, mysqld_exec_t)
-')

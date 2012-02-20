@@ -30,7 +30,8 @@ files_setattr_all_tmp_dirs(tmpreaper_t)
 files_getattr_all_dirs(tmpreaper_t)
 files_getattr_all_files(tmpreaper_t)
 
-mcs_file_delete_all(tmpreaper_t)
+mls_file_read_all_levels(tmpreaper_t)
+mls_file_write_all_levels(tmpreaper_t)
 
 logging_send_syslog_msg(tmpreaper_t)
 
@@ -38,7 +39,6 @@ miscfiles_read_localization(tmpreaper_t)
 miscfiles_delete_man_pages(tmpreaper_t)
 
 cron_system_entry(tmpreaper_t, tmpreaper_exec_t)
-init_system_domain(tmpreaper_t, tmpreaper_exec_t)
 
 ifdef(`distro_redhat',`
 	userdom_list_user_home_content(tmpreaper_t)

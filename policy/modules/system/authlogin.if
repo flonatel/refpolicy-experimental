@@ -426,7 +426,7 @@ interface(`auth_domtrans_chkpwd',`
 
 	corecmd_search_bin($1)
 	domtrans_pattern($1, chkpwd_exec_t, chkpwd_t)
-	dontaudit $1 shadow_t:file { open getattr read };
+	dontaudit $1 shadow_t:file { getattr read };
 	auth_domtrans_upd_passwd($1)
 ')
 

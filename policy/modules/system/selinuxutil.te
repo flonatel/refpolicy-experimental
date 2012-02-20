@@ -107,9 +107,6 @@ type setfiles_t alias restorecon_t, can_relabelto_binary_policy;
 type setfiles_exec_t alias restorecon_exec_t;
 init_system_domain(setfiles_t, setfiles_exec_t)
 domain_obj_id_change_exemption(setfiles_t)
-term_read_console(setfiles_t)
-dev_read_urand(setfiles_t)
-dev_rw_generic_chr_files(setfiles_t)
 
 ########################################
 #
@@ -162,7 +159,6 @@ allow load_policy_t self:capability dac_override;
 read_files_pattern(load_policy_t,{ policy_src_t policy_config_t },policy_config_t)
 
 domain_use_interactive_fds(load_policy_t)
-dev_read_urand(load_policy_t)
 
 # for mcs.conf
 files_read_etc_files(load_policy_t)
@@ -308,7 +304,6 @@ tunable_policy(`allow_polyinstantiation',`
 
 allow restorecond_t self:capability { dac_override dac_read_search fowner };
 allow restorecond_t self:fifo_file rw_fifo_file_perms;
-dev_read_urand(restorecond_t)
 
 allow restorecond_t restorecond_var_run_t:file manage_file_perms;
 files_pid_filetrans(restorecond_t, restorecond_var_run_t, file)
@@ -429,17 +424,12 @@ allow semanage_t self:capability { dac_override audit_write };
 allow semanage_t self:unix_stream_socket create_stream_socket_perms;
 allow semanage_t self:unix_dgram_socket create_socket_perms;
 allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
-fs_getattr_xattr_fs(semanage_t)
 
 allow semanage_t policy_config_t:file rw_file_perms;
 
 allow semanage_t semanage_tmp_t:dir manage_dir_perms;
 allow semanage_t semanage_tmp_t:file manage_file_perms;
 files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
-
-ifdef(`targeted_policy',`
-	allow semanage_t initrc_t:fd use;
-')
 
 kernel_read_system_state(semanage_t)
 kernel_read_kernel_sysctls(semanage_t)
@@ -458,7 +448,6 @@ files_list_pids(semanage_t)
 mls_file_write_all_levels(semanage_t)
 mls_file_read_all_levels(semanage_t)
 
-selinux_get_fs_mount(semanage_t)
 selinux_validate_context(semanage_t)
 selinux_get_enforce_mode(semanage_t)
 selinux_getattr_fs(semanage_t)
@@ -502,10 +491,6 @@ ifdef(`distro_ubuntu',`
 	optional_policy(`
 		unconfined_domain(semanage_t)
 	')
-')
-
-optional_policy(`
-	pythonsupport_compiled_read(semanage_t)
 ')
 
 ########################################

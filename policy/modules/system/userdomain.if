@@ -87,7 +87,6 @@ template(`userdom_base_user_template',`
 	files_read_etc_files($1_t)
 	files_read_etc_runtime_files($1_t)
 	files_read_usr_files($1_t)
-	files_exec_usr_files($1_t)
 	# Read directories and files with the readable_t type.
 	# This type is a general type for "world"-readable files.
 	files_list_world_readable($1_t)
@@ -117,19 +116,6 @@ template(`userdom_base_user_template',`
 	tunable_policy(`allow_execmem && allow_execstack',`
 		# Allow making the stack executable via mprotect.
 		allow $1_t self:process execstack;
-	')
-
-	tunable_policy(`user_manage_dos_files',`
-		fs_manage_dos_dirs($1_t)
-		fs_manage_dos_files($1_t)
-	')
-
-	ifdef(`distro_debian', `
-		# allow reading /var/lib/apt/lists
-		apt_read_db($1_t)
-		# allow reading /var/cache/apt - should not be needed but
-		# does not really matter
-		apt_read_cache($1_t)
 	')
 ')
 
@@ -363,7 +349,6 @@ interface(`userdom_exec_user_tmp_files',`
 interface(`userdom_manage_tmpfs_role',`
 	gen_require(`
 		type user_tmpfs_t;
-		type user_hugetlbfs_t;
 	')
 
 	manage_dirs_pattern($2, user_tmpfs_t, user_tmpfs_t)
@@ -372,8 +357,6 @@ interface(`userdom_manage_tmpfs_role',`
 	manage_sock_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
 	manage_fifo_files_pattern($2, user_tmpfs_t, user_tmpfs_t)
 	fs_tmpfs_filetrans($2, user_tmpfs_t, { dir file lnk_file sock_file fifo_file })
-	manage_files_pattern($2, user_hugetlbfs_t, user_hugetlbfs_t)
-	fs_hugetlbfs_filetrans($2, user_hugetlbfs_t, { file })
 ')
 
 #######################################
@@ -549,7 +532,6 @@ template(`userdom_common_user_template',`
 	files_read_var_symlinks($1_t)
 	files_read_generic_spool($1_t)
 	files_read_var_lib_files($1_t)
-	files_read_var_lib_symlinks($1_t)
 	# Stat lost+found.
 	files_getattr_lost_found_dirs($1_t)
 
@@ -670,10 +652,6 @@ template(`userdom_common_user_template',`
 	optional_policy(`
 		# to allow monitoring of pcmcia status
 		pcmcia_read_pid($1_t)
-	')
-
-	optional_policy(`
-		pythonsupport_compiled_read($1_t)
 	')
 
 	optional_policy(`
@@ -983,6 +961,7 @@ template(`userdom_unpriv_user_template', `
 	# Need the following rule to allow users to run vpnc
 	corenet_tcp_bind_xserver_port($1_t)
 
+	files_exec_usr_files($1_t)
 	# cjp: why?
 	files_read_kernel_symbol_table($1_t)
 
@@ -1027,47 +1006,8 @@ template(`userdom_unpriv_user_template', `
 	optional_policy(`
 		setroubleshoot_stream_connect($1_t)
 	')
-
-	optional_policy(`
-		mysqld_exec($1_t)
-	')
 ')
 
-#######################################
-## <summary>
-##	The template for creating a user with network access.
-## </summary>
-## <desc>
-##	<p>
-##	This template creates a user domain, types, and
-##	rules for the user's tty, pty, home directories,
-##	tmp, and tmpfs files.
-##	</p>
-##	<p>
-##	This differs from the unpriv_user_template by allowing non-privileged network access.
-##	</p>
-## </desc>
-## <param name="userdomain_prefix">
-##	<summary>
-##	The prefix of the user domain (e.g., sysadm
-##	is the prefix for sysadm_t).
-##	</summary>
-## </param>
-#
-template(`network_user_template',`
-	##############################
-	#
-	# Declarations
-	#
-
-	# Inherit rules for ordinary users.
-	userdom_unpriv_user_template($1)
-	# like user_tcp_server
-	corenet_tcp_bind_generic_port($1_t)
-	sysnet_dns_name_resolve($1_t)
-	allow $1_t self:tcp_socket create_stream_socket_perms;
-	allow $1_t self:udp_socket create_stream_socket_perms;
-')
 #######################################
 ## <summary>
 ##	The template for creating an administrative user.

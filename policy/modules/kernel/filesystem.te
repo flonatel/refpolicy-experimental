@@ -95,8 +95,6 @@ genfscon futexfs / gen_context(system_u:object_r:futexfs_t,s0)
 type hugetlbfs_t;
 fs_type(hugetlbfs_t)
 files_mountpoint(hugetlbfs_t)
-files_type(hugetlbfs_t)
-files_poly_parent(hugetlbfs_t)
 fs_use_trans hugetlbfs gen_context(system_u:object_r:hugetlbfs_t,s0);
 
 type ibmasmfs_t;

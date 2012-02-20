@@ -122,7 +122,6 @@ sysnet_exec_ifconfig(munin_t)
 userdom_dontaudit_use_unpriv_user_fds(munin_t)
 userdom_dontaudit_search_user_home_dirs(munin_t)
 
-apache_script_exec_domain(munin)
 optional_policy(`
 	apache_content_template(munin)
 

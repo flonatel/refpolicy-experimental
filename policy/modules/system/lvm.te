@@ -41,11 +41,6 @@ files_pid_file(lvm_var_run_t)
 type lvm_tmp_t;
 files_tmp_file(lvm_tmp_t)
 
-allow lvm_t self:sem create_sem_perms;
-optional_policy(`
-	unconfined_sem_rw(lvm_t)
-')
-
 ########################################
 #
 # Cluster LVM daemon local policy
@@ -183,7 +178,6 @@ allow lvm_t self:sem create_sem_perms;
 
 allow lvm_t self:unix_stream_socket { connectto create_stream_socket_perms };
 allow lvm_t clvmd_t:unix_stream_socket { connectto rw_socket_perms };
-term_dontaudit_use_generic_ptys(lvm_t)
 
 manage_dirs_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
 manage_files_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)

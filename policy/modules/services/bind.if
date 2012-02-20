@@ -336,7 +336,7 @@ interface(`bind_manage_zone',`
 ## </param>
 #
 interface(`bind_udp_chat_named',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

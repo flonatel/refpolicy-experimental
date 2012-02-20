@@ -96,8 +96,6 @@ template(`mta_base_mail_template',`
 
 	miscfiles_read_localization($1_mail_t)
 
-        kernel_read_system_state($1_mail_t)
-
 	optional_policy(`
 		exim_read_log($1_mail_t)
 		exim_append_log($1_mail_t)
@@ -106,8 +104,6 @@ template(`mta_base_mail_template',`
 
 	optional_policy(`
 		postfix_domtrans_user_mail_handler($1_mail_t)
-		# for postalias - role stops unpriv user from doing it
-		postfix_domtrans_master($1_mail_t)
 	')
 
 	optional_policy(`
@@ -589,7 +585,7 @@ interface(`mta_dontaudit_rw_delivery_tcp_sockets',`
 ## </param>
 #
 interface(`mta_tcp_connect_all_mailservers',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 #######################################
@@ -902,21 +898,4 @@ interface(`mta_rw_user_mail_stream_sockets',`
 	')
 
 	allow $1 user_mail_domain:unix_stream_socket rw_socket_perms;
-')
-
-########################################
-## <summary>
-##	Allow system_mail_t to access files of specified types
-## </summary>
-## <param name="private type">
-##	<summary>
-##	File type that system_mail_t can access
-##	</summary>
-## </param>
-#
-interface(`system_mail_file_access',`
-	gen_require(`
-		type system_mail_t;
-	')
-	allow system_mail_t $1:file { read write };
 ')

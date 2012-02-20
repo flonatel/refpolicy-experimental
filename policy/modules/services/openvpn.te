@@ -64,10 +64,6 @@ logging_log_filetrans(openvpn_t, openvpn_var_log_t, file)
 manage_files_pattern(openvpn_t, openvpn_var_run_t, openvpn_var_run_t)
 files_pid_filetrans(openvpn_t, openvpn_var_run_t, { file dir })
 
-# for the list of vulnerable keys
-files_read_usr_files(openvpn_t)
-files_read_var_lib_files(openvpn_t)
-
 kernel_read_kernel_sysctls(openvpn_t)
 kernel_read_net_sysctls(openvpn_t)
 kernel_read_network_state(openvpn_t)

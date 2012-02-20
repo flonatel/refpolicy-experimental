@@ -23,26 +23,20 @@ files_type(mount_loopback_t)
 type mount_tmp_t;
 files_tmp_file(mount_tmp_t)
 
-dev_read_sysfs(mount_t)
-
 # causes problems with interfaces when
 # this is optionally declared in monolithic
 # policy--duplicate type declaration
 type unconfined_mount_t;
 application_domain(unconfined_mount_t, mount_exec_t)
 
-kernel_request_load_module(mount_t)
 ########################################
 #
 # mount local policy
 #
 
-kernel_setsched(mount_t)
-
 # setuid/setgid needed to mount cifs 
 allow mount_t self:capability { ipc_lock sys_rawio sys_admin dac_override chown sys_tty_config setuid setgid };
 
-dev_read_urand(mount_t)
 allow mount_t mount_loopback_t:file read_file_perms;
 
 allow mount_t mount_tmp_t:file manage_file_perms;
@@ -56,7 +50,6 @@ kernel_read_system_state(mount_t)
 kernel_read_kernel_sysctls(mount_t)
 kernel_dontaudit_getattr_core_if(mount_t)
 kernel_dontaudit_write_debugfs_dirs(mount_t)
-kernel_search_debugfs(mount_t)
 kernel_dontaudit_write_proc_dirs(mount_t)
 # To load binfmt_misc kernel module
 kernel_request_load_module(mount_t)

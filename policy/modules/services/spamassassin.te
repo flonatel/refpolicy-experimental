@@ -43,7 +43,6 @@ typealias spamc_t alias { user_spamc_t staff_spamc_t sysadm_spamc_t };
 typealias spamc_t alias { auditadm_spamc_t secadm_spamc_t };
 application_domain(spamc_t, spamc_exec_t)
 ubac_constrained(spamc_t)
-role system_r types spamc_t;
 
 type spamc_tmp_t;
 typealias spamc_tmp_t alias { user_spamc_tmp_t staff_spamc_tmp_t sysadm_spamc_tmp_t };
@@ -53,8 +52,7 @@ ubac_constrained(spamc_tmp_t)
 
 type spamd_t;
 type spamd_exec_t;
-init_daemon_domain(spamd_t,spamd_exec_t)
-can_exec(spamd_t,spamc_exec_t)
+init_daemon_domain(spamd_t, spamd_exec_t)
 
 type spamd_spool_t;
 files_type(spamd_spool_t)
@@ -68,7 +66,6 @@ files_type(spamd_var_lib_t)
 
 type spamd_var_run_t;
 files_pid_file(spamd_var_run_t)
-manage_sock_files_pattern(spamd_t,spamd_var_run_t,spamd_var_run_t)
 
 ##############################
 #
@@ -208,7 +205,6 @@ allow spamc_t self:unix_dgram_socket sendto;
 allow spamc_t self:unix_stream_socket connectto;
 allow spamc_t self:tcp_socket create_stream_socket_perms;
 allow spamc_t self:udp_socket create_socket_perms;
-allow spamc_t self:netlink_route_socket { read write bind create getattr nlmsg_read };
 
 manage_dirs_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)
 manage_files_pattern(spamc_t, spamc_tmp_t, spamc_tmp_t)
@@ -290,7 +286,7 @@ optional_policy(`
 # setuids to the user running spamc.  Comment this if you are not
 # using this ability.
 
-allow spamd_t self:capability { kill setgid setuid dac_override sys_tty_config };
+allow spamd_t self:capability { setuid setgid dac_override sys_tty_config };
 dontaudit spamd_t self:capability sys_tty_config;
 allow spamd_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow spamd_t self:fd use;
@@ -337,7 +333,6 @@ corenet_tcp_sendrecv_all_ports(spamd_t)
 corenet_udp_sendrecv_all_ports(spamd_t)
 corenet_tcp_bind_generic_node(spamd_t)
 corenet_tcp_bind_spamd_port(spamd_t)
-corenet_tcp_connect_spamd_port(spamd_t)
 corenet_tcp_connect_razor_port(spamd_t)
 corenet_tcp_connect_smtp_port(spamd_t)
 corenet_sendrecv_razor_client_packets(spamd_t)
@@ -426,7 +421,6 @@ optional_policy(`
 
 optional_policy(`
 	postfix_read_config(spamd_t)
-	postfix_search_spool(spamd_t)
 ')
 
 optional_policy(`

@@ -278,7 +278,6 @@ optional_policy(`
 # prewikka_cgi Declarations
 #
 
-apache_script_exec_domain(prewikka)
 optional_policy(`
 	apache_content_template(prewikka)
 

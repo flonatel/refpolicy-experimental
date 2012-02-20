@@ -2145,7 +2145,7 @@ interface(`corenet_dontaudit_udp_bind_all_rpc_ports',`
 ## </param>
 #
 interface(`corenet_non_ipsec_sendrecv',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
 	corenet_all_recvfrom_unlabeled($1)
 ')
 
@@ -2173,7 +2173,7 @@ interface(`corenet_non_ipsec_sendrecv',`
 ## </param>
 #
 interface(`corenet_dontaudit_non_ipsec_sendrecv',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
 	corenet_dontaudit_all_recvfrom_unlabeled($1)
 ')
 
@@ -2188,7 +2188,7 @@ interface(`corenet_dontaudit_non_ipsec_sendrecv',`
 ## </param>
 #
 interface(`corenet_tcp_recv_netlabel',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
 	corenet_tcp_recvfrom_netlabel($1)
 ')
 
@@ -2243,7 +2243,7 @@ interface(`corenet_tcp_recvfrom_unlabeled',`
 ## </param>
 #
 interface(`corenet_dontaudit_tcp_recv_netlabel',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
 	corenet_dontaudit_tcp_recvfrom_netlabel($1)
 ')
 
@@ -2299,7 +2299,7 @@ interface(`corenet_dontaudit_tcp_recvfrom_unlabeled',`
 ## </param>
 #
 interface(`corenet_udp_recv_netlabel',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
 	corenet_udp_recvfrom_netlabel($1)
 ')
 
@@ -2354,7 +2354,7 @@ interface(`corenet_udp_recvfrom_unlabeled',`
 ## </param>
 #
 interface(`corenet_dontaudit_udp_recv_netlabel',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
 	corenet_dontaudit_udp_recvfrom_netlabel($1)
 ')
 
@@ -2410,7 +2410,7 @@ interface(`corenet_dontaudit_udp_recvfrom_unlabeled',`
 ## </param>
 #
 interface(`corenet_raw_recv_netlabel',`
-	refpolicyerr(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
+	refpolicywarn(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
 	corenet_raw_recvfrom_netlabel($1)
 ')
 

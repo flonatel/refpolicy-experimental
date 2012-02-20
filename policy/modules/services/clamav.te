@@ -36,10 +36,6 @@ logging_log_file(clamd_var_log_t)
 type clamd_var_lib_t;
 files_type(clamd_var_lib_t)
 
-# spool files
-type clamd_spool_t;
-files_type(clamd_spool_t)
-
 # pid files
 type clamd_var_run_t;
 files_pid_file(clamd_var_run_t)
@@ -57,8 +53,6 @@ type freshclam_t;
 type freshclam_exec_t;
 init_daemon_domain(freshclam_t, freshclam_exec_t)
 
-allow freshclam_t self:netlink_route_socket r_netlink_socket_perms;
-
 # log files
 type freshclam_var_log_t;
 logging_log_file(freshclam_var_log_t)
@@ -68,22 +62,12 @@ logging_log_file(freshclam_var_log_t)
 # clamd local policy
 #
 
-allow clamd_t self:process signull;
 allow clamd_t self:capability { kill setgid setuid dac_override };
 dontaudit clamd_t self:capability sys_tty_config;
 allow clamd_t self:fifo_file rw_fifo_file_perms;
 allow clamd_t self:unix_stream_socket { create_stream_socket_perms connectto };
 allow clamd_t self:unix_dgram_socket create_socket_perms;
 allow clamd_t self:tcp_socket { listen accept };
-allow clamd_t self:fd use;
-corecmd_exec_bin(clamd_t)
-corecmd_read_bin_symlinks(clamd_t)
-files_read_usr_files(clamd_t)
-
-optional_policy(`
-# to allow creating the unix domain socket
-	postfix_search_spool(clamd_t)
-')
 
 # configuration files
 allow clamd_t clamd_etc_t:dir list_dir_perms;
@@ -98,10 +82,6 @@ files_tmp_filetrans(clamd_t, clamd_tmp_t, { file dir })
 # var/lib files for clamd
 manage_dirs_pattern(clamd_t, clamd_var_lib_t, clamd_var_lib_t)
 manage_files_pattern(clamd_t, clamd_var_lib_t, clamd_var_lib_t)
-
-# spool files
-manage_dirs_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
-manage_files_pattern(clamd_t,clamd_spool_t,clamd_spool_t)
 
 # log files
 manage_dirs_pattern(clamd_t, clamd_var_log_t, clamd_var_log_t)
@@ -120,22 +100,17 @@ kernel_read_system_state(clamd_t)
 
 corecmd_exec_shell(clamd_t)
 
-# for /proc/meminfo
-allow clamd_t proc_t:file { getattr read };
-
 corenet_all_recvfrom_unlabeled(clamd_t)
 corenet_all_recvfrom_netlabel(clamd_t)
 corenet_tcp_sendrecv_generic_if(clamd_t)
 corenet_tcp_sendrecv_generic_node(clamd_t)
 corenet_tcp_sendrecv_all_ports(clamd_t)
 corenet_tcp_sendrecv_clamd_port(clamd_t)
-corenet_tcp_sendrecv_amavisd_send_port(clamd_t)
 corenet_tcp_bind_generic_node(clamd_t)
 corenet_tcp_bind_clamd_port(clamd_t)
 corenet_tcp_bind_generic_port(clamd_t)
 corenet_tcp_connect_generic_port(clamd_t)
 corenet_sendrecv_clamd_server_packets(clamd_t)
-corenet_udp_bind_all_nodes(clamd_t)
 
 dev_read_rand(clamd_t)
 dev_read_urand(clamd_t)
@@ -145,7 +120,6 @@ domain_use_interactive_fds(clamd_t)
 files_read_etc_files(clamd_t)
 files_read_etc_runtime_files(clamd_t)
 files_search_spool(clamd_t)
-files_search_var_lib(clamd_t)
 
 auth_use_nsswitch(clamd_t)
 
@@ -156,7 +130,6 @@ miscfiles_read_localization(clamd_t)
 cron_use_fds(clamd_t)
 cron_use_system_job_fds(clamd_t)
 cron_rw_pipes(clamd_t)
-crond_search_dir(clamd_var_lib_t)
 
 mta_read_config(clamd_t)
 mta_send_mail(clamd_t)
@@ -174,18 +147,14 @@ optional_policy(`
 
 tunable_policy(`clamd_use_jit',`
 	allow clamd_t self:process execmem;
-	allow freshclam_t self:process execmem;
 ', `
 	dontaudit clamd_t self:process execmem;
-	dontaudit freshclam_t self:process execmem;
 ')
 
 ########################################
 #
 # Freshclam local policy
 #
-
-files_search_var_lib(freshclam_t)
 
 allow freshclam_t self:capability { setgid setuid dac_override };
 allow freshclam_t self:fifo_file rw_fifo_file_perms;
@@ -220,7 +189,6 @@ corenet_tcp_sendrecv_generic_node(freshclam_t)
 corenet_tcp_sendrecv_all_ports(freshclam_t)
 corenet_tcp_sendrecv_clamd_port(freshclam_t)
 corenet_tcp_connect_http_port(freshclam_t)
-corenet_tcp_connect_http_cache_port(freshclam_t)
 corenet_sendrecv_http_client_packets(freshclam_t)
 
 dev_read_rand(freshclam_t)
@@ -236,7 +204,6 @@ auth_use_nsswitch(freshclam_t)
 logging_send_syslog_msg(freshclam_t)
 
 miscfiles_read_localization(freshclam_t)
-kernel_read_system_state(freshclam_t)
 
 clamav_stream_connect(freshclam_t)
 

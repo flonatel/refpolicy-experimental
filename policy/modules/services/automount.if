@@ -49,7 +49,7 @@ interface(`automount_signal',`
 ## </param>
 #
 interface(`automount_exec_config',`
-	refpolicyerr(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
+	refpolicywarn(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
 	files_exec_etc_files($1)
 ')
 

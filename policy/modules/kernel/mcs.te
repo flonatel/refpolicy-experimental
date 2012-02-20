@@ -5,19 +5,8 @@ policy_module(mcs, 1.2.0)
 # Declarations
 #
 
-# process may kill all processes (init)
 attribute mcskillall;
-# process may ptrace at all levels
 attribute mcsptraceall;
-# process may run a child in any level
 attribute mcssetcats;
-# process may set the low level for a child with no restriction
-attribute mcssetlow;
-# object may be accessed by any process at a higher level
-attribute mcstrustedobject;
-# process may write all files/dirs
 attribute mcswriteall;
-# process may read all files/dirs
 attribute mcsreadall;
-# process may delete all files and write dirs as appropriate
-attribute mcsdeleteall;

@@ -421,11 +421,6 @@ template(`ssh_role_template',`
 	')
 
 	optional_policy(`
-		run_gpg_agent($1_ssh_agent_t)
-	')
-
-	optional_policy(`
-		xdm_sigchld($1_ssh_agent_t)
 		xserver_use_xdm_fds($1_ssh_agent_t)
 		xserver_rw_xdm_pipes($1_ssh_agent_t)
 	')
@@ -568,7 +563,7 @@ interface(`ssh_dontaudit_rw_tcp_sockets',`
 ## </param>
 #
 interface(`ssh_tcp_connect',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

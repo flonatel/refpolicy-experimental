@@ -35,8 +35,7 @@ template(`cron_common_crontab_template',`
 	allow $1_t self:fifo_file rw_fifo_file_perms;
 
 	allow $1_t $1_tmp_t:file manage_file_perms;
-	allow $1_t $1_tmp_t:dir manage_dir_perms;
-	files_tmp_filetrans($1_t, $1_tmp_t, { file dir })
+	files_tmp_filetrans($1_t, $1_tmp_t, file)
 
 	# create files in /var/spool/cron
 	manage_files_pattern($1_t, { cron_spool_t user_cron_spool_t }, user_cron_spool_t)
@@ -208,7 +207,7 @@ interface(`cron_admin_role',`
 		class passwd crontab;
 	')
 
-	role $1 types { cronjob_t admin_crontab_t };
+	role $1 types { cronjob_t admin_crontab_t admin_crontab_tmp_t };
 
 	# cronjob shows up in user ps
 	ps_process_pattern($2, cronjob_t)
@@ -258,12 +257,11 @@ interface(`cron_admin_role',`
 #
 interface(`cron_system_entry',`
 	gen_require(`
-		type crond_t, system_cronjob_t, crond_tmp_t;
+		type crond_t, system_cronjob_t;
 	')
 
 	domtrans_pattern(system_cronjob_t, $2, $1)
 	domtrans_pattern(crond_t, $2, $1)
-	allow $1 crond_tmp_t:file { read write ioctl };
 
 	role system_r types $1;
 ')
@@ -632,23 +630,4 @@ interface(`cron_dontaudit_write_system_job_tmp_files',`
 	')
 
 	dontaudit $1 system_cronjob_tmp_t:file write_file_perms;
-')
-
-########################################
-## <summary>
-##	Allow crond to search directories that are home directories for
-##	accounts used or parent directories of home directories.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Type of directory that crond_t may search.
-##	</summary>
-## </param>
-#
-interface(`crond_search_dir',`
-	gen_require(`
-		type crond_t;
-	')
-
-	allow crond_t $1:dir search;
 ')

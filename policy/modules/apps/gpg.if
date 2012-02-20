@@ -22,7 +22,6 @@ interface(`gpg_role',`
 		type gpg_agent_tmp_t;
 		type gpg_helper_t, gpg_pinentry_t;
 		type gpg_pinentry_tmp_t;
-		type gpg_secret_t;
 	')
 
 	role $1 types { gpg_t gpg_agent_t gpg_helper_t gpg_pinentry_t };
@@ -55,8 +54,6 @@ interface(`gpg_role',`
 	manage_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
 	relabel_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
 
-	allow $2 gpg_secret_t:dir list_dir_perms;
-
 	optional_policy(`
 		gpg_pinentry_dbus_chat($2)
 	')
@@ -68,49 +65,6 @@ interface(`gpg_role',`
 		dontaudit gpg_agent_t $2:socket_class_set { getattr read write };
 		dontaudit gpg_agent_t $2:fifo_file rw_fifo_file_perms;
 	')
-')
-
-############################################################
-## <summary>
-##	Transition to gpg_agent_t from another domain
-##	Used for ssh_agent_t to launch the gpg agent for X logins
-## </summary>
-## <param name="domain">
-##	<summary>
-##	domain to run the gpg agent
-##	</summary>
-## </param>
-#
-interface(`run_gpg_agent',`
-	gen_require(`
-		type gpg_agent_t, gpg_agent_exec_t;
-	')
-	domtrans_pattern($1, gpg_agent_exec_t, gpg_agent_t)
-')
-
-########################################
-## <summary>
-##	Transition to a user domain from gpg_agent_t
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain to transition to
-##	</summary>
-## </param>
-## <param name="file_type">
-##	<summary>
-##	Type of file for log data - usually a home type
-##	</summary>
-## </param>
-#
-interface(`gpg_agent_domtrans_user',`
-	gen_require(`
-		type gpg_agent_t, shell_exec_t, bin_t;
-	')
-	allow $1 gpg_agent_t:fd use;
-	allow gpg_agent_t $1:process signull;
-	allow gpg_agent_t $2:file { getattr append };
-	domain_auto_trans(gpg_agent_t, { shell_exec_t bin_t }, $1)
 ')
 
 ########################################

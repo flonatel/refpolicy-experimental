@@ -95,7 +95,7 @@ define(`policy_call_depth',0)
 #
 define(`optional_policy',`
 	ifelse(regexp(`$1',`\W'),`-1',`
-		refpolicyerr(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
+		refpolicywarn(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
 		optional_policy(shift($*))
 	',`
 		optional {`'pushdef(`__in_optional_policy')

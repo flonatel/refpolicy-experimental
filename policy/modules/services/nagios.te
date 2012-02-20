@@ -143,7 +143,6 @@ optional_policy(`
 #
 # Nagios CGI local policy
 #
-apache_script_exec_domain(nagios)
 optional_policy(`
 	apache_content_template(nagios)
 	typealias httpd_nagios_script_t alias nagios_cgi_t;
@@ -192,14 +191,7 @@ read_files_pattern(nrpe_t, nagios_etc_t, nagios_etc_t)
 files_search_etc(nrpe_t)
 
 manage_files_pattern(nrpe_t, nrpe_var_run_t, nrpe_var_run_t)
-manage_files_pattern(nrpe_t, nagios_var_run_t, nagios_var_run_t)
 files_pid_filetrans(nrpe_t, nrpe_var_run_t, file)
-
-type nrpe_tmp_t;
-files_tmp_file(nrpe_tmp_t)
-manage_dirs_pattern(nrpe_t, nrpe_tmp_t, nrpe_tmp_t)
-manage_files_pattern(nrpe_t, nrpe_tmp_t, nrpe_tmp_t)
-files_tmp_filetrans(nrpe_t, nrpe_tmp_t, { file dir })
 
 kernel_read_system_state(nrpe_t)
 kernel_read_kernel_sysctls(nrpe_t)
@@ -210,16 +202,6 @@ corecmd_exec_shell(nrpe_t)
 corenet_tcp_bind_generic_node(nrpe_t)
 corenet_tcp_bind_inetd_child_port(nrpe_t)
 corenet_sendrecv_unlabeled_packets(nrpe_t)
-corenet_all_recvfrom_unlabeled(nrpe_t)
-corenet_all_recvfrom_netlabel(nrpe_t)
-corenet_tcp_sendrecv_all_if(nrpe_t)
-corenet_tcp_sendrecv_all_nodes(nrpe_t)
-corenet_tcp_sendrecv_generic_port(nrpe_t)
-corenet_tcp_bind_all_nodes(nrpe_t)
-corenet_tcp_bind_nrpe_port(nrpe_t)
-sysnet_dns_name_resolve(nrpe_t)
-
-allow nrpe_t self:netlink_route_socket create_netlink_socket_perms;
 
 dev_read_sysfs(nrpe_t)
 dev_read_urand(nrpe_t)
@@ -240,15 +222,6 @@ logging_send_syslog_msg(nrpe_t)
 miscfiles_read_localization(nrpe_t)
 
 userdom_dontaudit_use_unpriv_user_fds(nrpe_t)
-
-domain_read_all_domains_state(nrpe_t)
-fs_getattr_all_fs(nrpe_t)
-storage_getattr_fixed_disk_dev(nrpe_t)
-init_read_utmp(nrpe_t)
-
-term_dontaudit_getattr_all_user_ttys(nrpe_t)
-term_dontaudit_getattr_unallocated_ttys(nrpe_t)
-term_dontaudit_getattr_all_user_ptys(nrpe_t)
 
 optional_policy(`
 	inetd_tcp_service_domain(nrpe_t, nrpe_exec_t)
@@ -297,7 +270,6 @@ files_getattr_all_file_type_fs(nagios_admin_plugin_t)
 #
 
 allow nagios_mail_plugin_t self:capability { setuid setgid dac_override };
-dontaudit nagios_mail_plugin_t self:capability { sys_resource };
 
 allow nagios_mail_plugin_t self:netlink_route_socket r_netlink_socket_perms;
 allow nagios_mail_plugin_t self:tcp_socket create_stream_socket_perms;
@@ -317,14 +289,8 @@ logging_send_syslog_msg(nagios_mail_plugin_t)
 
 sysnet_read_config(nagios_mail_plugin_t)
 
-files_read_usr_files(nagios_mail_plugin_t)
-
 optional_policy(`
 	mta_send_mail(nagios_mail_plugin_t)
-')
-
-optional_policy(`
-	can_exec_sudo(nagios_mail_plugin_t)
 ')
 
 optional_policy(`
@@ -333,9 +299,7 @@ optional_policy(`
 
 optional_policy(`
 	postfix_stream_connect_master(nagios_mail_plugin_t)
-	posftix_run_postqueue(nagios_mail_plugin_t)
-	postfix_list_spool(nagios_mail_plugin_t)
-	postfix_read_spool_files(nagios_mail_plugin_t)
+	posftix_exec_postqueue(nagios_mail_plugin_t)
 ')
 
 ######################################
@@ -349,7 +313,6 @@ allow nagios_checkdisk_plugin_t self:capability { sys_admin sys_rawio };
 files_read_etc_runtime_files(nagios_checkdisk_plugin_t)
 
 fs_getattr_all_fs(nagios_checkdisk_plugin_t)
-files_getattr_all_mountpoints(nagios_checkdisk_plugin_t)
 
 storage_raw_read_fixed_disk(nagios_checkdisk_plugin_t)
 
@@ -380,8 +343,6 @@ optional_policy(`
 ')
 
 optional_policy(`
-	mysql_read_config(nagios_services_plugin_t)
-	mysql_tcp_connect(nagios_services_plugin_t)
 	mysql_stream_connect(nagios_services_plugin_t)
 ')
 
@@ -427,15 +388,4 @@ optional_policy(`
 
 optional_policy(`
 	unconfined_domain(nagios_unconfined_plugin_t)
-')
-
-optional_policy(`
-        mysql_tcp_connect(nrpe_t)
-        mysql_stream_connect(nrpe_t)
-       mysql_read_config(nrpe_t)
-')
-
-optional_policy(`
-        postgresql_tcp_connect(nrpe_t)
-        postgresql_stream_connect(nrpe_t)
 ')

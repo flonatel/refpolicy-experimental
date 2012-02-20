@@ -97,11 +97,6 @@ logging_send_syslog_msg(ldconfig_t)
 userdom_use_user_terminals(ldconfig_t)
 userdom_use_all_users_fds(ldconfig_t)
 
-optional_policy(`
-	# This is needed for apt to get and install packages silently
-        apt_dontaudit_use_fds(ldconfig_t)   
-')
-
 ifdef(`distro_ubuntu',`
 	optional_policy(`
 		unconfined_domain(ldconfig_t)

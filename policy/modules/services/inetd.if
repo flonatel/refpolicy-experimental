@@ -150,7 +150,7 @@ interface(`inetd_use_fds',`
 ## </param>
 #
 interface(`inetd_tcp_connect',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
@@ -183,7 +183,7 @@ interface(`inetd_domtrans_child',`
 ## </param>
 #
 interface(`inetd_udp_send',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################

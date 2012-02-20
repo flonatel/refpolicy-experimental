@@ -178,19 +178,12 @@ ifdef(`distro_redhat',`
 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
 ')
 
-ifdef(`distro_debian',`
-	fs_rw_tmpfs_chr_files(init_t)
-	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
-')
-
-optional_policy(`
 tunable_policy(`init_upstart',`
 	corecmd_shell_domtrans(init_t, initrc_t)
 ',`
 	# Run the shell in the sysadm role for single-user mode.
 	# causes problems with upstart
 	sysadm_shell_domtrans(init_t)
-')
 ')
 
 optional_policy(`
@@ -247,8 +240,7 @@ manage_lnk_files_pattern(initrc_t, initrc_state_t, initrc_state_t)
 manage_fifo_files_pattern(initrc_t, initrc_state_t, initrc_state_t)
 
 allow initrc_t initrc_var_run_t:file manage_file_perms;
-files_pid_filetrans(initrc_t,initrc_var_run_t,file)
-storage_var_run_filetrans_fixed_disk(initrc_t)
+files_pid_filetrans(initrc_t, initrc_var_run_t, file)
 
 can_exec(initrc_t, initrc_tmp_t)
 manage_files_pattern(initrc_t, initrc_tmp_t, initrc_tmp_t)
@@ -295,7 +287,6 @@ dev_list_usbfs(initrc_t)
 dev_read_framebuffer(initrc_t)
 dev_write_framebuffer(initrc_t)
 dev_read_realtime_clock(initrc_t)
-clock_rw_adjtime(initrc_t)
 dev_read_sound_mixer(initrc_t)
 dev_write_sound_mixer(initrc_t)
 dev_setattr_all_chr_files(initrc_t)
@@ -303,14 +294,8 @@ dev_rw_lvm_control(initrc_t)
 dev_delete_lvm_control_dev(initrc_t)
 dev_manage_generic_symlinks(initrc_t)
 dev_manage_generic_files(initrc_t)
-
-optional_policy(`
-	# Wants to remove udev.tbl:
-	dev_delete_generic_symlinks(initrc_t)
-	udev_unlink_table(initrc_t)
-	dev_delete_generic_dirs(initrc_t)
-')
-
+# Wants to remove udev.tbl:
+dev_delete_generic_symlinks(initrc_t)
 dev_getattr_all_blk_files(initrc_t)
 dev_getattr_all_chr_files(initrc_t)
 # Early devtmpfs
@@ -406,7 +391,6 @@ logging_manage_generic_logs(initrc_t)
 logging_read_all_logs(initrc_t)
 logging_append_all_logs(initrc_t)
 logging_read_audit_config(initrc_t)
-logging_setattr_xconsole(initrc_t)
 
 miscfiles_read_localization(initrc_t)
 # slapd needs to read cert files from its initscript
@@ -423,18 +407,10 @@ userdom_read_user_home_content_files(initrc_t)
 # started from init should be placed in their own domain.
 userdom_use_user_terminals(initrc_t)
 
-# seed udev /dev
-dev_create_generic_dirs(initrc_t)
-
 ifdef(`distro_debian',`
-	# to be able to create /dev/xconsole
-	dev_create_generic_pipes(initrc_t)
+	dev_setattr_generic_dirs(initrc_t)
 
-	# for /etc/network/run/ifstate
-	sysnet_manage_config(initrc_t)
-	fs_tmpfs_filetrans(initrc_t,initrc_var_run_t,dir)
-	allow initrc_t initrc_var_run_t:dir manage_dir_perms;
-	allow initrc_t initrc_var_run_t:lnk_file manage_lnk_file_perms;
+	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
 
 	# for storing state under /dev/shm
 	fs_setattr_tmpfs_dirs(initrc_t)
@@ -442,21 +418,6 @@ ifdef(`distro_debian',`
 	storage_tmpfs_filetrans_fixed_disk(initrc_t)
 
 	files_setattr_etc_dirs(initrc_t)
-
-        selinux_get_fs_mount(init_t)
-
-        # for /lib/init/rw/.ramfs
-        fs_tmpfs_filetrans(initrc_t,initrc_state_t,file)
-
-        # for progress_state which is created by the initramfs
-        fs_allow_tmpfs_file_read(initrc_t)
-
-        # /etc/network/if-up.d/mountnfs wants to mkdir
-        # /var/run/network/mountnfs as a poor mans lock
-        allow initrc_t var_run_t:dir create;
-
-	# for lsb_release which calls apt-cache
-	apt_read_cache(initrc_t)
 ')
 
 ifdef(`distro_gentoo',`
@@ -466,11 +427,13 @@ ifdef(`distro_gentoo',`
 	allow initrc_t self:process setfscreate;
 	dev_create_null_dev(initrc_t)
 	dev_create_zero_dev(initrc_t)
+	dev_create_generic_dirs(initrc_t)
 	term_create_console_dev(initrc_t)
 
 	# unfortunately /sbin/rc does stupid tricks
 	# with /dev/.rcboot to decide if we are in
 	# early init
+	dev_create_generic_dirs(initrc_t)
 	dev_delete_generic_dirs(initrc_t)
 
 	# allow bootmisc to create /var/lock/.keep.
@@ -772,7 +735,6 @@ optional_policy(`
 
 optional_policy(`
 	postfix_list_spool(initrc_t)
-	postfix_read_config(initrc_t)
 ')
 
 optional_policy(`
@@ -882,6 +844,9 @@ optional_policy(`
 ')
 
 optional_policy(`
+	# Set device ownerships/modes.
+	xserver_setattr_console_pipes(initrc_t)
+
 	# init script wants to check if it needs to update windowmanagerlist
 	xserver_read_xdm_rw_config(initrc_t)
 ')

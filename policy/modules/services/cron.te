@@ -136,8 +136,8 @@ tunable_policy(`fcron_crond', `
 # Cron daemon local policy
 #
 
-allow crond_t self:capability { dac_override setgid setuid sys_nice sys_resource dac_read_search };
-dontaudit crond_t self:capability { sys_tty_config };
+allow crond_t self:capability { dac_override setgid setuid sys_nice dac_read_search };
+dontaudit crond_t self:capability { sys_resource sys_tty_config };
 allow crond_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow crond_t self:process { setexec setfscreate };
 allow crond_t self:fd use;
@@ -222,7 +222,6 @@ userdom_use_unpriv_users_fds(crond_t)
 userdom_list_user_home_dirs(crond_t)
 
 mta_send_mail(crond_t)
-system_mail_file_access(crond_tmp_t)
 
 ifdef(`distro_debian',`
 	# pam_limits is used
@@ -261,8 +260,6 @@ optional_policy(`
 
 optional_policy(`
 	amavis_search_lib(crond_t)
-	# for bayes maintainance scripts
-	amavis_domtrans(crond_t)
 ')
 
 optional_policy(`
@@ -471,8 +468,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	mysql_read_config(system_crond_t)
-        mysql_stream_connect(system_crond_t)
+	mysql_read_config(system_cronjob_t)
 ')
 
 optional_policy(`

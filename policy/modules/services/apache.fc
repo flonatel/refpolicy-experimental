@@ -32,12 +32,8 @@ HOME_DIR/((www)|(web)|(public_html))(/.+)? gen_context(system_u:object_r:httpd_u
 /usr/lib(64)?/httpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
 /usr/lib(64)?/lighttpd(/.*)?		gen_context(system_u:object_r:httpd_modules_t,s0)
 
-ifdef(`distro_debian', `
-/usr/lib/apache2/mpm-.*/.*$	--	gen_context(system_u:object_r:httpd_exec_t,s0)
-', `
 /usr/sbin/apache(2)?		--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/apache-ssl(2)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
-')
 /usr/sbin/httpd(\.worker)?	--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/lighttpd		--	gen_context(system_u:object_r:httpd_exec_t,s0)
 /usr/sbin/rotatelogs		--	gen_context(system_u:object_r:httpd_rotatelogs_exec_t,s0)
@@ -83,8 +79,7 @@ ifdef(`distro_suse', `
 /var/lib/httpd(/.*)?			gen_context(system_u:object_r:httpd_var_lib_t,s0)
 /var/lib/php/session(/.*)?		gen_context(system_u:object_r:httpd_var_run_t,s0)
 /var/lib/squirrelmail/prefs(/.*)?	gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
-/var/lib/squirrelmail/data(/.*)?        gen_context(system_u:object_r:httpd_squirrelmail_t,s0)
- 
+
 /var/log/apache(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
 /var/log/apache-ssl(2)?(/.*)?		gen_context(system_u:object_r:httpd_log_t,s0)
 /var/log/cacti(/.*)?			gen_context(system_u:object_r:httpd_log_t,s0)

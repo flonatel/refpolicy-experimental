@@ -11,5 +11,5 @@
 ## </param>
 #
 interface(`perdition_tcp_connect',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')

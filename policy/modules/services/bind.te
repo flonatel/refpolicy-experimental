@@ -69,9 +69,6 @@ allow named_t self:unix_dgram_socket create_socket_perms;
 allow named_t self:tcp_socket create_stream_socket_perms;
 allow named_t self:udp_socket create_socket_perms;
 
-# because lwresd calls access(".", W_OK)
-files_dontaudit_rw_root_dir(named_t)
-
 allow named_t dnssec_t:file read_file_perms;
 
 # read configuration
@@ -202,7 +199,6 @@ allow ndc_t self:fifo_file rw_fifo_file_perms;
 allow ndc_t self:unix_stream_socket { connect create_stream_socket_perms };
 allow ndc_t self:tcp_socket create_socket_perms;
 allow ndc_t self:netlink_route_socket r_netlink_socket_perms;
-dev_read_urand(ndc_t)
 
 allow ndc_t dnssec_t:file read_file_perms;
 allow ndc_t dnssec_t:lnk_file { getattr read };

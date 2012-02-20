@@ -61,11 +61,6 @@ files_pid_file(klogd_var_run_t)
 type syslog_conf_t;
 files_config_file(syslog_conf_t)
 
-ifdef(`distro_debian', `
-# for xconsole detection
-    allow initrc_t syslog_conf_t:file read_file_perms;
-')
-
 type syslogd_t;
 type syslogd_exec_t;
 init_daemon_domain(syslogd_t, syslogd_exec_t)
@@ -86,13 +81,6 @@ type var_log_t;
 logging_log_file(var_log_t)
 files_mountpoint(var_log_t)
 
-# this is not actually a device, its a pipe
-type xconsole_device_t;
-files_type(xconsole_device_t)
-dev_associate(xconsole_device_t)
-files_associate_tmp(xconsole_device_t)
-allow syslogd_t xconsole_device_t:fifo_file rw_file_perms;
-
 ifdef(`enable_mls',`
 	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
@@ -105,7 +93,6 @@ ifdef(`enable_mls',`
 
 allow auditctl_t self:capability { fsetid dac_read_search dac_override };
 allow auditctl_t self:netlink_audit_socket nlmsg_readpriv;
-dev_read_urand(auditctl_t)
 
 read_files_pattern(auditctl_t, auditd_etc_t, auditd_etc_t)
 allow auditctl_t auditd_etc_t:dir list_dir_perms;
@@ -145,7 +132,6 @@ allow auditd_t self:file rw_file_perms;
 allow auditd_t self:unix_dgram_socket create_socket_perms;
 allow auditd_t self:fifo_file rw_fifo_file_perms;
 allow auditd_t self:tcp_socket create_stream_socket_perms;
-dev_read_urand(auditd_t)
 
 allow auditd_t auditd_etc_t:dir list_dir_perms;
 allow auditd_t auditd_etc_t:file read_file_perms;
@@ -238,7 +224,6 @@ allow audisp_t self:process { getcap signal_perms setcap setsched };
 allow audisp_t self:fifo_file rw_fifo_file_perms;
 allow audisp_t self:unix_stream_socket create_stream_socket_perms;
 allow audisp_t self:unix_dgram_socket create_socket_perms;
-dev_read_urand(audisp_t)
 
 allow audisp_t auditd_t:unix_stream_socket rw_socket_perms;
 
@@ -369,11 +354,11 @@ optional_policy(`
 # chown fsetid for syslog-ng
 # sys_admin for the integrated klog of syslog-ng and metalog
 # cjp: why net_admin!
-allow syslogd_t self:capability { chown dac_override fsetid net_admin sys_admin sys_nice sys_resource sys_tty_config };
+allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin chown fsetid };
 dontaudit syslogd_t self:capability sys_tty_config;
 # setpgid for metalog
 # setrlimit for syslog-ng
-allow syslogd_t self:process { signal_perms setpgid setrlimit getsched setsched };
+allow syslogd_t self:process { signal_perms setpgid setrlimit };
 # receive messages to be logged
 allow syslogd_t self:unix_dgram_socket create_socket_perms;
 allow syslogd_t self:unix_stream_socket create_stream_socket_perms;
@@ -391,9 +376,6 @@ files_pid_filetrans(syslogd_t, devlog_t, sock_file)
 # create/append log files.
 manage_files_pattern(syslogd_t, var_log_t, var_log_t)
 rw_fifo_files_pattern(syslogd_t, var_log_t, var_log_t)
-
-# for rsyslogd, this access is harmless so making it unconditional
-allow syslogd_t proc_t:file { getattr read };
 
 # Allow access for syslog-ng
 allow syslogd_t var_log_t:dir { create setattr };
@@ -523,4 +505,9 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(syslogd_t)
+')
+
+optional_policy(`
+	# log to the xconsole
+	xserver_rw_console(syslogd_t)
 ')

@@ -107,7 +107,6 @@ optional_policy(`
 # apcupsd_cgi Declarations
 #
 
-apache_script_exec_domain(apcupsd_cgi)
 optional_policy(`
 	apache_content_template(apcupsd_cgi)
 

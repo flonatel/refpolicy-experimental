@@ -11,7 +11,7 @@
 ## </param>
 #
 interface(`radius_use',`
-	refpolicyerr(`$0($*) has been deprecated.')
+	refpolicywarn(`$0($*) has been deprecated.')
 ')
 
 ########################################
