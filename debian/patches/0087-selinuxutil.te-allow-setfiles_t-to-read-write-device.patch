@@ -1,0 +1,37 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:46:05 +0100
+Subject: selinuxutil.te: allow setfiles_t to read/write device_t chr_file;
+ allow semanage to get fs mounts and to getattr xattrs.
+
+---
+ policy/modules/system/selinuxutil.te |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index e9e4f30..bf6dcf6 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -109,6 +109,7 @@ init_system_domain(setfiles_t, setfiles_exec_t)
+ domain_obj_id_change_exemption(setfiles_t)
+ term_read_console(setfiles_t)
+ dev_read_urand(setfiles_t)
++dev_rw_generic_chr_files(setfiles_t)
+ 
+ ########################################
+ #
+@@ -428,6 +429,7 @@ allow semanage_t self:capability { dac_override audit_write };
+ allow semanage_t self:unix_stream_socket create_stream_socket_perms;
+ allow semanage_t self:unix_dgram_socket create_socket_perms;
+ allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
++fs_getattr_xattr_fs(semanage_t)
+ 
+ allow semanage_t policy_config_t:file rw_file_perms;
+ 
+@@ -452,6 +454,7 @@ files_list_pids(semanage_t)
+ mls_file_write_all_levels(semanage_t)
+ mls_file_read_all_levels(semanage_t)
+ 
++selinux_get_fs_mount(semanage_t)
+ selinux_validate_context(semanage_t)
+ selinux_get_enforce_mode(semanage_t)
+ selinux_getattr_fs(semanage_t)

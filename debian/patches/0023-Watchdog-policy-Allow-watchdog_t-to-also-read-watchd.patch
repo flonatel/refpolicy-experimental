@@ -1,0 +1,50 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 02:17:25 +0100
+Subject: Watchdog policy: Allow watchdog_t to also read watchdog files.
+
+---
+ policy/modules/kernel/devices.if    |    6 +++---
+ policy/modules/services/watchdog.te |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index 206b01e..c23c3b5 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -4570,7 +4570,7 @@ interface(`dev_read_watchdog',`
+ 
+ ########################################
+ ## <summary>
+-##	Write to watchdog devices.
++##	Read/Write watchdog devices.
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -4578,12 +4578,12 @@ interface(`dev_read_watchdog',`
+ ##	</summary>
+ ## </param>
+ #
+-interface(`dev_write_watchdog',`
++interface(`dev_rw_watchdog',`
+ 	gen_require(`
+ 		type device_t, watchdog_device_t;
+ 	')
+ 
+-	write_chr_files_pattern($1, device_t, watchdog_device_t)
++	rw_chr_files_pattern($1, device_t, watchdog_device_t)
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/watchdog.te b/policy/modules/services/watchdog.te
+index b10bb05..28088ad 100644
+--- a/policy/modules/services/watchdog.te
++++ b/policy/modules/services/watchdog.te
+@@ -54,7 +54,7 @@ corenet_tcp_connect_all_ports(watchdog_t)
+ corenet_sendrecv_all_client_packets(watchdog_t)
+ 
+ dev_read_sysfs(watchdog_t)
+-dev_write_watchdog(watchdog_t)
++dev_rw_watchdog(watchdog_t)
+ # do not care about saving the random seed
+ dev_dontaudit_read_rand(watchdog_t)
+ dev_dontaudit_read_urand(watchdog_t)

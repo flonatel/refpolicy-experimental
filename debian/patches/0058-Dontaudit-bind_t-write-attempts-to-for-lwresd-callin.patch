@@ -1,0 +1,23 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:41:28 +0100
+Subject: Dontaudit bind_t write attempts to / for lwresd calling access(".",
+ W_OK)
+
+---
+ policy/modules/services/bind.te |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/bind.te b/policy/modules/services/bind.te
+index 2445f81..9ddb606 100644
+--- a/policy/modules/services/bind.te
++++ b/policy/modules/services/bind.te
+@@ -69,6 +69,9 @@ allow named_t self:unix_dgram_socket create_socket_perms;
+ allow named_t self:tcp_socket create_stream_socket_perms;
+ allow named_t self:udp_socket create_socket_perms;
+ 
++# because lwresd calls access(".", W_OK)
++files_dontaudit_rw_root_dir(named_t)
++
+ allow named_t dnssec_t:file read_file_perms;
+ 
+ # read configuration

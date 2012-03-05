@@ -1,0 +1,21 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:51:44 +0100
+Subject: Allow setrans_t to read proc_t files
+
+---
+ policy/modules/system/setrans.te |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/system/setrans.te b/policy/modules/system/setrans.te
+index 1447687..8e1e27d 100644
+--- a/policy/modules/system/setrans.te
++++ b/policy/modules/system/setrans.te
+@@ -50,7 +50,7 @@ manage_sock_files_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
+ files_pid_filetrans(setrans_t, setrans_var_run_t, { file dir })
+ 
+ kernel_read_kernel_sysctls(setrans_t)
+-kernel_read_proc_symlinks(setrans_t)
++kernel_read_system_state(setrans_t)
+ 
+ # allow performing getpidcon() on all processes
+ domain_read_all_domains_state(setrans_t)

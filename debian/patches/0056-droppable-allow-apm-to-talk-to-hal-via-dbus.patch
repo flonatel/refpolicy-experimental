@@ -1,0 +1,22 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:38:50 +0100
+Subject: droppable: allow apm to talk to hal via dbus
+
+---
+ policy/modules/services/apm.te |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/apm.te b/policy/modules/services/apm.te
+index 1c8c27e..8047894 100644
+--- a/policy/modules/services/apm.te
++++ b/policy/modules/services/apm.te
+@@ -190,6 +190,9 @@ optional_policy(`
+ 	optional_policy(`
+ 		networkmanager_dbus_chat(apmd_t)
+ 	')
++        optional_policy(`
++                hal_dbus_chat(apmd_t)
++        ')
+ ')
+ 
+ optional_policy(`

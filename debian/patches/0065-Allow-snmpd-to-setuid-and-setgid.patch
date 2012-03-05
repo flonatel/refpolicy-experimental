@@ -1,0 +1,21 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:51:49 +0100
+Subject: Allow snmpd to setuid and setgid
+
+---
+ policy/modules/services/snmp.te |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/services/snmp.te b/policy/modules/services/snmp.te
+index eb3c1d0..2de7e84 100644
+--- a/policy/modules/services/snmp.te
++++ b/policy/modules/services/snmp.te
+@@ -24,7 +24,7 @@ files_type(snmpd_var_lib_t)
+ #
+ # Local policy
+ #
+-allow snmpd_t self:capability { chown dac_override kill ipc_lock sys_ptrace net_admin sys_nice sys_tty_config };
++allow snmpd_t self:capability { chown dac_override setgid setuid kill ipc_lock sys_ptrace net_admin sys_nice sys_tty_config };
+ dontaudit snmpd_t self:capability { sys_module sys_tty_config };
+ allow snmpd_t self:process { signal_perms getsched setsched };
+ allow snmpd_t self:fifo_file rw_fifo_file_perms;

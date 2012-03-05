@@ -1,0 +1,201 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Mon, 20 Feb 2012 21:46:21 +0100
+Subject: Add support for Jabber, including adding the epmd_t domain for the
+ Erlang
+
+---
+ policy/modules/kernel/corenetwork.te.in |    1 +
+ policy/modules/services/epmd.fc         |    1 +
+ policy/modules/services/epmd.if         |   29 +++++++++++++++++
+ policy/modules/services/epmd.te         |   52 +++++++++++++++++++++++++++++++
+ policy/modules/services/jabber.fc       |    3 ++
+ policy/modules/services/jabber.te       |   16 ++++++++--
+ 6 files changed, 99 insertions(+), 3 deletions(-)
+ create mode 100644 policy/modules/services/epmd.fc
+ create mode 100644 policy/modules/services/epmd.if
+ create mode 100644 policy/modules/services/epmd.te
+
+diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
+index 624b263..daa10aa 100644
+--- a/policy/modules/kernel/corenetwork.te.in
++++ b/policy/modules/kernel/corenetwork.te.in
+@@ -100,6 +100,7 @@ network_port(dhcpd, udp,67,s0, udp,547,s0, tcp, 547,s0, udp,548,s0, tcp, 548,s0,
+ network_port(dict, tcp,2628,s0)
+ network_port(distccd, tcp,3632,s0)
+ network_port(dns, udp,53,s0, tcp,53,s0)
++network_port(epmd, tcp,4369,s0)
+ network_port(epmap, tcp,135,s0, udp,135,s0)
+ network_port(fingerd, tcp,79,s0)
+ network_port(ftp, tcp,21,s0, tcp,990,s0, udp,990,s0)
+diff --git a/policy/modules/services/epmd.fc b/policy/modules/services/epmd.fc
+new file mode 100644
+index 0000000..c5925ef
+--- /dev/null
++++ b/policy/modules/services/epmd.fc
+@@ -0,0 +1 @@
++/usr/lib/erlang/erts-[^/]*/bin/epmd -- gen_context(system_u:object_r:epmd_exec_t,s0)
+diff --git a/policy/modules/services/epmd.if b/policy/modules/services/epmd.if
+new file mode 100644
+index 0000000..1ce670c
+--- /dev/null
++++ b/policy/modules/services/epmd.if
+@@ -0,0 +1,29 @@
++## <summary>Erlang Port Mapper Daemon (epmd).</summary>
++
++########################################
++## <summary>
++##	Execute epmd in the epmd domain, and
++##	allow the specified role the epmd domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the epmd domain.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`run_epmd',`
++	gen_require(`
++		type epmd_t, epmd_exec_t;
++	')
++
++        domtrans_pattern($1, epmd_exec_t, epmd_t)
++	role $2 types epmd_t;
++	corenet_tcp_connect_epmd_port($1)
++')
++
+diff --git a/policy/modules/services/epmd.te b/policy/modules/services/epmd.te
+new file mode 100644
+index 0000000..af3ca9e
+--- /dev/null
++++ b/policy/modules/services/epmd.te
+@@ -0,0 +1,52 @@
++
++policy_module(epmd, 1.7.1)
++
++########################################
++#
++# Declarations
++#
++
++## <desc>
++## <p>
++## Allow the Erlang Port mapper to coordinate all nodes in distributed
++## computing.  It also wants to run on single nodes so any daemon written in
++## Erlang will need it.
++## </p>
++## </desc>
++
++type epmd_t;
++type epmd_exec_t;
++init_daemon_domain(epmd_t,epmd_exec_t)
++role system_r types epmd_t;
++
++########################################
++#
++# epmd local policy
++#
++
++allow epmd_t self:tcp_socket create_stream_socket_perms;
++#allow epmd_t self:udp_socket create_socket_perms;
++
++corenet_all_recvfrom_unlabeled(epmd_t)
++corenet_all_recvfrom_netlabel(epmd_t)
++corenet_tcp_bind_epmd_port(epmd_t)
++corenet_tcp_sendrecv_all_if(epmd_t)
++#corenet_udp_sendrecv_all_if(epmd_t)
++corenet_tcp_sendrecv_all_nodes(epmd_t)
++#corenet_udp_sendrecv_all_nodes(epmd_t)
++corenet_tcp_sendrecv_all_ports(epmd_t)
++#corenet_udp_sendrecv_all_ports(epmd_t)
++corenet_tcp_bind_all_nodes(epmd_t)
++#corenet_udp_bind_all_nodes(epmd_t)
++#corenet_tcp_connect_all_ports(epmd_t)
++#corenet_udp_bind_all_unreserved_ports(epmd_t)
++
++files_read_etc_files(epmd_t)
++
++libs_use_ld_so(epmd_t)
++libs_use_shared_libs(epmd_t)
++
++logging_send_syslog_msg(epmd_t)
++
++miscfiles_read_localization(epmd_t)
++
+diff --git a/policy/modules/services/jabber.fc b/policy/modules/services/jabber.fc
+index 4c9acec..b27ac10 100644
+--- a/policy/modules/services/jabber.fc
++++ b/policy/modules/services/jabber.fc
+@@ -1,6 +1,9 @@
+ /etc/rc\.d/init\.d/jabber --	gen_context(system_u:object_r:jabberd_initrc_exec_t,s0)
+ 
+ /usr/sbin/jabberd	--	gen_context(system_u:object_r:jabberd_exec_t,s0)
++/usr/sbin/ejabberd	--	gen_context(system_u:object_r:jabberd_exec_t,s0)
+ 
+ /var/lib/jabber(/.*)?		gen_context(system_u:object_r:jabberd_var_lib_t,s0)
++/var/lib/ejabberd(/.*)?		gen_context(system_u:object_r:jabberd_var_lib_t,s0)
+ /var/log/jabber(/.*)?		gen_context(system_u:object_r:jabberd_log_t,s0)
++/var/log/ejabberd(/.*)?		gen_context(system_u:object_r:jabberd_log_t,s0)
+diff --git a/policy/modules/services/jabber.te b/policy/modules/services/jabber.te
+index da2127e..dbcfb22 100644
+--- a/policy/modules/services/jabber.te
++++ b/policy/modules/services/jabber.te
+@@ -28,10 +28,11 @@ files_pid_file(jabberd_var_run_t)
+ 
+ allow jabberd_t self:capability dac_override;
+ dontaudit jabberd_t self:capability sys_tty_config;
+-allow jabberd_t self:process signal_perms;
+-allow jabberd_t self:fifo_file read_fifo_file_perms;
++allow jabberd_t self:process { signal_perms getsched setsched };
++allow jabberd_t self:fifo_file rw_fifo_file_perms;
+ allow jabberd_t self:tcp_socket create_stream_socket_perms;
+ allow jabberd_t self:udp_socket create_socket_perms;
++corenet_udp_bind_generic_node(jabberd_t)
+ 
+ manage_files_pattern(jabberd_t, jabberd_var_lib_t, jabberd_var_lib_t)
+ files_var_lib_filetrans(jabberd_t, jabberd_var_lib_t, file)
+@@ -44,7 +45,7 @@ files_pid_filetrans(jabberd_t, jabberd_var_run_t, file)
+ 
+ kernel_read_kernel_sysctls(jabberd_t)
+ kernel_list_proc(jabberd_t)
+-kernel_read_proc_symlinks(jabberd_t)
++kernel_read_system_state(jabberd_t)
+ 
+ corenet_all_recvfrom_unlabeled(jabberd_t)
+ corenet_all_recvfrom_netlabel(jabberd_t)
+@@ -55,14 +56,19 @@ corenet_udp_sendrecv_generic_node(jabberd_t)
+ corenet_tcp_sendrecv_all_ports(jabberd_t)
+ corenet_udp_sendrecv_all_ports(jabberd_t)
+ corenet_tcp_bind_generic_node(jabberd_t)
++corenet_tcp_connect_generic_port(jabberd_t)
+ corenet_tcp_bind_jabber_client_port(jabberd_t)
+ corenet_tcp_bind_jabber_interserver_port(jabberd_t)
+ corenet_sendrecv_jabber_client_server_packets(jabberd_t)
+ corenet_sendrecv_jabber_interserver_server_packets(jabberd_t)
+ 
++corecmd_exec_bin(jabberd_t)
++corecmd_exec_shell(jabberd_t)
++
+ dev_read_sysfs(jabberd_t)
+ # For SSL
+ dev_read_rand(jabberd_t)
++dev_read_urand(jabberd_t)
+ 
+ domain_use_interactive_fds(jabberd_t)
+ 
+@@ -82,6 +88,10 @@ userdom_dontaudit_use_unpriv_user_fds(jabberd_t)
+ userdom_dontaudit_search_user_home_dirs(jabberd_t)
+ 
+ optional_policy(`
++	run_epmd(jabberd_t, system_r)
++')
++
++optional_policy(`
+ 	nis_use_ypbind(jabberd_t)
+ ')
+ 

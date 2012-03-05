@@ -1,0 +1,50 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:37:51 +0100
+Subject: Debian fixes for xserver policy
+
+---
+ policy/modules/services/xserver.if |    9 +++++----
+ policy/modules/services/xserver.te |    1 +
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
+index bd4a1ff..6c339ae 100644
+--- a/policy/modules/services/xserver.if
++++ b/policy/modules/services/xserver.if
+@@ -601,12 +601,12 @@ interface(`xserver_use_all_users_fonts',`
+ 
+ ########################################
+ ## <summary>
+-##	Read all users .Xauthority.
++##    Read all users .Xauthority.
+ ## </summary>
+ ## <param name="domain">
+-##	<summary>
+-##	Domain allowed access.
+-##	</summary>
++##    <summary>
++##    Domain allowed access.
++##    </summary>
+ ## </param>
+ #
+ interface(`xserver_read_user_xauth',`
+@@ -747,6 +747,7 @@ interface(`xserver_stream_connect_xdm',`
+ 
+ 	files_search_tmp($1)
+ 	stream_connect_pattern($1, xdm_tmp_t, xdm_tmp_t, xdm_t)
++	stream_connect_pattern($1, xdm_var_run_t, xdm_var_run_t, xdm_t)
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
+index c759ad7..3fd9194 100644
+--- a/policy/modules/services/xserver.te
++++ b/policy/modules/services/xserver.te
+@@ -784,6 +784,7 @@ optional_policy(`
+ optional_policy(`
+ 	unconfined_domain_noaudit(xserver_t)
+ 	unconfined_domtrans(xserver_t)
++        unconfined_dbus_send(xserver_t)
+ ')
+ 
+ optional_policy(`

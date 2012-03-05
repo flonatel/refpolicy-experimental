@@ -1,0 +1,20 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 02:41:30 +0100
+Subject: add getattr access to selinux_validate_context
+
+---
+ policy/modules/kernel/selinux.if |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/kernel/selinux.if b/policy/modules/kernel/selinux.if
+index ca7e808..f8f37e2 100644
+--- a/policy/modules/kernel/selinux.if
++++ b/policy/modules/kernel/selinux.if
+@@ -544,6 +544,7 @@ interface(`selinux_validate_context',`
+ 
+ 	allow $1 security_t:dir list_dir_perms;
+ 	allow $1 security_t:file rw_file_perms;
++	allow $1 security_t:filesystem getattr;
+ 	allow $1 security_t:security check_context;
+ ')
+ 

@@ -1,0 +1,85 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 02:31:30 +0100
+Subject: files.if: Allow management of symlinks under /mnt; also add
+ interface files_manage_pid_dirs which is not used in standard
+ policy for local system administrator's use
+
+---
+ policy/modules/kernel/files.if |   29 +++++++++++++++++++++++++++--
+ 1 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index ff2748d..7ca0bd9 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -3480,8 +3480,9 @@ interface(`files_search_mnt',`
+ 	gen_require(`
+ 		type mnt_t;
+ 	')
+-
+-	allow $1 mnt_t:dir search_dir_perms;
++        
++        allow $1 mnt_t:dir search_dir_perms;
++        allow $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ########################################
+@@ -3500,6 +3501,7 @@ interface(`files_dontaudit_search_mnt',`
+ 	')
+ 
+ 	dontaudit $1 mnt_t:dir search_dir_perms;
++	dontaudit $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ########################################
+@@ -3518,6 +3520,7 @@ interface(`files_list_mnt',`
+ 	')
+ 
+ 	allow $1 mnt_t:dir list_dir_perms;
++	allow $1 mnt_t:lnk_file read_lnk_file_perms;
+ ')
+ 
+ ######################################
+@@ -5524,6 +5527,7 @@ interface(`files_read_all_locks',`
+ 
+ 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
++	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 lockfile:dir list_dir_perms;
+ 	read_files_pattern($1, lockfile, lockfile)
+ 	read_lnk_files_pattern($1, lockfile, lockfile)
+@@ -5547,6 +5551,7 @@ interface(`files_manage_all_locks',`
+ 
+ 	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	allow $1 { var_t var_lock_t }:dir search_dir_perms;
++	allow $1 var_lock_t:lnk_file read_lnk_file_perms;
+ 	manage_dirs_pattern($1, lockfile, lockfile)
+ 	manage_files_pattern($1, lockfile, lockfile)
+ 	manage_lnk_files_pattern($1, lockfile, lockfile)
+@@ -5821,6 +5826,26 @@ interface(`files_dontaudit_getattr_all_pids',`
+ 
+ ########################################
+ ## <summary>
++##      Create directories under /var/run
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`files_manage_pid_dirs',`
++	gen_require(`
++		type var_t, var_run_t;
++	')
++
++	allow $1 var_t:dir search;
++	allow $1 var_run_t:lnk_file read_lnk_file_perms;
++	allow $1 var_run_t:dir manage_dir_perms;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to write to daemon runtime data files.
+ ## </summary>
+ ## <param name="domain">

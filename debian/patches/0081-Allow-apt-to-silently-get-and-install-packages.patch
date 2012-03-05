@@ -1,0 +1,24 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:32:02 +0100
+Subject: Allow apt to silently get and install packages
+
+---
+ policy/modules/system/libraries.te |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/system/libraries.te b/policy/modules/system/libraries.te
+index 5a16f99..22da7eb 100644
+--- a/policy/modules/system/libraries.te
++++ b/policy/modules/system/libraries.te
+@@ -97,6 +97,11 @@ logging_send_syslog_msg(ldconfig_t)
+ userdom_use_user_terminals(ldconfig_t)
+ userdom_use_all_users_fds(ldconfig_t)
+ 
++optional_policy(`
++	# This is needed for apt to get and install packages silently
++        apt_dontaudit_use_fds(ldconfig_t)   
++')
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(ldconfig_t)

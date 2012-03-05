@@ -1,0 +1,39 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:06:37 +0100
+Subject: Small adaptions of the base dbus policy for debian.
+
+---
+ policy/modules/services/dbus.fc |    5 +++++
+ policy/modules/services/dbus.if |    2 ++
+ 2 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/dbus.fc b/policy/modules/services/dbus.fc
+index 81eba14..bbca1eb 100644
+--- a/policy/modules/services/dbus.fc
++++ b/policy/modules/services/dbus.fc
+@@ -6,7 +6,12 @@
+ /lib64/dbus-1/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
+ 
+ /usr/bin/dbus-daemon(-1)? --	gen_context(system_u:object_r:dbusd_exec_t,s0)
++ifdef(`distro_redhat', `
+ /usr/libexec/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
++')
++ifdef(`distro_debian', `
++/usr/lib/dbus-1.0/dbus-daemon-launch-helper -- gen_context(system_u:object_r:dbusd_exec_t,s0)
++')
+ 
+ /var/lib/dbus(/.*)?		gen_context(system_u:object_r:system_dbusd_var_lib_t,s0)
+ 
+diff --git a/policy/modules/services/dbus.if b/policy/modules/services/dbus.if
+index 1a1becd..64ce1df 100644
+--- a/policy/modules/services/dbus.if
++++ b/policy/modules/services/dbus.if
+@@ -194,6 +194,8 @@ interface(`dbus_system_bus_client',`
+ 	files_search_pids($1)
+ 	stream_connect_pattern($1, system_dbusd_var_run_t, system_dbusd_var_run_t, system_dbusd_t)
+ 	dbus_read_config($1)
++        allow system_dbusd_t $1:dir search;
++        allow system_dbusd_t $1:file read_file_perms;
+ ')
+ 
+ #######################################

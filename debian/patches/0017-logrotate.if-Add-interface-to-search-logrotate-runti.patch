@@ -1,0 +1,38 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 01:29:24 +0100
+Subject: logrotate.if: Add interface to search logrotate runtime directories.
+
+Nobody is using this interface so this is for easier local policies only.
+---
+ policy/modules/admin/logrotate.if |   18 ++++++++++++++++++
+ 1 files changed, 18 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/admin/logrotate.if b/policy/modules/admin/logrotate.if
+index 9cd6b0b..f9343c9 100644
+--- a/policy/modules/admin/logrotate.if
++++ b/policy/modules/admin/logrotate.if
+@@ -84,6 +84,24 @@ interface(`logrotate_use_fds',`
+ 
+ ########################################
+ ## <summary>
++##	Search logrotate runtime directries
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logrotate_search_varlib',`
++	gen_require(`
++		type logrotate_var_lib_t;
++	')
++
++	allow $1 logrotate_var_lib_t:dir search;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to inherit logrotate file descriptors.
+ ## </summary>
+ ## <param name="domain">

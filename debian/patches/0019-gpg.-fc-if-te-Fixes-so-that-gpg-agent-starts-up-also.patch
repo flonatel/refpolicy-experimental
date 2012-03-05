@@ -1,0 +1,190 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 01:48:51 +0100
+Subject: gpg.{fc,if,te}: Fixes so that gpg-agent starts up (also when
+ launched by ssh-agent). Add interfaces to access to transition to
+ gpg_agent_t. unprivuser.te, ssh.if: Make use of the new interfaces.
+ userdomain.fc: Label user's .gnupg
+
+---
+ policy/modules/apps/gpg.fc          |    1 +
+ policy/modules/apps/gpg.if          |   46 +++++++++++++++++++++++++++++++++++
+ policy/modules/apps/gpg.te          |    7 +++++
+ policy/modules/roles/unprivuser.te  |    1 +
+ policy/modules/services/ssh.if      |    5 ++++
+ policy/modules/services/xserver.if  |   18 +++++++++++++
+ policy/modules/system/userdomain.fc |    1 +
+ 7 files changed, 79 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/apps/gpg.fc b/policy/modules/apps/gpg.fc
+index e9853d4..a075b1c 100644
+--- a/policy/modules/apps/gpg.fc
++++ b/policy/modules/apps/gpg.fc
+@@ -1,4 +1,5 @@
+ HOME_DIR/\.gnupg(/.+)?		gen_context(system_u:object_r:gpg_secret_t,s0)
++HOME_DIR/\.gnupg/log-socket	gen_context(system_u:object_r:gpg_agent_tmp_t,s0)
+ 
+ /usr/bin/gpg(2)?	--	gen_context(system_u:object_r:gpg_exec_t,s0)
+ /usr/bin/gpg-agent	--	gen_context(system_u:object_r:gpg_agent_exec_t,s0)
+diff --git a/policy/modules/apps/gpg.if b/policy/modules/apps/gpg.if
+index 40e0a2a..0e037c6 100644
+--- a/policy/modules/apps/gpg.if
++++ b/policy/modules/apps/gpg.if
+@@ -22,6 +22,7 @@ interface(`gpg_role',`
+ 		type gpg_agent_tmp_t;
+ 		type gpg_helper_t, gpg_pinentry_t;
+ 		type gpg_pinentry_tmp_t;
++		type gpg_secret_t;
+ 	')
+ 
+ 	role $1 types { gpg_t gpg_agent_t gpg_helper_t gpg_pinentry_t };
+@@ -54,6 +55,8 @@ interface(`gpg_role',`
+ 	manage_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
+ 	relabel_sock_files_pattern($2, gpg_pinentry_tmp_t, gpg_pinentry_tmp_t)
+ 
++	allow $2 gpg_secret_t:dir list_dir_perms;
++
+ 	optional_policy(`
+ 		gpg_pinentry_dbus_chat($2)
+ 	')
+@@ -67,6 +70,49 @@ interface(`gpg_role',`
+ 	')
+ ')
+ 
++############################################################
++## <summary>
++##	Transition to gpg_agent_t from another domain
++##	Used for ssh_agent_t to launch the gpg agent for X logins
++## </summary>
++## <param name="domain">
++##	<summary>
++##	domain to run the gpg agent
++##	</summary>
++## </param>
++#
++interface(`run_gpg_agent',`
++	gen_require(`
++		type gpg_agent_t, gpg_agent_exec_t;
++	')
++	domtrans_pattern($1, gpg_agent_exec_t, gpg_agent_t)
++')
++
++########################################
++## <summary>
++##	Transition to a user domain from gpg_agent_t
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to transition to
++##	</summary>
++## </param>
++## <param name="file_type">
++##	<summary>
++##	Type of file for log data - usually a home type
++##	</summary>
++## </param>
++#
++interface(`gpg_agent_domtrans_user',`
++	gen_require(`
++		type gpg_agent_t, shell_exec_t, bin_t;
++	')
++	allow $1 gpg_agent_t:fd use;
++	allow gpg_agent_t $1:process signull;
++	allow gpg_agent_t $2:file { getattr append };
++	domain_auto_trans(gpg_agent_t, { shell_exec_t bin_t }, $1)
++')
++
+ ########################################
+ ## <summary>
+ ##	Transition to a user gpg domain.
+diff --git a/policy/modules/apps/gpg.te b/policy/modules/apps/gpg.te
+index 9050e8c..a8b478a 100644
+--- a/policy/modules/apps/gpg.te
++++ b/policy/modules/apps/gpg.te
+@@ -222,6 +222,9 @@ manage_dirs_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
+ manage_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
+ manage_sock_files_pattern(gpg_agent_t, gpg_agent_tmp_t, gpg_agent_tmp_t)
+ files_tmp_filetrans(gpg_agent_t, gpg_agent_tmp_t, { file sock_file dir })
++filetrans_pattern(gpg_agent_t, gpg_secret_t, gpg_agent_tmp_t, sock_file)
++files_read_etc_files(gpg_agent_t)
++kernel_read_crypto_sysctls(gpg_agent_t)
+ 
+ # allow gpg to connect to the gpg agent
+ stream_connect_pattern(gpg_t, gpg_agent_tmp_t, gpg_agent_tmp_t, gpg_agent_t)
+@@ -272,6 +275,10 @@ optional_policy(`
+ 	mozilla_dontaudit_rw_user_home_files(gpg_agent_t)
+ ')
+ 
++optional_policy(`
++	xdm_sigchld(gpg_agent_t)
++')
++
+ ##############################
+ #
+ # Pinentry local policy
+diff --git a/policy/modules/roles/unprivuser.te b/policy/modules/roles/unprivuser.te
+index e5bfdd4..baaba0f 100644
+--- a/policy/modules/roles/unprivuser.te
++++ b/policy/modules/roles/unprivuser.te
+@@ -67,6 +67,7 @@ ifndef(`distro_redhat',`
+ 
+ 	optional_policy(`
+ 		gpg_role(user_r, user_t)
++		gpg_agent_domtrans_user(user_t, user_home_t)
+ 	')
+ 
+ 	optional_policy(`
+diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
+index b14ce8b..4de43f2 100644
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -421,6 +421,11 @@ template(`ssh_role_template',`
+ 	')
+ 
+ 	optional_policy(`
++		run_gpg_agent($1_ssh_agent_t)
++	')
++
++	optional_policy(`
++		xdm_sigchld($1_ssh_agent_t)
+ 		xserver_use_xdm_fds($1_ssh_agent_t)
+ 		xserver_rw_xdm_pipes($1_ssh_agent_t)
+ 	')
+diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
+index 4acc8dc..bd4a1ff 100644
+--- a/policy/modules/services/xserver.if
++++ b/policy/modules/services/xserver.if
+@@ -116,6 +116,24 @@ interface(`xserver_restricted_role',`
+ 
+ ########################################
+ ## <summary>
++##	Allow domain to send sigchld to xdm_t
++##	and environment.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`xdm_sigchld',`
++	gen_require(`
++		type xdm_t;
++	')
++	allow $1 xdm_t:process sigchld;
++')
++
++########################################
++## <summary>
+ ##	Rules required for using the X Windows server
+ ##	and environment.
+ ## </summary>
+diff --git a/policy/modules/system/userdomain.fc b/policy/modules/system/userdomain.fc
+index db75976..a9f396a 100644
+--- a/policy/modules/system/userdomain.fc
++++ b/policy/modules/system/userdomain.fc
+@@ -1,4 +1,5 @@
+ HOME_DIR	-d	gen_context(system_u:object_r:user_home_dir_t,s0-mls_systemhigh)
+ HOME_DIR/.+		gen_context(system_u:object_r:user_home_t,s0)
++HOME_DIR/\.gnupg/gpg.conf -- gen_context(system_u:object_r:user_home_t,s0)
+ 
+ /tmp/gconfd-USER -d	gen_context(system_u:object_r:user_tmp_t,s0)

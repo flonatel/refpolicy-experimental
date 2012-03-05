@@ -1,0 +1,154 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Mon, 5 Mar 2012 21:17:57 +0100
+Subject: Legacy rest I couldn't make sense of
+
+---
+ policy/constraints                    |    2 +-
+ policy/mcs                            |   33 ++++++++++++++++++++++++++++++---
+ policy/modules/kernel/corecommands.fc |    4 +++-
+ policy/modules/system/fstools.fc      |    3 +++
+ policy/modules/system/sysnetwork.if   |    1 +
+ policy/users                          |    2 +-
+ 6 files changed, 39 insertions(+), 6 deletions(-)
+
+diff --git a/policy/constraints b/policy/constraints
+index 1308871..06ce728 100644
+--- a/policy/constraints
++++ b/policy/constraints
+@@ -28,7 +28,7 @@
+ define(`basic_ubac_conditions',`
+ 	ifdef(`enable_ubac',`
+ 		u1 == u2
+-		or u1 == system_u
++		or u1 == system_u or u1 == unconfined_u
+ 		or u2 == system_u
+ 		or t1 != ubac_constrained_type
+ 		or t2 != ubac_constrained_type
+diff --git a/policy/mcs b/policy/mcs
+index df8e0fa..e5f603a 100644
+--- a/policy/mcs
++++ b/policy/mcs
+@@ -71,32 +71,59 @@ gen_levels(1,mcs_num_cats)
+ mlsconstrain file { read ioctl lock execute execute_no_trans }
+ 	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t2 == domain ));
+ 
+-mlsconstrain file { write setattr append unlink link rename }
++mlsconstrain file { write setattr append link rename }
++ifdef(`distro_debian', `
++	((( h1 dom h2 ) and ( l1 domby l2 )) or ( t1 == mcswriteall ) or (t2 == mcstrustedobject) or ( t2 == domain ));
++', `
+ 	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t2 == domain ));
++')
++
++mlsconstrain file { unlink }
++ifdef(`distro_debian', `
++	((( h1 dom h2 ) and ( l1 domby l2 )) or (( t1 == mcswriteall ) or ( t1 == mcsdeleteall )) or (t2 == mcstrustedobject) or ( t2 == domain ));
++', `
++	(( h1 dom h2 ) or (( t1 == mcswriteall ) or ( t1 == mcsdeleteall )) or ( t2 == domain ));
++')
+ 
+ mlsconstrain dir { search read ioctl lock }
+-	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t2 == domain ));
++	(( h1 dom h2 ) or ( t1 == mcsreadall ) or ( t1 == mcsdeleteall ) or ( t2 == domain ));
+ 
+-mlsconstrain dir { write setattr append unlink link rename add_name remove_name }
++mlsconstrain dir { setattr append link rename add_name }
+ 	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t2 == domain ));
+ 
++mlsconstrain dir { write unlink remove_name }
++	(( h1 dom h2 ) or ( t1 == mcswriteall ) or ( t1 == mcsdeleteall ) or ( t2 == domain ));
++
+ # New filesystem object labels must be dominated by the relabeling subject
+ # clearance, also the objects are single-level.
+ mlsconstrain file { create relabelto }
++ifdef(`distro_debian', `
++	(( h1 dom h2 ) and ( l2 eq h2 ) and ((l1 domby l2) or (t2 == mcstrustedobject)));
++', `
+ 	(( h1 dom h2 ) and ( l2 eq h2 ));
++')
+ 
+ # new file labels must be dominated by the relabeling subject clearance
+ mlsconstrain { dir file lnk_file chr_file blk_file sock_file fifo_file } { relabelfrom }
+ 	( h1 dom h2 );
+ 
++# not mandatory at this time - can write down
+ mlsconstrain { dir file lnk_file chr_file blk_file sock_file fifo_file } { create relabelto }
+ 	(( h1 dom h2 ) and ( l2 eq h2 ));
+ 
+ mlsconstrain process { transition dyntransition }
++ifdef(`distro_debian', `
++	(( ( h1 dom h2 ) and ((l1 domby l2) or (t1 == mcssetlow)) ) or ( t1 == mcssetcats ));
++', `
+ 	(( h1 dom h2 ) or ( t1 == mcssetcats ));
++')
+ 
+ mlsconstrain process { ptrace }
++ifdef(`distro_debian', `
++	( (h1 dom h2) and ((l1 domby l2) or ( t1 == mcsptraceall )) );
++', `
+ 	(( h1 dom h2) or ( t1 == mcsptraceall ));
++')
+ 
+ mlsconstrain process { sigkill sigstop }
+ 	(( h1 dom h2 ) or ( t1 == mcskillall ));
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index 9e654c4..3a6ffaf 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -135,7 +135,6 @@ ifdef(`distro_debian',`
+ /lib/udev/scsi_id		--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/upstart(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+ 
+-
+ /lib64/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:bin_t,s0)
+ /lib64/udev/[^/]*		--	gen_context(system_u:object_r:bin_t,s0)
+ 
+@@ -299,6 +298,9 @@ ifdef(`distro_gentoo',`
+ 
+ ifdef(`distro_debian',`
+ /usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/gnome-vfs-2.0/gnome-vfs-daemon -- gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/udisks/.*		--	gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/dovecot/.+             --      gen_context(system_u:object_r:bin_t,s0)
+ ')
+ 
+ ifdef(`distro_gentoo', `
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index a97a096..c100ab5 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -36,6 +36,9 @@
+ /sbin/swapon.*		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /sbin/tune2fs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ 
++# this is not ideal, but the best way to minimise privs for initrc_t
++/sbin/logsave		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
++
+ /usr/bin/partition_uuid	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/raw		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/scsi_unique_id	--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+diff --git a/policy/modules/system/sysnetwork.if b/policy/modules/system/sysnetwork.if
+index ff80d0a..e3d4dc1 100644
+--- a/policy/modules/system/sysnetwork.if
++++ b/policy/modules/system/sysnetwork.if
+@@ -423,6 +423,7 @@ interface(`sysnet_manage_config',`
+ 		type net_conf_t;
+ 	')
+ 
++	allow $1 net_conf_t:dir manage_dir_perms;
+ 	allow $1 net_conf_t:file manage_file_perms;
+ 
+ 	ifdef(`distro_redhat',`
+diff --git a/policy/users b/policy/users
+index c4ebc7e..cac59b3 100644
+--- a/policy/users
++++ b/policy/users
+@@ -29,7 +29,7 @@ gen_user(staff_u, staff, staff_r sysadm_r ifdef(`enable_mls',`secadm_r auditadm_
+ gen_user(sysadm_u, sysadm, sysadm_r, s0, s0 - mls_systemhigh, mcs_allcats)
+ 
+ # Until order dependence is fixed for users:
+-gen_user(unconfined_u, unconfined, unconfined_r, s0, s0 - mls_systemhigh, mcs_allcats)
++gen_user(unconfined_u, unconfined, unconfined_r system_r, s0, s0 - mls_systemhigh, mcs_allcats)
+ 
+ #
+ # The following users correspond to Unix identities.

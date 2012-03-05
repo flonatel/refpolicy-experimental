@@ -1,0 +1,245 @@
+From: Chris PeBenito <cpebenito@tresys.com>
+Date: Wed, 16 Nov 2011 15:29:18 -0500
+Subject: Debian file locations patch from Russell Coker.
+
+---
+ policy/modules/kernel/corecommands.fc |    5 +++++
+ policy/modules/kernel/devices.fc      |    8 ++++++++
+ policy/modules/kernel/files.fc        |    8 +++++++-
+ policy/modules/services/xserver.fc    |   30 ++++++++++++++----------------
+ policy/modules/system/init.fc         |    5 +++++
+ policy/modules/system/sysnetwork.fc   |    7 +++++++
+ policy/modules/system/udev.fc         |   13 ++++++++++++-
+ policy/modules/system/unconfined.fc   |    6 ++++++
+ 8 files changed, 64 insertions(+), 18 deletions(-)
+
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index 3fae11a..9e654c4 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -187,6 +187,7 @@ ifdef(`distro_gentoo',`
+ /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ /usr/bin/scponly		--	gen_context(system_u:object_r:shell_exec_t,s0)
++/usr/bin/tcsh			--	gen_context(system_u:object_r:shell_exec_t,s0)
+ 
+ /usr/lib(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+ 
+@@ -296,6 +297,10 @@ ifdef(`distro_gentoo',`
+ 
+ /usr/X11R6/lib(64)?/X11/xkb/xkbcomp --	gen_context(system_u:object_r:bin_t,s0)
+ 
++ifdef(`distro_debian',`
++/usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
++')
++
+ ifdef(`distro_gentoo', `
+ /usr/.*-.*-linux-gnu/gcc-bin/.*(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+ /usr/.*-.*-linux-gnu/binutils-bin(/.*)?	gen_context(system_u:object_r:bin_t,s0)
+diff --git a/policy/modules/kernel/devices.fc b/policy/modules/kernel/devices.fc
+index 6cf8784..02b7ac1 100644
+--- a/policy/modules/kernel/devices.fc
++++ b/policy/modules/kernel/devices.fc
+@@ -179,6 +179,14 @@ ifdef(`distro_suse', `
+ /dev/xen/gntdev		-c	gen_context(system_u:object_r:xen_device_t,s0)
+ /dev/xen/gntalloc	-c	gen_context(system_u:object_r:xen_device_t,s0)
+ 
++ifdef(`distro_debian',`
++# this is a static /dev dir "backup mount"
++# if you want to disable udev, you'll have to boot permissive and relabel!
++/dev/\.static		-d	gen_context(system_u:object_r:device_t,s0)
++/dev/\.static/dev	-d	gen_context(system_u:object_r:device_t,s0)
++/dev/\.static/dev/(.*)?		<<none>>
++')
++
+ /etc/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
+ 
+ # used by init scripts to initally populate udev /dev
+diff --git a/policy/modules/kernel/files.fc b/policy/modules/kernel/files.fc
+index c19518a..ee086d2 100644
+--- a/policy/modules/kernel/files.fc
++++ b/policy/modules/kernel/files.fc
+@@ -107,6 +107,12 @@ HOME_ROOT/lost\+found/.*		<<none>>
+ /lib/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
+ /lib64/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
+ 
++ifdef(`distro_debian',`
++# on Debian /lib/init/rw is a tmpfs used like /var/run but
++# before /var is mounted
++/lib/init/rw(/.*)?		gen_context(system_u:object_r:var_run_t,s0-mls_systemhigh)
++')
++
+ #
+ # /lost+found
+ #
+@@ -255,5 +261,5 @@ ifndef(`distro_redhat',`
+ /var/tmp/vi\.recover	-d	gen_context(system_u:object_r:tmp_t,s0)
+ 
+ ifdef(`distro_debian',`
+-/var/run/motd		--	gen_context(system_u:object_r:etc_runtime_t,s0)
++/var/run/motd		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ ')
+diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
+index 4966c94..829fd44 100644
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
+@@ -18,13 +18,16 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ #
+ # /etc
+ #
++/etc/gdm/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/gdm/PreSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/gdm/Xsession	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ 
+ /etc/init\.d/xfree86-common --	gen_context(system_u:object_r:xserver_exec_t,s0)
+ 
+-/etc/kde3?/kdm/Xstartup	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/Xreset	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/Xsession	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/kde3?/kdm/backgroundrc	gen_context(system_u:object_r:xdm_var_run_t,s0)
++/etc/kde[34]?/kdm/Xstartup --	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/Xreset --	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/Xsession --	gen_context(system_u:object_r:xsession_exec_t,s0)
++/etc/kde[34]?/kdm/backgroundrc	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
+ /etc/X11/[wx]dm/Xreset.* --	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/X11/[wxg]dm/Xsession --	gen_context(system_u:object_r:xsession_exec_t,s0)
+@@ -33,11 +36,6 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ /etc/X11/wdm/Xstartup.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ /etc/X11/Xsession[^/]*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+ 
+-ifdef(`distro_redhat',`
+-/etc/gdm/PostSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-/etc/gdm/PreSession/.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
+-')
+-
+ #
+ # /opt
+ #
+@@ -65,14 +63,9 @@ ifdef(`distro_redhat',`
+ /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)
+ /usr/bin/xauth		--	gen_context(system_u:object_r:xauth_exec_t,s0)
+ /usr/bin/Xorg		--	gen_context(system_u:object_r:xserver_exec_t,s0)
+-ifdef(`distro_debian', `
+-/usr/sbin/gdm		--	gen_context(system_u:object_r:xdm_exec_t,s0)
+-')
+ 
+ /usr/lib(64)?/qt-.*/etc/settings(/.*)?	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
+-/usr/var/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+-
+ /usr/X11R6/bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
+ /usr/X11R6/bin/iceauth	--	gen_context(system_u:object_r:iceauth_exec_t,s0)
+ /usr/X11R6/bin/X	--	gen_context(system_u:object_r:xserver_exec_t,s0)
+@@ -84,21 +77,26 @@ ifdef(`distro_debian', `
+ /usr/X11R6/lib/X11/xkb	-d	gen_context(system_u:object_r:xkb_var_lib_t,s0)
+ /usr/X11R6/lib/X11/xkb/.* --	gen_context(system_u:object_r:xkb_var_lib_t,s0)
+ 
++ifndef(`distro_debian',`
++/usr/var/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
++')
++
+ #
+ # /var
+ #
+ 
+-/var/[xgk]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
++/var/[xgkw]dm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+ 
+ /var/lib/[xkw]dm(/.*)?		gen_context(system_u:object_r:xdm_var_lib_t,s0)
+ /var/lib/xkb(/.*)?		gen_context(system_u:object_r:xkb_var_lib_t,s0)
+ 
+-/var/log/[kw]dm\.log	--	gen_context(system_u:object_r:xserver_log_t,s0)
++/var/log/[kw]dm\.log.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/gdm(/.*)?		gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/XFree86.*	--	gen_context(system_u:object_r:xserver_log_t,s0)
+ /var/log/Xorg.*		--	gen_context(system_u:object_r:xserver_log_t,s0)
+ 
+ /var/run/[gx]dm\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
++/var/run/xauth(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/xdmctl(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
+ 
+ ifdef(`distro_suse',`
+diff --git a/policy/modules/system/init.fc b/policy/modules/system/init.fc
+index 354ce93..46263b8 100644
+--- a/policy/modules/system/init.fc
++++ b/policy/modules/system/init.fc
+@@ -64,6 +64,11 @@ ifdef(`distro_gentoo', `
+ /var/run/random-seed	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ /var/run/setmixer_flag	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ 
++ifdef(`distro_debian',`
++/var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++/var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++')
++
+ ifdef(`distro_gentoo', `
+ /var/lib/init\.d(/.*)?		gen_context(system_u:object_r:initrc_state_t,s0)
+ /var/run/svscan\.pid	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+diff --git a/policy/modules/system/sysnetwork.fc b/policy/modules/system/sysnetwork.fc
+index 694fd94..11009a5 100644
+--- a/policy/modules/system/sysnetwork.fc
++++ b/policy/modules/system/sysnetwork.fc
+@@ -5,6 +5,13 @@
+ /bin/ip			--	gen_context(system_u:object_r:ifconfig_exec_t,s0)
+ 
+ #
++# /dev
++#
++ifdef(`distro_debian',`
++/dev/shm/network(/.*)?		gen_context(system_u:object_r:net_conf_t,s0)
++')
++
++#
+ # /etc
+ #
+ /etc/dhclient.*conf	--	gen_context(system_u:object_r:dhcp_etc_t,s0)
+diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
+index 0506175..2575393 100644
+--- a/policy/modules/system/udev.fc
++++ b/policy/modules/system/udev.fc
+@@ -11,7 +11,10 @@
+ 
+ /lib/udev/udev-acl --	gen_context(system_u:object_r:udev_exec_t,s0)
+ 
+-/sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
++ifdef(`distro_debian',`
++/lib/udev/create_static_nodes -- gen_context(system_u:object_r:udev_exec_t,s0)
++')
++
+ /sbin/udev	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /sbin/udevadm	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /sbin/udevd	--	gen_context(system_u:object_r:udev_exec_t,s0)
+@@ -19,7 +22,15 @@
+ /sbin/udevstart	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /sbin/wait_for_sysfs -- gen_context(system_u:object_r:udev_exec_t,s0)
+ 
++ifdef(`distro_redhat',`
++/sbin/start_udev --	gen_context(system_u:object_r:udev_exec_t,s0)
++')
++
+ /usr/bin/udevinfo --	gen_context(system_u:object_r:udev_exec_t,s0)
+ 
+ /var/run/PackageKit/udev(/.*)? gen_context(system_u:object_r:udev_var_run_t,s0)
+ /var/run/udev(/.*)?	gen_context(system_u:object_r:udev_tbl_t,s0)
++
++ifdef(`distro_debian',`
++/var/run/xen-hotplug -d	gen_context(system_u:object_r:udev_var_run_t,s0)
++')
+diff --git a/policy/modules/system/unconfined.fc b/policy/modules/system/unconfined.fc
+index ce2fbb9..4902c11 100644
+--- a/policy/modules/system/unconfined.fc
++++ b/policy/modules/system/unconfined.fc
+@@ -10,6 +10,12 @@
+ 
+ /usr/local/RealPlayer/realplay\.bin --	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+ 
++ifdef(`distro_debian',`
++/usr/bin/gcj-dbtool-4\.1	--	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++/usr/bin/gij-4\.1		--	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++/usr/lib/openoffice/program/soffice\.bin -- gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
++')
++
+ ifdef(`distro_gentoo',`
+ /usr/lib32/openoffice/program/[^/]+\.bin -- gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)
+ ')

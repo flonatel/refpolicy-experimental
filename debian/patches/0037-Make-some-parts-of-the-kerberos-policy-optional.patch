@@ -1,0 +1,25 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:15:20 +0100
+Subject: Make some parts of the kerberos policy optional.
+
+---
+ policy/modules/services/kerberos.if |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/services/kerberos.if b/policy/modules/services/kerberos.if
+index 604f67b..e3838e4 100644
+--- a/policy/modules/services/kerberos.if
++++ b/policy/modules/services/kerberos.if
+@@ -237,8 +237,10 @@ template(`kerberos_keytab_template',`
+ 
+  	allow $2 $1_keytab_t:file read_file_perms;
+ 
+-	kerberos_read_keytab($2)
+-	kerberos_use($2)
++	optional_policy(`
++		kerberos_read_keytab($2)
++		kerberos_use($2)
++	')
+ ')
+ 
+ ########################################

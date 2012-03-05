@@ -1,0 +1,37 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:34:38 +0100
+Subject: syslog policy adjustments: * Allow syslogd_t capability sys_nice and
+ process:{ getsched setsched }
+
+---
+ policy/modules/system/logging.te |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 059fa97..f19b278 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -369,11 +369,11 @@ optional_policy(`
+ # chown fsetid for syslog-ng
+ # sys_admin for the integrated klog of syslog-ng and metalog
+ # cjp: why net_admin!
+-allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin chown fsetid };
++allow syslogd_t self:capability { chown dac_override fsetid net_admin sys_admin sys_nice sys_resource sys_tty_config };
+ dontaudit syslogd_t self:capability sys_tty_config;
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+-allow syslogd_t self:process { signal_perms setpgid setrlimit };
++allow syslogd_t self:process { signal_perms setpgid setrlimit getsched setsched };
+ # receive messages to be logged
+ allow syslogd_t self:unix_dgram_socket create_socket_perms;
+ allow syslogd_t self:unix_stream_socket create_stream_socket_perms;
+@@ -392,6 +392,9 @@ files_pid_filetrans(syslogd_t, devlog_t, sock_file)
+ manage_files_pattern(syslogd_t, var_log_t, var_log_t)
+ rw_fifo_files_pattern(syslogd_t, var_log_t, var_log_t)
+ 
++# for rsyslogd, this access is harmless so making it unconditional
++allow syslogd_t proc_t:file { getattr read };
++
+ # Allow access for syslog-ng
+ allow syslogd_t var_log_t:dir { create setattr };
+ 

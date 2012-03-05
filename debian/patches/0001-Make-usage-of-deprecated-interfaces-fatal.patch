@@ -1,0 +1,764 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Mon, 20 Feb 2012 21:46:21 +0100
+Subject: Make usage of deprecated interfaces fatal
+
+---
+ policy/modules/kernel/corenetwork.if.in |   14 +++++++-------
+ policy/modules/kernel/devices.if        |    4 ++--
+ policy/modules/kernel/kernel.if         |    6 +++---
+ policy/modules/kernel/terminal.if       |   30 +++++++++++++++---------------
+ policy/modules/services/automount.if    |    2 +-
+ policy/modules/services/bind.if         |    2 +-
+ policy/modules/services/bluetooth.if    |    4 ++--
+ policy/modules/services/cups.if         |    2 +-
+ policy/modules/services/dictd.if        |    2 +-
+ policy/modules/services/finger.if       |    2 +-
+ policy/modules/services/ftp.if          |    2 +-
+ policy/modules/services/i18n_input.if   |    2 +-
+ policy/modules/services/inetd.if        |    4 ++--
+ policy/modules/services/jabber.if       |    2 +-
+ policy/modules/services/ldap.if         |    2 +-
+ policy/modules/services/mta.if          |    2 +-
+ policy/modules/services/nessus.if       |    2 +-
+ policy/modules/services/nis.if          |    4 ++--
+ policy/modules/services/nsd.if          |    4 ++--
+ policy/modules/services/perdition.if    |    2 +-
+ policy/modules/services/portmap.if      |    6 +++---
+ policy/modules/services/radius.if       |    2 +-
+ policy/modules/services/rpc.if          |    4 ++--
+ policy/modules/services/snmp.if         |    4 ++--
+ policy/modules/services/soundserver.if  |    2 +-
+ policy/modules/services/squid.if        |    2 +-
+ policy/modules/services/ssh.if          |    2 +-
+ policy/modules/services/xserver.if      |    4 ++--
+ policy/support/loadable_module.spt      |    2 +-
+ policy/support/misc_patterns.spt        |    2 +-
+ policy/support/obj_perm_sets.spt        |   18 +++++++++---------
+ 31 files changed, 71 insertions(+), 71 deletions(-)
+
+diff --git a/policy/modules/kernel/corenetwork.if.in b/policy/modules/kernel/corenetwork.if.in
+index 4f3b542..f5b3b78 100644
+--- a/policy/modules/kernel/corenetwork.if.in
++++ b/policy/modules/kernel/corenetwork.if.in
+@@ -2145,7 +2145,7 @@ interface(`corenet_dontaudit_udp_bind_all_rpc_ports',`
+ ## </param>
+ #
+ interface(`corenet_non_ipsec_sendrecv',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_all_recvfrom_unlabeled() instead.')
+ 	corenet_all_recvfrom_unlabeled($1)
+ ')
+ 
+@@ -2173,7 +2173,7 @@ interface(`corenet_non_ipsec_sendrecv',`
+ ## </param>
+ #
+ interface(`corenet_dontaudit_non_ipsec_sendrecv',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_all_recvfrom_unlabeled() instead.')
+ 	corenet_dontaudit_all_recvfrom_unlabeled($1)
+ ')
+ 
+@@ -2188,7 +2188,7 @@ interface(`corenet_dontaudit_non_ipsec_sendrecv',`
+ ## </param>
+ #
+ interface(`corenet_tcp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_tcp_recvfrom_netlabel() instead.')
+ 	corenet_tcp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2243,7 +2243,7 @@ interface(`corenet_tcp_recvfrom_unlabeled',`
+ ## </param>
+ #
+ interface(`corenet_dontaudit_tcp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_tcp_recvfrom_netlabel() instead.')
+ 	corenet_dontaudit_tcp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2299,7 +2299,7 @@ interface(`corenet_dontaudit_tcp_recvfrom_unlabeled',`
+ ## </param>
+ #
+ interface(`corenet_udp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_udp_recvfrom_netlabel() instead.')
+ 	corenet_udp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2354,7 +2354,7 @@ interface(`corenet_udp_recvfrom_unlabeled',`
+ ## </param>
+ #
+ interface(`corenet_dontaudit_udp_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_dontaudit_udp_recvfrom_netlabel($1) instead.')
+ 	corenet_dontaudit_udp_recvfrom_netlabel($1)
+ ')
+ 
+@@ -2410,7 +2410,7 @@ interface(`corenet_dontaudit_udp_recvfrom_unlabeled',`
+ ## </param>
+ #
+ interface(`corenet_raw_recv_netlabel',`
+-	refpolicywarn(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
++	refpolicyerr(`$0($*) has been deprecated, use corenet_raw_recvfrom_netlabel() instead.')
+ 	corenet_raw_recvfrom_netlabel($1)
+ ')
+ 
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index f820f3b..7c275ba 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -2882,7 +2882,7 @@ interface(`dev_getattr_mtrr_dev',`
+ ## </param>
+ #
+ interface(`dev_read_mtrr',`
+-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
++	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
+ 	dev_rw_mtrr($1)
+ ')
+ 
+@@ -2911,7 +2911,7 @@ interface(`dev_read_mtrr',`
+ ## </param>
+ #
+ interface(`dev_write_mtrr',`
+-	refpolicywarn(`$0($*) has been replaced with dev_rw_mtrr().')
++	refpolicyerr(`$0($*) has been replaced with dev_rw_mtrr().')
+ 	dev_rw_mtrr($1)
+ ')
+ 
+diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
+index 6346378..e2ccd66 100644
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -299,7 +299,7 @@ interface(`kernel_dgram_send',`
+ ## </param>
+ #
+ interface(`kernel_tcp_recvfrom',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -313,7 +313,7 @@ interface(`kernel_tcp_recvfrom',`
+ ## </param>
+ #
+ interface(`kernel_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -327,7 +327,7 @@ interface(`kernel_udp_send',`
+ ## </param>
+ #
+ interface(`kernel_udp_recvfrom',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/kernel/terminal.if b/policy/modules/kernel/terminal.if
+index 01dd2f1..9c241e1 100644
+--- a/policy/modules/kernel/terminal.if
++++ b/policy/modules/kernel/terminal.if
+@@ -909,7 +909,7 @@ interface(`term_relabel_all_ptys',`
+ ## <rolecap/>
+ #
+ interface(`term_getattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_getattr_all_ptys() instead.')
+ 	term_getattr_all_ptys($1)
+ ')
+ 
+@@ -926,7 +926,7 @@ interface(`term_getattr_all_user_ptys',`
+ ## </param>
+ #
+ interface(`term_dontaudit_getattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_dontaudit_getattr_all_ptys() instead.')
+ 	term_dontaudit_getattr_all_ptys($1)
+ ')
+ 
+@@ -943,7 +943,7 @@ interface(`term_dontaudit_getattr_all_user_ptys',`
+ ## <rolecap/>
+ #
+ interface(`term_setattr_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_setattr_all_ptys() instead.')
+ 	term_setattr_all_ptys($1)
+ ')
+ 
+@@ -958,7 +958,7 @@ interface(`term_setattr_all_user_ptys',`
+ ## </param>
+ #
+ interface(`term_relabelto_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_relabelto_all_ptys() instead.')
+ 	term_relabelto_all_ptys($1)
+ ')
+ 
+@@ -973,7 +973,7 @@ interface(`term_relabelto_all_user_ptys',`
+ ## </param>
+ #
+ interface(`term_write_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_write_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_write_all_ptys() instead.')
+ 	term_write_all_ptys($1)
+ ')
+ 
+@@ -989,7 +989,7 @@ interface(`term_write_all_user_ptys',`
+ ## <rolecap/>
+ #
+ interface(`term_use_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_use_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_use_all_ptys() instead.')
+ 	term_use_all_ptys($1)
+ ')
+ 
+@@ -1005,7 +1005,7 @@ interface(`term_use_all_user_ptys',`
+ ## </param>
+ #
+ interface(`term_dontaudit_use_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_dontaudit_use_all_ptys() instead.')
+ 	term_dontaudit_use_all_ptys($1)
+ ')
+ 
+@@ -1021,7 +1021,7 @@ interface(`term_dontaudit_use_all_user_ptys',`
+ ## </param>
+ #
+ interface(`term_relabel_all_user_ptys',`
+-	refpolicywarn(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
++	refpolicyerr(`$0 has been deprecated, use term_relabel_all_ptys() instead.')
+ 	term_relabel_all_ptys($1)
+ ')
+ 
+@@ -1393,7 +1393,7 @@ interface(`term_dontaudit_use_all_ttys',`
+ ## <rolecap/>
+ #
+ interface(`term_getattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_getattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_getattr_all_ttys() instead.')
+ 	term_getattr_all_ttys($1)
+ ')
+ 
+@@ -1410,7 +1410,7 @@ interface(`term_getattr_all_user_ttys',`
+ ## </param>
+ #
+ interface(`term_dontaudit_getattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_dontaudit_getattr_all_ttys() instead.')
+ 	term_dontaudit_getattr_all_ttys($1)
+ ')
+ 
+@@ -1427,7 +1427,7 @@ interface(`term_dontaudit_getattr_all_user_ttys',`
+ ## <rolecap/>
+ #
+ interface(`term_setattr_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_setattr_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_setattr_all_ttys() instead.')
+ 	term_setattr_all_ttys($1)
+ ')
+ 
+@@ -1443,7 +1443,7 @@ interface(`term_setattr_all_user_ttys',`
+ ## </param>
+ #
+ interface(`term_relabel_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_relabel_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_relabel_all_ttys() instead.')
+ 	term_relabel_all_ttys($1)
+ ')
+ 
+@@ -1458,7 +1458,7 @@ interface(`term_relabel_all_user_ttys',`
+ ## </param>
+ #
+ interface(`term_write_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_write_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_write_all_ttys() instead.')
+ 	term_write_all_ttys($1)
+ ')
+ 
+@@ -1474,7 +1474,7 @@ interface(`term_write_all_user_ttys',`
+ ## <rolecap/>
+ #
+ interface(`term_use_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_use_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_use_all_ttys() instead.')
+ 	term_use_all_ttys($1)
+ ')
+ 
+@@ -1490,6 +1490,6 @@ interface(`term_use_all_user_ttys',`
+ ## </param>
+ #
+ interface(`term_dontaudit_use_all_user_ttys',`
+-	refpolicywarn(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
++	refpolicyerr(`$0() is deprecated, use term_dontaudit_use_all_ttys() instead.')
+ 	term_dontaudit_use_all_ttys($1)
+ ')
+diff --git a/policy/modules/services/automount.if b/policy/modules/services/automount.if
+index d80a16b..519dc83 100644
+--- a/policy/modules/services/automount.if
++++ b/policy/modules/services/automount.if
+@@ -49,7 +49,7 @@ interface(`automount_signal',`
+ ## </param>
+ #
+ interface(`automount_exec_config',`
+-	refpolicywarn(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
++	refpolicyerr(`$0(): has been deprecated, please use files_exec_etc_files() instead.')
+ 	files_exec_etc_files($1)
+ ')
+ 
+diff --git a/policy/modules/services/bind.if b/policy/modules/services/bind.if
+index 44a1e3d..b5e0ea5 100644
+--- a/policy/modules/services/bind.if
++++ b/policy/modules/services/bind.if
+@@ -336,7 +336,7 @@ interface(`bind_manage_zone',`
+ ## </param>
+ #
+ interface(`bind_udp_chat_named',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/bluetooth.if b/policy/modules/services/bluetooth.if
+index 3e45431..f232b3b 100644
+--- a/policy/modules/services/bluetooth.if
++++ b/policy/modules/services/bluetooth.if
+@@ -126,7 +126,7 @@ interface(`bluetooth_dbus_chat',`
+ ## </param>
+ #
+ interface(`bluetooth_domtrans_helper',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -152,7 +152,7 @@ interface(`bluetooth_domtrans_helper',`
+ ## <rolecap/>
+ #
+ interface(`bluetooth_run_helper',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/cups.if b/policy/modules/services/cups.if
+index 305ddf4..56cb53f 100644
+--- a/policy/modules/services/cups.if
++++ b/policy/modules/services/cups.if
+@@ -75,7 +75,7 @@ interface(`cups_stream_connect',`
+ ## </param>
+ #
+ interface(`cups_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/dictd.if b/policy/modules/services/dictd.if
+index a0d23ce..7650335 100644
+--- a/policy/modules/services/dictd.if
++++ b/policy/modules/services/dictd.if
+@@ -12,7 +12,7 @@
+ ## </param>
+ #
+ interface(`dictd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/finger.if b/policy/modules/services/finger.if
+index b5dd671..9bbb169 100644
+--- a/policy/modules/services/finger.if
++++ b/policy/modules/services/finger.if
+@@ -29,5 +29,5 @@ interface(`finger_domtrans',`
+ ## </param>
+ #
+ interface(`finger_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/ftp.if b/policy/modules/services/ftp.if
+index 9d3201b..3d29482 100644
+--- a/policy/modules/services/ftp.if
++++ b/policy/modules/services/ftp.if
+@@ -29,7 +29,7 @@ interface(`ftp_dyntrans_anon_sftpd',`
+ ## </param>
+ #
+ interface(`ftp_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/i18n_input.if b/policy/modules/services/i18n_input.if
+index bc7de4f..bd85f3b 100644
+--- a/policy/modules/services/i18n_input.if
++++ b/policy/modules/services/i18n_input.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`i18n_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/inetd.if b/policy/modules/services/inetd.if
+index df48e5e..75a7539 100644
+--- a/policy/modules/services/inetd.if
++++ b/policy/modules/services/inetd.if
+@@ -150,7 +150,7 @@ interface(`inetd_use_fds',`
+ ## </param>
+ #
+ interface(`inetd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -183,7 +183,7 @@ interface(`inetd_domtrans_child',`
+ ## </param>
+ #
+ interface(`inetd_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/jabber.if b/policy/modules/services/jabber.if
+index 9878499..00f78ed 100644
+--- a/policy/modules/services/jabber.if
++++ b/policy/modules/services/jabber.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`jabber_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/ldap.if b/policy/modules/services/ldap.if
+index 3aa8fa7..d1f9d09 100644
+--- a/policy/modules/services/ldap.if
++++ b/policy/modules/services/ldap.if
+@@ -50,7 +50,7 @@ interface(`ldap_read_config',`
+ ## </param>
+ #
+ interface(`ldap_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/mta.if b/policy/modules/services/mta.if
+index 343cee3..a1aa265 100644
+--- a/policy/modules/services/mta.if
++++ b/policy/modules/services/mta.if
+@@ -585,7 +585,7 @@ interface(`mta_dontaudit_rw_delivery_tcp_sockets',`
+ ## </param>
+ #
+ interface(`mta_tcp_connect_all_mailservers',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ #######################################
+diff --git a/policy/modules/services/nessus.if b/policy/modules/services/nessus.if
+index 6ec8003..edc4d91 100644
+--- a/policy/modules/services/nessus.if
++++ b/policy/modules/services/nessus.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`nessus_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/nis.if b/policy/modules/services/nis.if
+index abe3f7f..1430352 100644
+--- a/policy/modules/services/nis.if
++++ b/policy/modules/services/nis.if
+@@ -205,7 +205,7 @@ interface(`nis_list_var_yp',`
+ ## </param>
+ #
+ interface(`nis_udp_send_ypbind',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -219,7 +219,7 @@ interface(`nis_udp_send_ypbind',`
+ ## </param>
+ #
+ interface(`nis_tcp_connect_ypbind',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/nsd.if b/policy/modules/services/nsd.if
+index a1371d5..5142540 100644
+--- a/policy/modules/services/nsd.if
++++ b/policy/modules/services/nsd.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`nsd_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -25,5 +25,5 @@ interface(`nsd_udp_chat',`
+ ## </param>
+ #
+ interface(`nsd_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/perdition.if b/policy/modules/services/perdition.if
+index 2b0bd64..8919276 100644
+--- a/policy/modules/services/perdition.if
++++ b/policy/modules/services/perdition.if
+@@ -11,5 +11,5 @@
+ ## </param>
+ #
+ interface(`perdition_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/portmap.if b/policy/modules/services/portmap.if
+index 374afcf..f0484c3 100644
+--- a/policy/modules/services/portmap.if
++++ b/policy/modules/services/portmap.if
+@@ -57,7 +57,7 @@ interface(`portmap_run_helper',`
+ ## </param>
+ #
+ interface(`portmap_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -71,7 +71,7 @@ interface(`portmap_udp_send',`
+ ## </param>
+ #
+ interface(`portmap_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -85,5 +85,5 @@ interface(`portmap_udp_chat',`
+ ## </param>
+ #
+ interface(`portmap_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+diff --git a/policy/modules/services/radius.if b/policy/modules/services/radius.if
+index 75e5dc4..9b35194 100644
+--- a/policy/modules/services/radius.if
++++ b/policy/modules/services/radius.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`radius_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/rpc.if b/policy/modules/services/rpc.if
+index dddabcf..a8a31b7 100644
+--- a/policy/modules/services/rpc.if
++++ b/policy/modules/services/rpc.if
+@@ -133,7 +133,7 @@ template(`rpc_domain_template', `
+ ## </param>
+ #
+ interface(`rpc_udp_send',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -374,7 +374,7 @@ interface(`rpc_udp_rw_nfs_sockets',`
+ ## </param>
+ #
+ interface(`rpc_udp_send_nfs',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/snmp.if b/policy/modules/services/snmp.if
+index 275f9fb..f143171 100644
+--- a/policy/modules/services/snmp.if
++++ b/policy/modules/services/snmp.if
+@@ -30,7 +30,7 @@ interface(`snmp_stream_connect',`
+ ## </param>
+ #
+ interface(`snmp_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+@@ -44,7 +44,7 @@ interface(`snmp_tcp_connect',`
+ ## </param>
+ #
+ interface(`snmp_udp_chat',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/soundserver.if b/policy/modules/services/soundserver.if
+index 93fe7bf..d27ebc5 100644
+--- a/policy/modules/services/soundserver.if
++++ b/policy/modules/services/soundserver.if
+@@ -11,7 +11,7 @@
+ ## </param>
+ #
+ interface(`soundserver_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/squid.if b/policy/modules/services/squid.if
+index d2496bd..de25872 100644
+--- a/policy/modules/services/squid.if
++++ b/policy/modules/services/squid.if
+@@ -184,7 +184,7 @@ interface(`squid_manage_logs',`
+ ## </param>
+ #
+ interface(`squid_use',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
+index 22adaca..b14ce8b 100644
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -563,7 +563,7 @@ interface(`ssh_dontaudit_rw_tcp_sockets',`
+ ## </param>
+ #
+ interface(`ssh_tcp_connect',`
+-	refpolicywarn(`$0($*) has been deprecated.')
++	refpolicyerr(`$0($*) has been deprecated.')
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
+index 130ced9..4acc8dc 100644
+--- a/policy/modules/services/xserver.if
++++ b/policy/modules/services/xserver.if
+@@ -280,7 +280,7 @@ interface(`xserver_non_drawing_client',`
+ ## </param>
+ #
+ interface(`xserver_user_client',`
+-	refpolicywarn(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
++	refpolicyerr(`$0() has been deprecated, please use xserver_user_x_domain_template instead.')
+ 	gen_require(`
+ 		type xdm_t, xdm_tmp_t;
+ 		type xauth_home_t, iceauth_home_t, xserver_t, xserver_tmpfs_t;
+@@ -577,7 +577,7 @@ interface(`xserver_user_home_dir_filetrans_user_xauth',`
+ ## </param>
+ #
+ interface(`xserver_use_all_users_fonts',`
+-	refpolicywarn(`$0() has been deprecated, please use xserver_use_user_fonts.')
++	refpolicyerr(`$0() has been deprecated, please use xserver_use_user_fonts.')
+ 	xserver_use_user_fonts($1)
+ ')
+ 
+diff --git a/policy/support/loadable_module.spt b/policy/support/loadable_module.spt
+index 1fe3ab3..4888466 100644
+--- a/policy/support/loadable_module.spt
++++ b/policy/support/loadable_module.spt
+@@ -95,7 +95,7 @@ define(`policy_call_depth',0)
+ #
+ define(`optional_policy',`
+ 	ifelse(regexp(`$1',`\W'),`-1',`
+-		refpolicywarn(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
++		refpolicyerr(`deprecated use of module name ($1) as first parameter of optional_policy() block.')
+ 		optional_policy(shift($*))
+ 	',`
+ 		optional {`'pushdef(`__in_optional_policy')
+diff --git a/policy/support/misc_patterns.spt b/policy/support/misc_patterns.spt
+index 22ca011..8a5ec4f 100644
+--- a/policy/support/misc_patterns.spt
++++ b/policy/support/misc_patterns.spt
+@@ -51,7 +51,7 @@ define(`dyntrans_pattern',`
+ # Other process permissions
+ #
+ define(`send_audit_msgs_pattern',`
+-	refpolicywarn(`$0($*) has been deprecated, please use logging_send_audit_msgs($1) instead.')
++	refpolicyerr(`$0($*) has been deprecated, please use logging_send_audit_msgs($1) instead.')
+ 	allow $1 self:capability audit_write;
+ 	allow $1 self:netlink_audit_socket { create_netlink_socket_perms nlmsg_relay };
+ ')
+diff --git a/policy/support/obj_perm_sets.spt b/policy/support/obj_perm_sets.spt
+index f7380b3..bbaef34 100644
+--- a/policy/support/obj_perm_sets.spt
++++ b/policy/support/obj_perm_sets.spt
+@@ -54,47 +54,47 @@ define(`unpriv_socket_class_set', `{ tcp_socket udp_socket unix_stream_socket un
+ # 
+ # Permissions for getting file attributes.
+ #
+-define(`stat_file_perms', `{ getattr } refpolicywarn(`$0 is deprecated please use getattr_file_perms instead.')')
++define(`stat_file_perms', `{ getattr } refpolicyerr(`$0 is deprecated please use getattr_file_perms instead.')')
+ 
+ # 
+ # Permissions for executing files.
+ #
+-define(`x_file_perms', `{ getattr open execute } refpolicywarn(`$0 is deprecated please use { getattr execute } instead.')')
++define(`x_file_perms', `{ getattr open execute } refpolicyerr(`$0 is deprecated please use { getattr execute } instead.')')
+ 
+ # 
+ # Permissions for reading files and their attributes.
+ #
+-define(`r_file_perms', `{ open read getattr lock ioctl } refpolicywarn(`$0 is deprecated please use read_file_perms instead.')')
++define(`r_file_perms', `{ open read getattr lock ioctl } refpolicyerr(`$0 is deprecated please use read_file_perms instead.')')
+ 
+ # 
+ # Permissions for reading and executing files.
+ #
+-define(`rx_file_perms', `{ open read getattr lock execute ioctl } refpolicywarn(`$0 is deprecated please use { mmap_file_perms ioctl lock } instead.')')
++define(`rx_file_perms', `{ open read getattr lock execute ioctl } refpolicyerr(`$0 is deprecated please use { mmap_file_perms ioctl lock } instead.')')
+ 
+ # 
+ # Permissions for reading and appending to files.
+ #
+-define(`ra_file_perms', `{ open ioctl read getattr lock append } refpolicywarn(`$0 is deprecated please use { read_file_perms append_file_perms } instead.')')
++define(`ra_file_perms', `{ open ioctl read getattr lock append } refpolicyerr(`$0 is deprecated please use { read_file_perms append_file_perms } instead.')')
+ 
+ #
+ # Permissions for linking, unlinking and renaming files.
+ # 
+-define(`link_file_perms', `{ getattr link unlink rename } refpolicywarn(`$0 is deprecated please use { getattr link unlink rename } instead.')')
++define(`link_file_perms', `{ getattr link unlink rename } refpolicyerr(`$0 is deprecated please use { getattr link unlink rename } instead.')')
+ 
+ #
+ # Permissions for creating lnk_files.
+ #
+-define(`create_lnk_perms', `{ create read write getattr setattr link unlink rename } refpolicywarn(`$0 is deprecated please use manage_lnk_file_perms instead.')')
++define(`create_lnk_perms', `{ create read write getattr setattr link unlink rename } refpolicyerr(`$0 is deprecated please use manage_lnk_file_perms instead.')')
+ 
+ # 
+ # Permissions for reading directories and their attributes.
+ #
+-define(`r_dir_perms', `{ open read getattr lock search ioctl } refpolicywarn(`$0 is deprecated please use list_dir_perms instead.')')
++define(`r_dir_perms', `{ open read getattr lock search ioctl } refpolicyerr(`$0 is deprecated please use list_dir_perms instead.')')
+ 
+ # 
+ # Permissions for reading and adding names to directories.
+ #
+-define(`ra_dir_perms', `{ open read getattr lock search ioctl add_name write } refpolicywarn(`$0 is deprecated please use { list_dir_perms add_entry_dir_perms } instead.')')
++define(`ra_dir_perms', `{ open read getattr lock search ioctl add_name write } refpolicyerr(`$0 is deprecated please use { list_dir_perms add_entry_dir_perms } instead.')')
+ 
+ 
+ #

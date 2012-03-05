@@ -1,0 +1,59 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Mon, 20 Feb 2012 21:46:21 +0100
+Subject: Include policy for the iodine IP over DNS tunnel daemon
+
+---
+ policy/modules/system/iodine.fc |    1 +
+ policy/modules/system/iodine.if |    1 +
+ policy/modules/system/iodine.te |   26 ++++++++++++++++++++++++++
+ 3 files changed, 28 insertions(+), 0 deletions(-)
+ create mode 100644 policy/modules/system/iodine.fc
+ create mode 100644 policy/modules/system/iodine.if
+ create mode 100644 policy/modules/system/iodine.te
+
+diff --git a/policy/modules/system/iodine.fc b/policy/modules/system/iodine.fc
+new file mode 100644
+index 0000000..4e144ea
+--- /dev/null
++++ b/policy/modules/system/iodine.fc
+@@ -0,0 +1 @@
++/usr/sbin/iodine.*	-- gen_context(system_u:object_r:iodine_exec_t,s0)
+diff --git a/policy/modules/system/iodine.if b/policy/modules/system/iodine.if
+new file mode 100644
+index 0000000..3eb6a30
+--- /dev/null
++++ b/policy/modules/system/iodine.if
+@@ -0,0 +1 @@
++## <summary></summary>
+diff --git a/policy/modules/system/iodine.te b/policy/modules/system/iodine.te
+new file mode 100644
+index 0000000..96a7de7
+--- /dev/null
++++ b/policy/modules/system/iodine.te
+@@ -0,0 +1,26 @@
++policy_module(iodine,1.0.0)
++
++# policy for the iodine IP over DNS tunneling daemon
++type iodine_t;
++type iodine_exec_t;
++files_type(iodine_exec_t)
++init_daemon_domain(iodine_t, iodine_exec_t)
++
++logging_send_syslog_msg(iodine_t)
++kernel_search_network_sysctl(iodine_t)
++kernel_read_network_state(iodine_t)
++kernel_request_load_module(iodine_t)
++kernel_read_system_state(iodine_t)
++files_read_etc_files(iodine_t)
++corecmd_exec_shell(iodine_t)
++allow iodine_t self:capability { setgid setuid net_bind_service net_admin net_raw sys_chroot };
++sysnet_domtrans_ifconfig(iodine_t)
++
++allow iodine_t self:rawip_socket { write read create };
++allow iodine_t self:unix_dgram_socket { create connect };
++corenet_raw_receive_generic_node(iodine_t)
++corenet_rw_tun_tap_dev(iodine_t)
++corenet_udp_bind_dns_port(iodine_t)
++corenet_udp_bind_generic_node(iodine_t)
++allow iodine_t self:udp_socket connected_socket_perms;
++allow iodine_t self:tun_socket create;

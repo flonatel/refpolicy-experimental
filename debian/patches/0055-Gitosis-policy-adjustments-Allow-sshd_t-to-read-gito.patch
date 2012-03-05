@@ -1,0 +1,39 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:32:45 +0100
+Subject: Gitosis policy adjustments: * Allow sshd_t to read gitosis files *
+ Made the gitosis label apply to /srv/gitosis
+
+---
+ policy/modules/apps/gitosis.fc |    4 ++++
+ policy/modules/services/ssh.te |    4 ++++
+ 2 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/apps/gitosis.fc b/policy/modules/apps/gitosis.fc
+index 7e90e45..0c3a597 100644
+--- a/policy/modules/apps/gitosis.fc
++++ b/policy/modules/apps/gitosis.fc
+@@ -1,5 +1,9 @@
+ /usr/bin/gitosis-serve			--	gen_context(system_u:object_r:gitosis_exec_t,s0)
+ /usr/bin/gl-auth-command		--	gen_context(system_u:object_r:gitosis_exec_t,s0)
+ 
++ifdef(`distro_debian', `
++/srv/lib/gitosis(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
++', `
+ /var/lib/gitosis(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
++')
+ /var/lib/gitolite(/.*)?				gen_context(system_u:object_r:gitosis_var_lib_t,s0)
+diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
+index 2dad3c8..8117855 100644
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -291,6 +291,10 @@ optional_policy(`
+ 	xserver_domtrans_xauth(sshd_t)
+ ')
+ 
++optional_policy(`
++	gitosis_read_lib_files(sshd_t)
++')
++
+ ifdef(`TODO',`
+ tunable_policy(`ssh_sysadm_login',`
+ 	# Relabel and access ptys created by sshd

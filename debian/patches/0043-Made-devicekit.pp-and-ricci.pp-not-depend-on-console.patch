@@ -1,0 +1,61 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:33:53 +0100
+Subject: Made devicekit.pp and ricci.pp not depend on consoletype.pp
+
+---
+ policy/modules/services/devicekit.te |    4 +++-
+ policy/modules/services/ricci.te     |   12 +++++++++---
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/policy/modules/services/devicekit.te b/policy/modules/services/devicekit.te
+index f231f17..6d3456e 100644
+--- a/policy/modules/services/devicekit.te
++++ b/policy/modules/services/devicekit.te
+@@ -203,7 +203,9 @@ kernel_write_proc_files(devicekit_power_t)
+ corecmd_exec_bin(devicekit_power_t)
+ corecmd_exec_shell(devicekit_power_t)
+ 
+-consoletype_exec(devicekit_power_t)
++optional_policy(`
++	consoletype_exec(devicekit_power_t)
++')
+ 
+ domain_read_all_domains_state(devicekit_power_t)
+ 
+diff --git a/policy/modules/services/ricci.te b/policy/modules/services/ricci.te
+index 33e72e8..7847a70 100644
+--- a/policy/modules/services/ricci.te
++++ b/policy/modules/services/ricci.te
+@@ -213,7 +213,9 @@ modutils_domtrans_insmod(ricci_modcluster_t)
+ 
+ mount_domtrans(ricci_modcluster_t)
+ 
+-consoletype_exec(ricci_modcluster_t)
++optional_policy(`
++	consoletype_exec(ricci_modcluster_t)
++')
+ 
+ ricci_stream_connect_modclusterd(ricci_modcluster_t)
+ 
+@@ -394,7 +396,9 @@ files_search_usr(ricci_modservice_t)
+ # Needed for running chkconfig
+ files_manage_etc_symlinks(ricci_modservice_t)
+ 
+-consoletype_exec(ricci_modservice_t)
++optional_policy(`
++	consoletype_exec(ricci_modservice_t)
++')
+ 
+ init_domtrans_script(ricci_modservice_t)
+ 
+@@ -456,7 +460,9 @@ miscfiles_read_localization(ricci_modstorage_t)
+ 
+ modutils_read_module_deps(ricci_modstorage_t)
+ 
+-consoletype_exec(ricci_modstorage_t)
++optional_policy(`
++	consoletype_exec(ricci_modstorage_t)
++')
+ 
+ mount_domtrans(ricci_modstorage_t)
+ 

@@ -1,0 +1,53 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 02:49:21 +0100
+Subject: Add storage_var_run_filetrans_fixed_disk interface for use in init
+ policy
+
+---
+ policy/modules/kernel/storage.if |   18 ++++++++++++++++++
+ policy/modules/system/init.te    |    3 ++-
+ 2 files changed, 20 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/kernel/storage.if b/policy/modules/kernel/storage.if
+index 1700ef2..d1549d7 100644
+--- a/policy/modules/kernel/storage.if
++++ b/policy/modules/kernel/storage.if
+@@ -290,6 +290,24 @@ interface(`storage_tmpfs_filetrans_fixed_disk',`
+ 
+ ########################################
+ ## <summary>
++##	Create block devices in a directory labelled as var_run_t
++## </summary>
++## <param name="domain">
++##	<summary>
++##	The type of the process performing this action.
++##	</summary>
++## </param>
++#
++interface(`storage_var_run_filetrans_fixed_disk',`
++	gen_require(`
++		type fixed_disk_device_t;
++	')
++
++	files_pid_filetrans($1,fixed_disk_device_t,blk_file)
++')
++
++########################################
++## <summary>
+ ##	Relabel fixed disk device nodes.
+ ## </summary>
+ ## <param name="domain">
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 7dd6ee6..9dd9bc2 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -240,7 +240,8 @@ manage_lnk_files_pattern(initrc_t, initrc_state_t, initrc_state_t)
+ manage_fifo_files_pattern(initrc_t, initrc_state_t, initrc_state_t)
+ 
+ allow initrc_t initrc_var_run_t:file manage_file_perms;
+-files_pid_filetrans(initrc_t, initrc_var_run_t, file)
++files_pid_filetrans(initrc_t,initrc_var_run_t,file)
++storage_var_run_filetrans_fixed_disk(initrc_t)
+ 
+ can_exec(initrc_t, initrc_tmp_t)
+ manage_files_pattern(initrc_t, initrc_tmp_t, initrc_tmp_t)

@@ -1,0 +1,21 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:09:25 +0100
+Subject: Allow gpm_t self signull and signal access.
+
+---
+ policy/modules/services/gpm.te |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/services/gpm.te b/policy/modules/services/gpm.te
+index a627b34..234cfb8 100644
+--- a/policy/modules/services/gpm.te
++++ b/policy/modules/services/gpm.te
+@@ -27,7 +27,7 @@ files_type(gpmctl_t)
+ #
+ 
+ allow gpm_t self:capability { setpcap setuid dac_override sys_admin sys_tty_config };
+-allow gpm_t self:process { getcap setcap };
++allow gpm_t self:process { signal signull getcap setcap };
+ allow gpm_t self:unix_stream_socket create_stream_socket_perms;
+ 
+ allow gpm_t gpm_conf_t:dir list_dir_perms;

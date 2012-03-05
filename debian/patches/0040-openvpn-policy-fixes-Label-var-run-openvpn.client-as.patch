@@ -1,0 +1,35 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:25:52 +0100
+Subject: openvpn policy fixes: * Label /var/run/openvpn.client* as
+ openvpn_var_run_t. * allow openvpn_t to access var_lib_t and usr_t
+ files for vulnkey.
+
+---
+ policy/modules/services/openvpn.fc |    1 +
+ policy/modules/services/openvpn.te |    4 ++++
+ 2 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/openvpn.fc b/policy/modules/services/openvpn.fc
+index 9c186d2..ffe4d45 100644
+--- a/policy/modules/services/openvpn.fc
++++ b/policy/modules/services/openvpn.fc
+@@ -15,3 +15,4 @@
+ #
+ /var/log/openvpn.*		gen_context(system_u:object_r:openvpn_var_log_t,s0)
+ /var/run/openvpn(/.*)?		gen_context(system_u:object_r:openvpn_var_run_t,s0)
++/var/run/openvpn.client.* --    gen_context(system_u:object_r:openvpn_var_run_t,s0)
+diff --git a/policy/modules/services/openvpn.te b/policy/modules/services/openvpn.te
+index 8b550f4..5222c4f 100644
+--- a/policy/modules/services/openvpn.te
++++ b/policy/modules/services/openvpn.te
+@@ -64,6 +64,10 @@ logging_log_filetrans(openvpn_t, openvpn_var_log_t, file)
+ manage_files_pattern(openvpn_t, openvpn_var_run_t, openvpn_var_run_t)
+ files_pid_filetrans(openvpn_t, openvpn_var_run_t, { file dir })
+ 
++# for the list of vulnerable keys
++files_read_usr_files(openvpn_t)
++files_read_var_lib_files(openvpn_t)
++
+ kernel_read_kernel_sysctls(openvpn_t)
+ kernel_read_net_sysctls(openvpn_t)
+ kernel_read_network_state(openvpn_t)

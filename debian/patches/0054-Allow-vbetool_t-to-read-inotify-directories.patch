@@ -1,0 +1,20 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:30:30 +0100
+Subject: Allow vbetool_t to read inotify directories
+
+---
+ policy/modules/admin/vbetool.te |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/admin/vbetool.te b/policy/modules/admin/vbetool.te
+index 001c93c..30045be 100644
+--- a/policy/modules/admin/vbetool.te
++++ b/policy/modules/admin/vbetool.te
+@@ -30,6 +30,7 @@ dev_rwx_zero(vbetool_t)
+ dev_rw_sysfs(vbetool_t)
+ dev_rw_xserver_misc(vbetool_t)
+ dev_rw_mtrr(vbetool_t)
++fs_list_inotifyfs(vbetool_t)
+ 
+ domain_mmap_low(vbetool_t)
+ 

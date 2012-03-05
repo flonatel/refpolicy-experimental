@@ -1,0 +1,20 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:48:01 +0100
+Subject: Allow mailman to read user_t files
+
+---
+ policy/modules/services/mailman.te |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/mailman.te b/policy/modules/services/mailman.te
+index 1ecc9c2..43636c0 100644
+--- a/policy/modules/services/mailman.te
++++ b/policy/modules/services/mailman.te
+@@ -62,6 +62,7 @@ optional_policy(`
+ #
+ 
+ dev_read_urand(mailman_mail_t)
++files_read_usr_files(mailman_mail_t)
+ allow mailman_mail_t self:unix_dgram_socket create_socket_perms;
+ allow mailman_mail_t self:process { signal signull };
+ allow mailman_mail_t self:capability { kill dac_override setuid setgid sys_tty_config };

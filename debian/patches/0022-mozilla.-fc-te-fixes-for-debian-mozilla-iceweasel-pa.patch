@@ -1,0 +1,52 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 02:07:00 +0100
+Subject: mozilla.{fc,te}: fixes for debian mozilla/iceweasel packaging and
+ fix to use userdom_search_user_home_conent instead of
+ userdom_serach_user_home_dirs.
+
+---
+ policy/modules/apps/mozilla.fc |    4 ++++
+ policy/modules/apps/mozilla.te |    4 +++-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/apps/mozilla.fc b/policy/modules/apps/mozilla.fc
+index 5e1d020..eb6026e 100644
+--- a/policy/modules/apps/mozilla.fc
++++ b/policy/modules/apps/mozilla.fc
+@@ -15,6 +15,9 @@ HOME_DIR/\.config/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0
+ /usr/bin/epiphany		--	gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/bin/mozilla-[0-9].*	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/bin/mozilla-bin-[0-9].*	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
++ifdef(`distro_debian', `
++/usr/lib/iceweasel/iceweasel	--	gen_context(system_u:object_r:mozilla_exec_t,s0)
++')
+ 
+ #
+ # /lib
+@@ -30,3 +33,4 @@ HOME_DIR/\.config/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0
+ /usr/lib64/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:mozilla_exec_t,s0)
+ /usr/lib/chromium(-browser)?/chromium(-browser)?-sandbox -- gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
+ /usr/lib/chromium(-browser)?/chromium(-browser)? -- gen_context(system_u:object_r:chrome_browser_exec_t,s0)
++/usr/lib/xulrunner-1.9.1/xulrunner-stub -- gen_context(system_u:object_r:mozilla_exec_t,s0)
+diff --git a/policy/modules/apps/mozilla.te b/policy/modules/apps/mozilla.te
+index 8d03837..3927c35 100644
+--- a/policy/modules/apps/mozilla.te
++++ b/policy/modules/apps/mozilla.te
+@@ -126,7 +126,7 @@ can_exec(mozilla_t, mozilla_exec_t)
+ manage_dirs_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+ manage_files_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+ manage_lnk_files_pattern(mozilla_t, mozilla_home_t, mozilla_home_t)
+-userdom_search_user_home_dirs(mozilla_t)
++userdom_search_user_home_content(mozilla_t)
+ userdom_user_home_dir_filetrans(mozilla_t, mozilla_home_t, dir)
+ 
+ # Mozpluggerrc
+@@ -134,6 +134,8 @@ allow mozilla_t mozilla_conf_t:file read_file_perms;
+ 
+ manage_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
+ manage_dirs_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
++manage_lnk_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
++manage_sock_files_pattern(mozilla_t, mozilla_tmp_t, mozilla_tmp_t)
+ files_tmp_filetrans(mozilla_t, mozilla_tmp_t, { file dir })
+ 
+ manage_files_pattern(mozilla_t, mozilla_tmpfs_t, mozilla_tmpfs_t)

@@ -1,0 +1,76 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 01:48:06 +0100
+Subject: Cover amavisd in clamav policy
+
+---
+ policy/modules/services/clamav.fc  |   16 ++++++++++++++++
+ policy/modules/services/clamav.te  |    1 +
+ policy/modules/services/cron.te    |    2 ++
+ policy/modules/services/postfix.te |    4 ++++
+ 4 files changed, 23 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/clamav.fc b/policy/modules/services/clamav.fc
+index 560e9e5..9ebf999 100644
+--- a/policy/modules/services/clamav.fc
++++ b/policy/modules/services/clamav.fc
+@@ -20,4 +20,20 @@
+ /var/log/clamd.*			gen_context(system_u:object_r:clamd_var_log_t,s0)
+ /var/run/amavis(d)?/clamd\.pid	--	gen_context(system_u:object_r:clamd_var_run_t,s0)
+ /var/spool/amavisd/clamd\.sock	-s	gen_context(system_u:object_r:clamd_var_run_t,s0)
++
++/etc/amavis\.conf		--	gen_context(system_u:object_r:clamd_etc_t,s0)
++/etc/amavisd(/.*)?		--	gen_context(system_u:object_r:clamd_etc_t,s0)
++
++/usr/sbin/amavisd.*		--	gen_context(system_u:object_r:clamd_exec_t,s0)
++
++ifdef(`distro_debian',`
++/usr/sbin/amavisd-new-cronjob  --      gen_context(system_u:object_r:clamd_exec_t,s0)
++')
++
++/var/amavis(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/lib/amavis(/.*)?			gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/log/amavisd\.log		--	gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/run/amavis(d)?(/.*)?		gen_context(system_u:object_r:clamd_var_lib_t,s0)
++/var/spool/amavisd(/.*)?		gen_context(system_u:object_r:clamd_spool_t,s0)
++/var/virusmails(/.*)?			gen_context(system_u:object_r:clamd_spool_t,s0)
+ /var/spool/MailScanner(/.*)?		gen_context(system_u:object_r:clamd_var_run_t,s0)
+diff --git a/policy/modules/services/clamav.te b/policy/modules/services/clamav.te
+index b1c40cb..335dfde 100644
+--- a/policy/modules/services/clamav.te
++++ b/policy/modules/services/clamav.te
+@@ -129,6 +129,7 @@ corenet_tcp_sendrecv_generic_if(clamd_t)
+ corenet_tcp_sendrecv_generic_node(clamd_t)
+ corenet_tcp_sendrecv_all_ports(clamd_t)
+ corenet_tcp_sendrecv_clamd_port(clamd_t)
++corenet_tcp_sendrecv_amavisd_send_port(clamd_t)
+ corenet_tcp_bind_generic_node(clamd_t)
+ corenet_tcp_bind_clamd_port(clamd_t)
+ corenet_tcp_bind_generic_port(clamd_t)
+diff --git a/policy/modules/services/cron.te b/policy/modules/services/cron.te
+index a949f29..463a67c 100644
+--- a/policy/modules/services/cron.te
++++ b/policy/modules/services/cron.te
+@@ -261,6 +261,8 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	amavis_search_lib(crond_t)
++	# for bayes maintainance scripts
++	amavis_domtrans(crond_t)
+ ')
+ 
+ optional_policy(`
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index 99d66da..46f7fc5 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -607,6 +607,10 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	clamav_stream_connect(postfix_smtpd_t)
++')
++
++optional_policy(`
+ 	sasl_connect(postfix_smtpd_t)
+ ')
+ 

@@ -1,0 +1,98 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:58:46 +0100
+Subject: udev policy adjustments: * allow udev_t to manage etc_runtime_t *
+ Allow udev to read sym-links in it's config directory * Allow udev
+ to manage symlinks under /dev * Allow udev to manage xenfs_t files,
+ to write to etc_runtime_t (for ifstate), and to load modules *
+ Allow udev_t to access anon_inodefs_t
+
+---
+ policy/modules/system/udev.te |   22 ++++++++++++++++++++--
+ 1 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index 86b84bb..eedca43 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -14,6 +14,8 @@ domain_entry_file(udev_t, udev_helper_exec_t)
+ domain_interactive_fd(udev_t)
+ init_daemon_domain(udev_t, udev_exec_t)
+ 
++init_domtrans_script(udev_t)
++
+ type udev_etc_t alias etc_udev_t;
+ files_config_file(udev_etc_t)
+ 
+@@ -52,8 +54,8 @@ allow udev_t self:unix_dgram_socket sendto;
+ allow udev_t self:unix_stream_socket connectto;
+ allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow udev_t self:rawip_socket create_socket_perms;
++fs_read_anon_inodefs_files(udev_t)
+ 
+-allow udev_t udev_exec_t:file write;
+ can_exec(udev_t, udev_exec_t)
+ 
+ allow udev_t udev_helper_exec_t:dir list_dir_perms;
+@@ -64,10 +66,13 @@ allow udev_t udev_etc_t:file read_file_perms;
+ 
+ # create udev database in /dev/.udevdb
+ allow udev_t udev_tbl_t:file manage_file_perms;
+-dev_filetrans(udev_t, udev_tbl_t, file)
++allow udev_t udev_tbl_t:lnk_file manage_lnk_file_perms;
++allow udev_t udev_tbl_t:dir manage_dir_perms;
++dev_filetrans(udev_t,udev_tbl_t,file)
+ 
+ list_dirs_pattern(udev_t, udev_rules_t, udev_rules_t)
+ read_files_pattern(udev_t, udev_rules_t, udev_rules_t)
++read_lnk_files_pattern(udev_t, udev_rules_t, udev_rules_t)
+ 
+ manage_dirs_pattern(udev_t, udev_var_run_t, udev_var_run_t)
+ manage_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
+@@ -97,6 +102,7 @@ corecmd_exec_all_executables(udev_t)
+ 
+ dev_rw_sysfs(udev_t)
+ dev_manage_all_dev_nodes(udev_t)
++dev_create_generic_symlinks(udev_t)
+ dev_rw_generic_files(udev_t)
+ dev_delete_generic_files(udev_t)
+ dev_search_usbfs(udev_t)
+@@ -110,7 +116,11 @@ domain_read_all_domains_state(udev_t)
+ domain_dontaudit_ptrace_all_domains(udev_t) #pidof triggers these
+ 
+ files_read_usr_files(udev_t)
++ifdef(`distro_debian', `
++files_manage_etc_runtime_files(udev_t)
++', `
+ files_read_etc_runtime_files(udev_t)
++')
+ files_read_etc_files(udev_t)
+ files_exec_etc_files(udev_t)
+ files_dontaudit_search_isid_type_dirs(udev_t)
+@@ -171,12 +181,19 @@ sysnet_etc_filetrans_config(udev_t)
+ 
+ userdom_dontaudit_search_user_home_content(udev_t)
+ 
++fstools_getattr_swap_files(udev_t)
++
+ ifdef(`distro_gentoo',`
+ 	# during boot, init scripts use /dev/.rcsysinit
+ 	# existance to determine if we are in early booting
+ 	init_getattr_script_status_files(udev_t)
+ ')
+ 
++ifdef(`distro_debian',`
++	fs_manage_tmpfs_dirs(udev_t)
++	fs_manage_tmpfs_chr_files(udev_t)
++')
++
+ ifdef(`distro_redhat',`
+ 	fs_manage_tmpfs_dirs(udev_t)
+ 	fs_manage_tmpfs_files(udev_t)
+@@ -285,6 +302,7 @@ optional_policy(`
+ 	kernel_read_xen_state(udev_t)
+ 	xen_manage_log(udev_t)
+ 	xen_read_image_files(udev_t)
++	fs_manage_xenfs_files(udev_t)
+ ')
+ 
+ optional_policy(`

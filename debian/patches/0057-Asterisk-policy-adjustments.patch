@@ -1,0 +1,21 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:40:07 +0100
+Subject: Asterisk policy adjustments
+
+---
+ policy/modules/services/asterisk.te |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/services/asterisk.te b/policy/modules/services/asterisk.te
+index b3b0176..cc9d2d5 100644
+--- a/policy/modules/services/asterisk.te
++++ b/policy/modules/services/asterisk.te
+@@ -45,7 +45,7 @@ allow asterisk_t self:process { getsched setsched signal_perms getcap setcap };
+ allow asterisk_t self:fifo_file rw_fifo_file_perms;
+ allow asterisk_t self:sem create_sem_perms;
+ allow asterisk_t self:shm create_shm_perms;
+-allow asterisk_t self:unix_stream_socket connectto;
++allow asterisk_t self:unix_stream_socket { connectto rw_stream_socket_perms };
+ allow asterisk_t self:tcp_socket create_stream_socket_perms;
+ allow asterisk_t self:udp_socket create_socket_perms;
+ 

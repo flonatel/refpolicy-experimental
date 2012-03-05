@@ -1,0 +1,22 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 00:43:37 +0100
+Subject: Allow cron to read mysql config and connect to mysql
+
+---
+ policy/modules/services/cron.te |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/services/cron.te b/policy/modules/services/cron.te
+index 4f68f6d..a949f29 100644
+--- a/policy/modules/services/cron.te
++++ b/policy/modules/services/cron.te
+@@ -469,7 +469,8 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
+-	mysql_read_config(system_cronjob_t)
++	mysql_read_config(system_crond_t)
++        mysql_stream_connect(system_crond_t)
+ ')
+ 
+ optional_policy(`

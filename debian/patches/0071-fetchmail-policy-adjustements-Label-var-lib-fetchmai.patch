@@ -1,0 +1,55 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 01:51:46 +0100
+Subject: fetchmail policy adjustements: * Label /var/lib/fetchmail as
+ fetchmail_uidl_cache_t and allow fetchmail_t to search /var/lib and
+ manage fetchmail_uidl_cache_t dirs * Allow fetchmail_t to read
+ usr_t for certificates and to create /tmp files * File location
+ fixes
+
+---
+ policy/modules/services/fetchmail.fc |    1 +
+ policy/modules/services/fetchmail.te |    8 ++++++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/fetchmail.fc b/policy/modules/services/fetchmail.fc
+index 455c620..702d91a 100644
+--- a/policy/modules/services/fetchmail.fc
++++ b/policy/modules/services/fetchmail.fc
+@@ -17,3 +17,4 @@
+ 
+ /var/run/fetchmail/.*		--	gen_context(system_u:object_r:fetchmail_var_run_t,s0)
+ /var/mail/\.fetchmail-UIDL-cache --	gen_context(system_u:object_r:fetchmail_uidl_cache_t,s0)
++/var/lib/fetchmail(/.*)?		gen_context(system_u:object_r:fetchmail_uidl_cache_t,s0)
+diff --git a/policy/modules/services/fetchmail.te b/policy/modules/services/fetchmail.te
+index 3459d93..b6e8ad2 100644
+--- a/policy/modules/services/fetchmail.te
++++ b/policy/modules/services/fetchmail.te
+@@ -19,6 +19,11 @@ files_config_file(fetchmail_etc_t)
+ type fetchmail_uidl_cache_t;
+ files_type(fetchmail_uidl_cache_t)
+ 
++type fetchmail_tmp_t;
++files_tmp_file(fetchmail_tmp_t)
++ubac_constrained(fetchmail_tmp_t)
++files_tmp_filetrans(fetchmail_t, fetchmail_tmp_t, file)
++
+ ########################################
+ #
+ # Local policy
+@@ -33,13 +38,16 @@ allow fetchmail_t self:tcp_socket create_socket_perms;
+ allow fetchmail_t self:udp_socket create_socket_perms;
+ 
+ allow fetchmail_t fetchmail_etc_t:file read_file_perms;
++files_read_usr_files(fetchmail_t)
+ 
++allow fetchmail_t fetchmail_uidl_cache_t:dir manage_dir_perms;
+ allow fetchmail_t fetchmail_uidl_cache_t:file manage_file_perms;
+ mta_spool_filetrans(fetchmail_t, fetchmail_uidl_cache_t, file)
+ 
+ manage_dirs_pattern(fetchmail_t, fetchmail_var_run_t, fetchmail_var_run_t)
+ manage_files_pattern(fetchmail_t, fetchmail_var_run_t, fetchmail_var_run_t)
+ files_pid_filetrans(fetchmail_t, fetchmail_var_run_t, { dir file })
++files_search_var_lib(fetchmail_t)
+ 
+ kernel_read_kernel_sysctls(fetchmail_t)
+ kernel_list_proc(fetchmail_t)

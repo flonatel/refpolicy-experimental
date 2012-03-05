@@ -1,0 +1,227 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:17:02 +0100
+Subject: postfix policy adjustments: * Allow user_mail_t to transition to
+ postfix_master_t for postalias, confined by roles. Uses
+ domain_system_change_exemption() for user_mail_t via
+ postfix_domtrans_master() which isn't ideal. * Allow
+ postfix_local_t to write to mail_spool_t files for locking * Added
+ in_unconfined_r() interface and made postfix user domains use it so
+ they can be in the role unconfined_r. Ugly but no better solution
+ at this time Closes: #592038 #599053 * Allow postfix_local_t to run
+ sendmail for programs like vacation
+
+---
+ policy/modules/services/mta.if      |    4 ++++
+ policy/modules/services/postfix.if  |   12 ++++++++----
+ policy/modules/services/postfix.te  |   27 +++++++++++++++++++++++++--
+ policy/modules/system/unconfined.if |   32 ++++++++++++++++++++++++++++++++
+ 4 files changed, 69 insertions(+), 6 deletions(-)
+
+diff --git a/policy/modules/services/mta.if b/policy/modules/services/mta.if
+index b3b9d62..9c89b80 100644
+--- a/policy/modules/services/mta.if
++++ b/policy/modules/services/mta.if
+@@ -96,6 +96,8 @@ template(`mta_base_mail_template',`
+ 
+ 	miscfiles_read_localization($1_mail_t)
+ 
++        kernel_read_system_state($1_mail_t)
++
+ 	optional_policy(`
+ 		exim_read_log($1_mail_t)
+ 		exim_append_log($1_mail_t)
+@@ -104,6 +106,8 @@ template(`mta_base_mail_template',`
+ 
+ 	optional_policy(`
+ 		postfix_domtrans_user_mail_handler($1_mail_t)
++		# for postalias - role stops unpriv user from doing it
++		postfix_domtrans_master($1_mail_t)
+ 	')
+ 
+ 	optional_policy(`
+diff --git a/policy/modules/services/postfix.if b/policy/modules/services/postfix.if
+index 46bee12..9cf0931 100644
+--- a/policy/modules/services/postfix.if
++++ b/policy/modules/services/postfix.if
+@@ -163,6 +163,7 @@ template(`postfix_user_domain_template',`
+ 	allow postfix_$1_t self:capability dac_override;
+ 
+ 	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
++	in_unconfined_r(postfix_$1_t)
+ 
+ 	domain_use_interactive_fds(postfix_$1_t)
+ ')
+@@ -374,6 +375,7 @@ interface(`postfix_domtrans_master',`
+ 	')
+ 
+ 	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
++	domain_system_change_exemption($1)
+ ')
+ 
+ ########################################
+@@ -454,7 +456,7 @@ interface(`postfix_domtrans_postqueue',`
+ 
+ #######################################
+ ## <summary>
+-##	Execute the master postqueue in the caller domain.
++##	Allow the master postqueue to use a fifo of the caller and send sigchld
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+@@ -462,12 +464,14 @@ interface(`postfix_domtrans_postqueue',`
+ ##	</summary>
+ ## </param>
+ #
+-interface(`posftix_exec_postqueue',`
++interface(`posftix_run_postqueue',`
+ 	gen_require(`
+-		type postfix_postqueue_exec_t;
++		type postfix_postqueue_t;
+ 	')
+ 
+-	can_exec($1, postfix_postqueue_exec_t)
++	allow postfix_postqueue_t $1:fd use;
++	allow postfix_postqueue_t $1:fifo_file rw_file_perms;
++	allow postfix_postqueue_t $1:process sigchld;
+ ')
+ 
+ ########################################
+diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
+index d165a03..93e08b8 100644
+--- a/policy/modules/services/postfix.te
++++ b/policy/modules/services/postfix.te
+@@ -26,6 +26,9 @@ application_executable_file(postfix_exec_t)
+ postfix_server_domain_template(local)
+ mta_mailserver_delivery(postfix_local_t)
+ 
++# allow postfix_local_t to run programs like vacation that send mail
++mta_sendmail_domtrans(postfix_local_t, postfix_postdrop_t)
++
+ # Program for creating database files
+ type postfix_map_t;
+ type postfix_map_exec_t;
+@@ -183,9 +186,11 @@ mta_getattr_spool(postfix_master_t)
+ ifdef(`distro_redhat',`
+ 	# for newer main.cf that uses /etc/aliases
+ 	mta_manage_aliases(postfix_master_t)
+-	mta_etc_filetrans_aliases(postfix_master_t)
+ ')
+ 
++mta_etc_filetrans_aliases(postfix_master_t)
++allow postfix_master_t etc_aliases_t:file manage_file_perms;
++
+ optional_policy(`
+ 	cyrus_stream_connect(postfix_master_t)
+ ')
+@@ -201,6 +206,8 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	mysql_stream_connect(postfix_master_t)
++	mysql_stream_connect(postfix_smtpd_t)
++	mysql_stream_connect(postfix_cleanup_t)
+ ')
+ 
+ optional_policy(`
+@@ -231,6 +238,11 @@ manage_dirs_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_boun
+ manage_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
+ manage_lnk_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
+ 
++# for milters - may be a bug in postfix
++allow postfix_cleanup_t postfix_smtpd_t:fd use;
++allow postfix_cleanup_t postfix_smtpd_t:unix_stream_socket { getattr read write shutdown };
++allow postfix_cleanup_t postfix_smtpd_t:tcp_socket { read write getattr getopt };
++
+ ########################################
+ #
+ # Postfix cleanup local policy
+@@ -240,6 +252,7 @@ allow postfix_cleanup_t self:process setrlimit;
+ 
+ # connect to master process
+ stream_connect_pattern(postfix_cleanup_t, postfix_private_t, postfix_private_t, postfix_master_t)
++write_sock_files_pattern(postfix_virtual_t,postfix_private_t,postfix_private_t)
+ 
+ rw_fifo_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
+ write_sock_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
+@@ -273,6 +286,9 @@ stream_connect_pattern(postfix_local_t, postfix_public_t, postfix_public_t, post
+ # for .forward - maybe we need a new type for it?
+ rw_sock_files_pattern(postfix_local_t, postfix_private_t, postfix_private_t)
+ 
++# so it can write to the lock file
++mta_rw_spool(postfix_local_t)
++
+ allow postfix_local_t postfix_spool_t:file rw_file_perms;
+ 
+ corecmd_exec_shell(postfix_local_t)
+@@ -405,6 +421,8 @@ optional_policy(`
+ 	dovecot_domtrans_deliver(postfix_pipe_t)
+ ')
+ 
++corecmd_exec_bin(postfix_pipe_t)
++
+ optional_policy(`
+ 	procmail_domtrans(postfix_pipe_t)
+ ')
+@@ -569,7 +587,7 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
+-	milter_stream_connect_all(postfix_smtp_t)
++	milter_stream_connect_all(postfix_smtpd_t)
+ ')
+ 
+ ########################################
+@@ -611,6 +629,11 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	dkim_stream_connect(postfix_smtpd_t)
++	dkim_stream_connect(postfix_cleanup_t)
++')
++
++optional_policy(`
+ 	sasl_connect(postfix_smtpd_t)
+ ')
+ 
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index c599bc0..ca029d7 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -320,6 +320,38 @@ interface(`unconfined_run_to',`
+ 
+ ########################################
+ ## <summary>
++##	Allow a domain to be in role unconfined_r
++## </summary>
++## <desc>
++##	<p>
++##	Allow the specified domain to be run in the role unconfined_r
++##	This is suitable for domains that are entered indirectly from
++##	unconfined_t
++##	</p>
++##	<p>
++##	Also allow the domain to send sigchld to unconfined_t and use fds
++##	</p>
++## </desc>
++## <param name="domain">
++##	<summary>
++##	Domain to be in unconfined_r
++##	</summary>
++## </param>
++#
++interface(`in_unconfined_r',`
++	gen_require(`
++		type unconfined_t;
++		role unconfined_r;
++	')
++
++	role unconfined_r types $1;
++	allow $1 unconfined_t:process sigchld;
++	allow $1 unconfined_t:fd use;
++	allow $1 unconfined_t:fifo_file { read write getattr };
++')
++
++########################################
++## <summary>
+ ##	Inherit file descriptors from the unconfined domain.
+ ## </summary>
+ ## <param name="domain">

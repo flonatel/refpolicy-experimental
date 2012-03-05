@@ -1,0 +1,63 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:36:39 +0100
+Subject: lvm policy adjustments: * Allow lvm_t rw access to unconfined_t
+ semaphores * Allow lvm_t to use ptys
+
+---
+ policy/modules/system/lvm.te        |    6 ++++++
+ policy/modules/system/unconfined.if |   18 ++++++++++++++++++
+ 2 files changed, 24 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
+index 6a87211..cc2a6f8 100644
+--- a/policy/modules/system/lvm.te
++++ b/policy/modules/system/lvm.te
+@@ -41,6 +41,11 @@ files_pid_file(lvm_var_run_t)
+ type lvm_tmp_t;
+ files_tmp_file(lvm_tmp_t)
+ 
++allow lvm_t self:sem create_sem_perms;
++optional_policy(`
++	unconfined_sem_rw(lvm_t)
++')
++
+ ########################################
+ #
+ # Cluster LVM daemon local policy
+@@ -178,6 +183,7 @@ allow lvm_t self:sem create_sem_perms;
+ 
+ allow lvm_t self:unix_stream_socket { connectto create_stream_socket_perms };
+ allow lvm_t clvmd_t:unix_stream_socket { connectto rw_socket_perms };
++term_dontaudit_use_generic_ptys(lvm_t)
+ 
+ manage_dirs_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
+ manage_files_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index ca029d7..f8b0bee 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -370,6 +370,24 @@ interface(`unconfined_use_fds',`
+ 
+ ########################################
+ ## <summary>
++##	rw access to a semaphore created by the unconfined domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`unconfined_sem_rw',`
++	gen_require(`
++		type unconfined_t;
++	')
++
++	allow $1 unconfined_t:sem rw_sem_perms;
++')
++
++########################################
++## <summary>
+ ##	Send a SIGCHLD signal to the unconfined domain.
+ ## </summary>
+ ## <param name="domain">

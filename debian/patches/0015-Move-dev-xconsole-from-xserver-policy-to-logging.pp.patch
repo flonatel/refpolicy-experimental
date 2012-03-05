@@ -1,0 +1,209 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Mon, 27 Feb 2012 02:02:28 +0100
+Subject: Move /dev/xconsole from xserver policy to logging.pp
+
+The patch moves the xconsole policy to logging.pp from the xserver
+policy.  It's more about logging than the X server and there are a lot of
+systems which have syslogd configured to write to /dev/xconsole but that have
+no X server installed.
+---
+ policy/modules/kernel/devices.if   |   20 ++++++++++++++++++++
+ policy/modules/services/xserver.fc |    6 +-----
+ policy/modules/services/xserver.te |    9 ++-------
+ policy/modules/system/init.te      |    3 +++
+ policy/modules/system/logging.fc   |    1 +
+ policy/modules/system/logging.if   |   35 +++++++++++++++++++++++++++++++++++
+ policy/modules/system/logging.te   |   17 ++++++++++++-----
+ 7 files changed, 74 insertions(+), 17 deletions(-)
+
+diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
+index 7c275ba..206b01e 100644
+--- a/policy/modules/kernel/devices.if
++++ b/policy/modules/kernel/devices.if
+@@ -787,6 +787,26 @@ interface(`dev_delete_generic_symlinks',`
+ 
+ ########################################
+ ## <summary>
++##	Create FIFO pipes in device directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dev_create_generic_pipes',`
++	gen_require(`
++		type device_t;
++	')
++       allow $1 device_t:dir add_entry_dir_perms;
++       allow $1 device_t:fifo_file { getattr create };
++       allow $1 device_t:dir search_dir_perms;
++       allow $1 device_t:file setattr_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Create, delete, read, and write symbolic links in device directories.
+ ## </summary>
+ ## <param name="domain">
+diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
+index 47d64a8..5b9764e 100644
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
+@@ -9,11 +9,7 @@ HOME_DIR/\.ICEauthority.* --	gen_context(system_u:object_r:iceauth_home_t,s0)
+ HOME_DIR/\.serverauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+-
+-#
+-# /dev
+-#
+-/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
++HOME_DIR/\.xsession-errors --	gen_context(system_u:object_r:xauth_home_t,s0)
+ 
+ #
+ # /etc
+diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
+index 934ac8b..c759ad7 100644
+--- a/policy/modules/services/xserver.te
++++ b/policy/modules/services/xserver.te
+@@ -151,12 +151,6 @@ typealias xauth_tmp_t alias { auditadm_xauth_tmp_t secadm_xauth_tmp_t };
+ files_tmp_file(xauth_tmp_t)
+ ubac_constrained(xauth_tmp_t)
+ 
+-# this is not actually a device, its a pipe
+-type xconsole_device_t;
+-files_type(xconsole_device_t)
+-fs_associate_tmpfs(xconsole_device_t)
+-files_associate_tmp(xconsole_device_t)
+-
+ type xdm_t;
+ type xdm_exec_t;
+ auth_login_pgm_domain(xdm_t)
+@@ -317,7 +311,8 @@ allow xdm_t self:socket create_socket_perms;
+ allow xdm_t self:appletalk_socket create_socket_perms;
+ allow xdm_t self:key { search link write };
+ 
+-allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
++#allow xdm_t xconsole_device_t:fifo_file { getattr setattr };
++logging_r_xconsole(xdm_t)
+ 
+ # Allow gdm to run gdm-binary
+ can_exec(xdm_t, xdm_exec_t)
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 157e844..62deed5 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -391,6 +391,7 @@ logging_manage_generic_logs(initrc_t)
+ logging_read_all_logs(initrc_t)
+ logging_append_all_logs(initrc_t)
+ logging_read_audit_config(initrc_t)
++logging_setattr_xconsole(initrc_t)
+ 
+ miscfiles_read_localization(initrc_t)
+ # slapd needs to read cert files from its initscript
+@@ -409,6 +410,8 @@ userdom_use_user_terminals(initrc_t)
+ 
+ ifdef(`distro_debian',`
+ 	dev_setattr_generic_dirs(initrc_t)
++	# to be able to create /dev/xconsole
++	dev_create_generic_pipes(initrc_t)
+ 
+ 	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
+ 
+diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
+index 02f4c97..3fa8575 100644
+--- a/policy/modules/system/logging.fc
++++ b/policy/modules/system/logging.fc
+@@ -1,4 +1,5 @@
+ /dev/log		-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
++/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
+ 
+ /etc/rsyslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+ /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
+diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
+index 831b909..453c916 100644
+--- a/policy/modules/system/logging.if
++++ b/policy/modules/system/logging.if
+@@ -901,6 +901,41 @@ interface(`logging_rw_generic_logs',`
+ 
+ ########################################
+ ## <summary>
++##	Set the attributes of the xconsole named pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logging_setattr_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file setattr;
++')
++
++########################################
++## <summary>
++##	Read the xconsole named pipe.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`logging_r_xconsole',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file { getattr read };
++')
++########################################
++## <summary>
+ ##	Create, read, write, and delete
+ ##	generic log files.
+ ## </summary>
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index ebc216c..d8e5e1c 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -61,6 +61,11 @@ files_pid_file(klogd_var_run_t)
+ type syslog_conf_t;
+ files_config_file(syslog_conf_t)
+ 
++ifdef(`distro_debian', `
++# for xconsole detection
++    allow initrc_t syslog_conf_t:file read_file_perms;
++')
++
+ type syslogd_t;
+ type syslogd_exec_t;
+ init_daemon_domain(syslogd_t, syslogd_exec_t)
+@@ -81,6 +86,13 @@ type var_log_t;
+ logging_log_file(var_log_t)
+ files_mountpoint(var_log_t)
+ 
++# this is not actually a device, its a pipe
++type xconsole_device_t;
++files_type(xconsole_device_t)
++dev_associate(xconsole_device_t)
++files_associate_tmp(xconsole_device_t)
++allow syslogd_t xconsole_device_t:fifo_file rw_file_perms;
++
+ ifdef(`enable_mls',`
+ 	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
+ 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
+@@ -506,8 +518,3 @@ optional_policy(`
+ optional_policy(`
+ 	udev_read_db(syslogd_t)
+ ')
+-
+-optional_policy(`
+-	# log to the xconsole
+-	xserver_rw_console(syslogd_t)
+-')

@@ -1,0 +1,97 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:21:42 +0100
+Subject: mysqld policy fixes: * Allow mysqld_safe_t to send messages to
+ syslogd * Allow mysqld_t to run shell scripts (shell_exec_t and
+ bin_t) * Add interface to execute mysqld in its own domain for use
+ in userdomain
+
+---
+ policy/modules/services/mysql.fc    |    2 ++
+ policy/modules/services/mysql.if    |   20 ++++++++++++++++++++
+ policy/modules/services/mysql.te    |    6 +++++-
+ policy/modules/system/userdomain.if |    4 ++++
+ 4 files changed, 31 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/services/mysql.fc b/policy/modules/services/mysql.fc
+index cc7192c..08df012 100644
+--- a/policy/modules/services/mysql.fc
++++ b/policy/modules/services/mysql.fc
+@@ -16,6 +16,8 @@
+ /usr/libexec/mysqld	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
+ 
+ /usr/sbin/mysqld(-max)?	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
++/usr/sbin/ndbd		--	gen_context(system_u:object_r:mysqld_exec_t,s0)
++/usr/bin/mysql_upgrade	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
+ /usr/sbin/mysqlmanager	--	gen_context(system_u:object_r:mysqlmanagerd_exec_t,s0)
+ 
+ #
+diff --git a/policy/modules/services/mysql.if b/policy/modules/services/mysql.if
+index e9c0982..45eb10d 100644
+--- a/policy/modules/services/mysql.if
++++ b/policy/modules/services/mysql.if
+@@ -353,3 +353,23 @@ interface(`mysql_admin',`
+ 
+ 	admin_pattern($1, mysqld_tmp_t)
+ ')
++
++########################################
++## <summary>
++##	Execute mysqld in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++## 	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`mysqld_exec',`
++	gen_require(`
++		type mysqld_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	can_exec($1, mysqld_exec_t)
++')
+diff --git a/policy/modules/services/mysql.te b/policy/modules/services/mysql.te
+index 0a0d63c..4d87a4d 100644
+--- a/policy/modules/services/mysql.te
++++ b/policy/modules/services/mysql.te
+@@ -58,10 +58,13 @@ dontaudit mysqld_t self:capability sys_tty_config;
+ allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
+ allow mysqld_t self:fifo_file rw_fifo_file_perms;
+ allow mysqld_t self:shm create_shm_perms;
+-allow mysqld_t self:unix_stream_socket create_stream_socket_perms;
++allow mysqld_t self:unix_stream_socket { create_stream_socket_perms connectto };
+ allow mysqld_t self:tcp_socket create_stream_socket_perms;
+ allow mysqld_t self:udp_socket create_socket_perms;
+ 
++corecmd_exec_shell(mysqld_t)
++corecmd_exec_bin(mysqld_t)
++
+ manage_dirs_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+ manage_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+ manage_lnk_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+@@ -180,6 +183,7 @@ files_read_usr_files(mysqld_safe_t)
+ files_dontaudit_getattr_all_dirs(mysqld_safe_t)
+ 
+ logging_log_filetrans(mysqld_safe_t, mysqld_log_t, file)
++logging_send_syslog_msg(mysqld_safe_t)
+ 
+ hostname_exec(mysqld_safe_t)
+ 
+diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
+index 1bf060f..374a5e2 100644
+--- a/policy/modules/system/userdomain.if
++++ b/policy/modules/system/userdomain.if
+@@ -1026,6 +1026,10 @@ template(`userdom_unpriv_user_template', `
+ 	optional_policy(`
+ 		setroubleshoot_stream_connect($1_t)
+ 	')
++
++	optional_policy(`
++		mysqld_exec($1_t)
++	')
+ ')
+ 
+ #######################################

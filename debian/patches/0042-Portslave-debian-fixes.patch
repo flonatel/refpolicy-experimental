@@ -1,0 +1,71 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:31:12 +0100
+Subject: Portslave debian fixes
+
+---
+ policy/modules/services/portslave.te |    6 ++++++
+ policy/modules/services/ppp.if       |   18 ++++++++++++++++++
+ 2 files changed, 24 insertions(+), 0 deletions(-)
+
+diff --git a/policy/modules/services/portslave.te b/policy/modules/services/portslave.te
+index 69c331e..6374261 100644
+--- a/policy/modules/services/portslave.te
++++ b/policy/modules/services/portslave.te
+@@ -13,6 +13,9 @@ init_daemon_domain(portslave_t, portslave_exec_t)
+ type portslave_etc_t;
+ files_config_file(portslave_etc_t)
+ 
++# for filters
++can_exec(portslave_t, { portslave_etc_t portslave_exec_t })
++
+ type portslave_lock_t;
+ files_lock_file(portslave_lock_t)
+ 
+@@ -62,8 +65,10 @@ corenet_tcp_sendrecv_generic_node(portslave_t)
+ corenet_udp_sendrecv_generic_node(portslave_t)
+ corenet_tcp_sendrecv_all_ports(portslave_t)
+ corenet_udp_sendrecv_all_ports(portslave_t)
++corenet_udp_bind_all_nodes(portslave_t)
+ corenet_rw_ppp_dev(portslave_t)
+ 
++miscfiles_read_localization(portslave_t)
+ dev_read_sysfs(portslave_t)
+ # for ssh
+ dev_read_urand(portslave_t)
+@@ -102,6 +107,7 @@ mta_send_mail(portslave_t)
+ # instead of exec.
+ ppp_read_rw_config(portslave_t)
+ ppp_exec(portslave_t)
++ppp_script_exec(portslave_t)
+ ppp_read_secrets(portslave_t)
+ ppp_manage_pid_files(portslave_t)
+ ppp_pid_filetrans(portslave_t)
+diff --git a/policy/modules/services/ppp.if b/policy/modules/services/ppp.if
+index b524673..9448438 100644
+--- a/policy/modules/services/ppp.if
++++ b/policy/modules/services/ppp.if
+@@ -228,6 +228,24 @@ interface(`ppp_read_config',`
+ 
+ ########################################
+ ## <summary>
++##	 Execute domain in the ppp caller.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	 Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ppp_script_exec',`
++	gen_require(`
++		type pppd_script_exec_t;
++	')
++
++	can_exec($1, pppd_script_exec_t)
++')
++
++########################################
++## <summary>
+ ##	Read PPP-writable configuration files.
+ ## </summary>
+ ## <param name="domain">

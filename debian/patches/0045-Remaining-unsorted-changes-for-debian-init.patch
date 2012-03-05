@@ -1,0 +1,130 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Fri, 2 Mar 2012 03:40:05 +0100
+Subject: Remaining unsorted changes for debian init
+
+---
+ policy/modules/kernel/files.fc |    2 +-
+ policy/modules/system/init.fc  |    2 ++
+ policy/modules/system/init.if  |    2 ++
+ policy/modules/system/init.te  |   18 ++++++++++++++++--
+ policy/modules/system/udev.if  |   18 ++++++++++++++++++
+ 5 files changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/policy/modules/kernel/files.fc b/policy/modules/kernel/files.fc
+index ee086d2..6dabbb7 100644
+--- a/policy/modules/kernel/files.fc
++++ b/policy/modules/kernel/files.fc
+@@ -62,7 +62,7 @@ ifdef(`distro_suse',`
+ 
+ /etc/ipsec\.d/examples(/.*)?	gen_context(system_u:object_r:etc_t,s0)
+ 
+-/etc/network/ifstate	--	gen_context(system_u:object_r:etc_runtime_t,s0)
++/etc/network/run/ifstate --	gen_context(system_u:object_r:etc_runtime_t,s0)
+ 
+ /etc/ptal/ptal-printd-like -- 	gen_context(system_u:object_r:etc_runtime_t,s0)
+ 
+diff --git a/policy/modules/system/init.fc b/policy/modules/system/init.fc
+index 46263b8..a0dee71 100644
+--- a/policy/modules/system/init.fc
++++ b/policy/modules/system/init.fc
+@@ -67,6 +67,8 @@ ifdef(`distro_gentoo', `
+ ifdef(`distro_debian',`
+ /var/run/hotkey-setup	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ /var/run/kdm/.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++/etc/network/if-down.d/.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
++/etc/network/if-up.d/.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
+ ')
+ 
+ ifdef(`distro_gentoo', `
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 94fd8dd..c0561ba 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -346,6 +346,8 @@ interface(`init_system_domain',`
+ 
+ 	domtrans_pattern(initrc_t, $2, $1)
+ 
++	init_use_fds($1)
++
+ 	ifdef(`hide_broken_symptoms',`
+ 		# RHEL4 systems seem to have a stray
+ 		# fds open from the initrd
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 9dd9bc2..cfba657 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -178,6 +178,12 @@ ifdef(`distro_redhat',`
+ 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
+ ')
+ 
++ifdef(`distro_debian',`
++	fs_rw_tmpfs_chr_files(init_t)
++	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
++')
++
++optional_policy(`
+ tunable_policy(`init_upstart',`
+ 	corecmd_shell_domtrans(init_t, initrc_t)
+ ',`
+@@ -185,6 +191,7 @@ tunable_policy(`init_upstart',`
+ 	# causes problems with upstart
+ 	sysadm_shell_domtrans(init_t)
+ ')
++')
+ 
+ optional_policy(`
+ 	auth_rw_login_records(init_t)
+@@ -288,6 +295,7 @@ dev_list_usbfs(initrc_t)
+ dev_read_framebuffer(initrc_t)
+ dev_write_framebuffer(initrc_t)
+ dev_read_realtime_clock(initrc_t)
++clock_rw_adjtime(initrc_t)
+ dev_read_sound_mixer(initrc_t)
+ dev_write_sound_mixer(initrc_t)
+ dev_setattr_all_chr_files(initrc_t)
+@@ -295,8 +303,14 @@ dev_rw_lvm_control(initrc_t)
+ dev_delete_lvm_control_dev(initrc_t)
+ dev_manage_generic_symlinks(initrc_t)
+ dev_manage_generic_files(initrc_t)
+-# Wants to remove udev.tbl:
+-dev_delete_generic_symlinks(initrc_t)
++
++optional_policy(`
++	# Wants to remove udev.tbl:
++	dev_delete_generic_symlinks(initrc_t)
++	udev_unlink_table(initrc_t)
++	dev_delete_generic_dirs(initrc_t)
++')
++
+ dev_getattr_all_blk_files(initrc_t)
+ dev_getattr_all_chr_files(initrc_t)
+ # Early devtmpfs
+diff --git a/policy/modules/system/udev.if b/policy/modules/system/udev.if
+index 025348a..b6d3bbb 100644
+--- a/policy/modules/system/udev.if
++++ b/policy/modules/system/udev.if
+@@ -168,6 +168,24 @@ interface(`udev_dontaudit_search_db',`
+ 
+ ########################################
+ ## <summary>
++##     Allow process to remove udev table files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     The type of the process performing this action.
++##     </summary>
++## </param>
++#
++interface(`udev_unlink_table',`
++	gen_require(`
++		type udev_tbl_t;
++	')
++
++	allow $1 udev_tbl_t:file unlink;
++')
++
++########################################
++## <summary>
+ ##	Read the udev device table.
+ ## </summary>
+ ## <desc>

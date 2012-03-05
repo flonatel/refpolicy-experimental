@@ -1,0 +1,52 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
+Date: Sun, 4 Mar 2012 02:38:14 +0100
+Subject: insmod policy adjustments: * Allow insmod_t the capability sys_admin
+ * Allow insmod_t to mount a rpc_pipefs_t filesystem * Allow
+ insmod_t to do module_request * Domain trans from unconfined_t to
+ depmod_t
+
+---
+ policy/modules/system/modutils.te |   12 +++++++++++-
+ 1 files changed, 11 insertions(+), 1 deletions(-)
+
+diff --git a/policy/modules/system/modutils.te b/policy/modules/system/modutils.te
+index 6102997..d639dbf 100644
+--- a/policy/modules/system/modutils.te
++++ b/policy/modules/system/modutils.te
+@@ -20,6 +20,8 @@ application_domain(insmod_t, insmod_exec_t)
+ mls_file_write_all_levels(insmod_t)
+ role system_r types insmod_t;
+ 
++kernel_request_load_module(insmod_t)
++
+ # module loading config
+ type modules_conf_t;
+ files_type(modules_conf_t)
+@@ -75,6 +77,12 @@ userdom_use_user_terminals(depmod_t)
+ files_list_home(depmod_t)
+ userdom_read_user_home_content_files(depmod_t)
+ 
++ifdef(`distro_debian',`
++	optional_policy(`
++		unconfined_run_to(depmod_t, depmod_exec_t)
++	')
++')
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(depmod_t)
+@@ -104,11 +112,13 @@ optional_policy(`
+ # insmod local policy
+ #
+ 
+-allow insmod_t self:capability { dac_override net_raw sys_nice sys_tty_config };
++allow insmod_t self:capability { dac_override net_raw sys_admin sys_nice sys_tty_config };
+ allow insmod_t self:process { execmem sigchld sigkill sigstop signull signal };
+ 
+ allow insmod_t self:udp_socket create_socket_perms;
+ allow insmod_t self:rawip_socket create_socket_perms;
++fs_mount_rpc_pipefs(insmod_t)
++fs_list_rpc(insmod_t)
+ term_read_console(insmod_t)
+ 
+ # Read module config and dependency information
