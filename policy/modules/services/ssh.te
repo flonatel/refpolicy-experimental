@@ -1,4 +1,4 @@
-policy_module(ssh, 2.2.0)
+policy_module(ssh, 2.3.0)
 
 ########################################
 #
@@ -48,8 +48,7 @@ type ssh_t;
 type ssh_exec_t;
 typealias ssh_t alias { user_ssh_t staff_ssh_t sysadm_ssh_t };
 typealias ssh_t alias { auditadm_ssh_t secadm_ssh_t };
-application_domain(ssh_t, ssh_exec_t)
-ubac_constrained(ssh_t)
+userdom_user_application_domain(ssh_t, ssh_exec_t)
 
 type ssh_agent_exec_t;
 corecmd_executable_file(ssh_agent_exec_t)
@@ -57,26 +56,22 @@ corecmd_executable_file(ssh_agent_exec_t)
 type ssh_agent_tmp_t;
 typealias ssh_agent_tmp_t alias { user_ssh_agent_tmp_t staff_ssh_agent_tmp_t sysadm_ssh_agent_tmp_t };
 typealias ssh_agent_tmp_t alias { auditadm_ssh_agent_tmp_t secadm_ssh_agent_tmp_t };
-files_tmp_file(ssh_agent_tmp_t)
-ubac_constrained(ssh_agent_tmp_t)
+userdom_user_tmp_file(ssh_agent_tmp_t)
 
 type ssh_keysign_t;
 type ssh_keysign_exec_t;
 typealias ssh_keysign_t alias { user_ssh_keysign_t staff_ssh_keysign_t sysadm_ssh_keysign_t };
 typealias ssh_keysign_t alias { auditadm_ssh_keysign_t secadm_ssh_keysign_t };
-application_domain(ssh_keysign_t, ssh_keysign_exec_t)
-ubac_constrained(ssh_keysign_t)
+userdom_user_application_domain(ssh_keysign_t, ssh_keysign_exec_t)
 
 type ssh_tmpfs_t;
 typealias ssh_tmpfs_t alias { user_ssh_tmpfs_t staff_ssh_tmpfs_t sysadm_ssh_tmpfs_t };
 typealias ssh_tmpfs_t alias { auditadm_ssh_tmpfs_t secadm_ssh_tmpfs_t };
-files_tmpfs_file(ssh_tmpfs_t)
-ubac_constrained(ssh_tmpfs_t)
+userdom_user_tmpfs_file(ssh_tmpfs_t)
 
 type ssh_home_t;
 typealias ssh_home_t alias { home_ssh_t user_ssh_home_t user_home_ssh_t staff_home_ssh_t sysadm_home_ssh_t };
 typealias ssh_home_t alias { auditadm_home_ssh_t secadm_home_ssh_t };
-files_type(ssh_home_t)
 userdom_user_home_content(ssh_home_t)
 
 ##############################
@@ -274,6 +269,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	oddjob_domtrans_mkhomedir(sshd_t)
+')
+
+optional_policy(`
 	rpm_use_script_fds(sshd_t)
 ')
 
@@ -290,29 +289,6 @@ optional_policy(`
 optional_policy(`
 	xserver_domtrans_xauth(sshd_t)
 ')
-
-ifdef(`TODO',`
-tunable_policy(`ssh_sysadm_login',`
-	# Relabel and access ptys created by sshd
-	# ioctl is necessary for logout() processing for utmp entry and for w to
-	# display the tty.
-	# some versions of sshd on the new SE Linux require setattr
-	allow sshd_t ptyfile:chr_file relabelto;
-
-	optional_policy(`
-		domain_trans(sshd_t, xauth_exec_t, userdomain)
-	')
-',`
-	optional_policy(`
-		domain_trans(sshd_t, xauth_exec_t, unpriv_userdomain)
-	')
-	# Relabel and access ptys created by sshd
-	# ioctl is necessary for logout() processing for utmp entry and for w to
-	# display the tty.
-	# some versions of sshd on the new SE Linux require setattr
-	allow sshd_t userpty_type:chr_file { relabelto read write getattr ioctl setattr };
-')
-') dnl endif TODO
 
 ########################################
 #

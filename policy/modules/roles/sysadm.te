@@ -1,4 +1,4 @@
-policy_module(sysadm, 2.3.0)
+policy_module(sysadm, 2.4.0)
 
 ########################################
 #
@@ -51,6 +51,10 @@ ifdef(`direct_sysadm_daemon',`
 	')
 ')
 
+ifdef(`distro_gentoo',`
+	init_exec_rc(sysadm_t)
+')
+
 ifndef(`enable_mls',`
 	logging_manage_audit_log(sysadm_t)
 	logging_manage_audit_config(sysadm_t)
@@ -79,6 +83,10 @@ optional_policy(`
 
 optional_policy(`
 	apt_run(sysadm_t, sysadm_r)
+')
+
+optional_policy(`
+	asterisk_stream_connect(sysadm_t)
 ')
 
 optional_policy(`
@@ -145,6 +153,10 @@ optional_policy(`
 
 optional_policy(`
 	fstools_run(sysadm_t, sysadm_r)
+')
+
+optional_policy(`
+	git_role(sysadm_r, sysadm_t)
 ')
 
 optional_policy(`
@@ -245,6 +257,7 @@ optional_policy(`
 
 optional_policy(`
 	portage_run(sysadm_t, sysadm_r)
+	portage_run_fetch(sysadm_t, sysadm_r)
 	portage_run_gcc_config(sysadm_t, sysadm_r)
 ')
 
