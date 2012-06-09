@@ -1,11 +1,11 @@
 Source: refpolicy
-VCS-Git: git://git.debian.org/git/users/srivasta/debian/refpolicy.git
-VCS-Browser: http://git.debian.org/?p=users/srivasta/debian/refpolicy.git;a=summary
+VCS-Git: git://anonscm.debian.org/selinux/selinux.git
+VCS-Browser: http://anonscm.debian.org/gitweb/?p=selinux/selinux.git;a=summary
 Priority: optional
 Section: admin
 Homepage: http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
-Maintainer: Russell Coker <russell@coker.com.au>
-Uploaders: Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
+Maintainer: Debian SELinux maintainers <selinux-devel@lists.alioth.debian.org>
+Uploaders: Russell Coker <russell@coker.com.au>, Erich Schubert <erich@debian.org>, Manoj Srivastava <srivasta@debian.org>
 Standards-Version: 3.9.2
 Build-Depends-Indep: policycoreutils (>= 2.1.0), checkpolicy (>= 2.1.0),
                      python, m4, bzip2, gawk, libsepol1 (>=2.1.0)
