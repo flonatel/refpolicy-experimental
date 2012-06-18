@@ -291,6 +291,7 @@ debian/stamp/install/selinux-policy-src:
                              $(TMPTOP)/etc/selinux/default/src/policy/
 	(cd $(TMPTOP)/etc/selinux/default/src/; mv policy $(package);   \
                                                   mv support $(package)/; \
+                                                  rm $(package)/support/pyplate.pyc; \
 	  tar zfc $(TMPTOP)/usr/src/$(package).tar.gz $(package))
 	rm -rf               $(TMPTOP)/etc
 	$(install_file)      VERSION              $(DOCDIR)/

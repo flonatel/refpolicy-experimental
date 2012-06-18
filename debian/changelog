@@ -1,3 +1,10 @@
+refpolicy (2:2.20110726-7) UNRELEASED; urgency=low
+
+  [Mika Pflüger]
+  * Do not ship pyplate.pyc. Closes: #676852
+
+ -- Mika Pflüger <debian@mikapflueger.de>  Tue, 19 Jun 2012 01:00:21 +0200
+
 refpolicy (2:2.20110726-6) unstable; urgency=low
 
   * Added deny_ptrace tunable which some modules depend on
