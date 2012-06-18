@@ -1,3 +1,29 @@
+refpolicy (2:2.20110726-6) unstable; urgency=low
+
+  * Added deny_ptrace tunable which some modules depend on
+  * Fixed squid and nrpe policy
+  * Made all necessary changes to allow a KDE login
+    Closes: #677589
+  * Made all necessary changes for a mail server running Postfix, Courier
+    Maildrop, and Dovecot.  Not all mail server configurations will work (MTAs
+    tend to be complex and have lots of interactions) but getting other
+    configurations will be easier now.
+
+ -- Russell Coker <russell@coker.com.au>  Sun, 17 Jun 2012 06:18:01 +0000
+
+refpolicy (2:2.20110726-5) unstable; urgency=high
+
+  * Add systemd support - incomplete.
+    Closes: #660577.  I opened another bug for systemd not working.
+  * Depend on the latest SE Linux libraries
+  * Fix many problems that prevented successful boot, now should be quite
+    functional for servers.
+    Closes: #677579, #613977
+  * Fix djbdns port access.
+    Closes: #620718
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 16 Jun 2012 00:17:13 +1000
+
 refpolicy (2:2.20110726-4) unstable; urgency=low
   [Russell Coker]
   * Build and upload based on Laurent and Mika's good work.

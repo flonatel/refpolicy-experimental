@@ -1,0 +1,180 @@
+Description: Misc patches needed to make an MTA work
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2012-06-16
+
+Index: refpolicy-2.20110726/policy/modules/services/courier.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/courier.te	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/courier.te	2012-06-17 05:50:12.000000000 +0000
+@@ -64,6 +64,7 @@
+ files_search_spool(courier_authdaemon_t)
+ 
+ corecmd_search_bin(courier_authdaemon_t)
++corecmd_exec_shell(courier_authdaemon_t)
+ 
+ # for SSP
+ dev_read_urand(courier_authdaemon_t)
+Index: refpolicy-2.20110726/policy/modules/services/dovecot.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/dovecot.te	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/dovecot.te	2012-06-17 05:50:12.000000000 +0000
+@@ -58,7 +58,7 @@
+ # dovecot local policy
+ #
+ 
+-allow dovecot_t self:capability { dac_override dac_read_search chown kill net_bind_service setgid setuid sys_chroot };
++allow dovecot_t self:capability { dac_override dac_read_search chown kill net_bind_service setgid setuid sys_chroot sys_resource };
+ dontaudit dovecot_t self:capability sys_tty_config;
+ allow dovecot_t self:process { setrlimit signal_perms getcap setcap };
+ allow dovecot_t self:fifo_file rw_fifo_file_perms;
+@@ -98,9 +98,11 @@
+ manage_lnk_files_pattern(dovecot_t, dovecot_spool_t, dovecot_spool_t)
+ 
+ manage_files_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
++manage_dirs_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
+ manage_lnk_files_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
+ manage_sock_files_pattern(dovecot_t, dovecot_var_run_t, dovecot_var_run_t)
+-files_pid_filetrans(dovecot_t, dovecot_var_run_t, file)
++files_pid_filetrans(dovecot_t, dovecot_var_run_t, { dir file })
++allow dovecot_t dovecot_var_run_t:fifo_file manage_file_perms;
+ 
+ kernel_read_kernel_sysctls(dovecot_t)
+ kernel_read_system_state(dovecot_t)
+@@ -221,6 +223,8 @@
+ files_search_pids(dovecot_auth_t)
+ files_read_usr_files(dovecot_auth_t)
+ files_read_usr_symlinks(dovecot_auth_t)
++files_list_usr(dovecot_t)
++files_read_usr_files(dovecot_t)
+ files_read_var_lib_files(dovecot_auth_t)
+ files_search_tmp(dovecot_auth_t)
+ files_read_var_lib_files(dovecot_t)
+@@ -245,6 +249,7 @@
+ 	mysql_stream_connect(dovecot_auth_t)
+ 	mysql_tcp_connect(dovecot_auth_t)
+ 	mysql_read_config(dovecot_auth_t)
++	mysql_read_config(dovecot_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20110726/policy/modules/kernel/files.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.fc	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/kernel/files.fc	2012-06-17 05:50:12.000000000 +0000
+@@ -261,5 +261,5 @@
+ /var/tmp/vi\.recover	-d	gen_context(system_u:object_r:tmp_t,s0)
+ 
+ ifdef(`distro_debian',`
+-/var/run/motd		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
++/var/run/motd.*		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ ')
+Index: refpolicy-2.20110726/policy/modules/services/postfix.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postfix.fc	2012-06-17 05:27:18.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/postfix.fc	2012-06-17 05:50:12.000000000 +0000
+@@ -10,6 +10,7 @@
+ /usr/libexec/postfix/(n)?qmgr -- gen_context(system_u:object_r:postfix_qmgr_exec_t,s0)
+ /usr/libexec/postfix/showq --	gen_context(system_u:object_r:postfix_showq_exec_t,s0)
+ /usr/libexec/postfix/smtp --	gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
++/usr/libexec/postfix/lmtp --	gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
+ /usr/libexec/postfix/scache --	gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
+ /usr/libexec/postfix/smtpd --	gen_context(system_u:object_r:postfix_smtpd_exec_t,s0)
+ /usr/libexec/postfix/bounce --	gen_context(system_u:object_r:postfix_bounce_exec_t,s0)
+@@ -22,6 +23,7 @@
+ /usr/lib(64)?/postfix/master	-- gen_context(system_u:object_r:postfix_master_exec_t,s0)
+ /usr/lib(64)?/postfix/pickup	-- gen_context(system_u:object_r:postfix_pickup_exec_t,s0)
+ /usr/lib(64)?/postfix/(n)?qmgr -- gen_context(system_u:object_r:postfix_qmgr_exec_t,s0)
++/usr/lib(64)?/postfix/showq --	gen_context(system_u:object_r:postfix_showq_exec_t,s0)
+ /usr/lib(64)?/postfix/smtp	-- gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
+ /usr/lib(64)?/postfix/lmtp	-- gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
+ /usr/lib(64)?/postfix/scache	-- gen_context(system_u:object_r:postfix_smtp_exec_t,s0)
+Index: refpolicy-2.20110726/policy/modules/services/postfix.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postfix.te	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/postfix.te	2012-06-17 05:50:12.000000000 +0000
+@@ -503,6 +503,11 @@
+ # wants to write to /var/spool/postfix/public/showq
+ stream_connect_pattern(postfix_postqueue_t, postfix_public_t, postfix_public_t, postfix_master_t)
+ 
++allow postfix_postqueue_t self:capability { setuid setgid };
++allow postfix_postqueue_t postfix_spool_maildrop_t:dir list_dir_perms;
++allow postfix_postqueue_t postfix_spool_maildrop_t:file read_file_perms;
++allow postfix_postqueue_t postfix_spool_t:file read_file_perms;
++
+ # write to /var/spool/postfix/public/qmgr
+ write_fifo_files_pattern(postfix_postqueue_t, postfix_public_t, postfix_public_t)
+ 
+Index: refpolicy-2.20110726/policy/modules/services/courier.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/courier.if	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/courier.if	2012-06-17 05:50:12.000000000 +0000
+@@ -120,6 +120,7 @@
+ 	')
+ 	allow $1 courier_authdaemon_t:unix_stream_socket connectto;
+ 	allow $1 courier_etc_t:dir search;
++	allow $1 courier_var_run_t:dir { getattr search };
+ 	allow $1 courier_var_run_t:sock_file write;
+ ')
+ 
+Index: refpolicy-2.20110726/policy/modules/services/postfix.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postfix.if	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/postfix.if	2012-06-17 05:50:12.000000000 +0000
+@@ -191,6 +191,24 @@
+ 
+ ########################################
+ ## <summary>
++##	Access postfix master fifos
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`postfix_rw_master_fifo',`
++	gen_require(`
++		type postfix_master_t;
++	')
++	allow $1 postfix_master_t:fifo_file rw_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Create files with the specified type in
+ ##	the postfix configuration directories.
+ ## </summary>
+Index: refpolicy-2.20110726/policy/modules/services/lda.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/lda.te	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/services/lda.te	2012-06-17 05:50:12.000000000 +0000
+@@ -138,6 +138,7 @@
+ 	postfix_read_spool_files(lda_t)
+ 	postfix_read_local_state(lda_t)
+ 	postfix_read_master_state(lda_t)
++	postfix_rw_master_fifo(lda_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20110726/policy/modules/system/mount.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/mount.te	2012-06-17 05:50:12.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/system/mount.te	2012-06-17 05:53:18.369576900 +0000
+@@ -79,7 +79,7 @@
+ dev_dontaudit_getattr_memory_dev(mount_t)
+ dev_getattr_sound_dev(mount_t)
+ # Early devtmpfs, before udev relabel
+-dev_dontaudit_rw_generic_chr_files(mount_t)
++dev_rw_generic_chr_files(mount_t)
+ 
+ domain_use_interactive_fds(mount_t)
+ 
+@@ -116,6 +116,7 @@
+ mls_file_write_all_levels(mount_t)
+ 
+ selinux_get_enforce_mode(mount_t)
++selinux_getattr_fs(mount_t)
+ 
+ storage_raw_read_fixed_disk(mount_t)
+ storage_raw_write_fixed_disk(mount_t)

@@ -93,3 +93,10 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0093-unsorted-userdomain-changes-includes-adding-an-inter.patch
 0094-xen-policy-adjustments-Allow-xenconsoled_t-capabilit.patch
 0095-Legacy-rest-I-couldn-t-make-sense-of.patch
+0100-systemd
+0110-misc
+0120-polkit
+0130-djbdns
+0140-nrpe
+0150-squid
+0160-misc-mta

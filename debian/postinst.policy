@@ -80,7 +80,7 @@ my %map = (
            'cups'            => [ 'cupsys*', 'cups', 'cups-bsd', 'cups-client',
                                   'cups-common' ],
            'cyrus'           => [ 'cyrus*' ],
-           'devicekit'       => [ 'udev', 'hal', 'udisks' ],
+           'devicekit'       => [ 'udev', 'hal', 'udisks', 'upower' ],
            'dovecot'         => [ 'dovecot-imapd', 'dovecot-pop3d' ],
            'dhcp'            => [ 'dhcp*', 'dhclient*', 'pump' ],
            'dkim'            => [ 'dkim-filter' ],

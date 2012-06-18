@@ -3,7 +3,7 @@
 AWK ?= gawk
 NAME ?= $(strip $(shell $(AWK) -F= '/^SELINUXTYPE/{ print $$2 }' /etc/selinux/config))
 
-MLSENABLED := $(shell cat /selinux/mls)
+MLSENABLED := $(shell cat /sys/fs/selinux/mls)
 ifeq ($(MLSENABLED),)
 	MLSENABLED := 1
 endif

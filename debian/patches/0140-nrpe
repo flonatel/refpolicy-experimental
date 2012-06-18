@@ -1,0 +1,16 @@
+Description: Allow nrpe to read it's config fils
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2012-06-16
+
+--- refpolicy-2.20110726.orig/policy/modules/services/nagios.te
++++ refpolicy-2.20110726/policy/modules/services/nagios.te
+@@ -188,7 +188,9 @@ allow nrpe_t self:tcp_socket create_stre
+ 
+ domtrans_pattern(nrpe_t, nagios_checkdisk_plugin_exec_t, nagios_checkdisk_plugin_t)
+ 
++allow nrpe_t nagios_etc_t:dir list_dir_perms;
+ read_files_pattern(nrpe_t, nagios_etc_t, nagios_etc_t)
++read_files_pattern(nrpe_t, nrpe_etc_t, nrpe_etc_t)
+ files_search_etc(nrpe_t)
+ 
+ manage_files_pattern(nrpe_t, nrpe_var_run_t, nrpe_var_run_t)

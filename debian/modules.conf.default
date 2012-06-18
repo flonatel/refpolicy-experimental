@@ -94,6 +94,14 @@ mls = base
 selinux = base
 
 # Layer: kernel
+# Module: systemd
+# Required in base
+#
+# Policy for systemd as init
+# 
+systemd = base
+
+# Layer: kernel
 # Module: terminal
 # Required in base
 #

@@ -1,0 +1,14 @@
+Description: Make /var/cache/squid a mountpoint
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2012-06-16
+
+--- refpolicy-2.20110726.orig/policy/modules/services/squid.te
++++ refpolicy-2.20110726/policy/modules/services/squid.te
+@@ -27,6 +27,7 @@ init_daemon_domain(squid_t, squid_exec_t
+ # type for /var/cache/squid
+ type squid_cache_t;
+ files_type(squid_cache_t)
++files_mountpoint(squid_cache_t)
+ 
+ type squid_conf_t;
+ files_type(squid_conf_t)

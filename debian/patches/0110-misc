@@ -1,0 +1,435 @@
+Description: Misc small changes to fix the boot process
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2012-06-15
+
+--- refpolicy-2.20110726.orig/policy/modules/services/rpc.te
++++ refpolicy-2.20110726/policy/modules/services/rpc.te
+@@ -103,6 +103,8 @@ miscfiles_read_generic_certs(rpcd_t)
+ 
+ seutil_dontaudit_search_config(rpcd_t)
+ 
++allow rpcd_t self:udp_socket { create_socket_perms listen };
++
+ optional_policy(`
+ 	automount_signal(rpcd_t)
+ 	automount_dontaudit_write_pipes(rpcd_t)
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.te
++++ refpolicy-2.20110726/policy/modules/services/xserver.te
+@@ -154,7 +154,7 @@ ubac_constrained(xauth_tmp_t)
+ type xdm_t;
+ type xdm_exec_t;
+ auth_login_pgm_domain(xdm_t)
+-init_domain(xdm_t, xdm_exec_t)
++#init_domain(xdm_t, xdm_exec_t)
+ init_daemon_domain(xdm_t, xdm_exec_t)
+ xserver_object_types_template(xdm)
+ xserver_common_x_domain_template(xdm, xdm_t)
+--- refpolicy-2.20110726.orig/policy/modules/services/kerneloops.te
++++ refpolicy-2.20110726/policy/modules/services/kerneloops.te
+@@ -24,6 +24,9 @@ allow kerneloops_t self:capability sys_n
+ allow kerneloops_t self:process { getcap setcap setsched getsched signal };
+ allow kerneloops_t self:fifo_file rw_file_perms;
+ 
++fs_getattr_xattr_fs(kerneloops_t)
++kernel_read_system_state(kerneloops_t)
++
+ manage_files_pattern(kerneloops_t, kerneloops_tmp_t, kerneloops_tmp_t)
+ files_tmp_filetrans(kerneloops_t, kerneloops_tmp_t, file)
+ 
+--- refpolicy-2.20110726.orig/policy/modules/services/rpcbind.fc
++++ refpolicy-2.20110726/policy/modules/services/rpcbind.fc
+@@ -5,5 +5,7 @@
+ /var/lib/rpcbind(/.*)?		gen_context(system_u:object_r:rpcbind_var_lib_t,s0)
+ 
+ /var/run/rpc.statd\.pid	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
++/var/run/rpcbind/rpcbind\.xdr	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
++/var/run/rpcbind/portmap\.xdr	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+ /var/run/rpcbind\.lock	--	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+ /var/run/rpcbind\.sock	-s	gen_context(system_u:object_r:rpcbind_var_run_t,s0)
+--- refpolicy-2.20110726.orig/policy/modules/services/dhcp.te
++++ refpolicy-2.20110726/policy/modules/services/dhcp.te
+@@ -68,6 +68,7 @@ corenet_raw_sendrecv_generic_node(dhcpd_
+ corenet_tcp_sendrecv_all_ports(dhcpd_t)
+ corenet_udp_sendrecv_all_ports(dhcpd_t)
+ corenet_tcp_bind_generic_node(dhcpd_t)
++corenet_udp_bind_generic_port(dhcpd_t)
+ corenet_udp_bind_generic_node(dhcpd_t)
+ corenet_tcp_bind_dhcpd_port(dhcpd_t)
+ corenet_udp_bind_dhcpd_port(dhcpd_t)
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.te
++++ refpolicy-2.20110726/policy/modules/services/cron.te
+@@ -532,6 +532,8 @@ allow cronjob_t self:fifo_file rw_fifo_f
+ allow cronjob_t self:unix_stream_socket create_stream_socket_perms;
+ allow cronjob_t self:unix_dgram_socket create_socket_perms;
+ 
++allow cronjob_t crond_tmp_t:file rw_file_perms;
++
+ # The entrypoint interface is not used as this is not
+ # a regular entrypoint.  Since crontab files are
+ # not directly executed, crond must ensure that
+--- refpolicy-2.20110726.orig/policy/modules/services/ssh.te
++++ refpolicy-2.20110726/policy/modules/services/ssh.te
+@@ -100,6 +100,7 @@ allow ssh_t self:sem create_sem_perms;
+ allow ssh_t self:msgq create_msgq_perms;
+ allow ssh_t self:msg { send receive };
+ allow ssh_t self:tcp_socket create_stream_socket_perms;
++dev_search_sysfs(ssh_t)
+ 
+ # Read the ssh key file.
+ allow ssh_t sshd_key_t:file read_file_perms;
+@@ -234,6 +235,10 @@ optional_policy(`
+ # sshd_t is the domain for the sshd program.
+ #
+ 
++ifdef(`distro_debian', `
++files_read_var_symlinks(sshd_t)
++')
++
+ # so a tunnel can point to another ssh tunnel
+ allow sshd_t self:netlink_route_socket r_netlink_socket_perms;
+ allow sshd_t self:key { search link write };
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.te
++++ refpolicy-2.20110726/policy/modules/services/mysql.te
+@@ -162,6 +162,8 @@ optional_policy(`
+ allow mysqld_safe_t self:capability { chown dac_override fowner kill };
+ dontaudit mysqld_safe_t self:capability sys_ptrace;
+ allow mysqld_safe_t self:fifo_file rw_fifo_file_perms;
++can_exec(mysqld_safe_t, shell_exec_t)
++fs_getattr_xattr_fs(mysqld_safe_t)
+ 
+ read_lnk_files_pattern(mysqld_safe_t, mysqld_db_t, mysqld_db_t)
+ 
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.te
++++ refpolicy-2.20110726/policy/modules/system/logging.te
+@@ -126,7 +126,7 @@ allow auditctl_t self:capability { fseti
+ allow auditctl_t self:netlink_audit_socket nlmsg_readpriv;
+ dev_read_urand(auditctl_t)
+ 
+-allow auditctl_t self:process getcap;
++allow auditctl_t self:process { getcap getsched };
+ 
+ read_files_pattern(auditctl_t, auditd_etc_t, auditd_etc_t)
+ allow auditctl_t auditd_etc_t:dir list_dir_perms;
+@@ -419,7 +419,7 @@ dontaudit syslogd_t self:capability sys_
+ allow syslogd_t self:capability2 syslog;
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+-allow syslogd_t self:process { signal_perms getcap setcap setpgid setsched setrlimit };
++allow syslogd_t self:process { signal_perms getcap setcap setpgid setsched getsched setrlimit };
+ # receive messages to be logged
+ allow syslogd_t self:unix_dgram_socket create_socket_perms;
+ allow syslogd_t self:unix_stream_socket create_stream_socket_perms;
+--- refpolicy-2.20110726.orig/policy/modules/system/selinuxutil.te
++++ refpolicy-2.20110726/policy/modules/system/selinuxutil.te
+@@ -158,6 +158,8 @@ ifdef(`distro_ubuntu',`
+ 
+ allow load_policy_t self:capability dac_override;
+ 
++selinux_get_fs_mount(load_policy_t)
++
+ # only allow read of policy config files
+ read_files_pattern(load_policy_t,{ policy_src_t policy_config_t },policy_config_t)
+ 
+@@ -437,6 +439,8 @@ allow semanage_t semanage_tmp_t:dir mana
+ allow semanage_t semanage_tmp_t:file manage_file_perms;
+ files_tmp_filetrans(semanage_t, semanage_tmp_t, { file dir })
+ 
++selinux_get_fs_mount(semanage_t)
++
+ ifdef(`targeted_policy',`
+ 	allow semanage_t initrc_t:fd use;
+ ')
+@@ -582,6 +586,9 @@ userdom_use_all_users_fds(setfiles_t)
+ # for config files in a home directory
+ userdom_read_user_home_content_files(setfiles_t)
+ 
++# setfiles will stat /sys
++dev_getattr_sysfs_dirs(setfiles_t)
++
+ ifdef(`distro_debian',`
+ 	# udev tmpfs is populated with static device nodes
+ 	# and then relabeled afterwards; thus
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.te
++++ refpolicy-2.20110726/policy/modules/system/udev.te
+@@ -67,6 +67,7 @@ allow udev_t udev_etc_t:file read_file_p
+ # create udev database in /dev/.udevdb
+ allow udev_t udev_tbl_t:file manage_file_perms;
+ allow udev_t udev_tbl_t:lnk_file manage_lnk_file_perms;
++allow udev_t udev_tbl_t:sock_file manage_sock_file_perms;
+ allow udev_t udev_tbl_t:dir manage_dir_perms;
+ dev_filetrans(udev_t,udev_tbl_t,file)
+ 
+@@ -150,8 +151,13 @@ auth_read_pam_console_data(udev_t)
+ auth_domtrans_pam_console(udev_t)
+ auth_use_nsswitch(udev_t)
+ 
++ifdef(`distro_debian', `
++# needs manage access to initrc_var_run_t for ifstate
++init_manage_utmp(udev_t)
++', `
+ init_read_utmp(udev_t)
+ init_dontaudit_write_utmp(udev_t)
++')
+ init_getattr_initctl(udev_t)
+ 
+ logging_search_logs(udev_t)
+--- refpolicy-2.20110726.orig/policy/modules/system/init.if
++++ refpolicy-2.20110726/policy/modules/system/init.if
+@@ -184,8 +184,6 @@ interface(`init_ranged_domain',`
+ 		type init_t;
+ 	')
+ 
+-	init_domain($1, $2)
+-
+ 	ifdef(`enable_mcs',`
+ 		range_transition init_t $2:process $3;
+ 	')
+@@ -311,8 +309,6 @@ interface(`init_ranged_daemon_domain',`
+ 		type init_t;
+ 	')
+ 
+-#	init_daemon_domain($1, $2)
+-
+ 	ifdef(`enable_mcs',`
+ 		range_transition initrc_t $2:process $3;
+ 		range_transition init_t $2:process $3;
+--- refpolicy-2.20110726.orig/policy/modules/system/mount.fc
++++ refpolicy-2.20110726/policy/modules/system/mount.fc
+@@ -2,3 +2,4 @@
+ /bin/umount.*			--	gen_context(system_u:object_r:mount_exec_t,s0)
+ 
+ /usr/bin/fusermount		--	gen_context(system_u:object_r:mount_exec_t,s0)
++/var/run/mount(/.*)?			gen_context(system_u:object_r:mount_tmp_t,s0)
+--- refpolicy-2.20110726.orig/policy/modules/system/libraries.fc
++++ refpolicy-2.20110726/policy/modules/system/libraries.fc
+@@ -44,6 +44,8 @@ ifdef(`distro_debian', `
+ /lib32/.*					gen_context(system_u:object_r:lib_t,s0)
+ /lib32/ld-[^/]*\.so(\.[^/]*)*		--	gen_context(system_u:object_r:ld_so_t,s0)
+ /lib32/security/pam_poldi\.so		--	gen_context(system_u:object_r:textrel_shlib_t,s0)
++# for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=677468
++/usr/lib/i386-linux-gnu/i686/cmov/libcrypto.so.1.0.0 -- gen_context(system_u:object_r:textrel_shlib_t,s0)
+ ', `
+ /lib64					-d	gen_context(system_u:object_r:lib_t,s0)
+ /lib64/.*					gen_context(system_u:object_r:lib_t,s0)
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.fc
++++ refpolicy-2.20110726/policy/modules/system/lvm.fc
+@@ -28,6 +28,7 @@ ifdef(`distro_gentoo',`
+ #
+ /lib/lvm-10/.*		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /lib/lvm-200/.*		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/lib/udev/udisks-lvm-pv-export -- gen_context(system_u:object_r:lvm_exec_t,s0)
+ 
+ #
+ # /sbin
+--- refpolicy-2.20110726.orig/policy/modules/system/modutils.fc
++++ refpolicy-2.20110726/policy/modules/system/modutils.fc
+@@ -19,6 +19,7 @@ ifdef(`distro_gentoo',`
+ /sbin/generate-modprobe\.conf -- gen_context(system_u:object_r:update_modules_exec_t,s0)
+ /sbin/insmod.*		--	gen_context(system_u:object_r:insmod_exec_t,s0)
+ /sbin/modprobe.*	--	gen_context(system_u:object_r:insmod_exec_t,s0)
++/bin/kmod		--	gen_context(system_u:object_r:insmod_exec_t,s0)
+ /sbin/modules-update	--	gen_context(system_u:object_r:update_modules_exec_t,s0)
+ /sbin/rmmod.*		--	gen_context(system_u:object_r:insmod_exec_t,s0)
+ /sbin/update-modules	--	gen_context(system_u:object_r:update_modules_exec_t,s0)
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.if
++++ refpolicy-2.20110726/policy/modules/system/udev.if
+@@ -168,6 +168,25 @@ interface(`udev_dontaudit_search_db',`
+ 
+ ########################################
+ ## <summary>
++##     Allow process to read udev table files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     The type of the process performing this action.
++##     </summary>
++## </param>
++#
++interface(`udev_read_table',`
++	gen_require(`
++		type udev_tbl_t;
++	')
++
++	allow $1 udev_tbl_t:dir search;
++	allow $1 udev_tbl_t:file read_file_perms;
++')
++
++########################################
++## <summary>
+ ##     Allow process to remove udev table files
+ ## </summary>
+ ## <param name="domain">
+--- refpolicy-2.20110726.orig/policy/modules/system/init.fc
++++ refpolicy-2.20110726/policy/modules/system/init.fc
+@@ -34,6 +34,7 @@ ifdef(`distro_gentoo', `
+ # /sbin
+ #
+ /bin/systemd		--	gen_context(system_u:object_r:init_exec_t,s0)
++/lib/systemd/systemd	--	gen_context(system_u:object_r:init_exec_t,s0)
+ 
+ #
+ # systemd init scripts
+--- refpolicy-2.20110726.orig/policy/modules/system/setrans.te
++++ refpolicy-2.20110726/policy/modules/system/setrans.te
+@@ -47,10 +47,12 @@ corecmd_search_bin(setrans_t)
+ manage_dirs_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
+ manage_files_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
+ manage_sock_files_pattern(setrans_t, setrans_var_run_t, setrans_var_run_t)
+-files_pid_filetrans(setrans_t, setrans_var_run_t, { file dir })
++files_pid_filetrans(setrans_t, setrans_var_run_t, { file dir sock_file })
+ 
+ kernel_read_kernel_sysctls(setrans_t)
+ kernel_read_system_state(setrans_t)
++fs_getattr_xattr_fs(setrans_t)
++selinux_get_fs_mount(setrans_t)
+ 
+ # allow performing getpidcon() on all processes
+ domain_read_all_domains_state(setrans_t)
+--- refpolicy-2.20110726.orig/policy/modules/system/mount.te
++++ refpolicy-2.20110726/policy/modules/system/mount.te
+@@ -44,6 +44,7 @@ allow mount_t self:capability { ipc_lock
+ 
+ dev_read_urand(mount_t)
+ allow mount_t mount_loopback_t:file read_file_perms;
++files_list_locks(mount_t)
+ 
+ allow mount_t mount_tmp_t:file manage_file_perms;
+ allow mount_t mount_tmp_t:dir manage_dir_perms;
+@@ -52,6 +53,11 @@ can_exec(mount_t, mount_exec_t)
+ 
+ files_tmp_filetrans(mount_t, mount_tmp_t, { file dir })
+ 
++ifdef(`distro_debian', `
++# so mount can create /run/mount/utab
++files_pid_filetrans(mount_t, mount_tmp_t, { dir file })
++')
++
+ kernel_read_system_state(mount_t)
+ kernel_read_kernel_sysctls(mount_t)
+ kernel_dontaudit_getattr_core_if(mount_t)
+--- refpolicy-2.20110726.orig/policy/modules/system/fstools.te
++++ refpolicy-2.20110726/policy/modules/system/fstools.te
+@@ -24,6 +24,11 @@ files_type(swapfile_t)
+ # local policy
+ #
+ 
++ifdef(`distro_debian', `
++# for unlabeled /dev/console
++dev_rw_generic_chr_files(fsadm_t)
++')
++
+ # ipc_lock is for losetup
+ allow fsadm_t self:capability { ipc_lock sys_rawio sys_admin sys_resource sys_tty_config dac_override dac_read_search };
+ allow fsadm_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execmem execheap };
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.te
++++ refpolicy-2.20110726/policy/modules/system/lvm.te
+@@ -172,7 +172,7 @@ optional_policy(`
+ # net_admin for multipath
+ allow lvm_t self:capability { dac_override fowner ipc_lock sys_admin sys_nice mknod chown sys_resource sys_rawio net_admin };
+ dontaudit lvm_t self:capability sys_tty_config;
+-allow lvm_t self:process { sigchld sigkill sigstop signull signal };
++allow lvm_t self:process { setfscreate sigchld sigkill sigstop signull signal };
+ # LVM will complain a lot if it cannot set its priority.
+ allow lvm_t self:process setsched;
+ allow lvm_t self:file rw_file_perms;
+@@ -198,6 +198,7 @@ can_exec(lvm_t, lvm_exec_t)
+ 
+ # Creating lock files
+ manage_files_pattern(lvm_t, lvm_lock_t, lvm_lock_t)
++manage_dirs_pattern(lvm_t, lvm_lock_t, lvm_lock_t)
+ files_lock_filetrans(lvm_t, lvm_lock_t, file)
+ 
+ manage_dirs_pattern(lvm_t, lvm_var_lib_t, lvm_var_lib_t)
+@@ -207,7 +208,7 @@ files_var_lib_filetrans(lvm_t, lvm_var_l
+ manage_dirs_pattern(lvm_t, lvm_var_run_t, lvm_var_run_t)
+ manage_files_pattern(lvm_t, lvm_var_run_t, lvm_var_run_t)
+ manage_sock_files_pattern(lvm_t, lvm_var_run_t, lvm_var_run_t)
+-files_pid_filetrans(lvm_t, lvm_var_run_t, { file sock_file })
++files_pid_filetrans(lvm_t, lvm_var_run_t, { dir file sock_file })
+ 
+ read_files_pattern(lvm_t, lvm_etc_t, lvm_etc_t)
+ read_lnk_files_pattern(lvm_t, lvm_etc_t, lvm_etc_t)
+@@ -217,6 +218,9 @@ filetrans_pattern(lvm_t, lvm_etc_t, lvm_
+ files_etc_filetrans(lvm_t, lvm_metadata_t, file)
+ files_search_mnt(lvm_t)
+ 
++kernel_request_load_module(lvm_t)
++# for cryptsetup
++kernel_read_crypto_sysctls(lvm_t)
+ kernel_get_sysvipc_info(lvm_t)
+ kernel_read_system_state(lvm_t)
+ # Read system variables in /proc/sys
+@@ -229,6 +233,7 @@ kernel_search_debugfs(lvm_t)
+ corecmd_exec_bin(lvm_t)
+ corecmd_exec_shell(lvm_t)
+ 
++dev_getattr_fs(lvm_t)
+ dev_create_generic_chr_files(lvm_t)
+ dev_delete_generic_dirs(lvm_t)
+ dev_read_rand(lvm_t)
+@@ -238,7 +243,8 @@ dev_manage_generic_symlinks(lvm_t)
+ dev_relabel_generic_dev_dirs(lvm_t)
+ dev_manage_generic_blk_files(lvm_t)
+ # Read /sys/block. Device mapper metadata is kept there.
+-dev_read_sysfs(lvm_t)
++# write to read_ahead_kb
++dev_rw_sysfs(lvm_t)
+ # cjp: this has no effect since LVM does not
+ # have lnk_file relabelto for anything else.
+ # perhaps this should be blk_files?
+@@ -346,6 +352,7 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	udev_read_db(lvm_t)
++	udev_read_table(lvm_t)
+ ')
+ 
+ optional_policy(`
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.if
++++ refpolicy-2.20110726/policy/modules/kernel/files.if
+@@ -1407,6 +1407,10 @@ interface(`files_mounton_all_mountpoints
+ 	')
+ 
+ 	allow $1 mountpoint:dir { search_dir_perms mounton };
++ifdef(`distro_debian', `
++	# mount in wheezy writes to the root of the filesystem
++	allow $1 mountpoint:dir write;
++')
+ 	allow $1 mountpoint:file { getattr mounton };
+ ')
+ 
+--- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.te
++++ refpolicy-2.20110726/policy/modules/kernel/filesystem.te
+@@ -177,6 +177,7 @@ fs_type(tmpfs_t)
+ files_type(tmpfs_t)
+ files_mountpoint(tmpfs_t)
+ files_poly_parent(tmpfs_t)
++dev_associate(tmpfs_t)
+ 
+ # Use a transition SID based on the allocating task SID and the
+ # filesystem SID to label inodes in the following filesystem types,
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.te
++++ refpolicy-2.20110726/policy/modules/kernel/files.te
+@@ -169,6 +169,10 @@ files_mountpoint(var_lib_t)
+ #
+ type var_lock_t;
+ files_lock_file(var_lock_t)
++ifdef(`distro_debian', `
++# for /run/lock
++files_mountpoint(var_lock_t)
++')
+ 
+ #
+ # var_run_t is the type of /var/run, usually
+--- refpolicy-2.20110726.orig/policy/modules/kernel/selinux.if
++++ refpolicy-2.20110726/policy/modules/kernel/selinux.if
+@@ -66,6 +66,9 @@ interface(`selinux_get_fs_mount',`
+ 	# read /proc/filesystems to see if selinuxfs is supported
+ 	# then read /proc/self/mount to see where selinuxfs is mounted
+ 	kernel_read_system_state($1)
++
++	# because selinuxfs is now under /sys
++	dev_search_sysfs($1)
+ ')
+ 
+ ########################################
