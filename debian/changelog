@@ -1,3 +1,25 @@
+refpolicy (2:2.20110726-8) unstable; urgency=high
+
+  * Allow dbus domains to search cgroup dirs and init_var_run_t
+  * Have init_t transition to devicekit_power_t and devicekit_disk_t for
+    systemd.
+  * Allow user domains to create netlink_kobject_uevent_socket objects
+  * Put dansguardian in squid_t
+  * Fixed error in portslave.te that prevented module insertion
+  * Allow postgrey_t to exec bin_t for perl and self:netlink_route_socket
+    access
+  * Allow dac_override access to arpwatch_t
+  * Add tcsd.pp (for trousers) to the policy packages
+  * Add nut.pp for the nut-server package to the policy packages
+  * Load irqbalance.pp if irqbalance Debian package is installed, same for
+    kerneloops, tcsd.pp/trousers, nut.pp/nut-server, 
+    and smartmon.pp/smartmontools.
+  * High urgency because the support for tcsd and nut really needs to be
+    tested (and it's broken badly for those people) and portslave.pp is also
+    badly broken in previous versions.
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 23 Jun 2012 21:43:46 +1000
+
 refpolicy (2:2.20110726-7) unstable; urgency=high
 
   [Russell Coker]

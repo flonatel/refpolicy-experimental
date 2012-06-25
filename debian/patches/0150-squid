@@ -1,10 +1,10 @@
 Description: Make /var/cache/squid a mountpoint
 Author: Russell Coker <russell@coker.com.au>
-Last-Update: 2012-06-16
+Last-Update: 2012-06-23
 
---- refpolicy-2.20110726.orig/policy/modules/services/squid.te
-+++ refpolicy-2.20110726/policy/modules/services/squid.te
-@@ -27,6 +27,7 @@ init_daemon_domain(squid_t, squid_exec_t
+--- a/policy/modules/services/squid.te
++++ b/policy/modules/services/squid.te
+@@ -27,6 +27,7 @@
  # type for /var/cache/squid
  type squid_cache_t;
  files_type(squid_cache_t)
@@ -12,3 +12,34 @@ Last-Update: 2012-06-16
  
  type squid_conf_t;
  files_type(squid_conf_t)
+@@ -40,6 +41,13 @@
+ type squid_tmpfs_t;
+ files_tmpfs_file(squid_tmpfs_t)
+ 
++# for dansguardian
++type squid_tmp_t;
++files_tmp_file(squid_tmp_t)
++manage_files_pattern(squid_t, squid_tmp_t, squid_tmp_t)
++manage_sock_files_pattern(squid_t, squid_tmp_t, squid_tmp_t)
++files_tmp_filetrans(squid_t, squid_tmp_t, { file sock_file })
++
+ type squid_var_run_t;
+ files_pid_file(squid_var_run_t)
+ 
+--- a/policy/modules/services/squid.fc
++++ b/policy/modules/services/squid.fc
+@@ -4,11 +4,14 @@
+ /usr/lib/squid/cachemgr\.cgi -- gen_context(system_u:object_r:httpd_squid_script_exec_t,s0)
+ /usr/lib64/squid/cachemgr\.cgi -- gen_context(system_u:object_r:httpd_squid_script_exec_t,s0)
+ /usr/sbin/squid		--	gen_context(system_u:object_r:squid_exec_t,s0)
++/usr/sbin/dansguardian	--	gen_context(system_u:object_r:squid_exec_t,s0)
+ /usr/share/squid(/.*)?		gen_context(system_u:object_r:squid_conf_t,s0)
+ 
+ /var/cache/squid(/.*)?		gen_context(system_u:object_r:squid_cache_t,s0)
+ /var/log/squid(/.*)?		gen_context(system_u:object_r:squid_log_t,s0)
++/var/log/dansguardian(/.*)?	gen_context(system_u:object_r:squid_log_t,s0)
+ /var/log/squidGuard(/.*)?	gen_context(system_u:object_r:squid_log_t,s0)
+ /var/run/squid\.pid	--	gen_context(system_u:object_r:squid_var_run_t,s0)
++/var/run/dansguardian\.pid --	gen_context(system_u:object_r:squid_var_run_t,s0)
+ /var/spool/squid(/.*)?		gen_context(system_u:object_r:squid_cache_t,s0)
+ /var/squidGuard(/.*)?		gen_context(system_u:object_r:squid_cache_t,s0)

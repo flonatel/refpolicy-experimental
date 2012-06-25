@@ -50,9 +50,7 @@ my @all_modules;
 # Full path of all modules in the policy
 my %Module_Path;
 # Dpendencies for policy modules, as determined by semodule_deps
-my %Deps = ( 'cups'  => 'lpd',         'telnet'    => 'remotelogin',
-             'devicekit' => 'dbus'
-           );
+my %Deps = ( 'modemmanager' => 'dbus',  'modemmanager' => 'networkmanager',  'gnomeclock' => 'dbus',  'nagios' => 'nagios',  'xguest' => 'xserver',  'vmware' => 'xserver',  'vmware' => 'netutils',  'devicekit' => 'dbus',  'setroubleshoot' => 'dbus',  'openca' => 'apache',  'rhgb' => 'xserver',  'djbdns' => 'daemontools',  'djbdns' => 'ucspitcp',  'w3c' => 'apache',  'webalizer' => 'apache',  'ifplugd' => 'netutils',  'virt' => 'virt',  'rssh' => 'ssh',  'mozilla' => 'xserver',  'mplayer' => 'xserver',  'fprintd' => 'dbus',  'git' => 'apache',  'rtkit' => 'dbus',  'telnet' => 'remotelogin',  'qemu' => 'virt',  'xscreensaver' => 'xserver',  'mrtg' => 'netutils',  'postfix' => 'unconfined',  'webadm' => 'apache',  'awstats' => 'apache',  'cups' => 'lpd',  'portslave' => 'ssh',  'portslave' => 'ppp',  'thunderbird' => 'xserver',  'evolution' => 'xserver',  'dkim' => 'milter',  'yam' => 'apache',  'rlogin' => 'remotelogin',  'xen' => 'netutils' );
 # A hash of all modules already processed
 my %Seen;
 # A hash of all packages installed on this machine
@@ -71,7 +69,7 @@ my %map = (
            'automount'       => [ 'autofs*' ],
            'avahi'           => [ 'avahi-*' ],
            'bind'            => [ 'bind9' ],
-#           'bootloader'     => [ 'grub', 'lilo' ],
+           'bluetooth'       => [ 'bluez' ],
            'cdrecord'        => [ 'wodim' ],
            'clamav'          => [ 'clamav', 'amavisd-new' ],
            'courier'         => [ 'courier*' ],
@@ -96,11 +94,13 @@ my %map = (
            'inetd'           => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd',
                                   'rinetd', 'rlinetd', 'xinetd' ],
            'iodine'          => [ 'iodine' ],
+           'irqbalance'      => [ 'irqbalance' ],
            'ipsec'           => [ 'ipsec-tools', 'racoon' ],
            'jabber'          => [ 'jabber', 'ejabberd' ],
            'java'            => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
                                   'java*', 'jvm*', 'jre*', 'jsdk*' ],
            'kdump'           => [ 'crash' ],
+           'kerneloops'      => [ 'kerneloops' ],
            'lda'             => [ 'procmail', 'courier-maildrop', 'dovecot-common' ],
            'ldap'            => [ 'slapd' ],
            'lpd'             => [ 'lprng', 'rlpr' ],
@@ -116,6 +116,7 @@ my %map = (
            'nagios'          => [ 'nagios*' ],
            'netutils'        => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
            'nslcd'           => [ 'nslcd' ],
+           'nut'             => [ 'nut-server' ],
            'pcmcia'          => [ 'pcmciautils' ],
            'policykit'       => [ 'policykit', 'policykit-1' ],
            'ptchown'         => [ 'libc-bin' ],
@@ -128,9 +129,12 @@ my %map = (
                                   'shorewall-perl', 'shorewall-shell',
                                   'shorewall6', 'shorewall6-lite'
                                 ],
+           'smartmon'        => [ 'smartmontools' ],
            'ssh'             => [ 'openssh*' ],
+           'squid'           => [ 'squid', 'dansguardian' ],
 #           'su'             => [ 'login' ],
            'sysstat'         => [ 'atsar' ],
+           'tcsd'            => [ 'trousers' ],
            'telnet'          => [ 'telnet', '*telnetd*' ],
            'uml'             => [ 'linux-uml*' ],
            'uptime'          => [ 'uptimed' ],
@@ -307,7 +311,8 @@ sub main {
     print STDERR "This process may fail -- you should check the results, and \n";
     print STDERR "you need to switch to this policy yourself anyway.\n\n";
     &list_modules("$src_dir");
-    &get_dependencies("$src_dir");
+# now we provide a static list of dependencies created by gen-deps.sh.
+#    &get_dependencies("$src_dir");
     &get_ordering();
     &installed_modules();
     chdir "$src_dir" or die "Can't access $src_dir";

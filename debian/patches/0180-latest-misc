@@ -1,0 +1,163 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ refpolicy (2:2.20110726-7.1) UNRELEASED; urgency=low
+ .
+   * Allow dbus domains to search cgroup dirs.
+   * Have init_t transition to devicekit_power_t and devicekit_disk_t for
+     systemd.
+   * Allow user domains to create netlink_kobject_uevent_socket objects
+Author: Russell Coker <russell@coker.com.au>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+Index: refpolicy-2.20110726/policy/modules/services/devicekit.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/devicekit.if	2012-06-24 15:50:02.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/devicekit.if	2012-06-24 16:42:14.000000000 +1000
+@@ -20,6 +20,42 @@
+ 
+ ########################################
+ ## <summary>
++##	Execute a domain transition to run devicekit upowerd.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed to transition.
++## </summary>
++## </param>
++#
++interface(`devicekit_power_domtrans',`
++	gen_require(`
++		type devicekit_power_exec_t, devicekit_power_t;
++	')
++
++	domtrans_pattern($1, devicekit_power_exec_t, devicekit_power_t)
++')
++
++########################################
++## <summary>
++##	Execute a domain transition to run devicekit udisks-daemon.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed to transition.
++## </summary>
++## </param>
++#
++interface(`devicekit_disk_domtrans',`
++	gen_require(`
++		type devicekit_disk_t, devicekit_disk_exec_t;
++	')
++
++	domtrans_pattern($1, devicekit_disk_exec_t, devicekit_disk_t)
++')
++
++########################################
++## <summary>
+ ##	Send to devicekit over a unix domain
+ ##	datagram socket.
+ ## </summary>
+Index: refpolicy-2.20110726/policy/modules/services/dbus.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-24 16:42:14.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-24 16:42:14.000000000 +1000
+@@ -86,6 +86,7 @@
+ 
+ 	auth_use_nsswitch($1_dbusd_t)
+ 	init_search_pid_dirs($1_dbusd_t)
++	fs_search_cgroup_dirs($1_dbusd_t)
+ 	optional_policy(`
+ 		consolekit_read_pid_files($1_dbusd_t)
+ 	')
+Index: refpolicy-2.20110726/policy/modules/system/init.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-24 16:42:14.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-24 16:42:14.000000000 +1000
+@@ -225,6 +225,11 @@
+ ')
+ 
+ optional_policy(`
++	devicekit_power_domtrans(init_t)
++	devicekit_disk_domtrans(init_t)
++')
++
++optional_policy(`
+ 	postfix_list_spool(init_t)
+ 	mta_read_aliases(init_t)
+ ')
+Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-24 16:42:14.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-24 16:42:14.000000000 +1000
+@@ -66,6 +66,8 @@
+ 	# avoid annoying messages on terminal hangup on role change
+ 	dontaudit $1_t user_tty_device_t:chr_file ioctl;
+ 
++	allow $1_t self:netlink_kobject_uevent_socket create_socket_perms;
++
+ 	kernel_read_kernel_sysctls($1_t)
+ 	kernel_dontaudit_list_unlabeled($1_t)
+ 	kernel_dontaudit_getattr_unlabeled_files($1_t)
+Index: refpolicy-2.20110726/policy/modules/system/udev.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.te	2012-06-24 16:42:14.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/udev.te	2012-06-24 16:42:14.000000000 +1000
+@@ -38,7 +38,7 @@
+ # Local policy
+ #
+ 
+-allow udev_t self:capability { chown dac_override dac_read_search fowner fsetid sys_admin mknod net_raw net_admin sys_nice sys_rawio sys_resource setuid setgid sys_nice sys_ptrace };
++allow udev_t self:capability { chown dac_override dac_read_search fowner fsetid sys_admin mknod net_raw sys_module net_admin sys_nice sys_rawio sys_resource setuid setgid sys_nice sys_ptrace };
+ dontaudit udev_t self:capability sys_tty_config;
+ kernel_load_module(udev_t)
+ allow udev_t self:process ~{ setcurrent setexec setfscreate setrlimit execmem execstack execheap };
+Index: refpolicy-2.20110726/policy/modules/services/arpwatch.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.te	2012-06-24 16:42:14.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/arpwatch.te	2012-06-24 16:47:29.192917652 +1000
+@@ -28,7 +28,7 @@
+ #
+ # Local policy
+ #
+-allow arpwatch_t self:capability { net_admin net_raw setgid setuid };
++allow arpwatch_t self:capability { dac_override setgid setuid net_admin net_raw };
+ dontaudit arpwatch_t self:capability sys_tty_config;
+ allow arpwatch_t self:process signal_perms;
+ allow arpwatch_t self:unix_dgram_socket create_socket_perms;
+Index: refpolicy-2.20110726/policy/modules/services/postgrey.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postgrey.te	2011-03-29 02:04:20.000000000 +1100
++++ refpolicy-2.20110726/policy/modules/services/postgrey.te	2012-06-24 16:49:45.807335360 +1000
+@@ -34,6 +34,7 @@
+ allow postgrey_t self:process signal_perms;
+ allow postgrey_t self:tcp_socket create_stream_socket_perms;
+ allow postgrey_t self:fifo_file create_fifo_file_perms;
++allow postgrey_t self:netlink_route_socket create_netlink_socket_perms;
+ 
+ allow postgrey_t postgrey_etc_t:dir list_dir_perms;
+ read_files_pattern(postgrey_t, postgrey_etc_t, postgrey_etc_t)
+@@ -56,7 +57,7 @@
+ kernel_read_kernel_sysctls(postgrey_t)
+ 
+ # for perl
+-corecmd_search_bin(postgrey_t)
++corecmd_exec_bin(postgrey_t)
+ 
+ corenet_all_recvfrom_unlabeled(postgrey_t)
+ corenet_all_recvfrom_netlabel(postgrey_t)

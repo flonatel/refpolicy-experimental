@@ -1368,6 +1368,13 @@ ntop = module
 ntp = module
 
 # Layer: services
+# Module: nut
+#
+# Network UPS Tools daemon
+# 
+nut = module
+
+# Layer: services
 # Module: nx
 #
 # NX remote desktop
@@ -1804,6 +1811,13 @@ sysstat = module
 # Policy for TCP daemon.
 # 
 tcpd = module
+
+# Layer: services
+# Module: tcsd
+#
+# trousers TPM software
+# 
+tcsd = module
 
 # Layer: services
 # Module: telnet

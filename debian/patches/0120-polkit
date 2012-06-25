@@ -2,10 +2,8 @@ Description: Polkit and related changes
 Author: Russell Coker <russell@coker.com.au>
 Last-Update: 2012-06-15
 
-Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/authlogin.te	2012-06-21 22:38:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/authlogin.te	2012-06-21 22:38:07.000000000 +1000
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
 @@ -94,6 +94,7 @@
  
  allow chkpwd_t shadow_t:file read_file_perms;
@@ -14,10 +12,8 @@ Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
  
  kernel_read_crypto_sysctls(chkpwd_t)
  # is_selinux_enabled
-Index: refpolicy-2.20110726/policy/modules/services/policykit.te
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/policykit.te	2012-06-21 21:19:16.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/policykit.te	2012-06-21 22:38:07.000000000 +1000
+--- a/policy/modules/services/policykit.te
++++ b/policy/modules/services/policykit.te
 @@ -41,8 +41,21 @@
  allow policykit_t self:unix_dgram_socket create_socket_perms;
  allow policykit_t self:unix_stream_socket create_stream_socket_perms;
@@ -40,10 +36,8 @@ Index: refpolicy-2.20110726/policy/modules/services/policykit.te
  can_exec(policykit_t, policykit_exec_t)
  corecmd_exec_bin(policykit_t)
  
-Index: refpolicy-2.20110726/policy/modules/services/consolekit.te
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/consolekit.te	2012-06-21 22:38:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/consolekit.te	2012-06-21 22:38:07.000000000 +1000
+--- a/policy/modules/services/consolekit.te
++++ b/policy/modules/services/consolekit.te
 @@ -28,6 +28,7 @@
  allow consolekit_t self:fifo_file rw_fifo_file_perms;
  allow consolekit_t self:unix_stream_socket create_stream_socket_perms;
@@ -52,10 +46,8 @@ Index: refpolicy-2.20110726/policy/modules/services/consolekit.te
  
  manage_files_pattern(consolekit_t, consolekit_log_t, consolekit_log_t)
  logging_log_filetrans(consolekit_t, consolekit_log_t, file)
-Index: refpolicy-2.20110726/policy/modules/services/dbus.te
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dbus.te	2012-06-21 21:19:16.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/dbus.te	2012-06-21 22:39:32.314479509 +1000
+--- a/policy/modules/services/dbus.te
++++ b/policy/modules/services/dbus.te
 @@ -10,6 +10,7 @@
  #
  
@@ -285,10 +277,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dbus.te
  allow dbusd_unconfined session_bus_type:dbus all_dbus_perms;
 +allow dbusd_unconfined dbusd_unconfined:dbus all_dbus_perms;
 +allow session_bus_type dbusd_unconfined:dbus send_msg;
-Index: refpolicy-2.20110726/policy/modules/services/xserver.fc
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/xserver.fc	2012-06-21 22:38:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/xserver.fc	2012-06-21 22:38:07.000000000 +1000
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
 @@ -9,7 +9,6 @@
  HOME_DIR/\.serverauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
  HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
@@ -297,16 +287,18 @@ Index: refpolicy-2.20110726/policy/modules/services/xserver.fc
  
  #
  # /etc
-Index: refpolicy-2.20110726/policy/modules/services/dbus.if
-===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-21 22:38:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-21 22:38:07.000000000 +1000
-@@ -85,6 +85,9 @@
+--- a/policy/modules/services/dbus.if
++++ b/policy/modules/services/dbus.if
+@@ -85,6 +85,13 @@
  	allow $3 $1_dbusd_t:fifo_file rw_fifo_file_perms;
  
  	auth_use_nsswitch($1_dbusd_t)
++	init_search_pid_dirs($1_dbusd_t)
 +	optional_policy(`
 +		consolekit_read_pid_files($1_dbusd_t)
++	')
++	optional_policy(`
++		systemd_login_list_pid_dirs($1_dbusd_t)
 +	')
  ')
  
