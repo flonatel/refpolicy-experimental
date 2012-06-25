@@ -8,11 +8,11 @@ Subject: lvm policy adjustments: * Allow lvm_t rw access to unconfined_t
  policy/modules/system/unconfined.if |   18 ++++++++++++++++++
  2 files changed, 24 insertions(+), 0 deletions(-)
 
-diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
-index 6a87211..cc2a6f8 100644
---- a/policy/modules/system/lvm.te
-+++ b/policy/modules/system/lvm.te
-@@ -41,6 +41,11 @@ files_pid_file(lvm_var_run_t)
+Index: refpolicy-2.20110726/policy/modules/system/lvm.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.te	2012-06-21 23:37:32.619982514 +1000
++++ refpolicy-2.20110726/policy/modules/system/lvm.te	2012-06-21 23:37:36.108022660 +1000
+@@ -41,6 +41,11 @@
  type lvm_tmp_t;
  files_tmp_file(lvm_tmp_t)
  
@@ -24,7 +24,7 @@ index 6a87211..cc2a6f8 100644
  ########################################
  #
  # Cluster LVM daemon local policy
-@@ -178,6 +183,7 @@ allow lvm_t self:sem create_sem_perms;
+@@ -178,6 +183,7 @@
  
  allow lvm_t self:unix_stream_socket { connectto create_stream_socket_perms };
  allow lvm_t clvmd_t:unix_stream_socket { connectto rw_socket_perms };
@@ -32,11 +32,11 @@ index 6a87211..cc2a6f8 100644
  
  manage_dirs_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
  manage_files_pattern(lvm_t, lvm_tmp_t, lvm_tmp_t)
-diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
-index ca029d7..f8b0bee 100644
---- a/policy/modules/system/unconfined.if
-+++ b/policy/modules/system/unconfined.if
-@@ -370,6 +370,24 @@ interface(`unconfined_use_fds',`
+Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.if	2012-06-21 23:37:32.619982514 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.if	2012-06-21 23:37:36.108022660 +1000
+@@ -320,6 +320,24 @@
  
  ########################################
  ## <summary>

@@ -13,11 +13,11 @@ Subject: Debian file locations patch from Russell Coker.
  policy/modules/system/unconfined.fc   |    6 ++++++
  8 files changed, 64 insertions(+), 18 deletions(-)
 
-diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
-index 3fae11a..9e654c4 100644
---- a/policy/modules/kernel/corecommands.fc
-+++ b/policy/modules/kernel/corecommands.fc
-@@ -187,6 +187,7 @@ ifdef(`distro_gentoo',`
+Index: refpolicy-2.20110726/policy/modules/kernel/corecommands.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/corecommands.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/corecommands.fc	2012-06-21 15:55:57.255147324 +1000
+@@ -187,6 +187,7 @@
  /usr/bin/git-shell		--	gen_context(system_u:object_r:shell_exec_t,s0)
  /usr/bin/fish			--	gen_context(system_u:object_r:shell_exec_t,s0)
  /usr/bin/scponly		--	gen_context(system_u:object_r:shell_exec_t,s0)
@@ -25,7 +25,7 @@ index 3fae11a..9e654c4 100644
  
  /usr/lib(.*/)?bin(/.*)?			gen_context(system_u:object_r:bin_t,s0)
  
-@@ -296,6 +297,10 @@ ifdef(`distro_gentoo',`
+@@ -296,6 +297,10 @@
  
  /usr/X11R6/lib(64)?/X11/xkb/xkbcomp --	gen_context(system_u:object_r:bin_t,s0)
  
@@ -36,11 +36,11 @@ index 3fae11a..9e654c4 100644
  ifdef(`distro_gentoo', `
  /usr/.*-.*-linux-gnu/gcc-bin/.*(/.*)?	gen_context(system_u:object_r:bin_t,s0)
  /usr/.*-.*-linux-gnu/binutils-bin(/.*)?	gen_context(system_u:object_r:bin_t,s0)
-diff --git a/policy/modules/kernel/devices.fc b/policy/modules/kernel/devices.fc
-index 6cf8784..02b7ac1 100644
---- a/policy/modules/kernel/devices.fc
-+++ b/policy/modules/kernel/devices.fc
-@@ -179,6 +179,14 @@ ifdef(`distro_suse', `
+Index: refpolicy-2.20110726/policy/modules/kernel/devices.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.fc	2012-06-21 15:56:08.363289830 +1000
+@@ -179,6 +179,14 @@
  /dev/xen/gntdev		-c	gen_context(system_u:object_r:xen_device_t,s0)
  /dev/xen/gntalloc	-c	gen_context(system_u:object_r:xen_device_t,s0)
  
@@ -55,11 +55,11 @@ index 6cf8784..02b7ac1 100644
  /etc/udev/devices	-d	gen_context(system_u:object_r:device_t,s0)
  
  # used by init scripts to initally populate udev /dev
-diff --git a/policy/modules/kernel/files.fc b/policy/modules/kernel/files.fc
-index c19518a..ee086d2 100644
---- a/policy/modules/kernel/files.fc
-+++ b/policy/modules/kernel/files.fc
-@@ -107,6 +107,12 @@ HOME_ROOT/lost\+found/.*		<<none>>
+Index: refpolicy-2.20110726/policy/modules/kernel/files.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/files.fc	2012-06-21 15:56:03.931232970 +1000
+@@ -107,6 +107,12 @@
  /lib/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
  /lib64/modules(/.*)?		gen_context(system_u:object_r:modules_object_t,s0)
  
@@ -72,18 +72,18 @@ index c19518a..ee086d2 100644
  #
  # /lost+found
  #
-@@ -255,5 +261,5 @@ ifndef(`distro_redhat',`
+@@ -255,5 +261,5 @@
  /var/tmp/vi\.recover	-d	gen_context(system_u:object_r:tmp_t,s0)
  
  ifdef(`distro_debian',`
 -/var/run/motd		--	gen_context(system_u:object_r:etc_runtime_t,s0)
 +/var/run/motd		--	gen_context(system_u:object_r:initrc_var_run_t,s0)
  ')
-diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
-index 4966c94..829fd44 100644
---- a/policy/modules/services/xserver.fc
-+++ b/policy/modules/services/xserver.fc
-@@ -18,13 +18,16 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+Index: refpolicy-2.20110726/policy/modules/services/xserver.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.fc	2012-06-21 15:56:08.363289830 +1000
+@@ -18,13 +18,16 @@
  #
  # /etc
  #
@@ -104,7 +104,7 @@ index 4966c94..829fd44 100644
  
  /etc/X11/[wx]dm/Xreset.* --	gen_context(system_u:object_r:xsession_exec_t,s0)
  /etc/X11/[wxg]dm/Xsession --	gen_context(system_u:object_r:xsession_exec_t,s0)
-@@ -33,11 +36,6 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+@@ -33,11 +36,6 @@
  /etc/X11/wdm/Xstartup.*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
  /etc/X11/Xsession[^/]*	--	gen_context(system_u:object_r:xsession_exec_t,s0)
  
@@ -116,7 +116,7 @@ index 4966c94..829fd44 100644
  #
  # /opt
  #
-@@ -65,14 +63,9 @@ ifdef(`distro_redhat',`
+@@ -65,14 +63,9 @@
  /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)
  /usr/bin/xauth		--	gen_context(system_u:object_r:xauth_exec_t,s0)
  /usr/bin/Xorg		--	gen_context(system_u:object_r:xserver_exec_t,s0)
@@ -131,7 +131,7 @@ index 4966c94..829fd44 100644
  /usr/X11R6/bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
  /usr/X11R6/bin/iceauth	--	gen_context(system_u:object_r:iceauth_exec_t,s0)
  /usr/X11R6/bin/X	--	gen_context(system_u:object_r:xserver_exec_t,s0)
-@@ -84,21 +77,26 @@ ifdef(`distro_debian', `
+@@ -84,21 +77,26 @@
  /usr/X11R6/lib/X11/xkb	-d	gen_context(system_u:object_r:xkb_var_lib_t,s0)
  /usr/X11R6/lib/X11/xkb/.* --	gen_context(system_u:object_r:xkb_var_lib_t,s0)
  
@@ -160,11 +160,11 @@ index 4966c94..829fd44 100644
  /var/run/xdmctl(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
  
  ifdef(`distro_suse',`
-diff --git a/policy/modules/system/init.fc b/policy/modules/system/init.fc
-index 354ce93..46263b8 100644
---- a/policy/modules/system/init.fc
-+++ b/policy/modules/system/init.fc
-@@ -64,6 +64,11 @@ ifdef(`distro_gentoo', `
+Index: refpolicy-2.20110726/policy/modules/system/init.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/init.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.fc	2012-06-21 15:56:03.931232970 +1000
+@@ -64,6 +64,11 @@
  /var/run/random-seed	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
  /var/run/setmixer_flag	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
  
@@ -176,10 +176,10 @@ index 354ce93..46263b8 100644
  ifdef(`distro_gentoo', `
  /var/lib/init\.d(/.*)?		gen_context(system_u:object_r:initrc_state_t,s0)
  /var/run/svscan\.pid	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
-diff --git a/policy/modules/system/sysnetwork.fc b/policy/modules/system/sysnetwork.fc
-index 694fd94..11009a5 100644
---- a/policy/modules/system/sysnetwork.fc
-+++ b/policy/modules/system/sysnetwork.fc
+Index: refpolicy-2.20110726/policy/modules/system/sysnetwork.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/sysnetwork.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/sysnetwork.fc	2012-06-21 16:01:03.619077828 +1000
 @@ -5,6 +5,13 @@
  /bin/ip			--	gen_context(system_u:object_r:ifconfig_exec_t,s0)
  
@@ -194,10 +194,18 @@ index 694fd94..11009a5 100644
  # /etc
  #
  /etc/dhclient.*conf	--	gen_context(system_u:object_r:dhcp_etc_t,s0)
-diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
-index 0506175..2575393 100644
---- a/policy/modules/system/udev.fc
-+++ b/policy/modules/system/udev.fc
+@@ -49,6 +56,7 @@
+ # /usr
+ #
+ /usr/sbin/tc		--	gen_context(system_u:object_r:ifconfig_exec_t,s0)
++/usr/sbin/dhcp6c	--	gen_context(system_u:object_r:dhcpc_exec_t,s0)
+ 
+ #
+ # /var
+Index: refpolicy-2.20110726/policy/modules/system/udev.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/udev.fc	2012-06-21 15:56:08.363289830 +1000
 @@ -11,7 +11,10 @@
  
  /lib/udev/udev-acl --	gen_context(system_u:object_r:udev_exec_t,s0)
@@ -226,10 +234,10 @@ index 0506175..2575393 100644
 +ifdef(`distro_debian',`
 +/var/run/xen-hotplug -d	gen_context(system_u:object_r:udev_var_run_t,s0)
 +')
-diff --git a/policy/modules/system/unconfined.fc b/policy/modules/system/unconfined.fc
-index ce2fbb9..4902c11 100644
---- a/policy/modules/system/unconfined.fc
-+++ b/policy/modules/system/unconfined.fc
+Index: refpolicy-2.20110726/policy/modules/system/unconfined.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.fc	2012-06-21 15:44:15.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.fc	2012-06-21 15:56:08.363289830 +1000
 @@ -10,6 +10,12 @@
  
  /usr/local/RealPlayer/realplay\.bin --	gen_context(system_u:object_r:unconfined_execmem_exec_t,s0)

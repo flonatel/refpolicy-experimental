@@ -997,6 +997,13 @@ dhcp = module
 dictd = module
 
 # Layer: services
+# Module: dirmngr
+#
+# DirMngr  server for managing certificate revocation lists
+# 
+dirmngr = module
+
+# Layer: services
 # Module: distcc
 #
 # Distributed compiler daemon

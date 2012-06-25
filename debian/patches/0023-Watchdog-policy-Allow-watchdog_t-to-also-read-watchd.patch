@@ -7,11 +7,11 @@ Subject: Watchdog policy: Allow watchdog_t to also read watchdog files.
  policy/modules/services/watchdog.te |    2 +-
  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
-index 206b01e..c23c3b5 100644
---- a/policy/modules/kernel/devices.if
-+++ b/policy/modules/kernel/devices.if
-@@ -4570,7 +4570,7 @@ interface(`dev_read_watchdog',`
+Index: refpolicy-2.20110726/policy/modules/kernel/devices.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.if	2012-06-21 23:35:16.894554980 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.if	2012-06-21 23:35:33.262712101 +1000
+@@ -4512,7 +4512,7 @@
  
  ########################################
  ## <summary>
@@ -20,7 +20,7 @@ index 206b01e..c23c3b5 100644
  ## </summary>
  ## <param name="domain">
  ##	<summary>
-@@ -4578,12 +4578,12 @@ interface(`dev_read_watchdog',`
+@@ -4520,12 +4520,12 @@
  ##	</summary>
  ## </param>
  #
@@ -35,11 +35,11 @@ index 206b01e..c23c3b5 100644
  ')
  
  ########################################
-diff --git a/policy/modules/services/watchdog.te b/policy/modules/services/watchdog.te
-index b10bb05..28088ad 100644
---- a/policy/modules/services/watchdog.te
-+++ b/policy/modules/services/watchdog.te
-@@ -54,7 +54,7 @@ corenet_tcp_connect_all_ports(watchdog_t)
+Index: refpolicy-2.20110726/policy/modules/services/watchdog.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/watchdog.te	2012-06-21 23:34:15.218005058 +1000
++++ refpolicy-2.20110726/policy/modules/services/watchdog.te	2012-06-21 23:35:33.262712101 +1000
+@@ -54,7 +54,7 @@
  corenet_sendrecv_all_client_packets(watchdog_t)
  
  dev_read_sysfs(watchdog_t)

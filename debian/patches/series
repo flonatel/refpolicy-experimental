@@ -15,7 +15,6 @@ droppable/0012-Droppable-legacy-patch-differs-from-newer-upstream-o.patch
 0015-Move-dev-xconsole-from-xserver-policy-to-logging.pp.patch
 0016-Debian-specific-changes-for-init_t.patch
 0017-logrotate.if-Add-interface-to-search-logrotate-runti.patch
-0018-certwatch.if-Remove-deprecated-interface.patch
 0019-gpg.-fc-if-te-Fixes-so-that-gpg-agent-starts-up-also.patch
 0020-Small-fixes-for-gpg-policy-Label-gpgsm-and-allow-gpg.patch
 0021-mozilla.-fc-if-te-Add-chromium-policy.patch
@@ -100,3 +99,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0140-nrpe
 0150-squid
 0160-misc-mta
+0170-dirmngr

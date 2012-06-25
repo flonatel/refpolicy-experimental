@@ -14,10 +14,10 @@ Subject: some changes in cron policy for debian and small fixes: * Allow
  policy/modules/services/mta.if  |   17 +++++++++++++++++
  4 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/policy/modules/services/cron.fc b/policy/modules/services/cron.fc
-index 2eefc08..bd93dfc 100644
---- a/policy/modules/services/cron.fc
-+++ b/policy/modules/services/cron.fc
+Index: refpolicy-2.20110726/policy/modules/services/cron.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.fc	2012-06-21 23:34:14.682000582 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.fc	2012-06-21 23:35:58.786965849 +1000
 @@ -5,6 +5,7 @@
  
  /usr/bin/at			--	gen_context(system_u:object_r:crontab_exec_t,s0)
@@ -38,17 +38,17 @@ index 2eefc08..bd93dfc 100644
  /var/spool/anacron(/.*)?		gen_context(system_u:object_r:system_cron_spool_t,s0)
  /var/spool/at(/.*)?			gen_context(system_u:object_r:user_cron_spool_t,s0)
  
-@@ -45,3 +51,5 @@ ifdef(`distro_suse', `
+@@ -45,3 +51,5 @@
  /var/spool/fcron/systab\.orig	--	gen_context(system_u:object_r:system_cron_spool_t,s0)
  /var/spool/fcron/systab		--	gen_context(system_u:object_r:system_cron_spool_t,s0)
  /var/spool/fcron/new\.systab	--	gen_context(system_u:object_r:system_cron_spool_t,s0)
 +
 +/var/log/prelink.log		--	gen_context(system_u:object_r:cron_log_t,s0)
-diff --git a/policy/modules/services/cron.if b/policy/modules/services/cron.if
-index 35241ed..b965950 100644
---- a/policy/modules/services/cron.if
-+++ b/policy/modules/services/cron.if
-@@ -35,7 +35,8 @@ template(`cron_common_crontab_template',`
+Index: refpolicy-2.20110726/policy/modules/services/cron.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.if	2012-06-21 23:34:14.682000582 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.if	2012-06-21 23:35:58.786965849 +1000
+@@ -35,7 +35,8 @@
  	allow $1_t self:fifo_file rw_fifo_file_perms;
  
  	allow $1_t $1_tmp_t:file manage_file_perms;
@@ -58,7 +58,7 @@ index 35241ed..b965950 100644
  
  	# create files in /var/spool/cron
  	manage_files_pattern($1_t, { cron_spool_t user_cron_spool_t }, user_cron_spool_t)
-@@ -207,7 +208,7 @@ interface(`cron_admin_role',`
+@@ -207,7 +208,7 @@
  		class passwd crontab;
  	')
  
@@ -67,7 +67,7 @@ index 35241ed..b965950 100644
  
  	# cronjob shows up in user ps
  	ps_process_pattern($2, cronjob_t)
-@@ -257,11 +258,12 @@ interface(`cron_admin_role',`
+@@ -257,11 +258,12 @@
  #
  interface(`cron_system_entry',`
  	gen_require(`
@@ -81,11 +81,11 @@ index 35241ed..b965950 100644
  
  	role system_r types $1;
  ')
-diff --git a/policy/modules/services/cron.te b/policy/modules/services/cron.te
-index f22d27c..4f68f6d 100644
---- a/policy/modules/services/cron.te
-+++ b/policy/modules/services/cron.te
-@@ -136,8 +136,8 @@ tunable_policy(`fcron_crond', `
+Index: refpolicy-2.20110726/policy/modules/services/cron.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.te	2012-06-21 23:34:14.682000582 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.te	2012-06-21 23:35:58.786965849 +1000
+@@ -136,8 +136,8 @@
  # Cron daemon local policy
  #
  
@@ -96,7 +96,7 @@ index f22d27c..4f68f6d 100644
  allow crond_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execstack execheap };
  allow crond_t self:process { setexec setfscreate };
  allow crond_t self:fd use;
-@@ -222,6 +222,7 @@ userdom_use_unpriv_users_fds(crond_t)
+@@ -222,6 +222,7 @@
  userdom_list_user_home_dirs(crond_t)
  
  mta_send_mail(crond_t)
@@ -104,11 +104,11 @@ index f22d27c..4f68f6d 100644
  
  ifdef(`distro_debian',`
  	# pam_limits is used
-diff --git a/policy/modules/services/mta.if b/policy/modules/services/mta.if
-index a1aa265..b3b9d62 100644
---- a/policy/modules/services/mta.if
-+++ b/policy/modules/services/mta.if
-@@ -899,3 +899,20 @@ interface(`mta_rw_user_mail_stream_sockets',`
+Index: refpolicy-2.20110726/policy/modules/services/mta.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/mta.if	2012-06-21 23:34:54.666348925 +1000
++++ refpolicy-2.20110726/policy/modules/services/mta.if	2012-06-21 23:35:58.786965849 +1000
+@@ -885,3 +885,20 @@
  
  	allow $1 user_mail_domain:unix_stream_socket rw_socket_perms;
  ')

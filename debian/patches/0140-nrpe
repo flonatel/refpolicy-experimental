@@ -2,9 +2,9 @@ Description: Allow nrpe to read it's config fils
 Author: Russell Coker <russell@coker.com.au>
 Last-Update: 2012-06-16
 
---- refpolicy-2.20110726.orig/policy/modules/services/nagios.te
-+++ refpolicy-2.20110726/policy/modules/services/nagios.te
-@@ -188,7 +188,9 @@ allow nrpe_t self:tcp_socket create_stre
+--- a/policy/modules/services/nagios.te
++++ b/policy/modules/services/nagios.te
+@@ -188,7 +188,9 @@
  
  domtrans_pattern(nrpe_t, nagios_checkdisk_plugin_exec_t, nagios_checkdisk_plugin_t)
  
@@ -14,3 +14,15 @@ Last-Update: 2012-06-16
  files_search_etc(nrpe_t)
  
  manage_files_pattern(nrpe_t, nrpe_var_run_t, nrpe_var_run_t)
+@@ -246,9 +248,9 @@
+ storage_getattr_fixed_disk_dev(nrpe_t)
+ init_read_utmp(nrpe_t)
+ 
+-term_dontaudit_getattr_all_user_ttys(nrpe_t)
++term_dontaudit_getattr_all_ttys(nrpe_t)
+ term_dontaudit_getattr_unallocated_ttys(nrpe_t)
+-term_dontaudit_getattr_all_user_ptys(nrpe_t)
++term_dontaudit_getattr_all_ptys(nrpe_t)
+ 
+ optional_policy(`
+ 	inetd_tcp_service_domain(nrpe_t, nrpe_exec_t)

@@ -7,11 +7,11 @@ Subject: Debian specific changes for init_t
  policy/modules/system/init.te       |   31 ++++++++++++++++++++++++-------
  2 files changed, 42 insertions(+), 7 deletions(-)
 
-diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
-index 97fcdac..fdb524b 100644
---- a/policy/modules/kernel/filesystem.if
-+++ b/policy/modules/kernel/filesystem.if
-@@ -4064,6 +4064,24 @@ interface(`fs_dontaudit_rw_tmpfs_files',`
+Index: refpolicy-2.20110726/policy/modules/kernel/filesystem.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.if	2012-06-21 23:34:54.670348964 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/filesystem.if	2012-06-21 23:35:17.782563394 +1000
+@@ -4040,6 +4040,24 @@
  
  ########################################
  ## <summary>
@@ -36,11 +36,11 @@ index 97fcdac..fdb524b 100644
  ##	Create, read, write, and delete
  ##	auto moutpoints.
  ## </summary>
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 62deed5..7dd6ee6 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -408,12 +408,18 @@ userdom_read_user_home_content_files(initrc_t)
+Index: refpolicy-2.20110726/policy/modules/system/init.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-21 23:35:16.898555018 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-21 23:35:17.782563394 +1000
+@@ -408,12 +408,18 @@
  # started from init should be placed in their own domain.
  userdom_use_user_terminals(initrc_t)
  
@@ -61,7 +61,7 @@ index 62deed5..7dd6ee6 100644
  
  	# for storing state under /dev/shm
  	fs_setattr_tmpfs_dirs(initrc_t)
-@@ -421,6 +427,21 @@ ifdef(`distro_debian',`
+@@ -421,6 +427,21 @@
  	storage_tmpfs_filetrans_fixed_disk(initrc_t)
  
  	files_setattr_etc_dirs(initrc_t)
@@ -83,7 +83,7 @@ index 62deed5..7dd6ee6 100644
  ')
  
  ifdef(`distro_gentoo',`
-@@ -430,13 +451,11 @@ ifdef(`distro_gentoo',`
+@@ -430,13 +451,11 @@
  	allow initrc_t self:process setfscreate;
  	dev_create_null_dev(initrc_t)
  	dev_create_zero_dev(initrc_t)
@@ -97,7 +97,7 @@ index 62deed5..7dd6ee6 100644
  	dev_delete_generic_dirs(initrc_t)
  
  	# allow bootmisc to create /var/lock/.keep.
-@@ -738,6 +757,7 @@ optional_policy(`
+@@ -738,6 +757,7 @@
  
  optional_policy(`
  	postfix_list_spool(initrc_t)
@@ -105,7 +105,7 @@ index 62deed5..7dd6ee6 100644
  ')
  
  optional_policy(`
-@@ -847,9 +867,6 @@ optional_policy(`
+@@ -847,9 +867,6 @@
  ')
  
  optional_policy(`

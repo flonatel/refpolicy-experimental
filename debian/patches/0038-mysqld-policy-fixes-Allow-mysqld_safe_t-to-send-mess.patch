@@ -12,10 +12,10 @@ Subject: mysqld policy fixes: * Allow mysqld_safe_t to send messages to
  policy/modules/system/userdomain.if |    4 ++++
  4 files changed, 31 insertions(+), 1 deletions(-)
 
-diff --git a/policy/modules/services/mysql.fc b/policy/modules/services/mysql.fc
-index cc7192c..08df012 100644
---- a/policy/modules/services/mysql.fc
-+++ b/policy/modules/services/mysql.fc
+Index: refpolicy-2.20110726/policy/modules/services/mysql.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.fc	2012-06-21 23:34:14.161996253 +1000
++++ refpolicy-2.20110726/policy/modules/services/mysql.fc	2012-06-21 23:36:11.775098907 +1000
 @@ -16,6 +16,8 @@
  /usr/libexec/mysqld	--	gen_context(system_u:object_r:mysqld_exec_t,s0)
  
@@ -25,11 +25,11 @@ index cc7192c..08df012 100644
  /usr/sbin/mysqlmanager	--	gen_context(system_u:object_r:mysqlmanagerd_exec_t,s0)
  
  #
-diff --git a/policy/modules/services/mysql.if b/policy/modules/services/mysql.if
-index e9c0982..45eb10d 100644
---- a/policy/modules/services/mysql.if
-+++ b/policy/modules/services/mysql.if
-@@ -353,3 +353,23 @@ interface(`mysql_admin',`
+Index: refpolicy-2.20110726/policy/modules/services/mysql.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.if	2012-06-21 23:34:14.161996253 +1000
++++ refpolicy-2.20110726/policy/modules/services/mysql.if	2012-06-21 23:36:11.775098907 +1000
+@@ -353,3 +353,23 @@
  
  	admin_pattern($1, mysqld_tmp_t)
  ')
@@ -53,11 +53,11 @@ index e9c0982..45eb10d 100644
 +	corecmd_search_bin($1)
 +	can_exec($1, mysqld_exec_t)
 +')
-diff --git a/policy/modules/services/mysql.te b/policy/modules/services/mysql.te
-index 0a0d63c..4d87a4d 100644
---- a/policy/modules/services/mysql.te
-+++ b/policy/modules/services/mysql.te
-@@ -58,10 +58,13 @@ dontaudit mysqld_t self:capability sys_tty_config;
+Index: refpolicy-2.20110726/policy/modules/services/mysql.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.te	2012-06-21 23:34:14.161996253 +1000
++++ refpolicy-2.20110726/policy/modules/services/mysql.te	2012-06-21 23:36:11.775098907 +1000
+@@ -58,10 +58,13 @@
  allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
  allow mysqld_t self:fifo_file rw_fifo_file_perms;
  allow mysqld_t self:shm create_shm_perms;
@@ -72,7 +72,7 @@ index 0a0d63c..4d87a4d 100644
  manage_dirs_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
  manage_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
  manage_lnk_files_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
-@@ -180,6 +183,7 @@ files_read_usr_files(mysqld_safe_t)
+@@ -180,6 +183,7 @@
  files_dontaudit_getattr_all_dirs(mysqld_safe_t)
  
  logging_log_filetrans(mysqld_safe_t, mysqld_log_t, file)
@@ -80,11 +80,11 @@ index 0a0d63c..4d87a4d 100644
  
  hostname_exec(mysqld_safe_t)
  
-diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index 1bf060f..374a5e2 100644
---- a/policy/modules/system/userdomain.if
-+++ b/policy/modules/system/userdomain.if
-@@ -1026,6 +1026,10 @@ template(`userdom_unpriv_user_template', `
+Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-21 23:35:43.566813277 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-21 23:36:11.779098943 +1000
+@@ -985,6 +985,10 @@
  	optional_policy(`
  		setroubleshoot_stream_connect($1_t)
  	')

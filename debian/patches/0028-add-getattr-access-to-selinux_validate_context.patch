@@ -6,11 +6,11 @@ Subject: add getattr access to selinux_validate_context
  policy/modules/kernel/selinux.if |    1 +
  1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/policy/modules/kernel/selinux.if b/policy/modules/kernel/selinux.if
-index ca7e808..f8f37e2 100644
---- a/policy/modules/kernel/selinux.if
-+++ b/policy/modules/kernel/selinux.if
-@@ -544,6 +544,7 @@ interface(`selinux_validate_context',`
+Index: refpolicy-2.20110726/policy/modules/kernel/selinux.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/selinux.if	2012-06-21 23:34:54.670348964 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/selinux.if	2012-06-21 23:35:48.290860237 +1000
+@@ -512,6 +512,7 @@
  
  	allow $1 security_t:dir list_dir_perms;
  	allow $1 security_t:file rw_file_perms;

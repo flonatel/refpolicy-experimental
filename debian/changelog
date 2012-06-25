@@ -1,9 +1,21 @@
-refpolicy (2:2.20110726-7) UNRELEASED; urgency=low
+refpolicy (2:2.20110726-7) unstable; urgency=high
 
+  [Russell Coker]
+  * Got Chromium working!
+  * Allow user_dbusd_t to access /run/console
+  * Got systemd working
+    Closes: #677578
+  * Added policy for dirmngr.
+  * Added support for wide-dhcpv6-client.
+  * Remove all refpolicyerr and almost all refpolicywarn instances, removed all
+    obsolete interfaces and fixed syntax errors.
+    Closes: #678237
+  * Allow all users to run the Postfix mailq command
+  * Lots of little changes.
   [Mika Pflüger]
   * Do not ship pyplate.pyc. Closes: #676852
 
- -- Mika Pflüger <debian@mikapflueger.de>  Tue, 19 Jun 2012 01:00:21 +0200
+ -- Russell Coker <russell@coker.com.au>  Thu, 21 Jun 2012 23:15:59 +1000
 
 refpolicy (2:2.20110726-6) unstable; urgency=low
 

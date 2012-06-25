@@ -8,26 +8,27 @@ Subject: mozilla.{fc,if,te}: Add chromium policy.
  policy/modules/apps/mozilla.te |   53 ++++++++++++++++++++++++++++++++++++++++
  3 files changed, 63 insertions(+), 7 deletions(-)
 
-diff --git a/policy/modules/apps/mozilla.fc b/policy/modules/apps/mozilla.fc
-index 93ac529..5e1d020 100644
 --- a/policy/modules/apps/mozilla.fc
 +++ b/policy/modules/apps/mozilla.fc
-@@ -3,6 +3,7 @@ HOME_DIR/\.java(/.*)?			gen_context(system_u:object_r:mozilla_home_t,s0)
+@@ -3,6 +3,12 @@
  HOME_DIR/\.mozilla(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
  HOME_DIR/\.netscape(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
  HOME_DIR/\.phoenix(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
 +HOME_DIR/\.config/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/\.cache/chromium(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/\.fontconfig(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/Downloads(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/.macromedia(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/.pki(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
  
  #
  # /bin
-@@ -27,3 +28,5 @@ HOME_DIR/\.phoenix(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
+@@ -27,3 +33,5 @@
  /usr/lib(64)?/[^/]*firefox[^/]*/firefox-bin -- gen_context(system_u:object_r:mozilla_exec_t,s0)
  /usr/lib/[^/]*firefox[^/]*/firefox --	gen_context(system_u:object_r:mozilla_exec_t,s0)
  /usr/lib64/[^/]*firefox[^/]*/firefox -- gen_context(system_u:object_r:mozilla_exec_t,s0)
 +/usr/lib/chromium(-browser)?/chromium(-browser)?-sandbox -- gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
 +/usr/lib/chromium(-browser)?/chromium(-browser)? -- gen_context(system_u:object_r:chrome_browser_exec_t,s0)
-diff --git a/policy/modules/apps/mozilla.if b/policy/modules/apps/mozilla.if
-index fbb5c5a..a599b8b 100644
 --- a/policy/modules/apps/mozilla.if
 +++ b/policy/modules/apps/mozilla.if
 @@ -17,16 +17,16 @@
@@ -52,7 +53,7 @@ index fbb5c5a..a599b8b 100644
  	allow mozilla_t $2:unix_stream_socket connectto;
  
  	# Allow the user domain to signal/ps.
-@@ -179,10 +179,10 @@ interface(`mozilla_execmod_user_home_files',`
+@@ -179,10 +179,10 @@
  #
  interface(`mozilla_domtrans',`
  	gen_require(`
@@ -65,11 +66,9 @@ index fbb5c5a..a599b8b 100644
  ')
  
  ########################################
-diff --git a/policy/modules/apps/mozilla.te b/policy/modules/apps/mozilla.te
-index 1039ff2..8d03837 100644
 --- a/policy/modules/apps/mozilla.te
 +++ b/policy/modules/apps/mozilla.te
-@@ -19,6 +19,46 @@ typealias mozilla_t alias { auditadm_mozilla_t secadm_mozilla_t };
+@@ -19,6 +19,47 @@
  application_domain(mozilla_t, mozilla_exec_t)
  ubac_constrained(mozilla_t)
  
@@ -78,6 +77,7 @@ index 1039ff2..8d03837 100644
 +type chrome_browser_exec_t;
 +application_domain(mozilla_t, chrome_browser_exec_t)
 +domain_auto_trans(chrome_sandbox_t, chrome_browser_exec_t, mozilla_t)
++allow mozilla_t chrome_sandbox_t:process sigchld;
 +application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
 +ubac_constrained(chrome_sandbox_t)
 +fs_getattr_xattr_fs(chrome_sandbox_t)
@@ -116,7 +116,7 @@ index 1039ff2..8d03837 100644
  type mozilla_conf_t;
  files_config_file(mozilla_conf_t)
  
-@@ -55,6 +95,19 @@ ubac_constrained(mozilla_tmpfs_t)
+@@ -55,6 +96,20 @@
  # Local policy
  #
  
@@ -124,7 +124,7 @@ index 1039ff2..8d03837 100644
 +application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
 +domain_auto_trans(mozilla_t, chrome_sandbox_exec_t, chrome_sandbox_t)
 +allow mozilla_t mozilla_home_t:sock_file manage_sock_file_perms;
-+allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
++allow chrome_sandbox_t self:fifo_file rw_file_perms;
 +allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
 +allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
 +allow chrome_sandbox_t self:capability { chown dac_override fsetid setgid setuid net_raw net_raw sys_chroot sys_ptrace sys_admin };
@@ -132,7 +132,16 @@ index 1039ff2..8d03837 100644
 +allow mozilla_t chrome_sandbox_t:fd use;
 +allow mozilla_t chrome_sandbox_t:unix_stream_socket { read write };
 +dev_read_sysfs(mozilla_t)
++domain_dontaudit_search_all_domains_state(chrome_sandbox_t)
 +
  allow mozilla_t self:capability { sys_nice setgid setuid };
  allow mozilla_t self:process { sigkill signal setsched getsched setrlimit };
  allow mozilla_t self:fifo_file rw_fifo_file_perms;
+@@ -168,6 +223,7 @@
+ userdom_use_user_ptys(mozilla_t)
+ 
+ xserver_user_x_domain_template(mozilla, mozilla_t, mozilla_tmpfs_t)
++corenet_tcp_connect_xserver_port(mozilla_t)
+ xserver_dontaudit_read_xdm_tmp_files(mozilla_t)
+ xserver_dontaudit_getattr_xdm_tmp_sockets(mozilla_t)
+ 

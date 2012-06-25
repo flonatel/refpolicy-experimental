@@ -16,11 +16,11 @@ no X server installed.
  policy/modules/system/logging.te   |   17 ++++++++++++-----
  7 files changed, 74 insertions(+), 17 deletions(-)
 
-diff --git a/policy/modules/kernel/devices.if b/policy/modules/kernel/devices.if
-index 7c275ba..206b01e 100644
---- a/policy/modules/kernel/devices.if
-+++ b/policy/modules/kernel/devices.if
-@@ -787,6 +787,26 @@ interface(`dev_delete_generic_symlinks',`
+Index: refpolicy-2.20110726/policy/modules/kernel/devices.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.if	2012-06-21 23:34:54.654348823 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.if	2012-06-21 23:35:06.382456472 +1000
+@@ -787,6 +787,26 @@
  
  ########################################
  ## <summary>
@@ -47,11 +47,11 @@ index 7c275ba..206b01e 100644
  ##	Create, delete, read, and write symbolic links in device directories.
  ## </summary>
  ## <param name="domain">
-diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
-index 47d64a8..5b9764e 100644
---- a/policy/modules/services/xserver.fc
-+++ b/policy/modules/services/xserver.fc
-@@ -9,11 +9,7 @@ HOME_DIR/\.ICEauthority.* --	gen_context(system_u:object_r:iceauth_home_t,s0)
+Index: refpolicy-2.20110726/policy/modules/services/xserver.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.fc	2012-06-21 23:35:02.274418485 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.fc	2012-06-21 23:35:06.382456472 +1000
+@@ -9,11 +9,7 @@
  HOME_DIR/\.serverauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
  HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
  HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
@@ -64,11 +64,11 @@ index 47d64a8..5b9764e 100644
  
  #
  # /etc
-diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
-index 934ac8b..c759ad7 100644
---- a/policy/modules/services/xserver.te
-+++ b/policy/modules/services/xserver.te
-@@ -151,12 +151,6 @@ typealias xauth_tmp_t alias { auditadm_xauth_tmp_t secadm_xauth_tmp_t };
+Index: refpolicy-2.20110726/policy/modules/services/xserver.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.te	2012-06-21 23:34:15.806009968 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.te	2012-06-21 23:35:06.382456472 +1000
+@@ -151,12 +151,6 @@
  files_tmp_file(xauth_tmp_t)
  ubac_constrained(xauth_tmp_t)
  
@@ -81,7 +81,7 @@ index 934ac8b..c759ad7 100644
  type xdm_t;
  type xdm_exec_t;
  auth_login_pgm_domain(xdm_t)
-@@ -317,7 +311,8 @@ allow xdm_t self:socket create_socket_perms;
+@@ -317,7 +311,8 @@
  allow xdm_t self:appletalk_socket create_socket_perms;
  allow xdm_t self:key { search link write };
  
@@ -91,11 +91,11 @@ index 934ac8b..c759ad7 100644
  
  # Allow gdm to run gdm-binary
  can_exec(xdm_t, xdm_exec_t)
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 157e844..62deed5 100644
---- a/policy/modules/system/init.te
-+++ b/policy/modules/system/init.te
-@@ -391,6 +391,7 @@ logging_manage_generic_logs(initrc_t)
+Index: refpolicy-2.20110726/policy/modules/system/init.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-21 23:34:15.806009968 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-21 23:35:06.382456472 +1000
+@@ -391,6 +391,7 @@
  logging_read_all_logs(initrc_t)
  logging_append_all_logs(initrc_t)
  logging_read_audit_config(initrc_t)
@@ -103,7 +103,7 @@ index 157e844..62deed5 100644
  
  miscfiles_read_localization(initrc_t)
  # slapd needs to read cert files from its initscript
-@@ -409,6 +410,8 @@ userdom_use_user_terminals(initrc_t)
+@@ -409,6 +410,8 @@
  
  ifdef(`distro_debian',`
  	dev_setattr_generic_dirs(initrc_t)
@@ -112,21 +112,21 @@ index 157e844..62deed5 100644
  
  	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
  
-diff --git a/policy/modules/system/logging.fc b/policy/modules/system/logging.fc
-index 02f4c97..3fa8575 100644
---- a/policy/modules/system/logging.fc
-+++ b/policy/modules/system/logging.fc
+Index: refpolicy-2.20110726/policy/modules/system/logging.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.fc	2012-06-21 23:34:15.806009968 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.fc	2012-06-21 23:35:06.382456472 +1000
 @@ -1,4 +1,5 @@
  /dev/log		-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
 +/dev/xconsole		-p	gen_context(system_u:object_r:xconsole_device_t,s0)
  
  /etc/rsyslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
  /etc/syslog.conf		gen_context(system_u:object_r:syslog_conf_t,s0)
-diff --git a/policy/modules/system/logging.if b/policy/modules/system/logging.if
-index 831b909..453c916 100644
---- a/policy/modules/system/logging.if
-+++ b/policy/modules/system/logging.if
-@@ -901,6 +901,41 @@ interface(`logging_rw_generic_logs',`
+Index: refpolicy-2.20110726/policy/modules/system/logging.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.if	2012-06-21 23:34:54.674349006 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.if	2012-06-21 23:35:06.382456472 +1000
+@@ -886,6 +886,41 @@
  
  ########################################
  ## <summary>
@@ -168,11 +168,11 @@ index 831b909..453c916 100644
  ##	Create, read, write, and delete
  ##	generic log files.
  ## </summary>
-diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
-index ebc216c..d8e5e1c 100644
---- a/policy/modules/system/logging.te
-+++ b/policy/modules/system/logging.te
-@@ -61,6 +61,11 @@ files_pid_file(klogd_var_run_t)
+Index: refpolicy-2.20110726/policy/modules/system/logging.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.te	2012-06-21 23:34:15.806009968 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.te	2012-06-21 23:35:06.382456472 +1000
+@@ -61,6 +61,11 @@
  type syslog_conf_t;
  files_config_file(syslog_conf_t)
  
@@ -184,7 +184,7 @@ index ebc216c..d8e5e1c 100644
  type syslogd_t;
  type syslogd_exec_t;
  init_daemon_domain(syslogd_t, syslogd_exec_t)
-@@ -81,6 +86,13 @@ type var_log_t;
+@@ -81,6 +86,13 @@
  logging_log_file(var_log_t)
  files_mountpoint(var_log_t)
  
@@ -198,7 +198,7 @@ index ebc216c..d8e5e1c 100644
  ifdef(`enable_mls',`
  	init_ranged_daemon_domain(auditd_t, auditd_exec_t, mls_systemhigh)
  	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
-@@ -506,8 +518,3 @@ optional_policy(`
+@@ -506,8 +518,3 @@
  optional_policy(`
  	udev_read_db(syslogd_t)
  ')

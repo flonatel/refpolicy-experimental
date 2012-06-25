@@ -7,11 +7,11 @@ Subject: unsorted userdomain changes; includes adding an interface for a user
  policy/modules/system/userdomain.if |   38 ++++++++++++++++++++++++++++++++++-
  1 files changed, 37 insertions(+), 1 deletions(-)
 
-diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index 374a5e2..8cb14a5 100644
---- a/policy/modules/system/userdomain.if
-+++ b/policy/modules/system/userdomain.if
-@@ -87,6 +87,7 @@ template(`userdom_base_user_template',`
+Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-21 23:36:22.447210168 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-21 23:37:51.568202460 +1000
+@@ -87,6 +87,7 @@
  	files_read_etc_files($1_t)
  	files_read_etc_runtime_files($1_t)
  	files_read_usr_files($1_t)
@@ -19,7 +19,7 @@ index 374a5e2..8cb14a5 100644
  	# Read directories and files with the readable_t type.
  	# This type is a general type for "world"-readable files.
  	files_list_world_readable($1_t)
-@@ -548,6 +549,7 @@ template(`userdom_common_user_template',`
+@@ -507,6 +508,7 @@
  	files_read_var_symlinks($1_t)
  	files_read_generic_spool($1_t)
  	files_read_var_lib_files($1_t)
@@ -27,7 +27,7 @@ index 374a5e2..8cb14a5 100644
  	# Stat lost+found.
  	files_getattr_lost_found_dirs($1_t)
  
-@@ -981,7 +983,6 @@ template(`userdom_unpriv_user_template', `
+@@ -940,7 +942,6 @@
  	# Need the following rule to allow users to run vpnc
  	corenet_tcp_bind_xserver_port($1_t)
  
@@ -35,7 +35,7 @@ index 374a5e2..8cb14a5 100644
  	# cjp: why?
  	files_read_kernel_symbol_table($1_t)
  
-@@ -1034,6 +1035,41 @@ template(`userdom_unpriv_user_template', `
+@@ -993,6 +994,41 @@
  
  #######################################
  ## <summary>

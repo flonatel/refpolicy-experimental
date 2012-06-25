@@ -7,11 +7,11 @@ Subject: Debian fixes for xserver policy
  policy/modules/services/xserver.te |    1 +
  2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/policy/modules/services/xserver.if b/policy/modules/services/xserver.if
-index bd4a1ff..6c339ae 100644
---- a/policy/modules/services/xserver.if
-+++ b/policy/modules/services/xserver.if
-@@ -601,12 +601,12 @@ interface(`xserver_use_all_users_fonts',`
+Index: refpolicy-2.20110726/policy/modules/services/xserver.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.if	2012-06-21 23:35:29.550676083 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.if	2012-06-21 23:36:31.511306001 +1000
+@@ -526,12 +526,12 @@
  
  ########################################
  ## <summary>
@@ -28,7 +28,7 @@ index bd4a1ff..6c339ae 100644
  ## </param>
  #
  interface(`xserver_read_user_xauth',`
-@@ -747,6 +747,7 @@ interface(`xserver_stream_connect_xdm',`
+@@ -672,6 +672,7 @@
  
  	files_search_tmp($1)
  	stream_connect_pattern($1, xdm_tmp_t, xdm_tmp_t, xdm_t)
@@ -36,11 +36,11 @@ index bd4a1ff..6c339ae 100644
  ')
  
  ########################################
-diff --git a/policy/modules/services/xserver.te b/policy/modules/services/xserver.te
-index c759ad7..3fd9194 100644
---- a/policy/modules/services/xserver.te
-+++ b/policy/modules/services/xserver.te
-@@ -784,6 +784,7 @@ optional_policy(`
+Index: refpolicy-2.20110726/policy/modules/services/xserver.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.te	2012-06-21 23:35:16.898555018 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.te	2012-06-21 23:36:31.511306001 +1000
+@@ -784,6 +784,7 @@
  optional_policy(`
  	unconfined_domain_noaudit(xserver_t)
  	unconfined_domtrans(xserver_t)

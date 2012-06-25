@@ -17,11 +17,11 @@ Subject: postfix policy adjustments: * Allow user_mail_t to transition to
  policy/modules/system/unconfined.if |   32 ++++++++++++++++++++++++++++++++
  4 files changed, 69 insertions(+), 6 deletions(-)
 
-diff --git a/policy/modules/services/mta.if b/policy/modules/services/mta.if
-index b3b9d62..9c89b80 100644
---- a/policy/modules/services/mta.if
-+++ b/policy/modules/services/mta.if
-@@ -96,6 +96,8 @@ template(`mta_base_mail_template',`
+Index: refpolicy-2.20110726/policy/modules/services/mta.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/mta.if	2012-06-21 23:36:07.135051072 +1000
++++ refpolicy-2.20110726/policy/modules/services/mta.if	2012-06-21 23:37:09.427719709 +1000
+@@ -96,6 +96,8 @@
  
  	miscfiles_read_localization($1_mail_t)
  
@@ -30,7 +30,7 @@ index b3b9d62..9c89b80 100644
  	optional_policy(`
  		exim_read_log($1_mail_t)
  		exim_append_log($1_mail_t)
-@@ -104,6 +106,8 @@ template(`mta_base_mail_template',`
+@@ -104,6 +106,8 @@
  
  	optional_policy(`
  		postfix_domtrans_user_mail_handler($1_mail_t)
@@ -39,11 +39,11 @@ index b3b9d62..9c89b80 100644
  	')
  
  	optional_policy(`
-diff --git a/policy/modules/services/postfix.if b/policy/modules/services/postfix.if
-index 46bee12..9cf0931 100644
---- a/policy/modules/services/postfix.if
-+++ b/policy/modules/services/postfix.if
-@@ -163,6 +163,7 @@ template(`postfix_user_domain_template',`
+Index: refpolicy-2.20110726/policy/modules/services/postfix.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postfix.if	2012-06-21 23:34:11.689975726 +1000
++++ refpolicy-2.20110726/policy/modules/services/postfix.if	2012-06-21 23:37:09.427719709 +1000
+@@ -163,6 +163,7 @@
  	allow postfix_$1_t self:capability dac_override;
  
  	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
@@ -51,7 +51,7 @@ index 46bee12..9cf0931 100644
  
  	domain_use_interactive_fds(postfix_$1_t)
  ')
-@@ -374,6 +375,7 @@ interface(`postfix_domtrans_master',`
+@@ -374,6 +375,7 @@
  	')
  
  	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
@@ -59,7 +59,7 @@ index 46bee12..9cf0931 100644
  ')
  
  ########################################
-@@ -454,7 +456,7 @@ interface(`postfix_domtrans_postqueue',`
+@@ -454,7 +456,7 @@
  
  #######################################
  ## <summary>
@@ -68,7 +68,7 @@ index 46bee12..9cf0931 100644
  ## </summary>
  ## <param name="domain">
  ##	<summary>
-@@ -462,12 +464,14 @@ interface(`postfix_domtrans_postqueue',`
+@@ -462,12 +464,14 @@
  ##	</summary>
  ## </param>
  #
@@ -86,11 +86,11 @@ index 46bee12..9cf0931 100644
  ')
  
  ########################################
-diff --git a/policy/modules/services/postfix.te b/policy/modules/services/postfix.te
-index d165a03..93e08b8 100644
---- a/policy/modules/services/postfix.te
-+++ b/policy/modules/services/postfix.te
-@@ -26,6 +26,9 @@ application_executable_file(postfix_exec_t)
+Index: refpolicy-2.20110726/policy/modules/services/postfix.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/postfix.te	2012-06-21 23:37:07.415697255 +1000
++++ refpolicy-2.20110726/policy/modules/services/postfix.te	2012-06-21 23:37:09.427719709 +1000
+@@ -26,6 +26,9 @@
  postfix_server_domain_template(local)
  mta_mailserver_delivery(postfix_local_t)
  
@@ -100,7 +100,7 @@ index d165a03..93e08b8 100644
  # Program for creating database files
  type postfix_map_t;
  type postfix_map_exec_t;
-@@ -183,9 +186,11 @@ mta_getattr_spool(postfix_master_t)
+@@ -183,9 +186,11 @@
  ifdef(`distro_redhat',`
  	# for newer main.cf that uses /etc/aliases
  	mta_manage_aliases(postfix_master_t)
@@ -113,7 +113,7 @@ index d165a03..93e08b8 100644
  optional_policy(`
  	cyrus_stream_connect(postfix_master_t)
  ')
-@@ -201,6 +206,8 @@ optional_policy(`
+@@ -201,6 +206,8 @@
  
  optional_policy(`
  	mysql_stream_connect(postfix_master_t)
@@ -122,7 +122,7 @@ index d165a03..93e08b8 100644
  ')
  
  optional_policy(`
-@@ -231,6 +238,11 @@ manage_dirs_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_boun
+@@ -231,6 +238,11 @@
  manage_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
  manage_lnk_files_pattern(postfix_bounce_t, postfix_spool_bounce_t, postfix_spool_bounce_t)
  
@@ -134,7 +134,7 @@ index d165a03..93e08b8 100644
  ########################################
  #
  # Postfix cleanup local policy
-@@ -240,6 +252,7 @@ allow postfix_cleanup_t self:process setrlimit;
+@@ -240,6 +252,7 @@
  
  # connect to master process
  stream_connect_pattern(postfix_cleanup_t, postfix_private_t, postfix_private_t, postfix_master_t)
@@ -142,7 +142,7 @@ index d165a03..93e08b8 100644
  
  rw_fifo_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
  write_sock_files_pattern(postfix_cleanup_t, postfix_public_t, postfix_public_t)
-@@ -273,6 +286,9 @@ stream_connect_pattern(postfix_local_t, postfix_public_t, postfix_public_t, post
+@@ -273,6 +286,9 @@
  # for .forward - maybe we need a new type for it?
  rw_sock_files_pattern(postfix_local_t, postfix_private_t, postfix_private_t)
  
@@ -152,7 +152,7 @@ index d165a03..93e08b8 100644
  allow postfix_local_t postfix_spool_t:file rw_file_perms;
  
  corecmd_exec_shell(postfix_local_t)
-@@ -405,6 +421,8 @@ optional_policy(`
+@@ -405,6 +421,8 @@
  	dovecot_domtrans_deliver(postfix_pipe_t)
  ')
  
@@ -161,7 +161,7 @@ index d165a03..93e08b8 100644
  optional_policy(`
  	procmail_domtrans(postfix_pipe_t)
  ')
-@@ -569,7 +587,7 @@ optional_policy(`
+@@ -569,7 +587,7 @@
  ')
  
  optional_policy(`
@@ -170,7 +170,7 @@ index d165a03..93e08b8 100644
  ')
  
  ########################################
-@@ -611,6 +629,11 @@ optional_policy(`
+@@ -611,6 +629,11 @@
  ')
  
  optional_policy(`
@@ -182,11 +182,11 @@ index d165a03..93e08b8 100644
  	sasl_connect(postfix_smtpd_t)
  ')
  
-diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
-index c599bc0..ca029d7 100644
---- a/policy/modules/system/unconfined.if
-+++ b/policy/modules/system/unconfined.if
-@@ -320,6 +320,38 @@ interface(`unconfined_run_to',`
+Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.if	2012-06-21 23:34:56.266363475 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.if	2012-06-21 23:37:09.427719709 +1000
+@@ -270,6 +270,38 @@
  
  ########################################
  ## <summary>

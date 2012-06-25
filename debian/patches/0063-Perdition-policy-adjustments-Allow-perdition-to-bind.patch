@@ -26,7 +26,7 @@ index 8e92c65..9f918f4 100644
  allow perdition_t self:udp_socket create_socket_perms;
  
  allow perdition_t perdition_etc_t:file read_file_perms;
-+allow perdition_t perdition_etc_t:dir r_dir_perms;
++allow perdition_t perdition_etc_t:dir list_dir_perms;
  files_search_etc(perdition_t)
  
  manage_files_pattern(perdition_t, perdition_var_run_t, perdition_var_run_t)

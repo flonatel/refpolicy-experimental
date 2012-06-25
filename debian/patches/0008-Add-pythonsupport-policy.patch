@@ -15,11 +15,11 @@ Subject: Add pythonsupport policy
  create mode 100644 policy/modules/system/pythonsupport.if
  create mode 100644 policy/modules/system/pythonsupport.te
 
-diff --git a/policy/modules/admin/apt.te b/policy/modules/admin/apt.te
-index 4044710..185a37e 100644
---- a/policy/modules/admin/apt.te
-+++ b/policy/modules/admin/apt.te
-@@ -142,6 +142,10 @@ userdom_use_user_terminals(apt_t)
+Index: refpolicy-2.20110726/policy/modules/admin/apt.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/admin/apt.te	2012-06-21 23:34:16.322014287 +1000
++++ refpolicy-2.20110726/policy/modules/admin/apt.te	2012-06-21 23:34:40.902225703 +1000
+@@ -142,6 +142,10 @@
  #')
  
  optional_policy(`
@@ -30,11 +30,11 @@ index 4044710..185a37e 100644
  	# dpkg interaction
  	dpkg_read_db(apt_t)
  	dpkg_domtrans(apt_t)
-diff --git a/policy/modules/roles/sysadm.te b/policy/modules/roles/sysadm.te
-index 0f96353..ac352b3 100644
---- a/policy/modules/roles/sysadm.te
-+++ b/policy/modules/roles/sysadm.te
-@@ -156,6 +156,10 @@ optional_policy(`
+Index: refpolicy-2.20110726/policy/modules/roles/sysadm.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/roles/sysadm.te	2012-06-21 23:34:36.722188955 +1000
++++ refpolicy-2.20110726/policy/modules/roles/sysadm.te	2012-06-21 23:34:40.902225703 +1000
+@@ -156,6 +156,10 @@
  ')
  
  optional_policy(`
@@ -45,19 +45,17 @@ index 0f96353..ac352b3 100644
  	# allow system administrator to use the ipsec script to look
  	# at things (e.g., ipsec auto --status)
  	# probably should create an ipsec_admin role for this kind of thing
-diff --git a/policy/modules/system/pythonsupport.fc b/policy/modules/system/pythonsupport.fc
-new file mode 100644
-index 0000000..95a0998
---- /dev/null
-+++ b/policy/modules/system/pythonsupport.fc
+Index: refpolicy-2.20110726/policy/modules/system/pythonsupport.fc
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/system/pythonsupport.fc	2012-06-21 23:34:40.902225703 +1000
 @@ -0,0 +1,2 @@
 +/usr/sbin/update-python-modules	--	gen_context(system_u:object_r:pythoncompile_exec_t,s0)
 +/var/lib/python-support(/.*)?		gen_context(system_u:object_r:python_compiled_t,s0)
-diff --git a/policy/modules/system/pythonsupport.if b/policy/modules/system/pythonsupport.if
-new file mode 100644
-index 0000000..bacd1e4
---- /dev/null
-+++ b/policy/modules/system/pythonsupport.if
+Index: refpolicy-2.20110726/policy/modules/system/pythonsupport.if
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/system/pythonsupport.if	2012-06-21 23:34:40.902225703 +1000
 @@ -0,0 +1,83 @@
 +## <summary>Support for precompiling python modules</summary>
 +## <desc>
@@ -142,11 +140,10 @@ index 0000000..bacd1e4
 +	allow $1 python_compiled_t:file read_file_perms;
 +	allow $1 python_compiled_t:lnk_file read_lnk_file_perms;
 +')
-diff --git a/policy/modules/system/pythonsupport.te b/policy/modules/system/pythonsupport.te
-new file mode 100644
-index 0000000..2503760
---- /dev/null
-+++ b/policy/modules/system/pythonsupport.te
+Index: refpolicy-2.20110726/policy/modules/system/pythonsupport.te
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ refpolicy-2.20110726/policy/modules/system/pythonsupport.te	2012-06-21 23:34:40.902225703 +1000
 @@ -0,0 +1,41 @@
 +policy_module(pythonsupport,0.0.1)
 +
@@ -172,14 +169,14 @@ index 0000000..2503760
 +kernel_read_kernel_sysctls(pythoncompile_t)
 +
 +corecmd_exec_bin(pythoncompile_t)
-+corecmd_exec_sbin(pythoncompile_t)
++
 +
 +files_read_etc_files(pythoncompile_t)
 +files_read_usr_files(pythoncompile_t)
 +
 +libs_use_ld_so(pythoncompile_t)
 +libs_use_shared_libs(pythoncompile_t)
-+libs_use_lib_files(pythoncompile_t)
++
 +
 +miscfiles_read_localization(pythoncompile_t)
 +
@@ -189,11 +186,11 @@ index 0000000..2503760
 +allow pythoncompile_t python_compiled_t:file manage_file_perms;
 +allow pythoncompile_t python_compiled_t:lnk_file manage_lnk_file_perms;
 +files_var_lib_filetrans(pythoncompile_t, python_compiled_t, dir)
-diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
-index e252935..aced208 100644
---- a/policy/modules/system/selinuxutil.te
-+++ b/policy/modules/system/selinuxutil.te
-@@ -493,6 +493,10 @@ ifdef(`distro_ubuntu',`
+Index: refpolicy-2.20110726/policy/modules/system/selinuxutil.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/selinuxutil.te	2012-06-21 23:34:16.322014287 +1000
++++ refpolicy-2.20110726/policy/modules/system/selinuxutil.te	2012-06-21 23:34:40.902225703 +1000
+@@ -493,6 +493,10 @@
  	')
  ')
  
@@ -204,11 +201,11 @@ index e252935..aced208 100644
  ########################################
  #
  # Setfiles local policy
-diff --git a/policy/modules/system/userdomain.if b/policy/modules/system/userdomain.if
-index c6d3cc8..970f594 100644
---- a/policy/modules/system/userdomain.if
-+++ b/policy/modules/system/userdomain.if
-@@ -655,6 +655,10 @@ template(`userdom_common_user_template',`
+Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-21 23:34:36.722188955 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-21 23:34:40.906225731 +1000
+@@ -614,6 +614,10 @@
  	')
  
  	optional_policy(`

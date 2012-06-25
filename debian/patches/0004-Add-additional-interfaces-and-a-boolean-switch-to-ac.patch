@@ -8,11 +8,11 @@ Subject: Add additional interfaces and a boolean switch to access unconfined
  policy/modules/system/unconfined.te |    9 ++++
  2 files changed, 89 insertions(+), 0 deletions(-)
 
-diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
-index 416e668..c599bc0 100644
---- a/policy/modules/system/unconfined.if
-+++ b/policy/modules/system/unconfined.if
-@@ -96,6 +96,7 @@ interface(`unconfined_domain_noaudit',`
+Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.if	2012-06-21 23:34:19.842043862 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.if	2012-06-21 23:34:22.746068441 +1000
+@@ -96,6 +96,7 @@
  	optional_policy(`
  		xserver_unconfined($1)
  	')
@@ -20,7 +20,7 @@ index 416e668..c599bc0 100644
  ')
  
  ########################################
-@@ -587,3 +588,82 @@ interface(`unconfined_dbus_connect',`
+@@ -537,3 +538,82 @@
  
  	allow $1 unconfined_t:dbus acquire_svc;
  ')
@@ -103,11 +103,11 @@ index 416e668..c599bc0 100644
 +
 +	allow $1 unconfined_tmp_t:file { getattr write append };
 +')
-diff --git a/policy/modules/system/unconfined.te b/policy/modules/system/unconfined.te
-index eae5001..f3fa3e5 100644
---- a/policy/modules/system/unconfined.te
-+++ b/policy/modules/system/unconfined.te
-@@ -21,6 +21,15 @@ type unconfined_execmem_exec_t;
+Index: refpolicy-2.20110726/policy/modules/system/unconfined.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.te	2012-06-21 23:34:16.622016799 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.te	2012-06-21 23:34:22.746068441 +1000
+@@ -21,6 +21,15 @@
  init_system_domain(unconfined_execmem_t, unconfined_execmem_exec_t)
  role unconfined_r types unconfined_execmem_t;
  
