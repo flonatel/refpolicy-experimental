@@ -1,6 +1,6 @@
 Source: refpolicy
-VCS-Git: git://anonscm.debian.org/selinux/selinux.git
-VCS-Browser: http://anonscm.debian.org/gitweb/?p=selinux/selinux.git;a=summary
+VCS-Git: git://anonscm.debian.org/selinux/refpolicy.git
+VCS-Browser: http://anonscm.debian.org/gitweb/?p=selinux/refpolicy.git;a=summary
 Priority: optional
 Section: admin
 Homepage: http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
