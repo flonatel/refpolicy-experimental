@@ -10,8 +10,8 @@ refpolicy (2:2.20110726-9) unstable; urgency=high
   * Change readahead policy to support memlockd.
   * Allow devicekit_power_t, devicekit_disk_t, kerneloops_t, and policykit_t
     to send dbus messages to users.
-  * Grant systemd utilities access to selinuxfs so they can correctly label directories
-    Closes: #678392
+  * Grant systemd utilities access to selinuxfs so they can correctly label
+    directories. Closes: #678392
   * Assigned type consolekit_var_run_t to /var/run/console(/.*)? because it's
     created and managed by consolekit nowadays.
   * Created tunable allow_ssh_connect_reserved_ports to allow ssh client to
@@ -41,7 +41,7 @@ refpolicy (2:2.20110726-8) unstable; urgency=high
   * Add tcsd.pp (for trousers) to the policy packages
   * Add nut.pp for the nut-server package to the policy packages
   * Load irqbalance.pp if irqbalance Debian package is installed, same for
-    kerneloops, tcsd.pp/trousers, nut.pp/nut-server, 
+    kerneloops, tcsd.pp/trousers, nut.pp/nut-server,
     and smartmon.pp/smartmontools.
   * High urgency because the support for tcsd and nut really needs to be
     tested (and it's broken badly for those people) and portslave.pp is also
