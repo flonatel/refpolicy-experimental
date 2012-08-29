@@ -2,8 +2,10 @@ Description: Polkit and related changes
 Author: Russell Coker <russell@coker.com.au>
 Last-Update: 2012-06-15
 
---- a/policy/modules/system/authlogin.te
-+++ b/policy/modules/system/authlogin.te
+Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/authlogin.te	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/authlogin.te	2012-06-26 15:55:15.763895631 +1000
 @@ -94,6 +94,7 @@
  
  allow chkpwd_t shadow_t:file read_file_perms;
@@ -12,8 +14,10 @@ Last-Update: 2012-06-15
  
  kernel_read_crypto_sysctls(chkpwd_t)
  # is_selinux_enabled
---- a/policy/modules/services/policykit.te
-+++ b/policy/modules/services/policykit.te
+Index: refpolicy-2.20110726/policy/modules/services/policykit.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/policykit.te	2011-03-29 02:05:15.000000000 +1100
++++ refpolicy-2.20110726/policy/modules/services/policykit.te	2012-06-26 15:47:33.000000000 +1000
 @@ -41,8 +41,21 @@
  allow policykit_t self:unix_dgram_socket create_socket_perms;
  allow policykit_t self:unix_stream_socket create_stream_socket_perms;
@@ -36,8 +40,10 @@ Last-Update: 2012-06-15
  can_exec(policykit_t, policykit_exec_t)
  corecmd_exec_bin(policykit_t)
  
---- a/policy/modules/services/consolekit.te
-+++ b/policy/modules/services/consolekit.te
+Index: refpolicy-2.20110726/policy/modules/services/consolekit.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/consolekit.te	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/consolekit.te	2012-06-26 15:47:33.000000000 +1000
 @@ -28,6 +28,7 @@
  allow consolekit_t self:fifo_file rw_fifo_file_perms;
  allow consolekit_t self:unix_stream_socket create_stream_socket_perms;
@@ -46,8 +52,10 @@ Last-Update: 2012-06-15
  
  manage_files_pattern(consolekit_t, consolekit_log_t, consolekit_log_t)
  logging_log_filetrans(consolekit_t, consolekit_log_t, file)
---- a/policy/modules/services/dbus.te
-+++ b/policy/modules/services/dbus.te
+Index: refpolicy-2.20110726/policy/modules/services/dbus.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/dbus.te	2011-07-26 22:10:40.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/dbus.te	2012-06-26 15:47:33.000000000 +1000
 @@ -10,6 +10,7 @@
  #
  
@@ -277,8 +285,10 @@ Last-Update: 2012-06-15
  allow dbusd_unconfined session_bus_type:dbus all_dbus_perms;
 +allow dbusd_unconfined dbusd_unconfined:dbus all_dbus_perms;
 +allow session_bus_type dbusd_unconfined:dbus send_msg;
---- a/policy/modules/services/xserver.fc
-+++ b/policy/modules/services/xserver.fc
+Index: refpolicy-2.20110726/policy/modules/services/xserver.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/xserver.fc	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/xserver.fc	2012-06-26 15:47:33.000000000 +1000
 @@ -9,7 +9,6 @@
  HOME_DIR/\.serverauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
  HOME_DIR/\.xauth.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
@@ -287,8 +297,10 @@ Last-Update: 2012-06-15
  
  #
  # /etc
---- a/policy/modules/services/dbus.if
-+++ b/policy/modules/services/dbus.if
+Index: refpolicy-2.20110726/policy/modules/services/dbus.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-26 15:55:15.763895631 +1000
 @@ -85,6 +85,13 @@
  	allow $3 $1_dbusd_t:fifo_file rw_fifo_file_perms;
  
@@ -303,3 +315,38 @@ Last-Update: 2012-06-15
  ')
  
  #######################################
+Index: refpolicy-2.20110726/policy/modules/services/devicekit.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/devicekit.te	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/devicekit.te	2012-06-26 15:47:33.000000000 +1000
+@@ -220,6 +220,7 @@
+ files_read_usr_files(devicekit_power_t)
+ 
+ fs_list_inotifyfs(devicekit_power_t)
++fs_getattr_xattr_fs(devicekit_power_t)
+ 
+ term_use_all_terms(devicekit_power_t)
+ 
+Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-26 15:47:33.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-26 15:55:15.763895631 +1000
+@@ -589,6 +589,18 @@
+ 		optional_policy(`
+ 			networkmanager_dbus_chat($1_t)
+ 		')
++		optional_policy(`
++			devicekit_dbus_chat_power($1_t)
++		')
++		optional_policy(`
++			devicekit_dbus_chat_disk($1_t)
++		')
++		optional_policy(`
++			kerneloops_dbus_chat($1_t)
++		')
++		optional_policy(`
++			policykit_dbus_chat($1_t)
++		')
+ 	')
+ 
+ 	optional_policy(`

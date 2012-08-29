@@ -1,3 +1,32 @@
+refpolicy (2:2.20110726-9) unstable; urgency=high
+
+  * Enable UBAC as roles aren't useful.  I recommend using only roles user_r
+    and unconfined_r and using UBAC (constraining users from sharing files
+    between identities) where you would previously have used roles.
+  * Made cron jobs run in regular user domains such as unconfined_t and user_t
+    Closes: #679277
+  * Had the wrong timestamp on the last upload, corrected it for the record.
+  * Allow ftpd to create sock_file objects under /var/run for proftpd
+  * Change readahead policy to support memlockd.
+  * Allow devicekit_power_t, devicekit_disk_t, kerneloops_t, and policykit_t
+    to send dbus messages to users.
+  * Grant systemd utilities access to selinuxfs so they can correctly label directories
+    Closes: #678392
+  * Assigned type consolekit_var_run_t to /var/run/console(/.*)? because it's
+    created and managed by consolekit nowadays.
+  * Created tunable allow_ssh_connect_reserved_ports to allow ssh client to
+    connect to reserved ports.
+  * Correctly label all perdition binaries, give perdition_t dac_override, and
+    allow perdition_t to create it's own pid directories.
+  * Label /etc/dansguardian as squid_etc_t
+  * Allow devicekit_power_t to access acpi device and read udev tables and
+    allow devicekit_disk_t to read udev tables.
+  * Allow sshd_t to write to fifos inherited from systemd
+  * High urgency because we really need to have working cron jobs!!!
+  * Removed the postinst code to upgrade from pre-squeeze packages.
+
+ -- Russell Coker <russell@coker.com.au>  Sat, 30 Jun 2012 19:19:57 +1000
+
 refpolicy (2:2.20110726-8) unstable; urgency=high
 
   * Allow dbus domains to search cgroup dirs and init_var_run_t
@@ -18,7 +47,7 @@ refpolicy (2:2.20110726-8) unstable; urgency=high
     tested (and it's broken badly for those people) and portslave.pp is also
     badly broken in previous versions.
 
- -- Russell Coker <russell@coker.com.au>  Sat, 23 Jun 2012 21:43:46 +1000
+ -- Russell Coker <russell@coker.com.au>  Mon, 25 Jun 2012 16:37:45 +1000
 
 refpolicy (2:2.20110726-7) unstable; urgency=high
 

@@ -123,6 +123,7 @@ my %map = (
            'pythonsupport'   => [ 'python-support' ],
            'radius'          => [ 'freeradius*', 'radiusd*' ],
            'raid'            => [ 'mdadm' ],
+           'readahead'       => [ 'memlockd' ],
            'rpc'             => [ 'nfs-common', 'nfs-kernel-server' ],
            'sasl'            => [ 'libsasl2' ],
            'shorewall'       => [ 'shorewall-common', 'shorewall-lite',
@@ -279,28 +280,6 @@ sub installed_modules {
   }
 }
 
-sub change_policy_type
-{
-  my $file = "/etc/selinux/config";
-  open(IN, "<$file") or return;
-  open(OUT, ">$file.new") or close(IN) && return;
-  while(<IN>)
-  {
-    if($_ =~ /^SELINUXTYPE *= *refpolicy/)
-    {
-      print OUT "SELINUXTYPE=$type\n";
-    }
-    else
-    {
-      print OUT $_;
-    }
-  }
-  close(IN);
-  close(OUT);
-  rename("$file.new", "$file");
-  print "changed policy type to $type as the \"refpolicy\" names are obsolete\n";
-}
-
 sub main {
   if (-e "$basedir/modules/active/base.pp" ) {
     print STDERR "You already have a $policy_name policy installed.\n";
@@ -327,7 +306,6 @@ sub main {
     }
     if (system($semod) == 0) {
       print STDERR "Loaded modules $mod_list\n";
-      change_policy_type();
     }
     else {
       print STDERR "Error running \"$semod\", please load policy manually and report a bug.\n";

@@ -5,8 +5,8 @@ Last-Update: 2012-06-10
 
 Index: refpolicy-2.20110726/policy/flask/security_classes
 ===================================================================
---- refpolicy-2.20110726.orig/policy/flask/security_classes	2011-01-15 02:08:04.000000000 +1100
-+++ refpolicy-2.20110726/policy/flask/security_classes	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/flask/security_classes	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/flask/security_classes	2012-06-30 12:32:00.236479159 +1000
 @@ -131,4 +131,11 @@
  class db_sequence		# userspace
  class db_language		# userspace
@@ -21,8 +21,8 @@ Index: refpolicy-2.20110726/policy/flask/security_classes
  # FLASK
 Index: refpolicy-2.20110726/policy/flask/access_vectors
 ===================================================================
---- refpolicy-2.20110726.orig/policy/flask/access_vectors	2011-03-29 01:42:09.000000000 +1100
-+++ refpolicy-2.20110726/policy/flask/access_vectors	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/flask/access_vectors	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/flask/access_vectors	2012-06-30 12:32:00.236479159 +1000
 @@ -393,6 +393,10 @@
  	syslog_mod
  	syslog_console
@@ -57,8 +57,8 @@ Index: refpolicy-2.20110726/policy/flask/access_vectors
 +}
 Index: refpolicy-2.20110726/policy/support/obj_perm_sets.spt
 ===================================================================
---- refpolicy-2.20110726.orig/policy/support/obj_perm_sets.spt	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/support/obj_perm_sets.spt	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/support/obj_perm_sets.spt	2012-06-30 12:31:57.904435494 +1000
++++ refpolicy-2.20110726/policy/support/obj_perm_sets.spt	2012-06-30 12:32:00.236479159 +1000
 @@ -28,8 +28,7 @@
  #
  # All socket classes.
@@ -179,8 +179,8 @@ Index: refpolicy-2.20110726/policy/support/obj_perm_sets.spt
 +define(`all_association_perms', `{ sendto recvfrom setcontext polmatch } ')
 Index: refpolicy-2.20110726/policy/modules/services/nis.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/nis.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/nis.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/nis.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/nis.fc	2012-06-30 12:32:00.236479159 +1000
 @@ -19,3 +19,8 @@
  /var/run/ypbind.*	--	gen_context(system_u:object_r:ypbind_var_run_t,s0)
  /var/run/ypserv.*	--	gen_context(system_u:object_r:ypserv_var_run_t,s0)
@@ -192,8 +192,8 @@ Index: refpolicy-2.20110726/policy/modules/services/nis.fc
 +/lib/systemd/system/ypxfrd\.service    --      gen_context(system_u:object_r:nis_unit_file_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/automount.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/automount.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/automount.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/automount.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/automount.fc	2012-06-30 12:32:00.240479241 +1000
 @@ -4,6 +4,8 @@
  /etc/apm/event\.d/autofs --	gen_context(system_u:object_r:automount_exec_t,s0)
  /etc/rc\.d/init\.d/autofs	--	gen_context(system_u:object_r:automount_initrc_exec_t,s0)
@@ -205,8 +205,8 @@ Index: refpolicy-2.20110726/policy/modules/services/automount.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/clamav.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/clamav.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/clamav.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/clamav.te	2012-06-30 12:31:59.552466355 +1000
++++ refpolicy-2.20110726/policy/modules/services/clamav.te	2012-06-30 12:32:00.240479241 +1000
 @@ -24,6 +24,9 @@
  type clamd_initrc_exec_t;
  init_script_file(clamd_initrc_exec_t)
@@ -219,8 +219,8 @@ Index: refpolicy-2.20110726/policy/modules/services/clamav.te
  files_tmp_file(clamd_tmp_t)
 Index: refpolicy-2.20110726/policy/modules/services/bluetooth.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/bluetooth.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/bluetooth.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/bluetooth.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/bluetooth.fc	2012-06-30 12:32:00.240479241 +1000
 @@ -7,6 +7,8 @@
  /etc/rc\.d/init\.d/dund	--	gen_context(system_u:object_r:bluetooth_initrc_exec_t,s0)
  /etc/rc\.d/init\.d/pand	--	gen_context(system_u:object_r:bluetooth_initrc_exec_t,s0)
@@ -232,8 +232,8 @@ Index: refpolicy-2.20110726/policy/modules/services/bluetooth.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/apache.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apache.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/apache.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apache.fc	2012-06-30 12:31:58.100439164 +1000
++++ refpolicy-2.20110726/policy/modules/services/apache.fc	2012-06-30 12:32:00.240479241 +1000
 @@ -16,6 +16,9 @@
  /etc/vhosts			--	gen_context(system_u:object_r:httpd_config_t,s0)
  /etc/zabbix/web(/.*)?			gen_context(system_u:object_r:httpd_sys_rw_content_t,s0)
@@ -246,8 +246,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apache.fc
  
 Index: refpolicy-2.20110726/policy/modules/services/samba.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/samba.te	2011-07-26 22:10:40.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/samba.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/samba.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/samba.te	2012-06-30 12:32:00.240479241 +1000
 @@ -85,6 +85,9 @@
  type samba_initrc_exec_t;
  init_script_file(samba_initrc_exec_t)
@@ -260,8 +260,8 @@ Index: refpolicy-2.20110726/policy/modules/services/samba.te
  
 Index: refpolicy-2.20110726/policy/modules/services/apcupsd.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apcupsd.fc	2011-03-29 02:05:13.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/apcupsd.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apcupsd.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/apcupsd.fc	2012-06-30 12:32:00.244479309 +1000
 @@ -1,5 +1,7 @@
  /etc/rc\.d/init\.d/apcupsd	--	gen_context(system_u:object_r:apcupsd_initrc_exec_t,s0)
  
@@ -272,8 +272,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apcupsd.fc
  /usr/sbin/apcupsd		--	gen_context(system_u:object_r:apcupsd_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/dbus.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-24 15:45:41.663456000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-30 12:31:58.520447029 +1000
++++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-30 12:32:45.113311581 +1000
 @@ -41,9 +41,9 @@
  template(`dbus_role_template',`
  	gen_require(`
@@ -622,8 +622,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dbus.if
  ')
 Index: refpolicy-2.20110726/policy/modules/services/ldap.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ldap.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/ldap.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ldap.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ldap.te	2012-06-30 12:32:00.244479309 +1000
 @@ -21,6 +21,9 @@
  type slapd_initrc_exec_t;
  init_script_file(slapd_initrc_exec_t)
@@ -636,8 +636,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ldap.te
  
 Index: refpolicy-2.20110726/policy/modules/services/apache.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apache.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/apache.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apache.te	2012-06-30 12:31:58.104439246 +1000
++++ refpolicy-2.20110726/policy/modules/services/apache.te	2012-06-30 12:32:00.244479309 +1000
 @@ -177,6 +177,9 @@
  type httpd_initrc_exec_t;
  init_script_file(httpd_initrc_exec_t)
@@ -650,8 +650,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apache.te
  
 Index: refpolicy-2.20110726/policy/modules/services/mysql.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/mysql.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/mysql.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.fc	2012-06-30 12:31:58.688450184 +1000
++++ refpolicy-2.20110726/policy/modules/services/mysql.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -1,5 +1,7 @@
  # mysql database server
  
@@ -662,8 +662,8 @@ Index: refpolicy-2.20110726/policy/modules/services/mysql.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/apm.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apm.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/apm.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apm.te	2012-06-30 12:31:59.148458790 +1000
++++ refpolicy-2.20110726/policy/modules/services/apm.te	2012-06-30 12:32:00.248479380 +1000
 @@ -32,6 +32,9 @@
  	files_type(apmd_var_lib_t)
  ')
@@ -676,8 +676,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apm.te
  # apm client Local policy
 Index: refpolicy-2.20110726/policy/modules/services/automount.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/automount.te	2011-03-29 02:05:13.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/automount.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/automount.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/automount.te	2012-06-30 12:32:00.248479380 +1000
 @@ -22,6 +22,9 @@
  files_tmp_file(automount_tmp_t)
  files_mountpoint(automount_tmp_t)
@@ -690,8 +690,8 @@ Index: refpolicy-2.20110726/policy/modules/services/automount.te
  # Local policy
 Index: refpolicy-2.20110726/policy/modules/services/tor.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/tor.te	2011-03-29 02:05:15.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/tor.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/tor.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/tor.te	2012-06-30 12:32:00.248479380 +1000
 @@ -36,17 +36,24 @@
  type tor_var_run_t;
  files_pid_file(tor_var_run_t)
@@ -720,8 +720,8 @@ Index: refpolicy-2.20110726/policy/modules/services/tor.te
  read_files_pattern(tor_t, tor_etc_t, tor_etc_t)
 Index: refpolicy-2.20110726/policy/modules/services/rpc.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/rpc.fc	2011-03-29 02:05:15.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/rpc.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/rpc.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/rpc.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -6,6 +6,9 @@
  /etc/rc\.d/init\.d/nfslock --	gen_context(system_u:object_r:rpcd_initrc_exec_t,s0)
  /etc/rc\.d/init\.d/rpcidmapd --	gen_context(system_u:object_r:rpcd_initrc_exec_t,s0)
@@ -734,8 +734,8 @@ Index: refpolicy-2.20110726/policy/modules/services/rpc.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/arpwatch.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/arpwatch.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/arpwatch.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -1,5 +1,7 @@
  /etc/rc\.d/init\.d/arpwatch --	gen_context(system_u:object_r:arpwatch_initrc_exec_t,s0)
  
@@ -746,8 +746,8 @@ Index: refpolicy-2.20110726/policy/modules/services/arpwatch.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/avahi.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/avahi.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/avahi.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/avahi.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/avahi.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -1,5 +1,7 @@
  /etc/rc\.d/init\.d/avahi.*	--	gen_context(system_u:object_r:avahi_initrc_exec_t,s0)
  
@@ -758,8 +758,8 @@ Index: refpolicy-2.20110726/policy/modules/services/avahi.fc
  /usr/sbin/avahi-autoipd 	--	gen_context(system_u:object_r:avahi_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/dnsmasq.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dnsmasq.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/dnsmasq.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dnsmasq.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/dnsmasq.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -1,6 +1,8 @@
  /etc/dnsmasq\.conf		--	gen_context(system_u:object_r:dnsmasq_etc_t, s0)
  /etc/rc\.d/init\.d/dnsmasq	--	gen_context(system_u:object_r:dnsmasq_initrc_exec_t,s0)
@@ -771,8 +771,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dnsmasq.fc
  /var/lib/misc/dnsmasq\.leases	--	gen_context(system_u:object_r:dnsmasq_lease_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/cron.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/cron.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/cron.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.if	2012-06-30 12:31:59.520465754 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.if	2012-06-30 12:32:44.705304074 +1000
 @@ -12,6 +12,11 @@
  ## </param>
  #
@@ -1262,8 +1262,8 @@ Index: refpolicy-2.20110726/policy/modules/services/cron.if
  ########################################
 Index: refpolicy-2.20110726/policy/modules/services/consolekit.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/consolekit.te	2011-07-26 22:10:40.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/consolekit.te	2012-06-24 15:45:41.663456000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/consolekit.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/consolekit.te	2012-06-30 12:32:45.113311581 +1000
 @@ -15,6 +15,9 @@
  type consolekit_var_run_t;
  files_pid_file(consolekit_var_run_t)
@@ -1276,8 +1276,8 @@ Index: refpolicy-2.20110726/policy/modules/services/consolekit.te
  # consolekit local policy
 Index: refpolicy-2.20110726/policy/modules/services/dhcp.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dhcp.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/dhcp.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dhcp.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/dhcp.te	2012-06-30 12:32:45.285314741 +1000
 @@ -12,6 +12,9 @@
  type dhcpd_initrc_exec_t;
  init_script_file(dhcpd_initrc_exec_t)
@@ -1290,8 +1290,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dhcp.te
  
 Index: refpolicy-2.20110726/policy/modules/services/consolekit.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/consolekit.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/consolekit.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/consolekit.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/consolekit.fc	2012-06-30 12:32:44.753304966 +1000
 @@ -1,3 +1,5 @@
 +/lib/systemd/system/console-kit.*\.service -- gen_context(system_u:object_r:consolekit_unit_file_t,s0)
 +
@@ -1300,8 +1300,8 @@ Index: refpolicy-2.20110726/policy/modules/services/consolekit.fc
  /var/log/ConsoleKit(/.*)?		gen_context(system_u:object_r:consolekit_log_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/cron.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/cron.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/cron.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.fc	2012-06-30 12:31:58.488446430 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.fc	2012-06-30 12:32:44.705304074 +1000
 @@ -2,6 +2,8 @@
  
  /etc/cron\.d(/.*)?			gen_context(system_u:object_r:system_cron_spool_t,s0)
@@ -1313,8 +1313,8 @@ Index: refpolicy-2.20110726/policy/modules/services/cron.fc
  /usr/bin/(f)?crontab		--	gen_context(system_u:object_r:crontab_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/tor.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/tor.fc	2010-08-03 23:11:08.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/tor.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/tor.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/tor.fc	2012-06-30 12:32:00.248479380 +1000
 @@ -4,6 +4,8 @@
  /usr/bin/tor		--	gen_context(system_u:object_r:tor_exec_t,s0)
  /usr/sbin/tor		--	gen_context(system_u:object_r:tor_exec_t,s0)
@@ -1326,8 +1326,8 @@ Index: refpolicy-2.20110726/policy/modules/services/tor.fc
  
 Index: refpolicy-2.20110726/policy/modules/services/cups.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/cups.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/cups.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/cups.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/cups.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -19,6 +19,7 @@
  
  /etc/printcap.* 	--	gen_context(system_u:object_r:cupsd_rw_etc_t,s0)
@@ -1338,8 +1338,8 @@ Index: refpolicy-2.20110726/policy/modules/services/cups.fc
  /opt/gutenprint/ppds(/.*)? 	gen_context(system_u:object_r:cupsd_rw_etc_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/dhcp.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dhcp.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/dhcp.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dhcp.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/dhcp.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -1,5 +1,7 @@
  /etc/rc\.d/init\.d/dhcpd	--	gen_context(system_u:object_r:dhcpd_initrc_exec_t,s0)
  
@@ -1350,8 +1350,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dhcp.fc
  /var/lib/dhcpd(/.*)?			gen_context(system_u:object_r:dhcpd_state_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/ftp.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ftp.te	2011-07-26 22:10:40.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/ftp.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ftp.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ftp.te	2012-06-30 12:32:44.753304966 +1000
 @@ -85,6 +85,9 @@
  type ftpd_initrc_exec_t;
  init_script_file(ftpd_initrc_exec_t)
@@ -1364,8 +1364,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ftp.te
  
 Index: refpolicy-2.20110726/policy/modules/services/nscd.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/nscd.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/nscd.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/nscd.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/nscd.te	2012-06-30 12:32:00.252479456 +1000
 @@ -22,6 +22,9 @@
  type nscd_initrc_exec_t;
  init_script_file(nscd_initrc_exec_t)
@@ -1378,8 +1378,8 @@ Index: refpolicy-2.20110726/policy/modules/services/nscd.te
  
 Index: refpolicy-2.20110726/policy/modules/services/dnsmasq.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dnsmasq.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/dnsmasq.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dnsmasq.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/dnsmasq.te	2012-06-30 12:32:00.252479456 +1000
 @@ -24,6 +24,9 @@
  type dnsmasq_var_run_t;
  files_pid_file(dnsmasq_var_run_t)
@@ -1392,8 +1392,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dnsmasq.te
  # Local policy
 Index: refpolicy-2.20110726/policy/modules/services/cron.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/cron.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/cron.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/cron.te	2012-06-30 12:31:59.552466355 +1000
++++ refpolicy-2.20110726/policy/modules/services/cron.te	2012-06-30 12:32:45.285314741 +1000
 @@ -61,6 +61,9 @@
  type crond_initrc_exec_t;
  init_script_file(crond_initrc_exec_t)
@@ -1430,8 +1430,8 @@ Index: refpolicy-2.20110726/policy/modules/services/cron.te
  
 Index: refpolicy-2.20110726/policy/modules/services/avahi.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/avahi.te	2011-03-29 02:05:13.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/avahi.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/avahi.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/avahi.te	2012-06-30 12:32:00.252479456 +1000
 @@ -17,6 +17,10 @@
  
  type avahi_var_run_t;
@@ -1445,8 +1445,8 @@ Index: refpolicy-2.20110726/policy/modules/services/avahi.te
  #
 Index: refpolicy-2.20110726/policy/modules/services/bind.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/bind.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/bind.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/bind.te	2012-06-30 12:31:59.204459840 +1000
++++ refpolicy-2.20110726/policy/modules/services/bind.te	2012-06-30 12:32:00.252479456 +1000
 @@ -37,6 +37,9 @@
  type named_initrc_exec_t;
  init_script_file(named_initrc_exec_t)
@@ -1459,8 +1459,8 @@ Index: refpolicy-2.20110726/policy/modules/services/bind.te
  
 Index: refpolicy-2.20110726/policy/modules/services/clamav.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/clamav.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/clamav.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/clamav.fc	2012-06-30 12:31:59.548466282 +1000
++++ refpolicy-2.20110726/policy/modules/services/clamav.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -8,6 +8,10 @@
  /usr/sbin/clamd			--	gen_context(system_u:object_r:clamd_exec_t,s0)
  /usr/sbin/clamav-milter		--	gen_context(system_u:object_r:clamd_exec_t,s0)
@@ -1474,8 +1474,8 @@ Index: refpolicy-2.20110726/policy/modules/services/clamav.fc
  /var/run/clamav\..*			gen_context(system_u:object_r:clamd_var_run_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/rpc.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/rpc.te	2011-07-26 22:10:40.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/rpc.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/rpc.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/rpc.te	2012-06-30 12:32:45.285314741 +1000
 @@ -39,11 +39,17 @@
  type rpcd_initrc_exec_t;
  init_script_file(rpcd_initrc_exec_t)
@@ -1496,8 +1496,8 @@ Index: refpolicy-2.20110726/policy/modules/services/rpc.te
  
 Index: refpolicy-2.20110726/policy/modules/services/ppp.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ppp.fc	2010-08-03 23:11:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/ppp.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ppp.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ppp.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -11,6 +11,8 @@
  # Fix /etc/ppp {up,down} family scripts (see man pppd)
  /etc/ppp/(auth|ip(v6|x)?)-(up|down) --	gen_context(system_u:object_r:pppd_initrc_exec_t,s0)
@@ -1509,8 +1509,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ppp.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/arpwatch.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.te	2011-03-29 02:05:13.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/arpwatch.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/arpwatch.te	2012-06-30 12:32:44.753304966 +1000
 @@ -21,6 +21,9 @@
  type arpwatch_var_run_t;
  files_pid_file(arpwatch_var_run_t)
@@ -1523,8 +1523,8 @@ Index: refpolicy-2.20110726/policy/modules/services/arpwatch.te
  # Local policy
 Index: refpolicy-2.20110726/policy/modules/services/ftp.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ftp.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/ftp.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ftp.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ftp.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -6,6 +6,9 @@
  /etc/rc\.d/init\.d/vsftpd --	gen_context(system_u:object_r:ftpd_initrc_exec_t,s0)
  /etc/rc\.d/init\.d/proftpd --	gen_context(system_u:object_r:ftpd_initrc_exec_t,s0)
@@ -1537,8 +1537,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ftp.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/samba.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/samba.fc	2011-03-29 02:05:15.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/samba.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/samba.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/samba.fc	2012-06-30 12:32:00.252479456 +1000
 @@ -11,6 +11,9 @@
  /etc/samba/smbpasswd		--	gen_context(system_u:object_r:samba_secrets_t,s0)
  /etc/samba(/.*)?			gen_context(system_u:object_r:samba_etc_t,s0)
@@ -1551,8 +1551,8 @@ Index: refpolicy-2.20110726/policy/modules/services/samba.fc
  #
 Index: refpolicy-2.20110726/policy/modules/services/nis.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/nis.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/nis.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/nis.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/nis.te	2012-06-30 12:32:00.252479456 +1000
 @@ -24,6 +24,9 @@
  type ypbind_var_run_t;
  files_pid_file(ypbind_var_run_t)
@@ -1575,8 +1575,8 @@ Index: refpolicy-2.20110726/policy/modules/services/nis.te
  # ypbind local policy
 Index: refpolicy-2.20110726/policy/modules/services/milter.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/milter.if	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/milter.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/milter.if	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/milter.if	2012-06-30 12:32:00.252479456 +1000
 @@ -24,7 +24,7 @@
  
  	# Type for the milter data (e.g. the socket used to communicate with the MTA)
@@ -1660,8 +1660,8 @@ Index: refpolicy-2.20110726/policy/modules/services/milter.if
 +')
 Index: refpolicy-2.20110726/policy/modules/services/networkmanager.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/networkmanager.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/networkmanager.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/networkmanager.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/networkmanager.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -1,3 +1,4 @@
 +/lib/systemd/system/NetworkManager\.service -- gen_context(system_u:object_r:NetworkManager_unit_file_t,s0)
  /etc/rc\.d/init\.d/wicd		--	gen_context(system_u:object_r:NetworkManager_initrc_exec_t,s0)
@@ -1669,8 +1669,8 @@ Index: refpolicy-2.20110726/policy/modules/services/networkmanager.fc
  /etc/NetworkManager/dispatcher\.d(/.*)	gen_context(system_u:object_r:NetworkManager_initrc_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/ldap.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ldap.fc	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/ldap.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ldap.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ldap.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -2,6 +2,8 @@
  /etc/ldap/slapd\.conf	--	gen_context(system_u:object_r:slapd_etc_t,s0)
  /etc/rc\.d/init\.d/ldap	--	gen_context(system_u:object_r:slapd_initrc_exec_t,s0)
@@ -1682,8 +1682,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ldap.fc
  ifdef(`distro_debian',`
 Index: refpolicy-2.20110726/policy/modules/services/networkmanager.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/networkmanager.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/networkmanager.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/networkmanager.te	2012-06-30 12:31:58.720450782 +1000
++++ refpolicy-2.20110726/policy/modules/services/networkmanager.te	2012-06-30 12:32:00.256479540 +1000
 @@ -12,6 +12,9 @@
  type NetworkManager_initrc_exec_t;
  init_script_file(NetworkManager_initrc_exec_t)
@@ -1707,8 +1707,8 @@ Index: refpolicy-2.20110726/policy/modules/services/networkmanager.te
  ')
 Index: refpolicy-2.20110726/policy/modules/services/mysql.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/mysql.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/mysql.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/mysql.te	2012-06-30 12:31:58.688450184 +1000
++++ refpolicy-2.20110726/policy/modules/services/mysql.te	2012-06-30 12:32:45.285314741 +1000
 @@ -29,6 +29,9 @@
  type mysqld_etc_t alias etc_mysqld_t;
  files_config_file(mysqld_etc_t)
@@ -1721,8 +1721,8 @@ Index: refpolicy-2.20110726/policy/modules/services/mysql.te
  
 Index: refpolicy-2.20110726/policy/modules/services/cups.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/cups.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/cups.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/cups.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/cups.te	2012-06-30 12:32:00.256479540 +1000
 @@ -60,6 +60,9 @@
  files_pid_file(cupsd_var_run_t)
  mls_trusted_object(cupsd_var_run_t)
@@ -1735,8 +1735,8 @@ Index: refpolicy-2.20110726/policy/modules/services/cups.te
  init_daemon_domain(hplip_t, hplip_exec_t)
 Index: refpolicy-2.20110726/policy/modules/services/ntp.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ntp.te	2011-03-29 02:05:14.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/ntp.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ntp.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ntp.te	2012-06-30 12:32:00.256479540 +1000
 @@ -15,6 +15,9 @@
  type ntpd_initrc_exec_t;
  init_script_file(ntpd_initrc_exec_t)
@@ -1749,8 +1749,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ntp.te
  
 Index: refpolicy-2.20110726/policy/modules/services/apcupsd.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apcupsd.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/apcupsd.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apcupsd.te	2012-06-30 12:31:58.104439246 +1000
++++ refpolicy-2.20110726/policy/modules/services/apcupsd.te	2012-06-30 12:32:00.256479540 +1000
 @@ -24,6 +24,9 @@
  type apcupsd_var_run_t;
  files_pid_file(apcupsd_var_run_t)
@@ -1763,8 +1763,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apcupsd.te
  # apcupsd local policy
 Index: refpolicy-2.20110726/policy/modules/services/bind.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/bind.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/bind.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/bind.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/bind.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -5,6 +5,10 @@
  /etc/rndc\.key 		-- 	gen_context(system_u:object_r:dnssec_t,s0)
  /etc/unbound(/.*)?		gen_context(system_u:object_r:named_conf_t,s0)
@@ -1778,8 +1778,8 @@ Index: refpolicy-2.20110726/policy/modules/services/bind.fc
  /usr/sbin/named-checkconf --	gen_context(system_u:object_r:named_checkconf_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/services/bluetooth.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/bluetooth.te	2011-03-29 02:05:13.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/bluetooth.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/bluetooth.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/bluetooth.te	2012-06-30 12:32:00.256479540 +1000
 @@ -48,6 +48,9 @@
  type bluetooth_var_run_t;
  files_pid_file(bluetooth_var_run_t)
@@ -1792,8 +1792,8 @@ Index: refpolicy-2.20110726/policy/modules/services/bluetooth.te
  # Bluetooth services local policy
 Index: refpolicy-2.20110726/policy/modules/services/apm.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/apm.fc	2010-08-03 23:11:05.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/apm.fc	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/apm.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/apm.fc	2012-06-30 12:32:45.285314741 +1000
 @@ -1,3 +1,4 @@
 +/lib/systemd/system/apmd\.service -- gen_context(system_u:object_r:apmd_unit_file_t,s0)
  
@@ -1801,8 +1801,8 @@ Index: refpolicy-2.20110726/policy/modules/services/apm.fc
  # /usr
 Index: refpolicy-2.20110726/policy/modules/services/ntp.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ntp.fc	2010-08-03 23:11:07.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/ntp.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ntp.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ntp.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -10,6 +10,10 @@
  
  /etc/rc\.d/init\.d/ntpd		--	gen_context(system_u:object_r:ntpd_initrc_exec_t,s0)
@@ -1816,8 +1816,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ntp.fc
  
 Index: refpolicy-2.20110726/policy/modules/services/ppp.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/ppp.te	2011-03-29 02:05:15.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/ppp.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/ppp.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/services/ppp.te	2012-06-30 12:32:00.256479540 +1000
 @@ -39,6 +39,9 @@
  type pppd_initrc_exec_t alias pppd_script_exec_t;
  init_script_file(pppd_initrc_exec_t)
@@ -1830,8 +1830,8 @@ Index: refpolicy-2.20110726/policy/modules/services/ppp.te
  files_type(pppd_secret_t)
 Index: refpolicy-2.20110726/policy/modules/admin/kdump.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/admin/kdump.te	2011-03-29 02:04:07.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/admin/kdump.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/admin/kdump.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/admin/kdump.te	2012-06-30 12:32:00.256479540 +1000
 @@ -15,6 +15,9 @@
  type kdump_initrc_exec_t;
  init_script_file(kdump_initrc_exec_t)
@@ -1844,8 +1844,8 @@ Index: refpolicy-2.20110726/policy/modules/admin/kdump.te
  # kdump local policy
 Index: refpolicy-2.20110726/policy/modules/admin/kdump.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/admin/kdump.fc	2010-08-03 23:11:04.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/admin/kdump.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/admin/kdump.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/admin/kdump.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -1,5 +1,7 @@
  /etc/kdump\.conf	--	gen_context(system_u:object_r:kdump_etc_t,s0)
  /etc/rc\.d/init\.d/kdump --	gen_context(system_u:object_r:kdump_initrc_exec_t,s0)
@@ -1856,8 +1856,8 @@ Index: refpolicy-2.20110726/policy/modules/admin/kdump.fc
  /sbin/kexec		--	gen_context(system_u:object_r:kdump_exec_t,s0)
 Index: refpolicy-2.20110726/policy/modules/admin/alsa.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/admin/alsa.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/admin/alsa.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/admin/alsa.fc	2012-06-30 12:31:58.976455573 +1000
++++ refpolicy-2.20110726/policy/modules/admin/alsa.fc	2012-06-30 12:32:00.256479540 +1000
 @@ -24,3 +24,5 @@
  /usr/share/alsa/pcm(/.*)?	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
  
@@ -1866,8 +1866,8 @@ Index: refpolicy-2.20110726/policy/modules/admin/alsa.fc
 +/lib/systemd/system/alsa-.*\.service -- gen_context(system_u:object_r:alsa_unit_file_t,s0)
 Index: refpolicy-2.20110726/policy/modules/admin/alsa.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/admin/alsa.te	2011-07-26 22:10:39.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/admin/alsa.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/admin/alsa.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/admin/alsa.te	2012-06-30 12:32:00.256479540 +1000
 @@ -22,6 +22,9 @@
  type alsa_home_t;
  userdom_user_home_content(alsa_home_t)
@@ -1880,8 +1880,8 @@ Index: refpolicy-2.20110726/policy/modules/admin/alsa.te
  # Local policy
 Index: refpolicy-2.20110726/policy/modules/kernel/kernel.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/kernel.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/kernel.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/kernel.if	2012-06-30 12:31:57.896435339 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/kernel.if	2012-06-30 12:32:00.260479611 +1000
 @@ -303,13 +303,8 @@
  		attribute can_load_kernmodule;
  	')
@@ -2154,8 +2154,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/kernel.if
 +
 Index: refpolicy-2.20110726/policy/modules/kernel/terminal.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/terminal.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/terminal.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/terminal.if	2012-06-30 12:31:57.900435423 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/terminal.if	2012-06-30 12:32:00.260479611 +1000
 @@ -208,6 +208,27 @@
  
  ########################################
@@ -2238,8 +2238,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/terminal.if
  ## </summary>
 Index: refpolicy-2.20110726/policy/modules/kernel/devices.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/devices.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/devices.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.if	2012-06-30 12:31:59.492465232 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.if	2012-06-30 12:32:00.260479611 +1000
 @@ -155,6 +155,25 @@
  
  ########################################
@@ -2440,8 +2440,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/devices.if
  ## </summary>
 Index: refpolicy-2.20110726/policy/modules/kernel/devices.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/devices.te	2011-07-26 22:10:39.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/devices.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.te	2012-06-30 12:32:00.260479611 +1000
 @@ -20,6 +20,9 @@
  files_associate_tmp(device_t)
  fs_type(device_t)
@@ -2465,8 +2465,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/devices.te
  #
 Index: refpolicy-2.20110726/policy/modules/kernel/files.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/files.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/files.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.te	2012-06-30 12:31:58.360444028 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/files.te	2012-06-30 12:32:45.285314741 +1000
 @@ -10,6 +10,7 @@
  attribute lockfile;
  attribute mountpoint;
@@ -2488,8 +2488,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/files.te
  #
 Index: refpolicy-2.20110726/policy/modules/kernel/files.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/files.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/files.if	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/files.if	2012-06-30 12:31:58.396444703 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/files.if	2012-06-30 12:32:45.285314741 +1000
 @@ -3923,6 +3923,45 @@
  	allow $1 readable_t:sock_file read_sock_file_perms;
  ')
@@ -2921,8 +2921,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/files.if
 +')
 Index: refpolicy-2.20110726/policy/modules/kernel/filesystem.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/filesystem.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.if	2012-06-30 12:31:58.152440138 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/filesystem.if	2012-06-30 12:32:00.264479683 +1000
 @@ -631,6 +631,27 @@
  
  ########################################
@@ -3066,8 +3066,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/filesystem.if
  ##	files on tmpfs filesystems.
 Index: refpolicy-2.20110726/policy/modules/kernel/devices.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/devices.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/devices.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/devices.fc	2012-06-30 12:31:58.072438639 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/devices.fc	2012-06-30 12:32:00.264479683 +1000
 @@ -195,6 +195,7 @@
  /lib/udev/devices/zero	-c	gen_context(system_u:object_r:zero_device_t,s0)
  
@@ -3079,8 +3079,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/devices.fc
 Index: refpolicy-2.20110726/policy/modules/system/systemd.if
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ refpolicy-2.20110726/policy/modules/system/systemd.if	2012-06-24 15:45:34.000000000 +1000
-@@ -0,0 +1,717 @@
++++ refpolicy-2.20110726/policy/modules/system/systemd.if	2012-06-30 12:32:00.264479683 +1000
+@@ -0,0 +1,719 @@
 +## <summary>SELinux policy for systemd components</summary>
 +
 +#######################################
@@ -3344,10 +3344,12 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.if
 +#
 +interface(`systemd_write_inherited_logind_sessions_pipes',`
 +	gen_require(`
-+		type systemd_logind_sessions_t;
++		type systemd_logind_t, systemd_logind_sessions_t;
 +	')
 +
++	allow $1 systemd_logind_t:fd use;
 +	allow $1 systemd_logind_sessions_t:fifo_file write;
++	allow systemd_logind_t $1:process signal;
 +')
 +
 +########################################
@@ -3800,8 +3802,8 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.if
 +
 Index: refpolicy-2.20110726/policy/modules/system/udev.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/udev.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/udev.if	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.if	2012-06-30 12:31:58.896454079 +1000
++++ refpolicy-2.20110726/policy/modules/system/udev.if	2012-06-30 12:32:45.285314741 +1000
 @@ -34,6 +34,7 @@
  	')
  
@@ -4016,8 +4018,8 @@ Index: refpolicy-2.20110726/policy/modules/system/udev.if
 +
 Index: refpolicy-2.20110726/policy/modules/system/iptables.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/iptables.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/iptables.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/iptables.te	2012-06-30 12:31:59.744469957 +1000
++++ refpolicy-2.20110726/policy/modules/system/iptables.te	2012-06-30 12:32:00.268479757 +1000
 @@ -22,6 +22,9 @@
  type iptables_var_run_t;
  files_pid_file(iptables_var_run_t)
@@ -4030,8 +4032,8 @@ Index: refpolicy-2.20110726/policy/modules/system/iptables.te
  # Iptables local policy
 Index: refpolicy-2.20110726/policy/modules/system/init.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/init.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/init.if	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/init.if	2012-06-30 12:31:58.892453996 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.if	2012-06-30 12:32:45.285314741 +1000
 @@ -79,6 +79,44 @@
  	domtrans_pattern(init_run_all_scripts_domain, $2, $1)
  ')
@@ -5059,8 +5061,8 @@ Index: refpolicy-2.20110726/policy/modules/system/init.if
 +')
 Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/unconfined.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/unconfined.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/unconfined.if	2012-06-30 12:31:59.860472121 +1000
++++ refpolicy-2.20110726/policy/modules/system/unconfined.if	2012-06-30 12:32:00.268479757 +1000
 @@ -132,48 +132,6 @@
  
  ########################################
@@ -5110,7 +5112,7 @@ Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
  ##	Transition to the unconfined domain by executing a shell.
  ## </summary>
  ## <param name="domain">
-@@ -667,3 +625,229 @@
+@@ -667,3 +625,211 @@
  
  	allow $1 unconfined_tmp_t:file { getattr write append };
  ')
@@ -5322,29 +5324,11 @@ Index: refpolicy-2.20110726/policy/modules/system/unconfined.if
 +	allow $1 self:tun_socket relabelto;
 +')
 +
-+########################################
-+## <summary>
-+##     Do not audit attempts to write users
-+##     temporary files.
-+## </summary>
-+## <param name="domain">
-+##     <summary>
-+##     Domain to not audit.
-+##     </summary>
-+## </param>
-+#
-+interface(`userdom_dontaudit_write_user_tmp_files',`
-+	gen_require(`
-+		type user_tmp_t;
-+	')
-+
-+	dontaudit $1 user_tmp_t:file write;
-+')
 Index: refpolicy-2.20110726/policy/modules/system/systemd.te
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ refpolicy-2.20110726/policy/modules/system/systemd.te	2012-06-24 15:45:42.239466166 +1000
-@@ -0,0 +1,399 @@
++++ refpolicy-2.20110726/policy/modules/system/systemd.te	2012-06-30 12:32:45.285314741 +1000
+@@ -0,0 +1,402 @@
 +policy_module(systemd, 1.0.0)
 +
 +#######################################
@@ -5420,6 +5404,8 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.te
 +init_undefined(systemd_logind_t)
 +
 +kernel_read_system_state(systemd_logind_t)
++selinux_search_fs(systemd_logind_t)
++selinux_getattr_fs(systemd_logind_t)
 +
 +dev_getattr_all_chr_files(systemd_logind_t)
 +dev_getattr_all_blk_files(systemd_logind_t)
@@ -5618,6 +5604,7 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.te
 +mls_file_write_all_levels(systemd_tmpfiles_t)
 +
 +selinux_get_enforce_mode(systemd_tmpfiles_t)
++selinux_getattr_fs(systemd_tmpfiles_t)
 +
 +auth_manage_var_auth(systemd_tmpfiles_t)
 +auth_append_faillog(systemd_tmpfiles_t)
@@ -5746,8 +5733,8 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.te
 +miscfiles_read_localization(systemctl_domain)
 Index: refpolicy-2.20110726/policy/modules/system/iptables.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/iptables.fc	2011-04-19 01:54:20.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/iptables.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/iptables.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/iptables.fc	2012-06-30 12:32:00.268479757 +1000
 @@ -3,6 +3,9 @@
  /etc/sysconfig/ip6?tables.*	--	gen_context(system_u:object_r:iptables_conf_t,s0)
  /etc/sysconfig/system-config-firewall.* -- gen_context(system_u:object_r:iptables_conf_t,s0)
@@ -5761,7 +5748,7 @@ Index: refpolicy-2.20110726/policy/modules/system/iptables.fc
 Index: refpolicy-2.20110726/policy/modules/system/systemd.fc
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ refpolicy-2.20110726/policy/modules/system/systemd.fc	2012-06-24 15:45:34.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/systemd.fc	2012-06-30 12:32:00.268479757 +1000
 @@ -0,0 +1,29 @@
 +/bin/systemd-notify				--		gen_context(system_u:object_r:systemd_notify_exec_t,s0)
 +/bin/systemctl					--	gen_context(system_u:object_r:systemd_systemctl_exec_t,s0)
@@ -5794,8 +5781,8 @@ Index: refpolicy-2.20110726/policy/modules/system/systemd.fc
 +/var/run/initramfs(/.*)?	<<none>>
 Index: refpolicy-2.20110726/policy/modules/system/logging.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/logging.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/logging.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.if	2012-06-30 12:31:58.136439834 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.if	2012-06-30 12:32:00.268479757 +1000
 @@ -303,7 +303,7 @@
  
  ########################################
@@ -6103,8 +6090,8 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.if
 +')
 Index: refpolicy-2.20110726/policy/modules/system/clock.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/clock.if	2010-08-05 23:25:55.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/clock.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/clock.if	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/clock.if	2012-06-30 12:32:00.272479839 +1000
 @@ -82,6 +82,25 @@
  
  ########################################
@@ -6133,8 +6120,8 @@ Index: refpolicy-2.20110726/policy/modules/system/clock.if
  ## <param name="domain">
 Index: refpolicy-2.20110726/policy/modules/system/init.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/init.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/init.fc	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/init.fc	2012-06-30 12:31:58.892453996 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.fc	2012-06-30 12:32:45.285314741 +1000
 @@ -20,6 +20,7 @@
  # /dev
  #
@@ -6193,8 +6180,8 @@ Index: refpolicy-2.20110726/policy/modules/system/init.fc
 +/var/run/systemd(/.*)?		gen_context(system_u:object_r:init_var_run_t,s0)
 Index: refpolicy-2.20110726/policy/modules/system/lvm.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/lvm.if	2011-03-29 02:05:16.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/system/lvm.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.if	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/lvm.if	2012-06-30 12:32:00.272479839 +1000
 @@ -123,3 +123,94 @@
  	corecmd_search_bin($1)
  	domtrans_pattern($1, clvmd_exec_t, clvmd_t)
@@ -6292,8 +6279,8 @@ Index: refpolicy-2.20110726/policy/modules/system/lvm.if
 +')
 Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-24 15:45:38.275396172 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-30 12:32:00.144477436 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-30 12:32:45.113311581 +1000
 @@ -2610,6 +2610,53 @@
  
  ########################################
@@ -6391,7 +6378,7 @@ Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
  ########################################
  ## <summary>
  ##	Send a SIGCHLD signal to all user domains.
-@@ -3214,3 +3297,22 @@
+@@ -3214,3 +3297,60 @@
  
  	allow $1 userdomain:dbus send_msg;
  ')
@@ -6414,10 +6401,48 @@ Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
 +
 +	dontaudit $1 userdomain:unix_stream_socket rw_socket_perms;
 +')
++
++########################################
++## <summary>
++##	Do not audit attempts to write users
++##	temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`userdom_dontaudit_write_user_tmp_files',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	dontaudit $1 user_tmp_t:file write;
++')
++
++########################################
++## <summary>
++##	Do not audit attempts to read/write users
++##	temporary fifo files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`userdom_dontaudit_rw_user_tmp_pipes',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	dontaudit $1 user_tmp_t:fifo_file rw_inherited_fifo_file_perms;
++')
 Index: refpolicy-2.20110726/policy/modules/system/logging.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/logging.fc	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/logging.fc	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.fc	2012-06-30 12:31:58.136439834 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.fc	2012-06-30 12:32:00.272479839 +1000
 @@ -7,6 +7,8 @@
  /etc/rc\.d/init\.d/auditd --	gen_context(system_u:object_r:auditd_initrc_exec_t,s0)
  /etc/rc\.d/init\.d/rsyslog --	gen_context(system_u:object_r:syslogd_initrc_exec_t,s0)
@@ -6507,8 +6532,8 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.fc
 +
 Index: refpolicy-2.20110726/policy/modules/system/logging.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/logging.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/logging.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/logging.te	2012-06-30 12:31:59.828471522 +1000
++++ refpolicy-2.20110726/policy/modules/system/logging.te	2012-06-30 12:32:45.285314741 +1000
 @@ -5,6 +5,20 @@
  # Declarations
  #
@@ -6702,7 +6727,7 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
  # manage pid file
  manage_files_pattern(syslogd_t, syslogd_var_run_t, syslogd_var_run_t)
  files_pid_filetrans(syslogd_t, syslogd_var_run_t, file)
-@@ -444,10 +500,27 @@
+@@ -444,10 +500,29 @@
  corenet_sendrecv_postgresql_client_packets(syslogd_t)
  corenet_sendrecv_mysqld_client_packets(syslogd_t)
  
@@ -6722,6 +6747,8 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
 +dev_read_urand(syslogd_t)
 +# relating to systemd-kmsg-syslogd
 +dev_write_kmsg(syslogd_t)
++selinux_get_enforce_mode(syslogd_t)
++selinux_search_fs(syslogd_t)
  
 +domain_read_all_domains_state(syslogd_t)
  domain_use_interactive_fds(syslogd_t)
@@ -6730,7 +6757,7 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
  
  files_read_etc_files(syslogd_t)
  files_read_usr_files(syslogd_t)
-@@ -465,7 +538,9 @@
+@@ -465,7 +540,9 @@
  term_write_console(syslogd_t)
  # Allow syslog to a terminal
  term_write_unallocated_ttys(syslogd_t)
@@ -6740,7 +6767,7 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
  # for sending messages to logged in users
  init_read_utmp(syslogd_t)
  init_dontaudit_write_utmp(syslogd_t)
-@@ -477,6 +552,7 @@
+@@ -477,6 +554,7 @@
  
  # cjp: this doesnt make sense
  logging_send_syslog_msg(syslogd_t)
@@ -6748,7 +6775,7 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
  
  miscfiles_read_localization(syslogd_t)
  
-@@ -514,11 +590,20 @@
+@@ -514,11 +592,20 @@
  ')
  
  optional_policy(`
@@ -6771,8 +6798,8 @@ Index: refpolicy-2.20110726/policy/modules/system/logging.te
  optional_policy(`
 Index: refpolicy-2.20110726/policy/modules/system/application.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/application.if	2011-04-01 00:53:54.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/system/application.if	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/application.if	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/application.if	2012-06-30 12:32:00.272479839 +1000
 @@ -189,6 +189,24 @@
  
  ########################################
@@ -6800,8 +6827,8 @@ Index: refpolicy-2.20110726/policy/modules/system/application.if
  ## </summary>
 Index: refpolicy-2.20110726/policy/modules/system/udev.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/udev.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/udev.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.te	2012-06-30 12:32:00.088476387 +1000
++++ refpolicy-2.20110726/policy/modules/system/udev.te	2012-06-30 12:32:45.285314741 +1000
 @@ -153,6 +153,8 @@
  init_read_utmp(udev_t)
  init_dontaudit_write_utmp(udev_t)
@@ -6822,8 +6849,8 @@ Index: refpolicy-2.20110726/policy/modules/system/udev.te
  fstools_getattr_swap_files(udev_t)
 Index: refpolicy-2.20110726/policy/modules/system/init.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-24 15:45:38.275396172 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-30 12:31:58.896454079 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-30 12:32:44.753304966 +1000
 @@ -16,6 +16,27 @@
  ## </desc>
  gen_tunable(init_upstart, false)
@@ -7676,8 +7703,8 @@ Index: refpolicy-2.20110726/policy/modules/system/init.te
 +
 Index: refpolicy-2.20110726/policy/global_tunables
 ===================================================================
---- refpolicy-2.20110726.orig/policy/global_tunables	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/global_tunables	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/global_tunables	2012-06-30 12:31:58.024437740 +1000
++++ refpolicy-2.20110726/policy/global_tunables	2012-06-30 12:32:00.276479907 +1000
 @@ -6,6 +6,13 @@
  
  ## <desc>
@@ -7694,8 +7721,8 @@ Index: refpolicy-2.20110726/policy/global_tunables
  ## </desc>
 Index: refpolicy-2.20110726/policy/modules/kernel/filesystem.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/filesystem.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/filesystem.te	2012-06-30 12:31:58.368444181 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/filesystem.te	2012-06-30 12:32:45.285314741 +1000
 @@ -98,6 +98,8 @@
  files_type(hugetlbfs_t)
  files_poly_parent(hugetlbfs_t)
@@ -7707,8 +7734,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/filesystem.te
  fs_type(ibmasmfs_t)
 Index: refpolicy-2.20110726/policy/modules/kernel/kernel.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/kernel/kernel.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/kernel/kernel.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/kernel/kernel.te	2012-06-30 12:31:57.912435642 +1000
++++ refpolicy-2.20110726/policy/modules/kernel/kernel.te	2012-06-30 12:32:00.276479907 +1000
 @@ -288,6 +288,8 @@
  
  optional_policy(`
@@ -7720,8 +7747,8 @@ Index: refpolicy-2.20110726/policy/modules/kernel/kernel.te
  optional_policy(`
 Index: refpolicy-2.20110726/policy/modules/system/lvm.fc
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/lvm.fc	2011-03-29 02:05:16.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/system/lvm.fc	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.fc	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/lvm.fc	2012-06-30 12:32:45.285314741 +1000
 @@ -28,6 +28,7 @@
  #
  /lib/lvm-10/.*		--	gen_context(system_u:object_r:lvm_exec_t,s0)
@@ -7732,8 +7759,8 @@ Index: refpolicy-2.20110726/policy/modules/system/lvm.fc
  # /sbin
 Index: refpolicy-2.20110726/policy/modules/system/lvm.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/lvm.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/lvm.te	2012-06-24 15:45:42.239466166 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/lvm.te	2012-06-30 12:31:59.860472121 +1000
++++ refpolicy-2.20110726/policy/modules/system/lvm.te	2012-06-30 12:32:45.285314741 +1000
 @@ -296,6 +296,11 @@
  init_use_script_ptys(lvm_t)
  init_read_script_state(lvm_t)
@@ -7748,8 +7775,8 @@ Index: refpolicy-2.20110726/policy/modules/system/lvm.te
  miscfiles_read_localization(lvm_t)
 Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/authlogin.te	2011-07-26 22:10:41.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/authlogin.te	2012-06-24 15:45:41.663456000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/authlogin.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/authlogin.te	2012-06-30 12:32:45.113311581 +1000
 @@ -22,6 +22,9 @@
  
  type faillog_t;
@@ -7772,8 +7799,8 @@ Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
  logging_log_file(wtmp_t)
 Index: refpolicy-2.20110726/policy/modules/system/miscfiles.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/miscfiles.te	2011-03-29 02:05:16.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/system/miscfiles.te	2012-06-24 15:45:34.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/miscfiles.te	2012-06-30 12:31:47.440239041 +1000
++++ refpolicy-2.20110726/policy/modules/system/miscfiles.te	2012-06-30 12:32:00.276479907 +1000
 @@ -40,6 +40,9 @@
  #
  type man_t alias catman_t;
@@ -7786,8 +7813,8 @@ Index: refpolicy-2.20110726/policy/modules/system/miscfiles.te
  # Types for public content
 Index: refpolicy-2.20110726/policy/modules/services/portslave.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/portslave.te	2012-06-24 15:45:34.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/portslave.te	2012-06-24 15:45:54.811690162 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/portslave.te	2012-06-30 12:31:58.804452352 +1000
++++ refpolicy-2.20110726/policy/modules/services/portslave.te	2012-06-30 12:32:00.276479907 +1000
 @@ -7,7 +7,6 @@
  
  type portslave_t;
@@ -7796,3 +7823,18 @@ Index: refpolicy-2.20110726/policy/modules/services/portslave.te
  init_daemon_domain(portslave_t, portslave_exec_t)
  
  type portslave_etc_t;
+Index: refpolicy-2.20110726/policy/modules/services/ssh.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/ssh.te	2012-06-30 12:31:59.460464629 +1000
++++ refpolicy-2.20110726/policy/modules/services/ssh.te	2012-06-30 12:33:31.378154948 +1000
+@@ -269,6 +269,10 @@
+ ')
+ 
+ optional_policy(`
++	systemd_write_inherited_logind_sessions_pipes(sshd_t)
++')
++
++optional_policy(`
+ 	daemontools_service_domain(sshd_t, sshd_exec_t)
+ ')
+ 

@@ -1,9 +1,11 @@
 Description: Make /var/cache/squid a mountpoint
 Author: Russell Coker <russell@coker.com.au>
-Last-Update: 2012-06-23
+Last-Update: 2012-06-28
 
---- a/policy/modules/services/squid.te
-+++ b/policy/modules/services/squid.te
+Index: refpolicy-2.20110726/policy/modules/services/squid.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/squid.te	2012-06-28 14:38:11.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/squid.te	2012-06-28 14:38:11.000000000 +1000
 @@ -27,6 +27,7 @@
  # type for /var/cache/squid
  type squid_cache_t;
@@ -26,9 +28,15 @@ Last-Update: 2012-06-23
  type squid_var_run_t;
  files_pid_file(squid_var_run_t)
  
---- a/policy/modules/services/squid.fc
-+++ b/policy/modules/services/squid.fc
-@@ -4,11 +4,14 @@
+Index: refpolicy-2.20110726/policy/modules/services/squid.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/squid.fc	2012-06-28 14:27:34.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/squid.fc	2012-06-28 14:39:32.077384465 +1000
+@@ -1,14 +1,18 @@
+ /etc/rc\.d/init\.d/squid --	gen_context(system_u:object_r:squid_initrc_exec_t,s0)
+ /etc/squid(/.*)?		gen_context(system_u:object_r:squid_conf_t,s0)
++/etc/dansguardian(/.*)?		gen_context(system_u:object_r:squid_conf_t,s0)
+ 
  /usr/lib/squid/cachemgr\.cgi -- gen_context(system_u:object_r:httpd_squid_script_exec_t,s0)
  /usr/lib64/squid/cachemgr\.cgi -- gen_context(system_u:object_r:httpd_squid_script_exec_t,s0)
  /usr/sbin/squid		--	gen_context(system_u:object_r:squid_exec_t,s0)

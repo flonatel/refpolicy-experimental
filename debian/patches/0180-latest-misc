@@ -1,35 +1,11 @@
-Description: <short summary of the patch>
- TODO: Put a short summary on the line above and replace this paragraph
- with a longer explanation of this change. Complete the meta-information
- with other relevant fields (see below for details). To make it easier, the
- information below has been extracted from the changelog. Adjust it or drop
- it.
- .
- refpolicy (2:2.20110726-7.1) UNRELEASED; urgency=low
- .
-   * Allow dbus domains to search cgroup dirs.
-   * Have init_t transition to devicekit_power_t and devicekit_disk_t for
-     systemd.
-   * Allow user domains to create netlink_kobject_uevent_socket objects
+Description: More misc patches
 Author: Russell Coker <russell@coker.com.au>
-
----
-The information above should follow the Patch Tagging Guidelines, please
-checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
-are templates for supplementary fields that you might want to add:
-
-Origin: <vendor|upstream|other>, <url of original patch>
-Bug: <url in upstream bugtracker>
-Bug-Debian: http://bugs.debian.org/<bugnumber>
-Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
-Forwarded: <no|not-needed|url proving that it has been forwarded>
-Reviewed-By: <name and email of someone who approved the patch>
-Last-Update: <YYYY-MM-DD>
+Last-Update: 2012-06-26
 
 Index: refpolicy-2.20110726/policy/modules/services/devicekit.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/devicekit.if	2012-06-24 15:50:02.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/devicekit.if	2012-06-24 16:42:14.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/devicekit.if	2012-06-30 01:08:57.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/devicekit.if	2012-06-30 11:32:12.000000000 +1000
 @@ -20,6 +20,42 @@
  
  ########################################
@@ -75,8 +51,8 @@ Index: refpolicy-2.20110726/policy/modules/services/devicekit.if
  ## </summary>
 Index: refpolicy-2.20110726/policy/modules/services/dbus.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-24 16:42:14.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-24 16:42:14.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/dbus.if	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/dbus.if	2012-06-30 11:32:12.000000000 +1000
 @@ -86,6 +86,7 @@
  
  	auth_use_nsswitch($1_dbusd_t)
@@ -87,8 +63,8 @@ Index: refpolicy-2.20110726/policy/modules/services/dbus.if
  	')
 Index: refpolicy-2.20110726/policy/modules/system/init.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-24 16:42:14.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-24 16:42:14.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/init.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/init.te	2012-06-30 11:32:12.000000000 +1000
 @@ -225,6 +225,11 @@
  ')
  
@@ -103,8 +79,8 @@ Index: refpolicy-2.20110726/policy/modules/system/init.te
  ')
 Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-24 16:42:14.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-24 16:42:14.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/userdomain.if	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/userdomain.if	2012-06-30 11:32:12.000000000 +1000
 @@ -66,6 +66,8 @@
  	# avoid annoying messages on terminal hangup on role change
  	dontaudit $1_t user_tty_device_t:chr_file ioctl;
@@ -116,8 +92,8 @@ Index: refpolicy-2.20110726/policy/modules/system/userdomain.if
  	kernel_dontaudit_getattr_unlabeled_files($1_t)
 Index: refpolicy-2.20110726/policy/modules/system/udev.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/system/udev.te	2012-06-24 16:42:14.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/system/udev.te	2012-06-24 16:42:14.000000000 +1000
+--- refpolicy-2.20110726.orig/policy/modules/system/udev.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/udev.te	2012-06-30 11:32:12.000000000 +1000
 @@ -38,7 +38,7 @@
  # Local policy
  #
@@ -129,8 +105,8 @@ Index: refpolicy-2.20110726/policy/modules/system/udev.te
  allow udev_t self:process ~{ setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 Index: refpolicy-2.20110726/policy/modules/services/arpwatch.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.te	2012-06-24 16:42:14.000000000 +1000
-+++ refpolicy-2.20110726/policy/modules/services/arpwatch.te	2012-06-24 16:47:29.192917652 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/arpwatch.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/arpwatch.te	2012-06-30 11:32:12.000000000 +1000
 @@ -28,7 +28,7 @@
  #
  # Local policy
@@ -142,8 +118,8 @@ Index: refpolicy-2.20110726/policy/modules/services/arpwatch.te
  allow arpwatch_t self:unix_dgram_socket create_socket_perms;
 Index: refpolicy-2.20110726/policy/modules/services/postgrey.te
 ===================================================================
---- refpolicy-2.20110726.orig/policy/modules/services/postgrey.te	2011-03-29 02:04:20.000000000 +1100
-+++ refpolicy-2.20110726/policy/modules/services/postgrey.te	2012-06-24 16:49:45.807335360 +1000
+--- refpolicy-2.20110726.orig/policy/modules/services/postgrey.te	2012-06-30 01:08:57.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/postgrey.te	2012-06-30 11:32:12.000000000 +1000
 @@ -34,6 +34,7 @@
  allow postgrey_t self:process signal_perms;
  allow postgrey_t self:tcp_socket create_stream_socket_perms;
@@ -161,3 +137,213 @@ Index: refpolicy-2.20110726/policy/modules/services/postgrey.te
  
  corenet_all_recvfrom_unlabeled(postgrey_t)
  corenet_all_recvfrom_netlabel(postgrey_t)
+Index: refpolicy-2.20110726/policy/modules/admin/readahead.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/admin/readahead.fc	2012-06-30 01:08:57.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/admin/readahead.fc	2012-06-30 11:32:12.000000000 +1000
+@@ -1,3 +1,4 @@
+ /usr/sbin/readahead.*	--	gen_context(system_u:object_r:readahead_exec_t,s0)
++/usr/sbin/memlockd	--	gen_context(system_u:object_r:readahead_exec_t,s0)
+ /sbin/readahead.*	--	gen_context(system_u:object_r:readahead_exec_t,s0)
+ /var/lib/readahead(/.*)?	gen_context(system_u:object_r:readahead_var_lib_t,s0)
+Index: refpolicy-2.20110726/policy/modules/admin/readahead.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/admin/readahead.te	2012-06-30 01:08:57.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/admin/readahead.te	2012-06-30 11:32:12.000000000 +1000
+@@ -22,9 +22,16 @@
+ # Local policy
+ #
+ 
+-allow readahead_t self:capability { fowner dac_override dac_read_search };
++allow readahead_t self:capability { fowner dac_override dac_read_search setgid setuid ipc_lock };
+ dontaudit readahead_t self:capability { net_admin sys_tty_config };
+ allow readahead_t self:process { setsched signal_perms };
++allow readahead_t self:fifo_file rw_file_perms;
++
++# so that memlockd can execute ldd
++libs_exec_lib_files(readahead_t)
++corecmd_exec_bin(readahead_t)
++corecmd_check_exec_shell(readahead_t)
++corecmd_exec_all_executables(readahead_t)
+ 
+ manage_dirs_pattern(readahead_t, readahead_var_lib_t, readahead_var_lib_t)
+ manage_files_pattern(readahead_t, readahead_var_lib_t, readahead_var_lib_t)
+Index: refpolicy-2.20110726/policy/modules/services/ftp.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/ftp.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/ftp.te	2012-06-30 11:32:12.000000000 +1000
+@@ -166,7 +166,7 @@
+ manage_dirs_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+ manage_files_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+ manage_sock_files_pattern(ftpd_t, ftpd_var_run_t, ftpd_var_run_t)
+-files_pid_filetrans(ftpd_t, ftpd_var_run_t, { file dir} )
++files_pid_filetrans(ftpd_t, ftpd_var_run_t, { file dir sock_file } )
+ 
+ # proftpd requires the client side to bind a socket so that
+ # it can stat the socket to perform access control decisions,
+Index: refpolicy-2.20110726/policy/modules/system/authlogin.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/authlogin.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/authlogin.te	2012-06-30 11:32:12.000000000 +1000
+@@ -30,6 +30,7 @@
+ logging_log_file(lastlog_t)
+ 
+ type login_exec_t;
++files_type(login_exec_t)
+ application_executable_file(login_exec_t)
+ 
+ type pam_console_t;
+Index: refpolicy-2.20110726/policy/modules/system/getty.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/getty.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/getty.te	2012-06-30 11:32:12.000000000 +1000
+@@ -7,6 +7,7 @@
+ 
+ type getty_t;
+ type getty_exec_t;
++files_type(getty_exec_t)
+ init_domain(getty_t, getty_exec_t)
+ init_system_domain(getty_t, getty_exec_t)
+ domain_interactive_fd(getty_t)
+Index: refpolicy-2.20110726/policy/modules/services/ssh.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/ssh.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/ssh.te	2012-06-30 11:32:12.000000000 +1000
+@@ -19,6 +19,14 @@
+ ## </desc>
+ gen_tunable(ssh_sysadm_login, false)
+ 
++## <desc>
++## <p>
++## Allow ssh client to connect to reserved ports (random ports less than 1024),
++## for port forwarding and for ssh servers running on non-standard ports
++## </p>
++## </desc>
++gen_tunable(allow_ssh_connect_reserved_ports, false)
++
+ attribute ssh_server;
+ attribute ssh_agent_type;
+ 
+@@ -28,6 +36,7 @@
+ role system_r types ssh_keygen_t;
+ 
+ type sshd_exec_t;
++files_type(sshd_exec_t)
+ corecmd_executable_file(sshd_exec_t)
+ 
+ ssh_server_template(sshd)
+@@ -145,6 +154,10 @@
+ corenet_tcp_connect_ssh_port(ssh_t)
+ corenet_sendrecv_ssh_client_packets(ssh_t)
+ 
++tunable_policy(`allow_ssh_connect_reserved_ports',`
++	corenet_tcp_connect_reserved_port(ssh_t)
++')
++
+ dev_read_urand(ssh_t)
+ 
+ fs_getattr_all_fs(ssh_t)
+Index: refpolicy-2.20110726/policy/modules/services/consolekit.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/consolekit.fc	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/consolekit.fc	2012-06-30 11:32:12.000000000 +1000
+@@ -7,3 +7,4 @@
+ /var/run/consolekit\.pid	--	gen_context(system_u:object_r:consolekit_var_run_t,s0)
+ /var/run/console-kit-daemon\.pid --	gen_context(system_u:object_r:consolekit_var_run_t,s0)
+ /var/run/ConsoleKit(/.*)?		gen_context(system_u:object_r:consolekit_var_run_t,s0)
++/var/run/console(/.*)?			gen_context(system_u:object_r:consolekit_var_run_t,s0)
+Index: refpolicy-2.20110726/policy/modules/system/authlogin.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/system/authlogin.fc	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/system/authlogin.fc	2012-06-30 11:32:12.000000000 +1000
+@@ -40,7 +40,6 @@
+ /var/log/tallylog	--	gen_context(system_u:object_r:faillog_t,s0)
+ /var/log/wtmp.*		--	gen_context(system_u:object_r:wtmp_t,s0)
+ 
+-/var/run/console(/.*)?	 	gen_context(system_u:object_r:pam_var_console_t,s0)
+ /var/run/faillock(/.*)?		gen_context(system_u:object_r:faillog_t,s0)
+ /var/run/pam_mount(/.*)?	gen_context(system_u:object_r:pam_var_run_t,s0)
+ /var/run/pam_ssh(/.*)?		gen_context(system_u:object_r:var_auth_t,s0)
+Index: refpolicy-2.20110726/policy/modules/services/perdition.fc
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/perdition.fc	2012-06-30 01:08:57.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/perdition.fc	2012-06-30 11:32:12.000000000 +1000
+@@ -1,3 +1,4 @@
+ /etc/perdition(/.*)?		gen_context(system_u:object_r:perdition_etc_t,s0)
+ 
+ /usr/sbin/perdition	--	gen_context(system_u:object_r:perdition_exec_t,s0)
++/usr/sbin/perdition\..*	--	gen_context(system_u:object_r:perdition_exec_t,s0)
+Index: refpolicy-2.20110726/policy/modules/services/perdition.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/perdition.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/perdition.te	2012-06-30 11:32:12.000000000 +1000
+@@ -21,7 +21,7 @@
+ #
+ 
+ allow perdition_t self:netlink_route_socket create_netlink_socket_perms;
+-allow perdition_t self:capability { chown fowner setgid setuid };
++allow perdition_t self:capability { chown dac_override fowner setgid setuid };
+ dev_read_urand(perdition_t)
+ dontaudit perdition_t self:capability sys_tty_config;
+ allow perdition_t self:process signal_perms;
+@@ -32,8 +32,9 @@
+ allow perdition_t perdition_etc_t:dir list_dir_perms;
+ files_search_etc(perdition_t)
+ 
++manage_dirs_pattern(perdition_t, perdition_var_run_t, perdition_var_run_t)
+ manage_files_pattern(perdition_t, perdition_var_run_t, perdition_var_run_t)
+-files_pid_filetrans(perdition_t, perdition_var_run_t, file)
++files_pid_filetrans(perdition_t, perdition_var_run_t, { file dir })
+ 
+ kernel_read_kernel_sysctls(perdition_t)
+ kernel_list_proc(perdition_t)
+Index: refpolicy-2.20110726/policy/modules/services/devicekit.te
+===================================================================
+--- refpolicy-2.20110726.orig/policy/modules/services/devicekit.te	2012-06-30 11:32:12.000000000 +1000
++++ refpolicy-2.20110726/policy/modules/services/devicekit.te	2012-06-30 11:37:24.333524221 +1000
+@@ -118,6 +118,7 @@
+ fs_mount_all_fs(devicekit_disk_t)
+ fs_unmount_all_fs(devicekit_disk_t)
+ fs_search_all(devicekit_disk_t)
++fs_getattr_xattr_fs(devicekit_disk_t)
+ 
+ mls_file_read_all_levels(devicekit_disk_t)
+ mls_file_write_to_clearance(devicekit_disk_t)
+@@ -172,6 +173,7 @@
+ optional_policy(`
+ 	udev_domtrans(devicekit_disk_t)
+ 	udev_read_db(devicekit_disk_t)
++	udev_read_table(devicekit_disk_t)
+ ')
+ 
+ optional_policy(`
+@@ -193,6 +195,10 @@
+ manage_files_pattern(devicekit_power_t, devicekit_var_lib_t, devicekit_var_lib_t)
+ files_var_lib_filetrans(devicekit_power_t, devicekit_var_lib_t, dir)
+ 
++manage_dirs_pattern(devicekit_power_t, devicekit_var_run_t, devicekit_var_run_t)
++manage_files_pattern(devicekit_power_t, devicekit_var_run_t, devicekit_var_run_t)
++files_pid_filetrans(devicekit_power_t, devicekit_var_run_t, { file dir })
++
+ kernel_read_network_state(devicekit_power_t)
+ kernel_read_system_state(devicekit_power_t)
+ kernel_rw_hotplug_sysctls(devicekit_power_t)
+@@ -234,6 +240,10 @@
+ userdom_read_all_users_state(devicekit_power_t)
+ 
+ optional_policy(`
++	dev_getattr_apm_bios_dev(devicekit_power_t)
++')
++
++optional_policy(`
+ 	bootloader_domtrans(devicekit_power_t)
+ ')
+ 
+@@ -280,6 +290,7 @@
+ 
+ optional_policy(`
+ 	udev_read_db(devicekit_power_t)
++	udev_read_table(devicekit_power_t)
+ ')
+ 
+ optional_policy(`
