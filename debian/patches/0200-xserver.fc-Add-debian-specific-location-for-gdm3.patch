@@ -1,0 +1,22 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <mika@mikapflueger.de>
+Date: Wed, 29 Aug 2012 16:06:26 +0200
+Subject: xserver.fc: Add debian-specific location for gdm3
+
+---
+ policy/modules/services/xserver.fc |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/xserver.fc b/policy/modules/services/xserver.fc
+index eb0566c..287f3d6 100644
+--- a/policy/modules/services/xserver.fc
++++ b/policy/modules/services/xserver.fc
+@@ -54,6 +54,9 @@ HOME_DIR/\.Xauthority.*	--	gen_context(system_u:object_r:xauth_home_t,s0)
+ 
+ /usr/(s)?bin/gdm-binary	--	gen_context(system_u:object_r:xdm_exec_t,s0)
+ /usr/(s)?bin/[xgkw]dm	--	gen_context(system_u:object_r:xdm_exec_t,s0)
++ifdef(`distro_debian', `
++/usr/sbin/gdm3	--	gen_context(system_u:object_r:xdm_exec_t,s0)
++')
+ /usr/bin/gpe-dm		--	gen_context(system_u:object_r:xdm_exec_t,s0)
+ /usr/bin/iceauth	--	gen_context(system_u:object_r:iceauth_exec_t,s0)
+ /usr/bin/Xair		--	gen_context(system_u:object_r:xserver_exec_t,s0)
