@@ -44,7 +44,6 @@ droppable/0012-Droppable-legacy-patch-differs-from-newer-upstream-o.patch
 0045-Remaining-unsorted-changes-for-debian-init.patch
 0046-Add-dev_read_urand-to-several-programs.patch
 0047-Allow-several-programs-to-read-from-the-console.patch
-0048-Alsa-debian-locations.patch
 0049-Correctly-label-rotated-logs-of-apt.patch
 0050-Tweaks-to-the-dpkg-policy-especially-for-support-of-.patch
 0051-Webalizer-policy-adjustments-Labeled-awffull-as-weba.patch
