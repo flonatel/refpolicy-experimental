@@ -1,11 +1,15 @@
 refpolicy (2:2.20110726-10) UNRELEASED; urgency=low
 
-  [Mika Pflüger]
+  [ Mika Pflüger ]
   * xserver.fc: Add debian specific /usr/sbin/gdm3 as a location for gdm3.
     Closes: #683756
   * debian/control: Update Vcs-* fields.
 
- -- Mika Pflüger <debian@mikapflueger.de>  Wed, 29 Aug 2012 16:12:31 +0200
+  [ Laurent Bigonville ]
+  * d/p/0079-Allow-iptables_t-to-do-module_request.patch: Dropped, the code
+    present is this patch was already present further in the code.
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 05 Sep 2012 11:31:34 +0200
 
 refpolicy (2:2.20110726-9) unstable; urgency=high
 

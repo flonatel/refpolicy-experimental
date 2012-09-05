@@ -75,7 +75,6 @@ droppable/0074-Add-some-comments-to-mta.te-droppable.patch
 0076-Allow-mono_t-to-be-in-role-unconfined_r-Closes-54014.patch
 0077-courier-policy-adjustments-Label-courier-socket-file.patch
 0078-authlogin-policy-adjustments-Label-etc-.group.edit.s.patch
-0079-Allow-iptables_t-to-do-module_request.patch
 0080-debian-library-locations.patch
 0081-Allow-apt-to-silently-get-and-install-packages.patch
 0082-syslog-policy-adjustments-Allow-syslogd_t-capability.patch
