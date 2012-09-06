@@ -1,8 +1,5 @@
-# format version number, currently 2; this line is compulsory!
 version=3
 
-opts="uversionmangle=s/^2./0.2./" \
+opts="uversionmangle=s/^2./2./" \
 http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease \
  /files/refpolicy/refpolicy-(.*)\.tar\.bz2
-
-# arch-tag: cf70b245-38bc-49ea-a6a4-ac970978aea4

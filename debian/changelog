@@ -10,8 +10,9 @@ refpolicy (2:2.20110726-10) UNRELEASED; urgency=low
     present in this patch was already present further in the code.
   * d/p/0048-Alsa-debian-locations.patch: Dropped, changes merged upstream,
     and was breaking module loading due to duplicate paths (Closes: #686670)
+  * debian/watch: Fix watch file uversionmangle
 
- -- Laurent Bigonville <bigon@debian.org>  Wed, 05 Sep 2012 12:18:11 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Sep 2012 13:50:38 +0200
 
 refpolicy (2:2.20110726-9) unstable; urgency=high
 
