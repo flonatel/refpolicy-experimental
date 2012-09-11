@@ -1,5 +1,6 @@
 refpolicy (2:2.20110726-10) unstable; urgency=low
 
+  * Team upload.
   [ Mika Pflüger ]
   * xserver.fc: Add debian specific /usr/sbin/gdm3 as a location for gdm3.
     Closes: #683756
