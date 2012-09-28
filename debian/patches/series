@@ -100,3 +100,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0170-dirmngr
 0180-latest-misc
 0190-cron-remove-cronjob_t
+droppable/0200-Add-Debian-locations-for-GDM-3.patch
