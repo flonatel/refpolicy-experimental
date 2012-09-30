@@ -1,4 +1,4 @@
-refpolicy (2:2.20110726-11) UNRELEASED; urgency=low
+refpolicy (2:2.20110726-11) unstable; urgency=low
 
   * Team upload
   [ Mika Pflüger ]
@@ -6,7 +6,7 @@ refpolicy (2:2.20110726-11) UNRELEASED; urgency=low
     cherry-pick Laurent's complete patch from upstream instead. Slightly
     edit the patch to work around an issue in file context ordering.
 
- -- Mika Pflüger <debian@mikapflueger.de>  Fri, 28 Sep 2012 18:46:13 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 30 Sep 2012 22:43:12 +0200
 
 refpolicy (2:2.20110726-10) unstable; urgency=low
 
