@@ -5,6 +5,7 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
   * Label ~/.adobe(/.*)? as mozilla_home_t for flash
   * Label /usr/sbin/opendkim as dkim_milter_exec_t
   * Label postalias as postfix_master_exec_t for newaliases
+  * Make postfix.pp not depend on unconfined.pp for "strict" configurations
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 

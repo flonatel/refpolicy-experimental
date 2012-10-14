@@ -12,10 +12,10 @@ Subject: postfix policy adjustments: * Allow user_mail_t to transition to
 
 ---
  policy/modules/services/mta.if      |    4 ++++
- policy/modules/services/postfix.if  |   12 ++++++++----
+ policy/modules/services/postfix.if  |   14 ++++++++++----
  policy/modules/services/postfix.te  |   27 +++++++++++++++++++++++++--
  policy/modules/system/unconfined.if |   32 ++++++++++++++++++++++++++++++++
- 4 files changed, 69 insertions(+), 6 deletions(-)
+ 4 files changed, 71 insertions(+), 6 deletions(-)
 
 Index: refpolicy-2.20110726/policy/modules/services/mta.if
 ===================================================================
@@ -43,15 +43,17 @@ Index: refpolicy-2.20110726/policy/modules/services/postfix.if
 ===================================================================
 --- refpolicy-2.20110726.orig/policy/modules/services/postfix.if	2012-06-21 23:34:11.689975726 +1000
 +++ refpolicy-2.20110726/policy/modules/services/postfix.if	2012-06-21 23:37:09.427719709 +1000
-@@ -163,6 +163,7 @@
+@@ -163,6 +163,9 @@
  	allow postfix_$1_t self:capability dac_override;
  
  	domtrans_pattern(postfix_user_domtrans, postfix_$1_exec_t, postfix_$1_t)
-+	in_unconfined_r(postfix_$1_t)
++	optional_policy(`
++		in_unconfined_r(postfix_$1_t)
++	')
  
  	domain_use_interactive_fds(postfix_$1_t)
  ')
-@@ -374,6 +375,7 @@
+@@ -374,6 +377,7 @@
  	')
  
  	domtrans_pattern($1, postfix_master_exec_t, postfix_master_t)
@@ -59,7 +61,7 @@ Index: refpolicy-2.20110726/policy/modules/services/postfix.if
  ')
  
  ########################################
-@@ -454,7 +456,7 @@
+@@ -454,7 +458,7 @@
  
  #######################################
  ## <summary>
@@ -68,7 +70,7 @@ Index: refpolicy-2.20110726/policy/modules/services/postfix.if
  ## </summary>
  ## <param name="domain">
  ##	<summary>
-@@ -462,12 +464,14 @@
+@@ -462,12 +466,14 @@
  ##	</summary>
  ## </param>
  #
