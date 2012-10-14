@@ -1,0 +1,17 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Sun, 14 Oct 2012 20:11:23 +0200
+Subject: Label ~/.adobe(/.*)? as mozilla_home_t for flash
+
+---
+ policy/modules/apps/mozilla.fc |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/apps/mozilla.fc b/policy/modules/apps/mozilla.fc
+index 9f01732..0f9afb4 100644
+--- a/policy/modules/apps/mozilla.fc
++++ b/policy/modules/apps/mozilla.fc
+@@ -1,3 +1,4 @@
++HOME_DIR/\.adobe(/.*)?			gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.galeon(/.*)?			gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.java(/.*)?			gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.mozilla(/.*)?		gen_context(system_u:object_r:mozilla_home_t,s0)
