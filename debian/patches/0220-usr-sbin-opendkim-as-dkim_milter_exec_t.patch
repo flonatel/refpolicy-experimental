@@ -1,0 +1,24 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Sun, 14 Oct 2012 21:23:23 +0200
+Subject: Label /usr/sbin/opendkim as dkim_milter_exec_t
+
+---
+ policy/modules/services/dkim.fc |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/services/dkim.fc b/policy/modules/services/dkim.fc
+index dc1056c..06d96a9 100644
+--- a/policy/modules/services/dkim.fc
++++ b/policy/modules/services/dkim.fc
+@@ -1,9 +1,11 @@
+ /etc/mail/dkim-milter/keys(/.*)?	gen_context(system_u:object_r:dkim_milter_private_key_t,s0)
+ 
+ /usr/sbin/dkim-filter		--	gen_context(system_u:object_r:dkim_milter_exec_t,s0)
++/usr/sbin/opendkim		--	gen_context(system_u:object_r:dkim_milter_exec_t,s0)
+ 
+ /var/db/dkim(/.*)?			gen_context(system_u:object_r:dkim_milter_private_key_t,s0)
+ 
+ /var/run/dkim-filter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
+ /var/run/dkim-milter(/.*)?		gen_context(system_u:object_r:dkim_milter_data_t,s0)
+ /var/run/dkim-milter\.pid	--	gen_context(system_u:object_r:dkim_milter_data_t,s0)
++/var/run/opendkim(/.*)?			gen_context(system_u:object_r:dkim_milter_data_t,s0)

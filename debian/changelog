@@ -3,6 +3,7 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
   * Team upload.
   [ Russel Coker ]
   * Label ~/.adobe(/.*)? as mozilla_home_t for flash
+  * Label /usr/sbin/opendkim as dkim_milter_exec_t
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 
