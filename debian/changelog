@@ -7,7 +7,7 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
   * Label postalias as postfix_master_exec_t for newaliases
   * Make postfix.pp not depend on unconfined.pp for "strict" configurations
   * Label port 5546 as dhcpc_port_t and allow dhcpc_t to bind to TCP for
-	client control
+    client control
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 
