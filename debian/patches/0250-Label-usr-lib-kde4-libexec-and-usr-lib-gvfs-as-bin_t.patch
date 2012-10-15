@@ -1,0 +1,22 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Mon, 15 Oct 2012 22:36:32 +0200
+Subject: Label /usr/lib/kde4/libexec/* and /usr/lib/gvfs/* as bin_t for
+ desktops
+
+---
+ policy/modules/kernel/corecommands.fc |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/kernel/corecommands.fc b/policy/modules/kernel/corecommands.fc
+index 00d8b13..984acb2 100644
+--- a/policy/modules/kernel/corecommands.fc
++++ b/policy/modules/kernel/corecommands.fc
+@@ -303,6 +303,8 @@ ifdef(`distro_debian',`
+ /usr/lib(64)?/ConsoleKit/.*	--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/gdm3/.*		--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/gnome-vfs-2.0/gnome-vfs-daemon -- gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/gvfs/.*		--	gen_context(system_u:object_r:bin_t,s0)
++/usr/lib/kde4/libexec/.*	--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/udisks/.*		--	gen_context(system_u:object_r:bin_t,s0)
+ /usr/lib/dovecot/.+             --      gen_context(system_u:object_r:bin_t,s0)
+ ')

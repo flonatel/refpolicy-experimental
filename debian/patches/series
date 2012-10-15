@@ -105,3 +105,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0220-usr-sbin-opendkim-as-dkim_milter_exec_t.patch
 0230-Label-postalias-as-postfix_master_exec_t-for-newalia.patch
 0240-Label-port-5546-as-dhcpc_port_t-and-allow-dhcpc_t-to.patch
+0250-Label-usr-lib-kde4-libexec-and-usr-lib-gvfs-as-bin_t.patch
