@@ -1,0 +1,32 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <mika@mikapflueger.de>
+Date: Thu, 18 Oct 2012 00:02:54 +0200
+Subject: Label /run/pm-utils(/.*)? as devicekit_var_run_t not hald_var_run_t
+
+---
+ policy/modules/services/devicekit.fc |    1 +
+ policy/modules/services/hal.fc       |    1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/devicekit.fc b/policy/modules/services/devicekit.fc
+index 9d29497..272611f 100644
+--- a/policy/modules/services/devicekit.fc
++++ b/policy/modules/services/devicekit.fc
+@@ -15,5 +15,6 @@ ifdef(`distro_debian',`
+ 
+ /var/run/devkit(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
+ /var/run/DeviceKit-disks(/.*)?		gen_context(system_u:object_r:devicekit_var_run_t,s0)
++/var/run/pm-utils(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
+ /var/run/udisks(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
+ /var/run/upower(/.*)?			gen_context(system_u:object_r:devicekit_var_run_t,s0)
+diff --git a/policy/modules/services/hal.fc b/policy/modules/services/hal.fc
+index 2b6e3a9..98b605e 100644
+--- a/policy/modules/services/hal.fc
++++ b/policy/modules/services/hal.fc
+@@ -24,7 +24,6 @@
+ /var/run/hald(/.*)?				gen_context(system_u:object_r:hald_var_run_t,s0)
+ /var/run/haldaemon\.pid	--	 		gen_context(system_u:object_r:hald_var_run_t,s0)
+ /var/run/pm(/.*)?				gen_context(system_u:object_r:hald_var_run_t,s0)
+-/var/run/pm-utils(/.*)?				gen_context(system_u:object_r:hald_var_run_t,s0)
+ /var/run/synce.*	 			gen_context(system_u:object_r:hald_var_run_t,s0)
+ /var/run/vbe.*	 	--			gen_context(system_u:object_r:hald_var_run_t,s0)
+ 
