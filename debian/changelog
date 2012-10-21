@@ -18,6 +18,10 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
   * Allow lvm_t (systemd-cryptsetup) systemd_manage_passwd_run() access
   * Allow systemd_passwd_agent_t access to search selinuxfs and write to
     the console for getting a password for encrypted filesystems
+  * Label /usr/lib/dovecot/auth as dovecot_auth_exec_t.
+    Label /usr/lib/dovecot/dovecot-lda as lda_exec_t
+    Label /usr/lib/dovecot/libdovecot.*\.so.* as lib_t
+    Closes: #690225
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 
