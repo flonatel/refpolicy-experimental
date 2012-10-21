@@ -1,0 +1,52 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Sat, 20 Oct 2012 18:01:20 +0200
+Subject: Allow user roles access to mozilla_t classes shm and sem for sharing
+ the sound device
+
+---
+ policy/modules/apps/mozilla.if |   21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/policy/modules/apps/mozilla.if b/policy/modules/apps/mozilla.if
+index a599b8b..d5065b6 100644
+--- a/policy/modules/apps/mozilla.if
++++ b/policy/modules/apps/mozilla.if
+@@ -17,7 +17,7 @@
+ #
+ interface(`mozilla_role',`
+ 	gen_require(`
+-		type mozilla_t, chrome_sandbox_t, mozilla_exec_t, chrome_browser_exec_t, mozilla_home_t;
++		type mozilla_t, chrome_sandbox_t, mozilla_exec_t, chrome_browser_exec_t, mozilla_home_t, mozilla_tmpfs_t, mozilla_tmp_t;
+ 	')
+ 
+ 	role $1 types { mozilla_t chrome_sandbox_t };
+@@ -33,18 +33,21 @@ interface(`mozilla_role',`
+ 	ps_process_pattern($2, mozilla_t)
+ 	allow $2 mozilla_t:process signal_perms;
+ 
++	# for sharing the sound device
++	allow $2 mozilla_t:shm { rw_shm_perms destroy };
++	allow $2 mozilla_t:sem { rw_sem_perms destroy };
++	allow $2 mozilla_tmpfs_t:file rw_file_perms;
++
+ 	allow $2 mozilla_t:fd use;
+-	allow $2 mozilla_t:shm { associate getattr };
+-	allow $2 mozilla_t:shm { unix_read unix_write };
+ 	allow $2 mozilla_t:unix_stream_socket connectto;
+ 
+ 	# X access, Home files
+-	manage_dirs_pattern($2, mozilla_home_t, mozilla_home_t)
+-	manage_files_pattern($2, mozilla_home_t, mozilla_home_t)
+-	manage_lnk_files_pattern($2, mozilla_home_t, mozilla_home_t)
+-	relabel_dirs_pattern($2, mozilla_home_t, mozilla_home_t)
+-	relabel_files_pattern($2, mozilla_home_t, mozilla_home_t)
+-	relabel_lnk_files_pattern($2, mozilla_home_t, mozilla_home_t)
++	manage_dirs_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
++	manage_files_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
++	manage_lnk_files_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
++	relabel_dirs_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
++	relabel_files_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
++	relabel_lnk_files_pattern($2, { mozilla_home_t mozilla_tmp_t }, { mozilla_home_t mozilla_tmp_t })
+ 
+ 	mozilla_run_plugin(mozilla_t, $1)
+ 	mozilla_dbus_chat($2)

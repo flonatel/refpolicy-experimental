@@ -10,6 +10,8 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
     client control
   * Label /usr/lib/kde4/libexec/* and /usr/lib/gvfs/* as bin_t for desktops
   * Label /run/pm-utils(/.*)? as devicekit_var_run_t not hald_var_run_t
+  * Allow user roles access to mozilla_t classes shm and sem for sharing
+    the sound device
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 
