@@ -15,6 +15,9 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
   * Allow user roles access to mozilla_tmp_t
   * Label /sbin/xtables-multi (the new iptables)
   * Allow watchdog_t to read syslog pid files for process watching
+  * Allow lvm_t (systemd-cryptsetup) systemd_manage_passwd_run() access
+  * Allow systemd_passwd_agent_t access to search selinuxfs and write to
+    the console for getting a password for encrypted filesystems
 
  -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
 

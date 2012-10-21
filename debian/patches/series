@@ -110,3 +110,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0270-Allow-user-roles-access-to-mozilla_t-classes-shm-and.patch
 0280-Label-sbin-xtables-multi-the-new-iptables.patch
 0290-Allow-watchdog_t-to-read-syslog-pid-files-for-proces.patch
+0300-Allow-lvm_t-systemd-cryptsetup-systemd_manage_passwd.patch

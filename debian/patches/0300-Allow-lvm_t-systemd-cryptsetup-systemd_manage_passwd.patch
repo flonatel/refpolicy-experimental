@@ -1,0 +1,48 @@
+From: Russell Coker <russell@coker.com.au>
+Date: Sun, 21 Oct 2012 03:51:40 +0200
+Subject: Allow lvm_t (systemd-cryptsetup) systemd_manage_passwd_run() access
+Allow systemd_passwd_agent_t access to search selinuxfs and write to
+the console for getting a password for encrypted filesystems
+
+---
+ policy/modules/system/lvm.te     |    4 ++++
+ policy/modules/system/systemd.te |    8 +++-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
+index 678efc3..e0d1784 100644
+--- a/policy/modules/system/lvm.te
++++ b/policy/modules/system/lvm.te
+@@ -328,6 +328,10 @@ ifdef(`distro_redhat',`
+ ')
+ 
+ optional_policy(`
++	systemd_manage_passwd_run(lvm_t)
++')
++
++optional_policy(`
+ 	bootloader_rw_tmp_files(lvm_t)
+ ')
+ 
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 988a010..b0c291f 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -203,14 +203,12 @@ init_read_utmp(systemd_passwd_agent_t)
+ init_stream_connect(systemd_passwd_agent_t)
+ 
+ miscfiles_read_localization(systemd_passwd_agent_t)
+-
++selinux_getattr_fs(systemd_passwd_agent_t)
++selinux_search_fs(systemd_passwd_agent_t)
++term_write_console(systemd_passwd_agent_t)
+ userdom_use_user_ptys(systemd_passwd_agent_t)
+ 
+ optional_policy(`
+-	lvm_signull(systemd_passwd_agent_t)
+-')
+-
+-optional_policy(`
+ 	plymouthd_stream_connect(systemd_passwd_agent_t)
+ ')
+ 
