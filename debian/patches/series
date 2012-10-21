@@ -108,3 +108,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0250-Label-usr-lib-kde4-libexec-and-usr-lib-gvfs-as-bin_t.patch
 0260-Label-run-pm-utils-for-devicekit-not-hal.patch
 0270-Allow-user-roles-access-to-mozilla_t-classes-shm-and.patch
+0280-Label-sbin-xtables-multi-the-new-iptables.patch
