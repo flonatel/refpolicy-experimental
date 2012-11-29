@@ -1,4 +1,4 @@
-refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
+refpolicy (2:2.20110726-12) unstable; urgency=low
 
   * Team upload.
   [ Russel Coker ]
@@ -23,7 +23,7 @@ refpolicy (2:2.20110726-12) UNRELEASED; urgency=low
     Label /usr/lib/dovecot/libdovecot.*\.so.* as lib_t
     Closes: #690225
 
- -- Mika Pflüger <debian@mikapflueger.de>  Sun, 14 Oct 2012 20:15:05 +0200
+ -- Mika Pflüger <debian@mikapflueger.de>  Fri, 30 Nov 2012 00:28:21 +0100
 
 refpolicy (2:2.20110726-11) unstable; urgency=low
 
