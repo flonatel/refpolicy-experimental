@@ -1,0 +1,2 @@
+etc/selinux/default/
+usr/share/selinux/default/*.pp

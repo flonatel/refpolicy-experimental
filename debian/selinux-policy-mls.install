@@ -1,0 +1,2 @@
+etc/selinux/mls/
+usr/share/selinux/mls/*.pp
