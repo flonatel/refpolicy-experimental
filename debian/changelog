@@ -6,6 +6,7 @@ refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
 
   [ Laurent Bigonville ]
   * Rework the build system
+  * Compress modules files with bzip2
 
  -- Laurent Bigonville <bigon@debian.org>  Sun, 20 Jan 2013 21:08:58 +0100
 

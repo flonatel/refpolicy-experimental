@@ -172,7 +172,7 @@ sub list_modules {
   print STDERR "Locating modules\n";
   opendir(DIR, $src_dir) || die "can't opendir $src_dir: $!";
 
-  @all_modules = grep { ! m/^base\.pp$/ && m/\.pp/ && -f "$src_dir/$_" }
+  @all_modules = grep { ! m/^base\.pp\.bz2$/ && m/\.pp\.bz2/ && -f "$src_dir/$_" }
     readdir(DIR);
   %Module_Path = map { +"$src_dir/$_" => 0 } @all_modules;
   closedir DIR;
@@ -184,7 +184,7 @@ sub list_modules {
 sub get_dependencies {
   my $src_dir = shift;
   print STDERR "Calculating dependencies between modules\n";
-  open(COMMAND, '-|', "semodule_deps -g  $src_dir/base.pp " .
+  open(COMMAND, '-|', "semodule_deps -g  $src_dir/base.pp.bz2 " .
        join(' ', keys %Module_Path)) || die "Could not run semodule_deps";
   while (<COMMAND>) {
     chomp;
@@ -245,7 +245,7 @@ sub installed_modules {
  close($PACKAGES) or die("Could not close pipe.");
 
   foreach my $module (@ordered, @all_modules) {
-    $module =~ s/\.pp$//o;
+    $module =~ s/\.pp\.bz2$//o;
 
     next if $Seen{$module};
     $Seen{$module}++;
@@ -261,14 +261,14 @@ sub installed_modules {
         if (defined $Deps{$module}) {
           for my $dep (split(' ', $Deps{$module})) {
             next if $Loaded{$dep};
-            if (-e "${src_dir}/${dep}.pp") {
+            if (-e "${src_dir}/${dep}.pp.bz2") {
               push @Load_Order, $dep;
               $Loaded{$dep}++
             }
             else {
-              print STDERR "Could not find ${src_dir}/${dep}.pp\n";
-              print STDERR "which is required for module ${module}.pp\n";
-              print STDERR "Assuming ${dep}.pp is built into base.pp\n";
+              print STDERR "Could not find ${src_dir}/${dep}.pp.bz2\n";
+              print STDERR "which is required for module ${module}.pp.bz2\n";
+              print STDERR "Assuming ${dep}.pp.bz2 is built into base.pp.bz2\n";
             }
           }
         }
@@ -281,11 +281,11 @@ sub installed_modules {
 }
 
 sub main {
-  if (-e "$basedir/modules/active/base.pp" ) {
+  if (-e "$basedir/modules/active/base.pp.bz2" ) {
     print STDERR "You already have a $policy_name policy installed.\n";
     print STDERR "I am leaving it alone. Please check and update manually.\n";
   }
-  elsif (-e "$src_dir/base.pp") {
+  elsif (-e "$src_dir/base.pp.bz2") {
     print STDERR "Notice: Trying to link (but not load) a $policy_name policy.\n";
     print STDERR "This process may fail -- you should check the results, and \n";
     print STDERR "you need to switch to this policy yourself anyway.\n\n";
@@ -295,13 +295,13 @@ sub main {
     &get_ordering();
     &installed_modules();
     chdir "$src_dir" or die "Can't access $src_dir";
-    my $semod = "semodule -b base.pp -s $policy_name -n ";
+    my $semod = "semodule -b base.pp.bz2 -s $policy_name -n ";
     if("$type" eq "default") {
-      $semod .= " -i unconfined.pp";
+      $semod .= " -i unconfined.pp.bz2";
     }
     my $mod_list;
     for my $mod (@Load_Order) {
-      $semod .= " -i ${mod}.pp";
+      $semod .= " -i ${mod}.pp.bz2";
       $mod_list .= " $mod";
     }
     if (system($semod) == 0) {

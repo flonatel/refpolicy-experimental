@@ -22,6 +22,14 @@ override_dh_fixperms:
 	  chmod +x $(CURDIR)/debian/selinux-policy-dev/usr/share/selinux/$$flavour/include/support/segenxml.py; \
 	done
 
+override_dh_compress:
+	dh_compress
+	for flavour in $(FLAVOURS) ; do \
+	  for f in $(CURDIR)/debian/selinux-policy-$$flavour/usr/share/selinux/$$flavour/*.pp ; do \
+	    bzip2 -9f $$f; \
+	  done; \
+	done
+
 override_dh_installdeb:
 	for flavour in $(FLAVOURS) ; do \
 	  sed -e "s/=T/$$flavour/g" debian/postinst.policy > $(CURDIR)/debian/selinux-policy-$$flavour.postinst; \
