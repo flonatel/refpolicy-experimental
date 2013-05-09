@@ -1,3 +1,10 @@
+refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
+
+  * Team upload.
+  * Allow dhcpc_t to bind to all udp ports (Closes: #707658).
+
+ -- Mika Pflüger <debian@mikapflueger.de>  Fri, 10 May 2013 01:39:11 +0200
+
 refpolicy (2:2.20110726-12) unstable; urgency=low
 
   * Team upload.
