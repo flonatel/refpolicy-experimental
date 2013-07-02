@@ -9,6 +9,7 @@ refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
   * Compress modules files with bzip2
   * debian/control:
     - Bump Standards-Version to 3.9.4 (no further changes)
+    - Drop really old Conflicts
   * debian/source/lintian-overrides: Add an override for
     maintainer-script-lacks-debhelper-token
 
