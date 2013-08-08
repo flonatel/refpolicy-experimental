@@ -1,17 +1,17 @@
 From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <debian@mikapflueger.de>
 Date: Sun, 4 Mar 2012 02:58:46 +0100
 Subject: udev policy adjustments: * allow udev_t to manage etc_runtime_t *
- Allow udev to read sym-links in it's config directory * Allow udev
- to manage symlinks under /dev * Allow udev to manage xenfs_t files,
+ Allow udev to manage files and symlinks in its config directory * Allow
+ udev to manage symlinks under /dev * Allow udev to manage xenfs_t files,
  to write to etc_runtime_t (for ifstate), and to load modules *
  Allow udev_t to access anon_inodefs_t
 
 ---
- policy/modules/system/udev.te |   22 ++++++++++++++++++++--
- 1 files changed, 20 insertions(+), 2 deletions(-)
+ policy/modules/system/udev.te |   24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
-index 86b84bb..eedca43 100644
+index bfdb265..9e6869d 100644
 --- a/policy/modules/system/udev.te
 +++ b/policy/modules/system/udev.te
 @@ -14,6 +14,8 @@ domain_entry_file(udev_t, udev_helper_exec_t)
@@ -43,8 +43,9 @@ index 86b84bb..eedca43 100644
 +dev_filetrans(udev_t,udev_tbl_t,file)
  
  list_dirs_pattern(udev_t, udev_rules_t, udev_rules_t)
- read_files_pattern(udev_t, udev_rules_t, udev_rules_t)
-+read_lnk_files_pattern(udev_t, udev_rules_t, udev_rules_t)
+-read_files_pattern(udev_t, udev_rules_t, udev_rules_t)
++manage_files_pattern(udev_t, udev_rules_t, udev_rules_t)
++manage_lnk_files_pattern(udev_t, udev_rules_t, udev_rules_t)
  
  manage_dirs_pattern(udev_t, udev_var_run_t, udev_var_run_t)
  manage_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
