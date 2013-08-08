@@ -1,0 +1,21 @@
+From: =?UTF-8?q?Mika=20Pfl=C3=BCger?= <mika@mikapflueger.de>
+Date: Thu, 8 Aug 2013 16:53:28 +0200
+Subject: Dovecot: Allow setting scheduling to nice the background regeneration of SSL DH parameters
+
+---
+ policy/modules/services/dovecot.te |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/dovecot.te b/policy/modules/services/dovecot.te
+index fddbb51..26eb9cf 100644
+--- a/policy/modules/services/dovecot.te
++++ b/policy/modules/services/dovecot.te
+@@ -60,7 +60,7 @@ files_pid_file(dovecot_var_run_t)
+ 
+ allow dovecot_t self:capability { dac_override dac_read_search chown kill net_bind_service setgid setuid sys_chroot sys_resource };
+ dontaudit dovecot_t self:capability sys_tty_config;
+-allow dovecot_t self:process { setrlimit signal_perms getcap setcap };
++allow dovecot_t self:process { setrlimit signal_perms getcap setcap setsched };
+ allow dovecot_t self:fifo_file rw_fifo_file_perms;
+ allow dovecot_t self:tcp_socket create_stream_socket_perms;
+ allow dovecot_t self:unix_dgram_socket create_socket_perms;

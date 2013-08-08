@@ -112,3 +112,5 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0290-Allow-watchdog_t-to-read-syslog-pid-files-for-proces.patch
 0300-Allow-lvm_t-systemd-cryptsetup-systemd_manage_passwd.patch
 0310-Label-new-locations-of-dovecot-auth-and-dovecot-deli.patch
+0320-Allow-dhclient-to-bind-to-all-udp-ports.patch
+0330-dovecot-allow-scheduling-for-ssl-dh-parameters.patch

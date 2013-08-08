@@ -3,7 +3,7 @@ refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
   * Team upload.
   * Allow dhcpc_t to bind to all udp ports (Closes: #707658).
   * Allow udev_t to manage udev_rules_t, which is necessary for stable device
-	names (Closes: #712970).
+    names (Closes: #712970).
 
  -- Mika Pflüger <debian@mikapflueger.de>  Fri, 10 May 2013 01:39:11 +0200
 
