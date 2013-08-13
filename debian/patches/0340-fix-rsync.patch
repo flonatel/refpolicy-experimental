@@ -1,0 +1,45 @@
+Index: refpolicy/policy/modules/services/rsync.te
+===================================================================
+--- refpolicy.orig/policy/modules/services/rsync.te	2013-08-13 22:34:55.000000000 +0200
++++ refpolicy/policy/modules/services/rsync.te	2013-08-13 22:44:26.148268514 +0200
+@@ -118,6 +118,12 @@
+ ')
+ 
+ optional_policy(`
++	ssh_sigchld(rsync_t)
++	ssh_rw_pipes(rsync_t)
++	ssh_use_fd(rsync_t)
++')
++
++optional_policy(`
+ 	inetd_service_domain(rsync_t, rsync_exec_t)
+ ')
+ 
+Index: refpolicy/policy/modules/services/ssh.if
+===================================================================
+--- refpolicy.orig/policy/modules/services/ssh.if	2013-08-13 22:51:51.432858222 +0200
++++ refpolicy/policy/modules/services/ssh.if	2013-08-13 22:50:12.406910798 +0200
+@@ -501,6 +501,23 @@
+ 
+ 	allow $1 sshd_t:fifo_file { write read getattr ioctl };
+ ')
++########################################
++## <summary>
++##	Use an fd inherited from the sshd.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ssh_use_fd',`
++	gen_require(`
++		type sshd_t;
++	')
++
++	allow $1 sshd_t:fd use;
++')
+ 
+ ########################################
+ ## <summary>

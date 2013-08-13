@@ -114,3 +114,4 @@ droppable/0091-droppable-reordering-of-udev-permissions.patch
 0310-Label-new-locations-of-dovecot-auth-and-dovecot-deli.patch
 0320-Allow-dhclient-to-bind-to-all-udp-ports.patch
 0330-dovecot-allow-scheduling-for-ssl-dh-parameters.patch
+0340-fix-rsync.patch
