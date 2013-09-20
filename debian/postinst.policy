@@ -281,7 +281,7 @@ sub installed_modules {
 }
 
 sub main {
-  if (-e "$basedir/modules/active/base.pp.bz2" ) {
+  if (-e "$basedir/modules/active/base.pp" ) {
     print STDERR "You already have a $policy_name policy installed.\n";
     print STDERR "I am leaving it alone. Please check and update manually.\n";
   }
