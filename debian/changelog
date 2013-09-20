@@ -1,4 +1,4 @@
-refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
+refpolicy (2:2.20110726-13) unstable; urgency=low
 
   * Team upload.
   [ Mika Pflüger ]
@@ -15,7 +15,7 @@ refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
   * debian/source/lintian-overrides: Add an override for
     maintainer-script-lacks-debhelper-token
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 20 Sep 2013 16:54:39 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 20 Sep 2013 19:18:57 +0200
 
 refpolicy (2:2.20110726-12) unstable; urgency=low
 
