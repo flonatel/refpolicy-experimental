@@ -10,10 +10,12 @@ refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
   * debian/control:
     - Bump Standards-Version to 3.9.4 (no further changes)
     - Drop really old Conflicts
+    - Add a Breaks against selinux-basics (<< 0.5.2~) so we are sure it
+      supports .bz2 compressed modules
   * debian/source/lintian-overrides: Add an override for
     maintainer-script-lacks-debhelper-token
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 20 Jan 2013 21:08:58 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 20 Sep 2013 16:54:39 +0200
 
 refpolicy (2:2.20110726-12) unstable; urgency=low
 
