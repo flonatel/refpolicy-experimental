@@ -1,3 +1,22 @@
+refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
+
+  * New GIT snapshot of the policy
+    - Add block_suspend access vectors (Closes: #722700)
+    - libvirt should now run when compiled with selinux support
+      (Closes: #559356)
+    - Allow smartd daemon to write in /var/lib/smartmontools directory
+      (Closes: #720631)
+    - NetworkManager should now be able to write /run/network/ifstate
+      (Closes: #711083)
+    - Allow dovecot self:process setsched permission (Closes: #716753)
+    - Add denyhosts policy package (Closes: #700403)
+    - deny_ptrace boolean is now gone (Closes: #691284)
+    - Allow fail2ban dac_read_search and dac_override capabilities
+      (Closes: #700326)
+    - irqbalance has now the getsched permission (Closes: #707243)
+
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 21:29:59 +0100
+
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
   * Team upload.
