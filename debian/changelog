@@ -1,6 +1,9 @@
 refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
 
   * New GIT snapshot of the policy
+    - Drop all the Debian specific patches, some of the patches have been
+      merged upstream, but the rest was making it really difficult to upgrade
+      the policy to the new upstream versions.
     - Add block_suspend access vectors (Closes: #722700)
     - libvirt should now run when compiled with selinux support
       (Closes: #559356)
@@ -15,7 +18,7 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
       (Closes: #700326)
     - irqbalance has now the getsched permission (Closes: #707243)
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 21:29:59 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 22:27:22 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
