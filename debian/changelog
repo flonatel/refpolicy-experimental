@@ -19,8 +19,9 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
     - irqbalance has now the getsched permission (Closes: #707243)
   * Refresh debian/modules.conf.* for new release, build all the policy
     packages as modules now
+  * Drop debian/file_contexts.subs_dist, install upstream one instead
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 23:01:44 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 23:10:52 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 

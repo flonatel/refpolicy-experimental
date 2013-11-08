@@ -110,8 +110,7 @@ install-%-policy: build-%-policy
 	cp -a debian/setrans.conf.$* $(CURDIR)/debian/tmp/etc/selinux/$*/setrans.conf
 	mkdir -p $(CURDIR)/debian/tmp/etc/selinux/$*/contexts/files/
 	mkdir -p $(CURDIR)/debian/tmp/etc/selinux/$*/modules/active/
-	cp -a debian/file_contexts.subs_dist $(CURDIR)/debian/tmp/etc/selinux/$*/contexts/files/
-	touch $(CURDIR)/debian/tmp/etc/selinux/$*/modules/active/file_contexts.local $(CURDIR)/debian/tmp/etc/selinux/$*/contexts/files/file_contexts.subs_dist
+	touch $(CURDIR)/debian/tmp/etc/selinux/$*/modules/active/file_contexts.local
 	mkdir -p $(CURDIR)/debian/tmp/etc/selinux/$*/policy/
 	mkdir -p $(CURDIR)/debian/tmp/etc/selinux/$*/modules/
 	touch $(CURDIR)/debian/tmp/etc/selinux/$*/modules/semanage.read.LOCK $(CURDIR)/debian/tmp/etc/selinux/$*/modules/semanage.trans.LOCK
