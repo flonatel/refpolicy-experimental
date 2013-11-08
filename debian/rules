@@ -141,8 +141,6 @@ install-src: conf-src
 	      mv modules.conf modules.conf.dist;                          \
 	  fi;                                                             \
 	  ln -sf modules.conf.mls modules.conf)
-	install -p -o root -g root -m  644      policy/rolemap                               \
-	                     $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/
 	install -p -o root -g root -m 644      debian/build.conf.default                   \
 	                     $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/build.conf
 	(cd $(CURDIR)/debian/tmp/etc/selinux/default/src/; mv policy selinux-policy-src;   \
