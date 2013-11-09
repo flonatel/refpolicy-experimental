@@ -21,8 +21,9 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
     packages as modules now
   * Drop debian/file_contexts.subs_dist, install upstream one instead
   * debian/rules: policy/rolemap file is gone
+  * debian/control: Bump {build-}dependencies to the last userspace release
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 08 Nov 2013 23:12:16 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 09 Nov 2013 01:46:25 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
