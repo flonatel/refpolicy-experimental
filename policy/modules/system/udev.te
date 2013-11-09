@@ -1,4 +1,4 @@
-policy_module(udev, 1.13.0)
+policy_module(udev, 1.16.2)
 
 ########################################
 #
@@ -25,6 +25,7 @@ files_type(udev_rules_t)
 
 type udev_var_run_t;
 files_pid_file(udev_var_run_t)
+init_daemon_run_dir(udev_var_run_t, "udev")
 
 ifdef(`enable_mcs',`
 	kernel_ranged_domtrans_to(udev_t, udev_exec_t, s0 - mcs_systemhigh)
@@ -38,6 +39,7 @@ ifdef(`enable_mcs',`
 
 allow udev_t self:capability { chown dac_override dac_read_search fowner fsetid sys_admin mknod net_raw net_admin sys_nice sys_rawio sys_resource setuid setgid sys_nice sys_ptrace };
 dontaudit udev_t self:capability sys_tty_config;
+allow udev_t self:capability2 block_suspend;
 allow udev_t self:process ~{ setcurrent setexec setfscreate setrlimit execmem execstack execheap };
 allow udev_t self:process { execmem setfscreate };
 allow udev_t self:fd use;
@@ -62,7 +64,6 @@ can_exec(udev_t, udev_helper_exec_t)
 # read udev config
 allow udev_t udev_etc_t:file read_file_perms;
 
-# create udev database in /dev/.udevdb
 allow udev_t udev_tbl_t:file manage_file_perms;
 dev_filetrans(udev_t, udev_tbl_t, file)
 
@@ -72,7 +73,8 @@ read_files_pattern(udev_t, udev_rules_t, udev_rules_t)
 manage_dirs_pattern(udev_t, udev_var_run_t, udev_var_run_t)
 manage_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
 manage_lnk_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
-files_pid_filetrans(udev_t, udev_var_run_t, { dir file })
+manage_sock_files_pattern(udev_t, udev_var_run_t, udev_var_run_t)
+files_pid_filetrans(udev_t, udev_var_run_t, dir, "udev")
 
 kernel_read_system_state(udev_t)
 kernel_request_load_module(udev_t)
@@ -171,6 +173,21 @@ sysnet_etc_filetrans_config(udev_t)
 
 userdom_dontaudit_search_user_home_content(udev_t)
 
+ifdef(`distro_debian',`
+	files_pid_filetrans(udev_t, udev_var_run_t, dir, "xen-hotplug")
+
+	optional_policy(`
+		# for /usr/lib/avahi/avahi-daemon-check-dns.sh
+		kernel_read_vm_sysctls(udev_t)
+		corenet_udp_bind_generic_node(udev_t)
+		miscfiles_read_generic_certs(udev_t)
+		avahi_create_pid_dirs(udev_t)
+		avahi_initrc_domtrans(udev_t)
+		avahi_manage_pid_files(udev_t)
+		avahi_filetrans_pid(udev_t, dir, "avahi-daemon")
+	')
+')
+
 ifdef(`distro_gentoo',`
 	# during boot, init scripts use /dev/.rcsysinit
 	# existance to determine if we are in early booting
@@ -220,11 +237,20 @@ optional_policy(`
 ')
 
 optional_policy(`
+	consolekit_read_pid_files(udev_t)
+')
+
+optional_policy(`
 	cups_domtrans_config(udev_t)
 ')
 
 optional_policy(`
 	dbus_system_bus_client(udev_t)
+	dbus_use_system_bus_fds(udev_t)
+
+	optional_policy(`
+		consolekit_dbus_chat(udev_t)
+	')
 ')
 
 optional_policy(`
@@ -255,6 +281,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	lvm_domtrans(udev_t)
+')
+
+optional_policy(`
 	mount_domtrans(udev_t)
 ')
 
@@ -264,7 +294,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	pcscd_read_pub_files(udev_t)
+	pcscd_read_pid_files(udev_t)
 	pcscd_domtrans(udev_t)
 ')
 

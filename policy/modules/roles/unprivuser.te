@@ -1,4 +1,4 @@
-policy_module(unprivuser, 2.2.0)
+policy_module(unprivuser, 2.4.0)
 
 # this module should be named user, but that is
 # a compile error since user is a keyword.
@@ -14,6 +14,10 @@ userdom_unpriv_user_template(user)
 
 optional_policy(`
 	apache_role(user_r, user_t)
+')
+
+optional_policy(`
+	git_role(user_r, user_t)
 ')
 
 optional_policy(`
@@ -47,6 +51,10 @@ ifndef(`distro_redhat',`
 
 	optional_policy(`
 		dbus_role_template(user, user_r, user_t)
+
+		optional_policy(`
+			gnome_role_template(user, user_r, user_t)
+		')
 	')
 
 	optional_policy(`
@@ -62,15 +70,11 @@ ifndef(`distro_redhat',`
 	')
 
 	optional_policy(`
-		gnome_role(user_r, user_t)
-	')
-
-	optional_policy(`
 		gpg_role(user_r, user_t)
 	')
 
 	optional_policy(`
-        	hadoop_role(user_r, user_t)
+		hadoop_role(user_r, user_t)
 	')
 
 	optional_policy(`
@@ -118,7 +122,7 @@ ifndef(`distro_redhat',`
 	')
 
 	optional_policy(`
-	spamassassin_role(user_r, user_t)
+		spamassassin_role(user_r, user_t)
 	')
 
 	optional_policy(`

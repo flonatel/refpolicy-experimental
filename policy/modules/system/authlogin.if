@@ -201,12 +201,8 @@ interface(`auth_login_entry_type',`
 ## <infoflow type="none"/>
 #
 interface(`auth_file',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_security_file($1)
-	typeattribute $1 auth_file_type;
+	refpolicywarn(`$0($*) has been deprecated, use files_auth_file() instead.')
+	files_auth_file($1)
 ')
 
 ########################################
@@ -399,7 +395,7 @@ interface(`auth_domtrans_chk_passwd',`
 	')
 
 	optional_policy(`
-		pcscd_read_pub_files($1)
+		pcscd_read_pid_files($1)
 		pcscd_stream_connect($1)
 	')
 
@@ -1106,6 +1102,25 @@ interface(`auth_list_pam_console_data',`
 
 ########################################
 ## <summary>
+##	Create pam var console pid directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`auth_create_pam_console_data_dirs',`
+	gen_require(`
+		type pam_var_console_t;
+	')
+
+	files_search_pids($1)
+	allow $1 pam_var_console_t:dir create_dir_perms;
+')
+
+########################################
+## <summary>
 ##	Relabel pam_console data directories.
 ## </summary>
 ## <param name="domain">
@@ -1185,6 +1200,37 @@ interface(`auth_delete_pam_console_data',`
 
 ########################################
 ## <summary>
+##	Create specified objects in
+##	pid directories with the pam var
+##      console pid file type using a
+##      file type transition.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="object_class">
+##	<summary>
+##	Class of the object being created.
+##	</summary>
+## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
+#
+interface(`auth_pid_filetrans_pam_var_console',`
+	gen_require(`
+		type pam_var_console_t;
+	')
+
+	files_pid_filetrans($1, pam_var_console_t, $2, $3)
+')
+
+########################################
+## <summary>
 ##	Read all directories on the filesystem, except
 ##	login files and listed exceptions.
 ## </summary>
@@ -1201,11 +1247,8 @@ interface(`auth_delete_pam_console_data',`
 ## </param>
 #
 interface(`auth_read_all_dirs_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_read_all_dirs_except($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_list_non_auth_dirs() instead.')
+	files_list_non_auth_dirs($1)
 ')
 
 ########################################
@@ -1226,8 +1269,8 @@ interface(`auth_read_all_dirs_except_auth_files',`
 ## </param>
 #
 interface(`auth_read_all_dirs_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_read_all_dirs_except_auth_files() instead.')
-	auth_read_all_dirs_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_list_non_auth_dirs() instead.')
+	files_list_non_auth_dirs($1)
 ')
 
 ########################################
@@ -1249,11 +1292,8 @@ interface(`auth_read_all_dirs_except_shadow',`
 ## <rolecap/>
 #
 interface(`auth_read_all_files_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_read_all_files_except($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_read_non_auth_files() instead.')
+	files_read_non_auth_files($1)
 ')
 
 ########################################
@@ -1275,8 +1315,8 @@ interface(`auth_read_all_files_except_auth_files',`
 ## <rolecap/>
 #
 interface(`auth_read_all_files_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_read_all_files_except_auth_files() instead.')
-	auth_read_all_files_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_read_non_auth_files() instead.')
+	files_read_non_auth_files($1)
 ')
 
 ########################################
@@ -1297,11 +1337,8 @@ interface(`auth_read_all_files_except_shadow',`
 ## </param>
 #
 interface(`auth_read_all_symlinks_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_read_all_symlinks_except($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_read_non_auth_symlinks() instead.')
+	files_read_non_auth_symlinks($1)
 ')
 
 ########################################
@@ -1322,8 +1359,8 @@ interface(`auth_read_all_symlinks_except_auth_files',`
 ## </param>
 #
 interface(`auth_read_all_symlinks_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_read_all_symlinks_except_auth_files() instead.')
-	auth_read_all_symlinks_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_read_non_auth_symlinks() instead.')
+	files_read_non_auth_symlinks($1)
 ')
 
 #######################################
@@ -1344,11 +1381,8 @@ interface(`auth_read_all_symlinks_except_shadow',`
 ## </param>
 #
 interface(`auth_relabel_all_files_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_relabel_all_files($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_relabel_non_auth_files() instead.')
+	files_relabel_non_auth_files($1)
 ')
 
 ########################################
@@ -1369,8 +1403,8 @@ interface(`auth_relabel_all_files_except_auth_files',`
 ## </param>
 #
 interface(`auth_relabel_all_files_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_relabel_all_files_except_auth_files() instead.')
-	auth_relabel_all_files_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_relabel_non_auth_files() instead.')
+	files_relabel_non_auth_files($1)
 ')
 
 ########################################
@@ -1391,11 +1425,8 @@ interface(`auth_relabel_all_files_except_shadow',`
 ## </param>
 #
 interface(`auth_rw_all_files_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_rw_all_files($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_rw_non_auth_files() instead.')
+	files_rw_non_auth_files($1)
 ')
 
 ########################################
@@ -1416,8 +1447,8 @@ interface(`auth_rw_all_files_except_auth_files',`
 ## </param>
 #
 interface(`auth_rw_all_files_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_rw_all_files_except_auth_files() instead.')
-	auth_rw_all_files_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_rw_non_auth_files() instead.')
+	files_rw_non_auth_files($1)
 ')
 
 ########################################
@@ -1438,11 +1469,8 @@ interface(`auth_rw_all_files_except_shadow',`
 ## </param>
 #
 interface(`auth_manage_all_files_except_auth_files',`
-	gen_require(`
-		attribute auth_file_type;
-	')
-
-	files_manage_all_files($1, $2 -auth_file_type)
+	refpolicywarn(`$0($*) has been deprecated, use files_manage_non_auth_files() instead.')
+	files_manage_non_auth_files($1)
 ')
 
 ########################################
@@ -1463,8 +1491,8 @@ interface(`auth_manage_all_files_except_auth_files',`
 ## </param>
 #
 interface(`auth_manage_all_files_except_shadow',`
-	refpolicywarn(`$0($*) has been deprecated, use auth_manage_all_files_except_auth_files() instead.')
-	auth_manage_all_files_except_auth_files($1, $2)
+	refpolicywarn(`$0($*) has been deprecated, use files_manage_non_auth_files() instead.')
+	files_manage_non_auth_files($1)
 ')
 
 ########################################
@@ -1739,54 +1767,11 @@ interface(`auth_relabel_login_records',`
 ## <infoflow type="both" weight="10"/>
 #
 interface(`auth_use_nsswitch',`
+    gen_require(`
+        attribute nsswitch_domain;
+    ')
 
-	files_list_var_lib($1)
-
-	# read /etc/nsswitch.conf
-	files_read_etc_files($1)
-
-	miscfiles_read_generic_certs($1)
-
-	sysnet_dns_name_resolve($1)
-	sysnet_use_ldap($1)
-
-	optional_policy(`
-		avahi_stream_connect($1)
-	')
-
-	optional_policy(`
-		ldap_stream_connect($1)
-	')
-
- 	optional_policy(`
-		likewise_stream_connect_lsassd($1)
-	')
-
-	optional_policy(`
-		kerberos_use($1)
-	')
-
-	optional_policy(`
-		nis_use_ypbind($1)
-	')
-
-	optional_policy(`
-		nscd_socket_use($1)
-	')
-
-	optional_policy(`
-		nslcd_stream_connect($1)
-	')
-
-	optional_policy(`
-		sssd_stream_connect($1)
-	')
-
-	optional_policy(`
-		samba_stream_connect_winbind($1)
-		samba_read_var_files($1)
-		samba_dontaudit_write_var_files($1)
-	')
+	typeattribute $1 nsswitch_domain;
 ')
 
 ########################################

@@ -1,4 +1,4 @@
-policy_module(files, 1.15.0)
+policy_module(files, 1.18.1)
 
 ########################################
 #
@@ -28,6 +28,12 @@ attribute polymember;
 attribute security_file_type;
 # and its opposite
 attribute non_security_file_type;
+
+# sensitive authentication files whose accesses should
+# not be dontaudited for uses
+attribute auth_file_type;
+# and its opposite
+attribute non_auth_file_type;
 
 attribute tmpfile;
 attribute tmpfsfile;
@@ -167,6 +173,7 @@ files_mountpoint(var_lib_t)
 #
 type var_lock_t;
 files_lock_file(var_lock_t)
+files_mountpoint(var_lock_t)
 
 #
 # var_run_t is the type of /var/run, usually
