@@ -1,4 +1,4 @@
-## <summary>mDNS/DNS-SD daemon implementing Apple ZeroConf architecture</summary>
+## <summary>mDNS/DNS-SD daemon implementing Apple ZeroConf architecture.</summary>
 
 ########################################
 ## <summary>
@@ -21,7 +21,26 @@ interface(`avahi_domtrans',`
 
 ########################################
 ## <summary>
-##	Send avahi a signal
+##	Execute avahi init scripts in the
+##	init script domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`avahi_initrc_domtrans',`
+	gen_require(`
+		type avahi_initrc_exec_t;
+	')
+
+	init_labeled_script_domtrans($1, avahi_initrc_exec_t)
+')
+
+########################################
+## <summary>
+##	Send generic signals to avahi.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -39,7 +58,7 @@ interface(`avahi_signal',`
 
 ########################################
 ## <summary>
-##	Send avahi a kill signal.
+##	Send kill signals to avahi.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -57,7 +76,7 @@ interface(`avahi_kill',`
 
 ########################################
 ## <summary>
-##	Send avahi a signull
+##	Send null signals to avahi.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -96,7 +115,8 @@ interface(`avahi_dbus_chat',`
 
 ########################################
 ## <summary>
-##	Connect to avahi using a unix domain stream socket.
+##	Connect to avahi using a unix
+##	stream socket.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -115,7 +135,65 @@ interface(`avahi_stream_connect',`
 
 ########################################
 ## <summary>
-##	Do not audit attempts to search the avahi pid directory.
+##	Create avahi pid directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`avahi_create_pid_dirs',`
+	gen_require(`
+		type avahi_var_run_t;
+	')
+
+	files_search_pids($1)
+	allow $1 avahi_var_run_t:dir create_dir_perms;
+')
+
+########################################
+## <summary>
+##	Set attributes of avahi pid directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`avahi_setattr_pid_dirs',`
+	gen_require(`
+		type avahi_var_run_t;
+	')
+
+	files_search_pids($1)
+	allow $1 avahi_var_run_t:dir setattr_dir_perms;
+')
+
+########################################
+## <summary>
+##	Create, read, and write avahi pid files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`avahi_manage_pid_files',`
+	gen_require(`
+		type avahi_var_run_t;
+	')
+
+	files_search_pids($1)
+	manage_files_pattern($1, avahi_var_run_t, avahi_var_run_t)
+')
+
+########################################
+## <summary>
+##	Do not audit attempts to search
+##	avahi pid directories.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -133,8 +211,37 @@ interface(`avahi_dontaudit_search_pid',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate
-##	an avahi environment
+##	Create specified objects in generic
+##	pid directories with the avahi pid file type.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="object_class">
+##	<summary>
+##	Class of the object being created.
+##	</summary>
+## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
+#
+interface(`avahi_filetrans_pid',`
+	gen_require(`
+		type avahi_var_run_t;
+	')
+
+	files_pid_filetrans($1, avahi_var_run_t, $2, $3)
+')
+
+########################################
+## <summary>
+##	All of the rules required to
+##	administrate an avahi environment.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -143,7 +250,7 @@ interface(`avahi_dontaudit_search_pid',`
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed to manage the avahi domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -151,16 +258,20 @@ interface(`avahi_dontaudit_search_pid',`
 interface(`avahi_admin',`
 	gen_require(`
 		type avahi_t, avahi_var_run_t, avahi_initrc_exec_t;
+		type avahi_var_lib_t;
 	')
 
 	allow $1 avahi_t:process { ptrace signal_perms };
 	ps_process_pattern($1, avahi_t)
 
-	init_labeled_script_domtrans($1, avahi_initrc_exec_t)
+	avahi_initrc_domtrans($1)
 	domain_system_change_exemption($1)
 	role_transition $2 avahi_initrc_exec_t system_r;
 	allow $2 system_r;
 
-	files_list_pids($1)
+	files_search_pids($1)
 	admin_pattern($1, avahi_var_run_t)
+
+	files_search_var_lib($1)
+	admin_pattern($1, avahi_var_lib_t)
 ')

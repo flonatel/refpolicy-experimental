@@ -1,4 +1,4 @@
-policy_module(selinuxutil, 1.16.0)
+policy_module(selinuxutil, 1.17.2)
 
 gen_require(`
 	bool secure_mode;
@@ -60,6 +60,7 @@ application_domain(newrole_t, newrole_exec_t)
 domain_role_change_exemption(newrole_t)
 domain_obj_id_change_exemption(newrole_t)
 domain_interactive_fd(newrole_t)
+role newrole_roles types newrole_t;
 
 #
 # policy_config_t is the type of /etc/security/selinux/*
@@ -91,6 +92,7 @@ type run_init_t;
 type run_init_exec_t;
 application_domain(run_init_t, run_init_exec_t)
 domain_system_change_exemption(run_init_t)
+role run_init_roles types run_init_t;
 
 type semanage_t;
 type semanage_exec_t;
@@ -337,8 +339,8 @@ selinux_compute_create_context(restorecond_t)
 selinux_compute_relabel_context(restorecond_t)
 selinux_compute_user_contexts(restorecond_t)
 
-auth_relabel_all_files_except_auth_files(restorecond_t )
-auth_read_all_files_except_auth_files(restorecond_t)
+files_relabel_non_auth_files(restorecond_t )
+files_read_non_auth_files(restorecond_t)
 auth_use_nsswitch(restorecond_t)
 
 locallogin_dontaudit_use_fds(restorecond_t)
@@ -541,6 +543,8 @@ kernel_dontaudit_list_all_proc(setfiles_t)
 kernel_dontaudit_list_all_sysctls(setfiles_t)
 
 dev_relabel_all_dev_nodes(setfiles_t)
+# to handle when /dev/console needs to be relabeled
+dev_rw_generic_chr_files(setfiles_t)
 
 domain_use_interactive_fds(setfiles_t)
 domain_dontaudit_search_all_domains_state(setfiles_t)
@@ -550,6 +554,7 @@ files_read_etc_files(setfiles_t)
 files_list_all(setfiles_t)
 files_relabel_all_files(setfiles_t)
 files_read_usr_symlinks(setfiles_t)
+files_dontaudit_read_all_symlinks(setfiles_t)
 
 fs_getattr_xattr_fs(setfiles_t)
 fs_list_all(setfiles_t)

@@ -1,4 +1,4 @@
-policy_module(devices, 1.13.0)
+policy_module(devices, 1.15.0)
 
 ########################################
 #
@@ -42,6 +42,9 @@ dev_node(autofs_device_t)
 type cardmgr_dev_t;
 dev_node(cardmgr_dev_t)
 files_tmp_file(cardmgr_dev_t)
+
+type cachefiles_device_t;
+dev_node(cachefiles_device_t)
 
 #
 # clock_device_t is the type of
@@ -115,11 +118,17 @@ dev_node(kvm_device_t)
 type lirc_device_t;
 dev_node(lirc_device_t)
 
+type loop_control_device_t;
+dev_node(loop_control_device_t)
+
 #
 # Type for /dev/mapper/control
 #
 type lvm_control_t;
 dev_node(lvm_control_t)
+
+type mei_device_t;
+dev_node(mei_device_t)
 
 #
 # memory_device_t is the type of /dev/kmem,

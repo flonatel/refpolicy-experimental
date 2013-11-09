@@ -1,9 +1,9 @@
-## <summary>Cyrus is an IMAP service intended to be run on sealed servers</summary>
+## <summary>Cyrus is an IMAP service intended to be run on sealed servers.</summary>
 
 ########################################
 ## <summary>
-##	Allow caller to create, read, write,
-##	and delete cyrus data files.
+##	Create, read, write, and delete
+##	cyrus data files.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -22,7 +22,8 @@ interface(`cyrus_manage_data',`
 
 ########################################
 ## <summary>
-##	Connect to Cyrus using a unix domain stream socket.
+##	Connect to Cyrus using a unix
+##	domain stream socket.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -41,8 +42,8 @@ interface(`cyrus_stream_connect',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate 
-##	an cyrus environment
+##	All of the rules required to
+##	administrate an cyrus environment.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -51,7 +52,7 @@ interface(`cyrus_stream_connect',`
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed to manage the cyrus domain.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -60,6 +61,7 @@ interface(`cyrus_admin',`
 	gen_require(`
 		type cyrus_t, cyrus_tmp_t, cyrus_var_lib_t;
 		type cyrus_var_run_t, cyrus_initrc_exec_t;
+		type cyrus_keytab_t;
 	')
 
 	allow $1 cyrus_t:process { ptrace signal_perms };
@@ -69,6 +71,9 @@ interface(`cyrus_admin',`
 	domain_system_change_exemption($1)
 	role_transition $2 cyrus_initrc_exec_t system_r;
 	allow $2 system_r;
+
+	files_list_etc($1)
+	admin_pattern($1, cyrus_keytab_t)
 
 	files_list_tmp($1)
 	admin_pattern($1, cyrus_tmp_t)

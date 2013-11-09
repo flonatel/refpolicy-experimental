@@ -2188,6 +2188,11 @@ interface(`fs_dontaudit_list_inotifyfs',`
 ##	The object class of the object being created.
 ##	</summary>
 ## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
 #
 interface(`fs_hugetlbfs_filetrans',`
 	gen_require(`
@@ -2195,7 +2200,7 @@ interface(`fs_hugetlbfs_filetrans',`
 	')
 
 	allow $2 hugetlbfs_t:filesystem associate;
-	filetrans_pattern($1, hugetlbfs_t, $2, $3)
+	filetrans_pattern($1, hugetlbfs_t, $2, $3, $4)
 ')
 
 ########################################
@@ -3848,6 +3853,24 @@ interface(`fs_associate_tmpfs',`
 
 ########################################
 ## <summary>
+##	Relabel from tmpfs filesystem.
+## </summary>
+## <param name="type">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_relabelfrom_tmpfs',`
+	gen_require(`
+		type tmpfs_t;
+	')
+
+	allow $1 tmpfs_t:filesystem relabelfrom;
+')
+
+########################################
+## <summary>
 ##	Get the attributes of tmpfs directories.
 ## </summary>
 ## <param name="domain">
@@ -3881,6 +3904,24 @@ interface(`fs_dontaudit_getattr_tmpfs_dirs',`
 	')
 
 	dontaudit $1 tmpfs_t:dir getattr;
+')
+
+########################################
+## <summary>
+##	Mount on tmpfs directories.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`fs_mounton_tmpfs',`
+	gen_require(`
+		type tmpfs_t;
+	')
+
+	allow $1 tmpfs_t:dir mounton;
 ')
 
 ########################################
@@ -4014,6 +4055,11 @@ interface(`fs_dontaudit_write_tmpfs_dirs',`
 ##	The object class of the object being created.
 ##	</summary>
 ## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
 #
 interface(`fs_tmpfs_filetrans',`
 	gen_require(`
@@ -4021,7 +4067,7 @@ interface(`fs_tmpfs_filetrans',`
 	')
 
 	allow $2 tmpfs_t:filesystem associate;
-	filetrans_pattern($1, tmpfs_t, $2, $3)
+	filetrans_pattern($1, tmpfs_t, $2, $3, $4)
 ')
 
 ########################################

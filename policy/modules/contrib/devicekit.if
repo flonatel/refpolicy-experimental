@@ -1,4 +1,4 @@
-## <summary>Devicekit modular hardware abstraction layer</summary>
+## <summary>Devicekit modular hardware abstraction layer.</summary>
 
 ########################################
 ## <summary>
@@ -15,6 +15,7 @@ interface(`devicekit_domtrans',`
 		type devicekit_t, devicekit_exec_t;
 	')
 
+	corecmd_search_bin($1)
 	domtrans_pattern($1, devicekit_exec_t, devicekit_t)
 ')
 
@@ -31,10 +32,11 @@ interface(`devicekit_domtrans',`
 #
 interface(`devicekit_dgram_send',`
 	gen_require(`
-		type devicekit_t;
+		type devicekit_t, devicekit_var_run_t;
 	')
 
-	allow $1 devicekit_t:unix_dgram_socket sendto;
+	files_search_pids($1)
+	dgram_send_pattern($1, devicekit_var_run_t, devicekit_var_run_t, devicekit_t)
 ')
 
 ########################################
@@ -81,7 +83,7 @@ interface(`devicekit_dbus_chat_disk',`
 
 ########################################
 ## <summary>
-##	Send signal devicekit power
+##	Send generic signals to devicekit power.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -120,6 +122,85 @@ interface(`devicekit_dbus_chat_power',`
 
 ########################################
 ## <summary>
+##	Use and inherit devicekit power
+##	file descriptors.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`devicekit_use_fds_power',`
+	gen_require(`
+		type devicekit_power_t;
+	')
+
+	allow $1 devicekit_power_t:fd use;
+')
+
+########################################
+## <summary>
+##	Append inherited devicekit log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`devicekit_append_inherited_log_files',`
+	gen_require(`
+		type devicekit_var_log_t;
+	')
+
+	logging_search_logs($1)
+	allow $1 devicekit_var_log_t:file { getattr_file_perms append };
+
+	devicekit_use_fds_power($1)
+')
+
+########################################
+## <summary>
+##	Create, read, write, and delete
+##	devicekit log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`devicekit_manage_log_files',`
+	gen_require(`
+		type devicekit_var_log_t;
+	')
+
+	logging_search_logs($1)
+	manage_files_pattern($1, devicekit_var_log_t, devicekit_var_log_t)
+')
+
+########################################
+## <summary>
+##	Relabel devicekit log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`devicekit_relabel_log_files',`
+	gen_require(`
+		type devicekit_var_log_t;
+	')
+
+	logging_search_logs($1)
+	relabel_files_pattern($1, devicekit_var_log_t, devicekit_var_log_t)
+')
+
+########################################
+## <summary>
 ##	Read devicekit PID files.
 ## </summary>
 ## <param name="domain">
@@ -139,8 +220,28 @@ interface(`devicekit_read_pid_files',`
 
 ########################################
 ## <summary>
-##	All of the rules required to administrate
-##	an devicekit environment
+##	Create, read, write, and delete
+##	devicekit PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`devicekit_manage_pid_files',`
+	gen_require(`
+		type devicekit_var_run_t;
+	')
+
+	files_search_pids($1)
+	manage_files_pattern($1, devicekit_var_run_t, devicekit_var_run_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to
+##	administrate an devicekit environment.
 ## </summary>
 ## <param name="domain">
 ##	<summary>
@@ -149,12 +250,7 @@ interface(`devicekit_read_pid_files',`
 ## </param>
 ## <param name="role">
 ##	<summary>
-##	The role to be allowed to manage the devicekit domain.
-##	</summary>
-## </param>
-## <param name="terminal">
-##	<summary>
-##	The type of the user terminal.
+##	Role allowed access.
 ##	</summary>
 ## </param>
 ## <rolecap/>
@@ -163,23 +259,21 @@ interface(`devicekit_admin',`
 	gen_require(`
 		type devicekit_t, devicekit_disk_t, devicekit_power_t;
 		type devicekit_var_lib_t, devicekit_var_run_t, devicekit_tmp_t;
+		type devicekit_var_log_t;
 	')
 
-	allow $1 devicekit_t:process { ptrace signal_perms getattr };
-	ps_process_pattern($1, devicekit_t)
+	allow $1 { devicekit_t devicekit_disk_t devicekit_power_t }:process { ptrace signal_perms };
+	ps_process_pattern($1, { devicekit_t devicekit_disk_t devicekit_power_t })
 
-	allow $1 devicekit_disk_t:process { ptrace signal_perms getattr };
-	ps_process_pattern($1, devicekit_disk_t)
-
-	allow $1 devicekit_power_t:process { ptrace signal_perms getattr };
-	ps_process_pattern($1, devicekit_power_t)
-
-	admin_pattern($1, devicekit_tmp_t)
 	files_search_tmp($1)
+	admin_pattern($1, devicekit_tmp_t)
 
-	admin_pattern($1, devicekit_var_lib_t)
 	files_search_var_lib($1)
+	admin_pattern($1, devicekit_var_lib_t)
 
-	admin_pattern($1, devicekit_var_run_t)
+	logging_search_logs($1)
+	admin_pattern($1, devicekit_var_log_t)
+
 	files_search_pids($1)
+	admin_pattern($1, devicekit_var_run_t)
 ')

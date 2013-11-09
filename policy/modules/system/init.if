@@ -234,7 +234,7 @@ interface(`init_daemon_domain',`
 	')
 
 	optional_policy(`
-		nscd_socket_use($1)
+		nscd_use($1)
 	')
 ')
 
@@ -413,6 +413,33 @@ interface(`init_ranged_system_domain',`
 		range_transition initrc_t $2:process $3;
 		mls_rangetrans_target($1)
 	')
+')
+
+########################################
+## <summary>
+##	Mark the file type as a daemon run dir, allowing initrc_t
+##	to create it
+## </summary>
+## <param name="filetype">
+##	<summary>
+##	Type to mark as a daemon run dir
+##	</summary>
+## </param>
+## <param name="filename">
+##	<summary>
+##	Filename of the directory that the init script creates
+##	</summary>
+## </param>
+#
+interface(`init_daemon_run_dir',`
+	gen_require(`
+		attribute daemonrundir;
+		type initrc_t;
+	')
+
+	typeattribute $1 daemonrundir;
+
+	files_pid_filetrans(initrc_t, $1, dir, $2)
 ')
 
 ########################################
@@ -1461,6 +1488,27 @@ interface(`init_use_script_ptys',`
 
 ########################################
 ## <summary>
+##	Read and write inherited init script ptys.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`init_use_inherited_script_ptys',`
+	gen_require(`
+		type initrc_devpts_t;
+	')
+
+	term_list_ptys($1)
+	allow $1 initrc_devpts_t:chr_file { getattr read write ioctl };
+
+	init_use_fds($1)
+')
+
+########################################
+## <summary>
 ##	Do not audit attempts to read and
 ##	write the init script pty.
 ## </summary>
@@ -1575,6 +1623,11 @@ interface(`init_rw_script_tmp_files',`
 ##	The object class.
 ##	</summary>
 ## </param>
+## <param name="name" optional="true">
+##	<summary>
+##	The name of the object being created.
+##	</summary>
+## </param>
 #
 interface(`init_script_tmp_filetrans',`
 	gen_require(`
@@ -1582,7 +1635,7 @@ interface(`init_script_tmp_filetrans',`
 	')
 
 	files_search_tmp($1)
-	filetrans_pattern($1, initrc_tmp_t, $2, $3)
+	filetrans_pattern($1, initrc_tmp_t, $2, $3, $4)
 ')
 
 ########################################
@@ -1750,7 +1803,7 @@ interface(`init_pid_filetrans_utmp',`
 		type initrc_var_run_t;
 	')
 
-	files_pid_filetrans($1, initrc_var_run_t, file)
+	files_pid_filetrans($1, initrc_var_run_t, file, "utmp")
 ')
 
 ########################################

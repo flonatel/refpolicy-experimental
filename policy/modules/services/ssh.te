@@ -1,4 +1,4 @@
-policy_module(ssh, 2.3.0)
+policy_module(ssh, 2.4.2)
 
 ########################################
 #
@@ -73,6 +73,9 @@ type ssh_home_t;
 typealias ssh_home_t alias { home_ssh_t user_ssh_home_t user_home_ssh_t staff_home_ssh_t sysadm_home_ssh_t };
 typealias ssh_home_t alias { auditadm_home_ssh_t secadm_home_ssh_t };
 userdom_user_home_content(ssh_home_t)
+
+type sshd_keytab_t;
+files_type(sshd_keytab_t)
 
 ##############################
 #
@@ -200,21 +203,17 @@ optional_policy(`
 # ssh_keysign_t local policy
 #
 
-tunable_policy(`allow_ssh_keysign',`
-	allow ssh_keysign_t self:capability { setgid setuid };
-	allow ssh_keysign_t self:unix_stream_socket create_socket_perms;
+allow ssh_keysign_t self:capability { setgid setuid };
+allow ssh_keysign_t self:unix_stream_socket create_socket_perms;
 
-	allow ssh_keysign_t sshd_key_t:file { getattr read };
+allow ssh_keysign_t sshd_key_t:file { getattr read };
 
-	dev_read_urand(ssh_keysign_t)
+dev_read_urand(ssh_keysign_t)
 
-	files_read_etc_files(ssh_keysign_t)
-')
+files_read_etc_files(ssh_keysign_t)
 
 optional_policy(`
-	tunable_policy(`allow_ssh_keysign',`
-		nscd_socket_use(ssh_keysign_t)
-	')
+	nscd_use(ssh_keysign_t)
 ')
 
 #################################
@@ -227,6 +226,8 @@ optional_policy(`
 # so a tunnel can point to another ssh tunnel
 allow sshd_t self:netlink_route_socket r_netlink_socket_perms;
 allow sshd_t self:key { search link write };
+
+allow sshd_t sshd_keytab_t:file read_file_perms;
 
 manage_dirs_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
 manage_files_pattern(sshd_t, sshd_tmp_t, sshd_tmp_t)
@@ -243,6 +244,10 @@ term_relabelto_all_ptys(sshd_t)
 # for X forwarding
 corenet_tcp_bind_xserver_port(sshd_t)
 corenet_sendrecv_xserver_server_packets(sshd_t)
+
+ifdef(`distro_debian',`
+	allow sshd_t self:process { getcap setcap };
+')
 
 tunable_policy(`ssh_sysadm_login',`
 	# Relabel and access ptys created by sshd
@@ -265,7 +270,8 @@ optional_policy(`
 ')
 
 optional_policy(`
-	kerberos_keytab_template(sshd, sshd_t)
+	kerberos_read_keytab(sshd_t)
+	kerberos_use(sshd_t)
 ')
 
 optional_policy(`
@@ -327,10 +333,6 @@ auth_use_nsswitch(ssh_keygen_t)
 logging_send_syslog_msg(ssh_keygen_t)
 
 userdom_dontaudit_use_unpriv_user_fds(ssh_keygen_t)
-
-optional_policy(`
-	nscd_socket_use(ssh_keygen_t)
-')
 
 optional_policy(`
 	seutil_sigchld_newrole(ssh_keygen_t)

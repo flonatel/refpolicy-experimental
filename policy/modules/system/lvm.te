@@ -1,4 +1,4 @@
-policy_module(lvm, 1.13.0)
+policy_module(lvm, 1.15.2)
 
 ########################################
 #
@@ -167,7 +167,7 @@ optional_policy(`
 # net_admin for multipath
 allow lvm_t self:capability { dac_override fowner ipc_lock sys_admin sys_nice mknod chown sys_resource sys_rawio net_admin };
 dontaudit lvm_t self:capability sys_tty_config;
-allow lvm_t self:process { sigchld sigkill sigstop signull signal };
+allow lvm_t self:process { sigchld sigkill sigstop signull signal setfscreate };
 # LVM will complain a lot if it cannot set its priority.
 allow lvm_t self:process setsched;
 allow lvm_t self:file rw_file_perms;
@@ -192,7 +192,9 @@ can_exec(lvm_t, lvm_exec_t)
 
 # Creating lock files
 manage_files_pattern(lvm_t, lvm_lock_t, lvm_lock_t)
+create_dirs_pattern(lvm_t, lvm_lock_t, lvm_lock_t)
 files_lock_filetrans(lvm_t, lvm_lock_t, file)
+files_lock_filetrans(lvm_t, lvm_lock_t, dir, "lvm")
 
 manage_dirs_pattern(lvm_t, lvm_var_lib_t, lvm_var_lib_t)
 manage_files_pattern(lvm_t, lvm_var_lib_t, lvm_var_lib_t)
@@ -340,6 +342,7 @@ optional_policy(`
 
 optional_policy(`
 	udev_read_db(lvm_t)
+	udev_read_pid_files(lvm_t)
 ')
 
 optional_policy(`

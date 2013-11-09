@@ -1,4 +1,4 @@
-policy_module(xserver, 3.7.0)
+policy_module(xserver, 3.9.4)
 
 gen_require(`
 	class x_drawable all_x_drawable_perms;
@@ -151,6 +151,7 @@ userdom_user_tmp_file(xauth_tmp_t)
 # this is not actually a device, its a pipe
 type xconsole_device_t;
 files_type(xconsole_device_t)
+dev_associate(xconsole_device_t)
 fs_associate_tmpfs(xconsole_device_t)
 files_associate_tmp(xconsole_device_t)
 
@@ -514,6 +515,15 @@ optional_policy(`
 ')
 
 optional_policy(`
+	dbus_system_bus_client(xdm_t)
+	dbus_connect_system_bus(xdm_t)
+
+	optional_policy(`
+		accountsd_dbus_chat(xdm_t)
+	')
+')
+
+optional_policy(`
 	# Talk to the console mouse server.
 	gpm_stream_connect(xdm_t)
 	gpm_setattr_gpmctl(xdm_t)
@@ -678,6 +688,8 @@ dev_rw_xserver_misc(xserver_t)
 # read events - the synaptics touchpad driver reads raw events
 dev_rw_input_dev(xserver_t)
 dev_rwx_zero(xserver_t)
+
+domain_dontaudit_search_all_domains_state(xserver_t)
 
 files_read_etc_files(xserver_t)
 files_read_etc_runtime_files(xserver_t)

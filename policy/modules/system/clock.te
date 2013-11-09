@@ -1,4 +1,4 @@
-policy_module(clock, 1.6.0)
+policy_module(clock, 1.7.0)
 
 ########################################
 #
@@ -65,7 +65,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	nscd_socket_use(hwclock_t)
+	nscd_use(hwclock_t)
 ')
 
 optional_policy(`

@@ -1,4 +1,4 @@
-policy_module(sysadm, 2.4.0)
+policy_module(sysadm, 2.6.1)
 
 ########################################
 #
@@ -98,6 +98,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	bacula_run_admin(sysadm_t, sysadm_r)
+')
+
+optional_policy(`
 	bind_run_ndc(sysadm_t, sysadm_r)
 ')
 
@@ -153,10 +157,6 @@ optional_policy(`
 
 optional_policy(`
 	fstools_run(sysadm_t, sysadm_r)
-')
-
-optional_policy(`
-	git_role(sysadm_r, sysadm_t)
 ')
 
 optional_policy(`
@@ -303,7 +303,7 @@ optional_policy(`
 ')
 
 optional_policy(`
-	samhain_admin(sysadm_t)
+	samhain_admin(sysadm_t, sysadm_r)
 ')
 
 optional_policy(`
@@ -390,6 +390,10 @@ optional_policy(`
 ')
 
 optional_policy(`
+	virt_stream_connect(sysadm_t)
+')
+
+optional_policy(`
 	vmware_role(sysadm_r, sysadm_t)
 ')
 
@@ -436,6 +440,10 @@ ifndef(`distro_redhat',`
 
 	optional_policy(`
 		dbus_role_template(sysadm, sysadm_r, sysadm_t)
+
+		optional_policy(`
+			gnome_role_template(sysadm, sysadm_r, sysadm_t)
+		')
 	')
 
 	optional_policy(`
@@ -448,10 +456,6 @@ ifndef(`distro_redhat',`
 
 	optional_policy(`
 		gift_role(sysadm_r, sysadm_t)
-	')
-
-	optional_policy(`
-		gnome_role(sysadm_r, sysadm_t)
 	')
 
 	optional_policy(`
