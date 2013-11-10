@@ -22,8 +22,10 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
   * Drop debian/file_contexts.subs_dist, install upstream one instead
   * debian/rules: policy/rolemap file is gone
   * debian/control: Bump {build-}dependencies to the last userspace release
+  * debian/patches/0004-systemd-udevd_path.patch,
+    debian/patches/0005-udevadm_path.patch: Properly label udevd and udevadm
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 09 Nov 2013 01:46:25 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 10 Nov 2013 13:49:50 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 

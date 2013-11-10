@@ -1,0 +1,23 @@
+Signed-off-by: Dominick Grift <dominick.grift@gmail.com>
+---
+ policy/modules/system/udev.fc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/udev.fc b/policy/modules/system/udev.fc
+index 374ac00..dd1a887 100644
+--- a/policy/modules/system/udev.fc
++++ b/policy/modules/system/udev.fc
+@@ -33,5 +33,6 @@ ifdef(`distro_redhat',`
+ /var/run/udev(/.*)?	gen_context(system_u:object_r:udev_var_run_t,s0)
+ 
+ ifdef(`distro_debian',`
++/lib/systemd/systemd-udevd	--	gen_context(system_u:object_r:udev_exec_t,s0)
+ /var/run/xen-hotplug -d	gen_context(system_u:object_r:udev_var_run_t,s0)
+ ')
+-- 
+1.8.3.1
+
+_______________________________________________
+refpolicy mailing list
+refpolicy@oss.tresys.com
+http://oss.tresys.com/mailman/listinfo/refpolicy
