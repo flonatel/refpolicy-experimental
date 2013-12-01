@@ -4,7 +4,7 @@
 COMMON_OPTIONS = DISTRO=debian DIRECT_INITRC=y MONOLITHIC=n
 FLAVOURS = default mls
 TYPE_default = mcs
-UBAC_default = y
+UBAC_default = n
 TYPE_mls = mls
 UBAC_mls = n
 
@@ -80,7 +80,7 @@ conf-docs:
                 README man $(CURDIR)/debian/build-docs
 	cp  debian/build.conf.default $(CURDIR)/debian/build-docs/build.conf
 	(cd $(CURDIR)/debian/build-docs ;                          \
-           $(MAKE) NAME=default TYPE=mcs UBAC=y $(COMMON_OPTIONS) conf)
+           $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) conf)
 	touch $@
 
 conf-src:
@@ -125,13 +125,13 @@ install-%-dev:
 
 install-docs: conf-docs
 	(cd $(CURDIR)/debian/build-docs; \
-	    $(MAKE) NAME=default TYPE=mcs UBAC=y $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ PKGNAME=selinux-policy-doc conf html install-docs)
+	    $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ PKGNAME=selinux-policy-doc conf html install-docs)
 	touch $@
 
 install-src: conf-src
 	mkdir -p    $(CURDIR)/debian/tmp/usr/src
 	(cd $(CURDIR)/debian/build-src;                                 \
-	 $(MAKE) NAME=default TYPE=mcs UBAC=y $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ bare conf install-src; )
+	 $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ bare conf install-src; )
 	find $(CURDIR)/debian/tmp -type d -name .arch-ids -print0 | xargs -0r rm -rf
 	test ! -e $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/COPYING || \
 	   rm -f $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/COPYING
