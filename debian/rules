@@ -5,8 +5,10 @@ COMMON_OPTIONS = DISTRO=debian DIRECT_INITRC=y MONOLITHIC=n
 FLAVOURS = default mls
 TYPE_default = mcs
 UBAC_default = n
+UNK_PERMS_default = allow
 TYPE_mls = mls
 UBAC_mls = n
+UNK_PERMS_mls = deny
 
 %:
 	dh $@
@@ -64,9 +66,9 @@ conf-%-policy:
             README man $(CURDIR)/debian/build-$*
 	cp debian/build.conf.$* $(CURDIR)/debian/build-$*/build.conf
 	$(MAKE) -C $(CURDIR)/debian/build-$*                               \
-                   NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) $(COMMON_OPTIONS) bare
+                   NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) bare
 	(cd $(SRCTOP)/debian/build-$(package) ;                            \
-           $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) $(COMMON_OPTIONS) conf)
+           $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) conf)
 	cp debian/modules.conf.$*                                          \
                      $(CURDIR)/debian/build-$*/policy/modules.conf
 	touch $@
@@ -80,7 +82,7 @@ conf-docs:
                 README man $(CURDIR)/debian/build-docs
 	cp  debian/build.conf.default $(CURDIR)/debian/build-docs/build.conf
 	(cd $(CURDIR)/debian/build-docs ;                          \
-           $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) conf)
+           $(MAKE) NAME=default TYPE=mcs UBAC=n UNK_PERMS=allow $(COMMON_OPTIONS) conf)
 	touch $@
 
 conf-src:
@@ -100,12 +102,12 @@ conf-src:
 
 build-%-policy: conf-%-policy
 	(cd $(CURDIR)/debian/build-$* ;                          \
-             $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) $(COMMON_OPTIONS) policy)
+             $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) policy)
 	touch $@
 
 install-%-policy: build-%-policy
 	(cd $(CURDIR)/debian/build-$*; \
-	    $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install \
+	    $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install \
 	    $(CURDIR)/debian/tmp/etc/selinux/$*/users/local.users $(CURDIR)/debian/tmp/etc/selinux/$*/users/system.users)
 	cp -a debian/setrans.conf.$* $(CURDIR)/debian/tmp/etc/selinux/$*/setrans.conf
 	mkdir -p $(CURDIR)/debian/tmp/etc/selinux/$*/contexts/files/
@@ -119,19 +121,19 @@ install-%-policy: build-%-policy
 
 install-%-dev:
 	(cd $(CURDIR)/debian/build-$*; \
-	    $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install-headers)
+	    $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install-headers)
 	cp -a $(CURDIR)/doc/Makefile.example $(CURDIR)/debian/tmp/usr/share/selinux/$*/Makefile
 	touch $@
 
 install-docs: conf-docs
 	(cd $(CURDIR)/debian/build-docs; \
-	    $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ PKGNAME=selinux-policy-doc conf html install-docs)
+	    $(MAKE) NAME=default TYPE=mcs UBAC=n UNK_PERMS=allow $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ PKGNAME=selinux-policy-doc conf html install-docs)
 	touch $@
 
 install-src: conf-src
 	mkdir -p    $(CURDIR)/debian/tmp/usr/src
 	(cd $(CURDIR)/debian/build-src;                                 \
-	 $(MAKE) NAME=default TYPE=mcs UBAC=n $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ bare conf install-src; )
+	 $(MAKE) NAME=default TYPE=mcs UBAC=n UNK_PERMS=allow $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp/ bare conf install-src; )
 	find $(CURDIR)/debian/tmp -type d -name .arch-ids -print0 | xargs -0r rm -rf
 	test ! -e $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/COPYING || \
 	   rm -f $(CURDIR)/debian/tmp/etc/selinux/default/src/policy/COPYING
