@@ -1,323 +1,74 @@
-#! /usr/bin/perl
-#                              -*- Mode: Cperl -*-
-# postinst.pl ---
-# Author           : Manoj Srivastava ( srivasta@golden-gryphon.com )
-# Created On       : Mon Aug 21 01:14:21 2006
-# Created On Node  : glaurung.internal.golden-gryphon.com
-# Last Modified By : Manoj Srivastava
-# Last Modified On : Tue Sep  1 22:50:34 2009
-# Last Machine Used: anzu.internal.golden-gryphon.com
-# Update Count     : 35
-# Status           : Unknown, Use with caution!
-# HISTORY          :
-# Description      :
-#
-# arch-tag: 69c85425-4822-4b17-bb54-3b2d22e76687
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-#
-#
-#use strict; #for debugging
-use Cwd 'abs_path';
-$|=1;
+#!/bin/bash
+set -e
 
-# Ignore all invocations except when called on to configure.
-exit 0 if $ARGV[0] =~ /abort-upgrade/;
-exit 0 if $ARGV[0] =~ /abort-remove/;
-exit 0 if $ARGV[0] =~ /abort-deconfigure/;
-exit 0 unless $ARGV[0] =~ /configure/;
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
 
-my $type        = '=T';
-my $package_name= "selinux-policy-$type";
-my $policy_name = "$type";
-my $basedir     = "/etc/selinux/$policy_name";
-my $src_dir     = "/usr/share/selinux/$policy_name";
+# Will be replaced by the binary package flavour in debian/rules
+flavour="=FLAVOUR="
+moduledir="/etc/selinux/${flavour}/modules/active/modules"
 
-# List of all the modules in the policy
-my @all_modules;
-# Full path of all modules in the policy
-my %Module_Path;
-# Dpendencies for policy modules, as determined by semodule_deps
-my %Deps = ( 'modemmanager' => 'dbus',  'modemmanager' => 'networkmanager',  'gnomeclock' => 'dbus',  'nagios' => 'nagios',  'xguest' => 'xserver',  'vmware' => 'xserver',  'vmware' => 'netutils',  'devicekit' => 'dbus',  'setroubleshoot' => 'dbus',  'openca' => 'apache',  'rhgb' => 'xserver',  'djbdns' => 'daemontools',  'djbdns' => 'ucspitcp',  'w3c' => 'apache',  'webalizer' => 'apache',  'ifplugd' => 'netutils',  'virt' => 'virt',  'rssh' => 'ssh',  'mozilla' => 'xserver',  'mplayer' => 'xserver',  'fprintd' => 'dbus',  'git' => 'apache',  'rtkit' => 'dbus',  'telnet' => 'remotelogin',  'qemu' => 'virt',  'xscreensaver' => 'xserver',  'mrtg' => 'netutils',  'postfix' => 'unconfined',  'webadm' => 'apache',  'awstats' => 'apache',  'cups' => 'lpd',  'portslave' => 'ssh',  'portslave' => 'ppp',  'thunderbird' => 'xserver',  'evolution' => 'xserver',  'dkim' => 'milter',  'yam' => 'apache',  'rlogin' => 'remotelogin',  'xen' => 'netutils' );
-# A hash of all modules already processed
-my %Seen;
-# A hash of all packages installed on this machine
-my %Installed;
-# Policy modules in dependency order (subset of all modules in policy)
-my @ordered;
-# A list of modules already scheduled to be laoded
-my %Loaded;
-# and the order in which the modules should be loaded into policy.
-my @load_order;
-# A mapping of policy modules to Debian package names.
-my %map = (
-           'apache'          => [ 'apache*', 'cvsweb' ],
-           'apm'             => [ 'acpid' ],
-           'asterisk'        => [ 'asterisk' ],
-           'automount'       => [ 'autofs*' ],
-           'avahi'           => [ 'avahi-*' ],
-           'bind'            => [ 'bind9' ],
-           'bluetooth'       => [ 'bluez' ],
-           'cdrecord'        => [ 'wodim' ],
-           'clamav'          => [ 'clamav', 'amavisd-new' ],
-           'courier'         => [ 'courier*' ],
-           'consolekit'      => [ 'consolekit' ],
-           'cpufreqselector' => [ 'cpufreqd', 'cpufrequtils', 'gnome-applets'  ],
-           'cups'            => [ 'cupsys*', 'cups', 'cups-bsd', 'cups-client',
-                                  'cups-common' ],
-           'cyrus'           => [ 'cyrus*' ],
-           'devicekit'       => [ 'udev', 'hal', 'udisks', 'upower' ],
-           'dovecot'         => [ 'dovecot-imapd', 'dovecot-pop3d' ],
-           'dhcp'            => [ 'dhcp*', 'dhclient*', 'pump', 'wide-dhcpv6-client', 'isc-dhcp-client' ],
-           'dirmngr'         => [ 'dirmngr' ],
-           'dkim'            => [ 'dkim-filter' ],
-           'epmd'            => [ 'erlang-base' ],
-           'exim'            => [ 'exim4' ],
-           'finger'          => [ 'finger', '*fingerd' ],
-           'ftp'             => [ 'ftp', '*ftpd' ],
-           'gitosis'         => [ 'gitosis' ],
-           'gpg'             => [ 'gnupg' ],
-           'hddtemp'         => [ 'hddtemp' ],
-           'hwclock'         => [ 'util-linux' ],
-           'inetd'           => [ '*-inetd', 'openbsd-inetd', 'netkit-inetd',
-                                  'rinetd', 'rlinetd', 'xinetd' ],
-           'iodine'          => [ 'iodine' ],
-           'irqbalance'      => [ 'irqbalance' ],
-           'ipsec'           => [ 'ipsec-tools', 'racoon' ],
-           'jabber'          => [ 'jabber', 'ejabberd' ],
-           'java'            => [ 'sun-java5*', 'cacao', 'gcj*', 'gij*', 'kaffe*',
-                                  'java*', 'jvm*', 'jre*', 'jsdk*' ],
-           'kdump'           => [ 'crash' ],
-           'kerneloops'      => [ 'kerneloops' ],
-           'lda'             => [ 'procmail', 'courier-maildrop', 'dovecot-common' ],
-           'ldap'            => [ 'slapd' ],
-           'lpd'             => [ 'lprng', 'rlpr' ],
-           'loadkeys'        => [ 'console-tools' ],
-           'lvm'             => [ 'lvm2', 'dmsetup' ],
-           'milter'            => [ 'milter-greylist', 'spamass-milter' ],
-           'mono'            => [ 'mono*' ],
-           'munin'           => [ 'munin-node' ],
-           'mysql'           => [ 'mysql-server', 'mysql-server*' ],
-           'mozilla'         => [ 'mozilla-browser', 'firefox', 'galeon',
-                                'mozilla-*', 'firefox*', 'epiphany-browser',
-                                'chromium-browser' ],
-           'nagios'          => [ 'nagios*' ],
-           'netutils'        => [ 'arping', 'nmap', '*-ping', 'traceroute*' ],
-           'nslcd'           => [ 'nslcd' ],
-           'nut'             => [ 'nut-server' ],
-           'pcmcia'          => [ 'pcmciautils' ],
-           'policykit'       => [ 'policykit', 'policykit-1' ],
-           'ptchown'         => [ 'libc-bin' ],
-           'pythonsupport'   => [ 'python-support' ],
-           'radius'          => [ 'freeradius*', 'radiusd*' ],
-           'raid'            => [ 'mdadm' ],
-           'readahead'       => [ 'memlockd' ],
-           'rpc'             => [ 'nfs-common', 'nfs-kernel-server' ],
-           'sasl'            => [ 'libsasl2' ],
-           'shorewall'       => [ 'shorewall-common', 'shorewall-lite',
-                                  'shorewall-perl', 'shorewall-shell',
-                                  'shorewall6', 'shorewall6-lite'
-                                ],
-           'smartmon'        => [ 'smartmontools' ],
-           'ssh'             => [ 'openssh*' ],
-           'squid'           => [ 'squid', 'dansguardian' ],
-#           'su'             => [ 'login' ],
-           'sysstat'         => [ 'atsar' ],
-           'tcsd'            => [ 'trousers' ],
-           'telnet'          => [ 'telnet', '*telnetd*' ],
-           'uml'             => [ 'linux-uml*' ],
-           'uptime'          => [ 'uptimed' ],
-           'usbmodules'      => [ 'usbutils' ],
-           'varnishd'        => [ 'varnish' ],
-#           'usermanage'     => [ 'passwd' ],
-           'wm'              => [ 'aewm', 'afterstep', 'awesome', 'blackbox',
-                                  'compiz', 'ctwm', 'dwm', 'e17', 'evilwm',
-                                  'fluxbox', 'flwm', 'fvwm', 'i3-wm', 'icewm',
-                                  'lwm', 'matchbox-window-manager', 'metacity',
-                                  'mutter', 'nawm', 'openbox', 'oroborus',
-                                  'pekwm', 'ratpoison', 'sapphire', 'sawfish',
-                                  'scrotwm', 'stumpwm','sugar-0.84', 'tinywm',
-                                  'twm', 'uwm', 'vtwm', 'w9wm', 'wm2', 'wmaker',
-                                  'xfwm4', 'xmonad', 'ion3', 'kwin', 'amiwm'
-                                ],
-           'xen'             => [ 'xen-utils-common' ],
-           'xscreensaver'    => [ 'xscreensaver', 'kscreensaver',
-                                  'gnome-screensaver', 'innerspace.app',
-                                  'kanjisaver', 'kannasaver' ],
-           'xserver'         => [ 'gdm', 'kdm', 'xdm', 'xserver*', 'xbase-clients' ]
-          );
+# modules which are not enabled by default, because they are usually
+# not needed on a debian system
+notdefault="rpm firstboot portage"
 
-# Converts wildcard (glob) pattern into regex pattern (only `*' is wild).
-sub wild2re {
-  my ($pat) = @_;
-  return join('.*', map(quotemeta, split('\*', $pat, -1)));
-}
+case "$1" in
+    configure)
+	# record which non-default modules do not yet exist for disabling them later
+	# for idempotency we need to store this in a file
+	if [ ! -f "/etc/selinux/${flavour}/modules_to_disable" ]; then
+	    for module in ${notdefault}; do
+		if [ ! -e "${moduledir}/${module}.pp" ]; then
+		    echo "${module}"
+		fi
+	    done > "/etc/selinux/${flavour}/modules_to_disable.new"
+	    mv "/etc/selinux/${flavour}/modules_to_disable"{.new,}
+	fi
 
-#  List all th modules, except the base module, in the policy
-#  directory. This sets @all_modules and %Module_Path
-sub list_modules {
-  my $src_dir = shift;
-  print STDERR "Locating modules\n";
-  opendir(DIR, $src_dir) || die "can't opendir $src_dir: $!";
+	echo -n "Updating selinux policy ${flavour}..."
+	mkdir -p "${moduledir}/"
+	
+	# first copy the modules to the proper location in /etc
+	# note that they stay compressed, but without the compression suffix
+	cd "/usr/share/selinux/${flavour}/"
+	for module in $(ls | grep -v '^base\.pp\.bz2$' | sed s'#\.pp\.bz2$##'); do
+	    cp "${module}.pp.bz2" "${moduledir}/${module}.pp"
+	done
+	cp base.pp.bz2 "/etc/selinux/${flavour}/modules/active/base.pp"
 
-  @all_modules = grep { ! m/^base\.pp\.bz2$/ && m/\.pp\.bz2/ && -f "$src_dir/$_" }
-    readdir(DIR);
-  %Module_Path = map { +"$src_dir/$_" => 0 } @all_modules;
-  closedir DIR;
-}
+	# disable newly added non-default modules
+	while read module; do
+	    touch "${moduledir}/${module}.pp.disabled"
+	done < "/etc/selinux/${flavour}/modules_to_disable"
+	rm "/etc/selinux/${flavour}/modules_to_disable"
+	
+	semodule -B
+	
+	echo " done."
+	
+    ;;
 
-# Using the hash array %Module_Path created in the last step, run
-# semodule_deps to get the dependency relationships. This creates the
-# %Deps dependency hash.
-sub get_dependencies {
-  my $src_dir = shift;
-  print STDERR "Calculating dependencies between modules\n";
-  open(COMMAND, '-|', "semodule_deps -g  $src_dir/base.pp.bz2 " .
-       join(' ', keys %Module_Path)) || die "Could not run semodule_deps";
-  while (<COMMAND>) {
-    chomp;
-    next unless m/\-\>/;
-    next unless m/\s*(\S+)\s*\-\>\s*(\S+)\s*$/;
-    if (defined $Deps{$1}) {
-      $Deps{$1} = "$Deps{$1} $2";
-    }
-    else {
-      $Deps{$1} = $2;
-    }
-  }
-  close COMMAND;
-}
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
 
-# In this step, use the dependecy hash %Deps created in the last step,
-# and feed the information to tsort to get an ordered list of
-# modules. This creates the array @ordered
-sub get_ordering {
-  print STDERR "Ordering modules based on dependencies\n";
-  my $tempfile=`tempfile -p tsrt -m 0600`;
-  open(SORT, "| tsort > $tempfile") || die "can't open pipe to tsort: $!";
-  for my $pkg (keys %Deps) {
-    for my $dep (split(/ /, $Deps{$pkg})) {
-      print SORT "$dep $pkg\n";
-    }
-  }
-  close SORT;
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
 
-  open(RESULTS, $tempfile) || die "can't read $tempfile: $!";
-  while (<RESULTS>) {
-    chomp;
-    push @ordered, $_;
-  }
-  unlink $tempfile;
-  close RESULTS;
-}
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
 
-my @Load_Order;
-# Cycle over all the modules installed, starting with the dependency
-# ordered modules, taking care that we only look at a module once. For
-# each module, we look to see a mapping ogf the packages that need
-# this policy module. We then query dpkg to see if any of the package
-# patterns that are associated with a policy module are installed on
-# this system, if so, we schedule the module to be loaded, ensuring
-# that the dependent policy modules are also targeted for installation
-# before the current module is installed. This creates the Seen hash,
-# and the Load_Order array, as well as the Loaded hash.
-sub installed_modules {
-  print STDERR "Selecting modules based on installed packages\n";
+#DEBHELPER#
 
-  # This suggestion from Alexander Bürger <buerger@iskp.uni-bonn.de>
-  open( my $PACKAGES, "dpkg-query -W |" )
-    or die("Cannot run 'dpkg-query -W'. $!");
-  while( my $p = <$PACKAGES> ) {
-    $Installed{$1} = $2 if( $p =~ /^(.*)\t(.+)$/ );
-  }
- close($PACKAGES) or die("Could not close pipe.");
-
-  foreach my $module (@ordered, @all_modules) {
-    $module =~ s/\.pp\.bz2$//o;
-
-    next if $Seen{$module};
-    $Seen{$module}++;
-
-    if (! defined $map{$module}) { $map{$module} = [ $module ]; }
-
-  PACKAGE:
-    for my $pkg (@{ $map{$module} }) {
-      my $is_installed = index($pkg, '*') < 0 ?
-        $Installed{$pkg} # exact name
-          : grep(m/^@{[wild2re($pkg)]}$/, keys %Installed); # wildcard
-      if ($is_installed) {
-        if (defined $Deps{$module}) {
-          for my $dep (split(' ', $Deps{$module})) {
-            next if $Loaded{$dep};
-            if (-e "${src_dir}/${dep}.pp.bz2") {
-              push @Load_Order, $dep;
-              $Loaded{$dep}++
-            }
-            else {
-              print STDERR "Could not find ${src_dir}/${dep}.pp.bz2\n";
-              print STDERR "which is required for module ${module}.pp.bz2\n";
-              print STDERR "Assuming ${dep}.pp.bz2 is built into base.pp.bz2\n";
-            }
-          }
-        }
-        push @Load_Order, $module;
-        $Loaded{$module}++;
-        last PACKAGE;
-      }
-    }
-  }
-}
-
-sub main {
-  if (-e "$basedir/modules/active/base.pp" ) {
-    print STDERR "You already have a $policy_name policy installed.\n";
-    print STDERR "I am leaving it alone. Please check and update manually.\n";
-  }
-  elsif (-e "$src_dir/base.pp.bz2") {
-    print STDERR "Notice: Trying to link (but not load) a $policy_name policy.\n";
-    print STDERR "This process may fail -- you should check the results, and \n";
-    print STDERR "you need to switch to this policy yourself anyway.\n\n";
-    &list_modules("$src_dir");
-# now we provide a static list of dependencies created by gen-deps.sh.
-#    &get_dependencies("$src_dir");
-    &get_ordering();
-    &installed_modules();
-    chdir "$src_dir" or die "Can't access $src_dir";
-    my $semod = "semodule -b base.pp.bz2 -s $policy_name -n ";
-    if("$type" eq "default") {
-      $semod .= " -i unconfined.pp.bz2";
-    }
-    my $mod_list;
-    for my $mod (@Load_Order) {
-      $semod .= " -i ${mod}.pp.bz2";
-      $mod_list .= " $mod";
-    }
-    if (system($semod) == 0) {
-      print STDERR "Loaded modules $mod_list\n";
-    }
-    else {
-      print STDERR "Error running \"$semod\", please load policy manually and report a bug.\n";
-    }
-  }
-  else {
-    print STDERR ".\n";
-  }
-}
-
-&main;
-
-exit 0;
-
-__END__
+exit 0
