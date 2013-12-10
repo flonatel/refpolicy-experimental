@@ -21,6 +21,8 @@ moduledir="/etc/selinux/${flavour}/modules/active/modules"
 # not needed on a debian system
 notdefault="rpm firstboot portage"
 
+. /etc/selinux/config
+
 case "$1" in
     configure)
 	# record which non-default modules do not yet exist for disabling them later
@@ -34,13 +36,13 @@ case "$1" in
 	    mv "/etc/selinux/${flavour}/modules_to_disable"{.new,}
 	fi
 
-	echo -n "Updating selinux policy ${flavour}..."
+	echo -n "Updating selinux ${flavour} policy..."
 	mkdir -p "${moduledir}/"
 	
 	# first copy the modules to the proper location in /etc
 	# note that they stay compressed, but without the compression suffix
 	cd "/usr/share/selinux/${flavour}/"
-	for module in $(ls | grep -v '^base\.pp\.bz2$' | sed s'#\.pp\.bz2$##'); do
+	for module in $(ls *.pp.bz2 | grep -v '^base\.pp\.bz2$' | sed s'#\.pp\.bz2$##'); do
 	    cp "${module}.pp.bz2" "${moduledir}/${module}.pp"
 	done
 	cp base.pp.bz2 "/etc/selinux/${flavour}/modules/active/base.pp"
@@ -50,10 +52,22 @@ case "$1" in
 	    touch "${moduledir}/${module}.pp.disabled"
 	done < "/etc/selinux/${flavour}/modules_to_disable"
 	rm "/etc/selinux/${flavour}/modules_to_disable"
+
+	# remove superseded modules not available anymore
+	rm -f "${moduledir}/"{epmd,lda,pythonsupport}.pp
 	
-	semodule -B
-	
+	# Build policy but do not load it into the kernel yet
+	semodule -s "${flavour}" -BN
+
 	echo " done."
+	
+	# Now load policy into the kernel if it is the configured policy
+	# and we are running selinux
+	if [ "${SELINUXTYPE}" == "${flavour}" ] && selinuxenabled; then
+	    echo -n "Loading selinux ${flavour} policy..."
+	    semodule -s "${flavour}" -R
+	    echo " done."
+	fi
 	
     ;;
 
