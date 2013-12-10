@@ -28,6 +28,7 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
   * debian/rules: Build the default policy with UNK_PERMS=allow
   * debian/postinst.policy: Rewrite the postinst script for the
     selinux-policy-* packages to automatically upgrade the running policy.
+  * debian/copyright: Update to machine-readable copyright format.
 
  -- Laurent Bigonville <bigon@debian.org>  Sun, 01 Dec 2013 17:57:21 +0100
 

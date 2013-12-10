@@ -1,49 +1,49 @@
-This is the Debian package for the SELinux Reference policy, and it is
-built from sources obtained from:
- http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: http://oss.tresys.com/projects/refpolicy
+License: GPL-2+
 
-This package was originally debianized by Erich Schubert
-<erich@debian.org> on Mon, 13 Feb 2006 22:50:03 +0100.
+Files: *
+Copyright: Copyright (C) 2003-2013 Tresys Technology, LLC
+License: GPL-2+
 
-The package has since changed maintainers, the current maintainer being 
-Manoj Srivastava <srivasta@debian.org>.
+Files: support/pyplate.py
+Copyright: Copyright (C) 2002 Michael Droettboom
+License: GPL-2+
 
-Changes:
- * added Debian GNU/Linux package maintenance system files
- * Some Debian specific tweaks and changes to policy also exist
+Files: man/*
+Copyright: 2005, 2009 Red Hat
+     2010 Dominick Grift
+License: GPL-2+
 
+Files: debian/*
+Copyright: 2006 Erich Schubert
+     2006-2008 Manoj Srivastava <srivasta@debian.org>
+     2008-2013 Russel Coker
+     2012-2013 Laurent Bigonville, Mika Pflüger
+License: GPL-2+
 
-The reference policy is
-Copyright (C) 2002 Michael Droettboom
-Copyright (C) 2003 - 2006 Tresys Technology, LLC
+Files: debian/policygentool
+Copyright: Copyright (C) 2006 Red Hat
+License: GPL-2+
 
-
-License:
-
-   This package is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, version 2 of the License.
-
-   This package is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this package; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-The debian specific changes are Copyright © 2006 Manoj Srivastava, and
-distributed under the terms of the GNU General Public License, version
-2.
-
-On Debian GNU/Linux systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL-2'. 
-
-    A copy of the GNU General Public License is also available at
-    <URL:http://www.gnu.org/copyleft/gpl.html>.  You may also obtain
-    it by writing to the Free Software Foundation, Inc., 51 Franklin
-    St, Fifth Floor, Boston, MA 02110-1301 USA
-
-Manoj Srivastava <srivasta@debian.org>
-arch-tag: d4250e44-a0e0-4ee0-adb9-2bd74f6eeb27
+License: GPL-2+
+ This program is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with this package; if not, write to the Free
+ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
