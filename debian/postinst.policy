@@ -19,7 +19,7 @@ moduledir="/etc/selinux/${flavour}/modules/active/modules"
 
 # modules which are not enabled by default, because they are usually
 # not needed on a debian system
-notdefault="rpm firstboot portage"
+notdefault="abrt anaconda certwatch clockspeed clogd cmirrord cobbler consoletype cyphesis dnssec-triggerd firewallgui firstboot howl imaze jockey keyboardd ksmtuned ktalk likewise livecd nessus numad oav oddjob podsleuth portage resmgr rhgb rhsmcertd ricci rpm sambagui soundserver speedtouch updfstab usernetctl"
 
 . /etc/selinux/config
 
