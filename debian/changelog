@@ -1,5 +1,6 @@
 refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
 
+  [ Laurent Bigonville ]
   * New GIT snapshot of the policy
     - Drop all the Debian specific patches, some of the patches have been
       merged upstream, but the rest was making it really difficult to upgrade
@@ -26,6 +27,8 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
     debian/patches/0005-udevadm_path.patch: Properly label udevd and udevadm
   * debian/rules: Disable UBAC for the default policy
   * debian/rules: Build the default policy with UNK_PERMS=allow
+
+  [ Mika Pflüger ]
   * debian/postinst.policy: Rewrite the postinst script for the
     selinux-policy-* packages to automatically upgrade the running policy.
   * debian/copyright: Update to machine-readable copyright format.
