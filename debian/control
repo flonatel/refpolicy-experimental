@@ -14,7 +14,7 @@ Build-Depends-Indep: policycoreutils (>= 2.2.1), checkpolicy (>= 2.2),
 Package: selinux-policy-default
 Architecture: all
 Depends: ${misc:Depends}, policycoreutils (>= 2.2.1), libpam-modules (>= 0.77-0.se5),
-          python, libselinux1 (>= 2.2), libsepol1 (>= 2.2)
+          python, libselinux1 (>= 2.2), libsepol1 (>= 2.2), selinux-utils (>= 2.2.1)
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
 Breaks: selinux-basics (<< 0.5.2~)
@@ -30,7 +30,7 @@ Package: selinux-policy-mls
 Architecture: all
 Priority: extra
 Depends: ${misc:Depends}, policycoreutils (>= 2.2.1), libpam-modules (>= 0.77-0.se5),
-          python, libselinux1 (>= 2.2), libsepol1 (>= 2.2)
+          python, libselinux1 (>= 2.2), libsepol1 (>= 2.2), selinux-utils (>= 2.2.1)
 Recommends: checkpolicy, setools
 Suggests: logcheck, syslog-summary
 Breaks: selinux-basics (<< 0.5.2~)

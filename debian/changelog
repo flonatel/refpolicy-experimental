@@ -27,6 +27,7 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
     debian/patches/0005-udevadm_path.patch: Properly label udevd and udevadm
   * debian/rules: Disable UBAC for the default policy
   * debian/rules: Build the default policy with UNK_PERMS=allow
+  * debian/control: Add dependency against selinux-utils for selinuxenabled
 
   [ Mika Pflüger ]
   * debian/postinst.policy: Rewrite the postinst script for the
@@ -35,7 +36,7 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
   * debian/postrm.policy: Use comon postrm script for selinux-policy-*
     packages.
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 01 Dec 2013 17:57:21 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 11 Dec 2013 17:46:23 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
