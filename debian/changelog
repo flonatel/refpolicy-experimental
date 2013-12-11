@@ -29,6 +29,8 @@ refpolicy (2:2.20131109-1) UNRELEASED; urgency=low
   * debian/postinst.policy: Rewrite the postinst script for the
     selinux-policy-* packages to automatically upgrade the running policy.
   * debian/copyright: Update to machine-readable copyright format.
+  * debian/postrm.policy: Use comon postrm script for selinux-policy-*
+    packages.
 
  -- Laurent Bigonville <bigon@debian.org>  Sun, 01 Dec 2013 17:57:21 +0100
 

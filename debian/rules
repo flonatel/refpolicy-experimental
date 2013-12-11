@@ -35,6 +35,7 @@ override_dh_compress:
 override_dh_installdeb:
 	for flavour in $(FLAVOURS) ; do \
 	  sed -e "s/=FLAVOUR=/$$flavour/g" debian/postinst.policy > $(CURDIR)/debian/selinux-policy-$$flavour.postinst; \
+	  sed -e "s/=FLAVOUR=/$$flavour/g" debian/postrm.policy > $(CURDIR)/debian/selinux-policy-$$flavour.postrm; \
 	done
 	dh_installdeb
 
