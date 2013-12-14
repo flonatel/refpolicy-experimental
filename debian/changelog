@@ -28,6 +28,8 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * debian/control: Add dependency against selinux-utils for selinuxenabled
   * debian/NEWS: Add some information about the proper way to permanently
     disable a module
+  * d/p/0004-init-startpar-initrc_t-gets-attributes-of-dev-dm-0-d.patch:
+    Fix FTBFS and allow startpar can getattr of some devices
 
   [ Mika Pflüger ]
   * debian/postinst.policy: Rewrite the postinst script for the
@@ -36,7 +38,7 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * debian/postrm.policy: Use comon postrm script for selinux-policy-*
     packages.
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 14 Dec 2013 19:01:47 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 14 Dec 2013 19:41:43 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 

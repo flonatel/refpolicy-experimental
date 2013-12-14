@@ -1,0 +1,38 @@
+From ad46ce856a1a780cf6c3a0bb741794019e03edc2 Mon Sep 17 00:00:00 2001
+From: Dominick Grift <dominick.grift@gmail.com>
+Date: Sat, 9 Nov 2013 10:45:09 +0100
+Subject: [PATCH] init: startpar (initrc_t) gets attributes of /dev/dm-0
+ (device_t) early on boot, soon later the node context is properly reset
+ (debian only) init: startpar (initrc_t) gets attributes of /proc/kcore file
+
+Signed-off-by: Dominick Grift <dominick.grift@gmail.com>
+---
+ policy/modules/system/init.te | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 078fea6..9023d11 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -180,7 +180,7 @@ seutil_read_config(init_t)
+ miscfiles_read_localization(init_t)
+ 
+ ifdef(`distro_debian',`
+-	fs_tmpfs_filetrans(init_t, initctl_t, fifo, "initctl")
++	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file, "initctl")
+ 
+ 	allow init_t initrc_var_run_t:file manage_file_perms;
+ 	fs_tmpfs_filetrans(init_t, initrc_var_run_t, file, "utmp")
+@@ -439,6 +439,9 @@ userdom_read_user_home_content_files(initrc_t)
+ userdom_use_user_terminals(initrc_t)
+ 
+ ifdef(`distro_debian',`
++	kernel_getattr_core_if(initrc_t)
++
++	dev_getattr_generic_blk_files(initrc_t)
+ 	dev_setattr_generic_dirs(initrc_t)
+ 
+ 	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
+-- 
+1.8.5.1
+
