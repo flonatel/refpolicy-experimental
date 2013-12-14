@@ -1,4 +1,4 @@
-policy_module(pegasus, 1.9.0)
+policy_module(pegasus, 1.9.1)
 
 ########################################
 #
@@ -140,6 +140,10 @@ optional_policy(`
 	optional_policy(`
 		networkmanager_dbus_chat(pegasus_t)
 	')
+')
+
+optional_policy(`
+	dmidecode_domtrans(pegasus_t)
 ')
 
 optional_policy(`

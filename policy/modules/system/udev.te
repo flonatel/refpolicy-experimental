@@ -1,4 +1,4 @@
-policy_module(udev, 1.16.2)
+policy_module(udev, 1.16.4)
 
 ########################################
 #
@@ -154,6 +154,7 @@ miscfiles_read_localization(udev_t)
 miscfiles_read_hwdata(udev_t)
 
 modutils_domtrans_insmod(udev_t)
+modutils_read_module_config(udev_t)
 # read modules.inputmap:
 modutils_read_module_deps(udev_t)
 
@@ -184,6 +185,7 @@ ifdef(`distro_debian',`
 		avahi_create_pid_dirs(udev_t)
 		avahi_initrc_domtrans(udev_t)
 		avahi_manage_pid_files(udev_t)
+		avahi_setattr_pid_dirs(udev_t)
 		avahi_filetrans_pid(udev_t, dir, "avahi-daemon")
 	')
 ')

@@ -945,6 +945,10 @@ template(`userdom_restricted_xwindows_user_template',`
 			gnome_role_template($1, $1_r, $1_t)
 			wm_role_template($1, $1_r, $1_t)
 		')
+
+		optional_policy(`
+			pulseaudio_role($1_r, $1_t)
+		')
 	')
 
 	optional_policy(`
@@ -2699,6 +2703,25 @@ interface(`userdom_rw_user_tmpfs_files',`
 	rw_files_pattern($1, user_tmpfs_t, user_tmpfs_t)
 	read_lnk_files_pattern($1, user_tmpfs_t, user_tmpfs_t)
 	allow $1 user_tmpfs_t:dir list_dir_perms;
+	fs_search_tmpfs($1)
+')
+
+########################################
+## <summary>
+##	Delete user tmpfs files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`userdom_delete_user_tmpfs_files',`
+	gen_require(`
+		type user_tmpfs_t;
+	')
+
+	delete_files_pattern($1, user_tmpfs_t, user_tmpfs_t)
 	fs_search_tmpfs($1)
 ')
 
