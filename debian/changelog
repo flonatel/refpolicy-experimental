@@ -23,8 +23,6 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * Drop debian/file_contexts.subs_dist, install upstream one instead
   * debian/rules: policy/rolemap file is gone
   * debian/control: Bump {build-}dependencies to the last userspace release
-  * debian/patches/0004-systemd-udevd_path.patch,
-    debian/patches/0005-udevadm_path.patch: Properly label udevd and udevadm
   * debian/rules: Disable UBAC for the default policy
   * debian/rules: Build the default policy with UNK_PERMS=allow
   * debian/control: Add dependency against selinux-utils for selinuxenabled
@@ -38,7 +36,7 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * debian/postrm.policy: Use comon postrm script for selinux-policy-*
     packages.
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 14 Dec 2013 18:57:34 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 14 Dec 2013 19:01:47 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
