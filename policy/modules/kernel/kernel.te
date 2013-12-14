@@ -1,4 +1,4 @@
-policy_module(kernel, 1.17.1)
+policy_module(kernel, 1.17.2)
 
 ########################################
 #
@@ -227,6 +227,8 @@ allow kernel_t unlabeled_t:dir mounton;
 # Kernel-generated traffic e.g., TCP resets on
 # connections with invalidated labels:
 allow kernel_t unlabeled_t:packet send;
+
+kernel_request_load_module(kernel_t)
 
 # Allow unlabeled network traffic
 allow unlabeled_t unlabeled_t:packet { forward_in forward_out };

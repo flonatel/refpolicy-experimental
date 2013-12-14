@@ -1,4 +1,4 @@
-policy_module(fstools, 1.16.1)
+policy_module(fstools, 1.16.3)
 
 ########################################
 #
@@ -149,6 +149,10 @@ seutil_read_config(fsadm_t)
 
 userdom_use_user_terminals(fsadm_t)
 
+ifdef(`distro_debian',`
+	term_dontaudit_use_unallocated_ttys(fsadm_t)
+')
+
 ifdef(`distro_redhat',`
 	optional_policy(`
 		unconfined_domain(fsadm_t)
@@ -163,6 +167,11 @@ optional_policy(`
 optional_policy(`
 	# for smartctl cron jobs
 	cron_system_entry(fsadm_t, fsadm_exec_t)
+')
+
+optional_policy(`
+	devicekit_read_pid_files(fsadm_t)
+	devicekit_append_inherited_log_files(fsadm_t)
 ')
 
 optional_policy(`

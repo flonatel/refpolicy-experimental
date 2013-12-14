@@ -1,4 +1,4 @@
-policy_module(smoltclient, 1.2.0)
+policy_module(smoltclient, 1.2.1)
 
 ########################################
 #
@@ -74,6 +74,10 @@ optional_policy(`
 	optional_policy(`
 		hal_dbus_chat(smoltclient_t)
 	')
+')
+
+optional_policy(`
+    libs_exec_ldconfig(smoltclient_t)
 ')
 
 optional_policy(`
