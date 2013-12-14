@@ -1,4 +1,4 @@
-refpolicy (2:2.20131109-1.1) UNRELEASED; urgency=low
+refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
 
   Starting with this version, the modules will be automatically updated with
   each package upgrade. Modules that have previously been removed (semodule -r)
@@ -9,7 +9,7 @@ refpolicy (2:2.20131109-1.1) UNRELEASED; urgency=low
   files are properly labeled on disk, you should force a full relabel by
   running the following command: "touch /.autorelabel" and then rebooting.
 
- -- Laurent Bigonville <bigon@debian.org>  Thu, 12 Dec 2013 20:58:10 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 14 Dec 2013 18:58:18 +0100
 
 refpolicy (2:0.2.20100524-6) unstable; urgency=low
 
