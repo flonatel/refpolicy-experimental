@@ -54,7 +54,9 @@ case "$1" in
 	rm "/etc/selinux/${flavour}/modules_to_disable"
 
 	# remove superseded modules not available anymore
-	rm -f "${moduledir}/"{epmd,lda,pythonsupport}.pp
+	if dpkg --compare-versions "$2" le-nl "2:2.20131214-1~"; then
+		rm -f "${moduledir}/"{epmd,lda,pythonsupport}.pp
+	fi
 	
 	# Build policy but do not load it into the kernel yet
 	semodule -s "${flavour}" -BN
