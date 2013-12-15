@@ -32,6 +32,8 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
     Fix FTBFS and allow startpar can getattr of some devices
   * Add d/p/0005-add-missing-newline.patch: Add missing newline at the end of
     the file, this is causing weird behaviour, thanks M4
+  * d/p/0006-allow-udev-write-rulesd.patch: Allow udev to write in
+    /etc/udev/rules.d (Closes: #712970)
 
   [ Mika Pflüger ]
   * debian/postinst.policy: Rewrite the postinst script for the
@@ -41,7 +43,7 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * debian/postrm.policy: Use common postrm script for selinux-policy-*
     packages.
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 15 Dec 2013 13:11:12 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 15 Dec 2013 21:56:18 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
