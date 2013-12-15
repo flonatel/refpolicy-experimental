@@ -1,5 +1,6 @@
-refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
+refpolicy (2:2.20131214-1) unstable; urgency=low
 
+  * Team upload.
   [ Laurent Bigonville ]
   * New GIT snapshot of the policy
     - Drop all the Debian specific patches, some of the patches have been
@@ -43,7 +44,7 @@ refpolicy (2:2.20131214-1) UNRELEASED; urgency=low
   * debian/postrm.policy: Use common postrm script for selinux-policy-*
     packages.
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 15 Dec 2013 21:56:18 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 15 Dec 2013 22:53:06 +0100
 
 refpolicy (2:2.20110726-13) unstable; urgency=low
 
