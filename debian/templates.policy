@@ -1,0 +1,8 @@
+Template: refpolicy/reload
+Type: boolean
+Default: true
+Description: Reload selinux policy on package upgrade?
+ Automatically reload the active selinux policy when upgrading the
+ debian package. If you decide not to automatically reload
+ the policy, you will have to reload yourself using
+ "semodule -R" in order to start using the updated policy.

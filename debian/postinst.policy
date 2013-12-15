@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+# for debconf
+. /usr/share/debconf/confmodule
 
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
@@ -24,7 +26,7 @@ notdefault="abrt anaconda certwatch clockspeed clogd cmirrord cobbler consoletyp
 . /etc/selinux/config
 
 case "$1" in
-    configure)
+    configure|reconfigure)
 	# record which non-default modules do not yet exist for disabling them later
 	# for idempotency we need to store this in a file
 	if [ ! -f "/etc/selinux/${flavour}/modules_to_disable" ]; then
@@ -64,11 +66,14 @@ case "$1" in
 	echo " done."
 	
 	# Now load policy into the kernel if it is the configured policy
-	# and we are running selinux
+	# and we are running selinux and the user did not object
 	if [ "${SELINUXTYPE}" == "${flavour}" ] && selinuxenabled; then
-	    echo -n "Loading selinux ${flavour} policy..."
-	    semodule -s "${flavour}" -R
-	    echo " done."
+	    db_get 'refpolicy/reload'
+	    if [ "${RET}" == "true" ]; then
+		echo -n "Loading selinux ${flavour} policy..."
+		semodule -s "${flavour}" -R
+		echo " done."
+	    fi
 	fi
 	
     ;;
