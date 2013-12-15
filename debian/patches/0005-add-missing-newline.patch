@@ -1,0 +1,11 @@
+diff --git a/policy/modules/contrib/userhelper.fc b/policy/modules/contrib/userhelper.fc
+index c416a83..9fe1258 100644
+--- a/policy/modules/contrib/userhelper.fc
++++ b/policy/modules/contrib/userhelper.fc
+@@ -2,4 +2,4 @@
+ 
+ /usr/bin/consolehelper	--	gen_context(system_u:object_r:consolehelper_exec_t,s0)
+ 
+-/usr/sbin/userhelper	--	gen_context(system_u:object_r:userhelper_exec_t,s0)
+\ No newline at end of file
++/usr/sbin/userhelper	--	gen_context(system_u:object_r:userhelper_exec_t,s0)
