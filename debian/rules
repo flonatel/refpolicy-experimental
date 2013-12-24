@@ -20,9 +20,7 @@ override_dh_install:
 
 override_dh_fixperms:
 	dh_fixperms
-	for flavour in $(FLAVOURS) ; do \
-	  chmod +x $(CURDIR)/debian/selinux-policy-dev/usr/share/selinux/$$flavour/include/support/segenxml.py; \
-	done
+	chmod +x $(CURDIR)/debian/selinux-policy-dev/usr/share/selinux/devel/include/support/segenxml.py; \
 
 override_dh_compress:
 	dh_compress
@@ -48,15 +46,15 @@ override_dh_clean:
 	  rm -f build-$$flavour-policy; \
 	  rm -f install-$$flavour-policy; \
 	  rm -f conf-$$flavour-policy; \
-	  rm -f install-$$flavour-dev; \
 	done
+	rm -f install-default-dev;
 	rm -rf $(CURDIR)/debian/build-docs;
 	rm -rf $(CURDIR)/debian/build-src;
 	rm -f support/pyplate.pyc conf-docs install-docs conf-src install-src
 
 override_dh_auto_build: $(patsubst %, build-%-policy, $(FLAVOURS))
 
-override_dh_auto_install: $(patsubst %, install-%-policy, $(FLAVOURS)) $(patsubst %, install-%-dev, $(FLAVOURS)) install-docs install-src
+override_dh_auto_install: $(patsubst %, install-%-policy, $(FLAVOURS)) install-default-dev install-docs install-src
 
 conf-%-policy:
 	test ! -d $(CURDIR)/debian/build-$* ||                             \
@@ -120,10 +118,13 @@ install-%-policy: build-%-policy
 	chmod 600 $(CURDIR)/debian/tmp/etc/selinux/$*/modules/semanage.read.LOCK $(CURDIR)/debian/tmp/etc/selinux/$*/modules/semanage.trans.LOCK
 	touch $@
 
-install-%-dev:
-	(cd $(CURDIR)/debian/build-$*; \
-	    $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install-headers)
-	cp -a $(CURDIR)/doc/Makefile.example $(CURDIR)/debian/tmp/usr/share/selinux/$*/Makefile
+# The headers are based on the default policy
+install-default-dev: build-default-policy
+	(cd $(CURDIR)/debian/build-default; \
+	    $(MAKE) NAME=default TYPE=$(TYPE_default) UBAC=$(UBAC_default) UNK_PERMS=$(UNK_PERMS_default) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install-headers)
+	mkdir -p $(CURDIR)/debian/tmp/usr/share/selinux/devel/
+	mv $(CURDIR)/debian/tmp/usr/share/selinux/default/include $(CURDIR)/debian/tmp/usr/share/selinux/devel/
+	cp -a $(CURDIR)/doc/Makefile.example $(CURDIR)/debian/tmp/usr/share/selinux/devel/Makefile
 	touch $@
 
 install-docs: conf-docs

@@ -2,8 +2,11 @@ refpolicy (2:2.20131214-2) UNRELEASED; urgency=low
 
   * debian/selinux-policy-dev.post{inst,rm}: Call sepolgen-ifgen after
     selinux-policy-dev installation if SELinux is enabled
+  * debian/selinux-policy-dev.install, debian/rules: Install headers in
+    /usr/share/selinux/devel, there is no differences between default and mls
+    headers, so it's not necessary to install both.
 
- -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 14:20:14 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 14:53:03 +0100
 
 refpolicy (2:2.20131214-1) unstable; urgency=low
 

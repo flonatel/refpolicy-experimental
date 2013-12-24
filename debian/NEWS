@@ -1,3 +1,12 @@
+refpolicy (2:2.20131214-2) UNRELEASED; urgency=low
+
+  The selinux-policy-dev package is now installing the headers and Makefile
+  under /usr/share/selinux/devel instead of /usr/share/selinux/{default,mls}.
+  If you are bulding custom modules, be sure you are pointing to this new
+  location.
+
+ -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 15:58:51 +0100
+
 refpolicy (2:2.20131214-1) unstable; urgency=low
 
   Starting with this version, the modules will be automatically updated with

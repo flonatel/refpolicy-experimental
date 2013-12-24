@@ -1,5 +1,3 @@
 debian/policygentool usr/bin
-usr/share/selinux/default/include/
-usr/share/selinux/default/Makefile
-usr/share/selinux/mls/include/
-usr/share/selinux/mls/Makefile
+usr/share/selinux/devel/include/
+usr/share/selinux/devel/Makefile
