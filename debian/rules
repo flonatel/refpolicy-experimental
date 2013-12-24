@@ -124,7 +124,7 @@ install-default-dev: build-default-policy
 	    $(MAKE) NAME=default TYPE=$(TYPE_default) UBAC=$(UBAC_default) UNK_PERMS=$(UNK_PERMS_default) $(COMMON_OPTIONS) DESTDIR=$(CURDIR)/debian/tmp install-headers)
 	mkdir -p $(CURDIR)/debian/tmp/usr/share/selinux/devel/
 	mv $(CURDIR)/debian/tmp/usr/share/selinux/default/include $(CURDIR)/debian/tmp/usr/share/selinux/devel/
-	cp -a $(CURDIR)/doc/Makefile.example $(CURDIR)/debian/tmp/usr/share/selinux/devel/Makefile
+	cp -a $(CURDIR)/debian/Makefile.devel $(CURDIR)/debian/tmp/usr/share/selinux/devel/Makefile
 	touch $@
 
 install-docs: conf-docs

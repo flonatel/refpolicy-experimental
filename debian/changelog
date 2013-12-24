@@ -5,8 +5,10 @@ refpolicy (2:2.20131214-2) UNRELEASED; urgency=low
   * debian/selinux-policy-dev.install, debian/rules: Install headers in
     /usr/share/selinux/devel, there is no differences between default and mls
     headers, so it's not necessary to install both.
+  * debian/rules, debian/example/Makefile, debian/Makefile.devel: Fix
+    development Makefile to work with new headers location
 
- -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 14:53:03 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 15:27:06 +0100
 
 refpolicy (2:2.20131214-1) unstable; urgency=low
 
