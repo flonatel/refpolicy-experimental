@@ -6,7 +6,7 @@ Section: admin
 Homepage: http://oss.tresys.com/projects/refpolicy/wiki/DownloadRelease
 Maintainer: Debian SELinux maintainers <selinux-devel@lists.alioth.debian.org>
 Uploaders: Russell Coker <russell@coker.com.au>
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Build-Depends: debhelper (>= 9)
 Build-Depends-Indep: policycoreutils (>= 2.2.1), checkpolicy (>= 2.2),
                      python, m4, bzip2, gawk, libsepol1 (>= 2.2)
