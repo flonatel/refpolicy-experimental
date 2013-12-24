@@ -71,7 +71,8 @@ Description: Source of the SELinux reference policy for customization
 
 Package: selinux-policy-dev
 Architecture: all
-Depends: ${misc:Depends}, python, policycoreutils (>= 2.2.1), checkpolicy (>= 2.2), gawk, make, m4
+Depends: ${misc:Depends}, python, policycoreutils (>= 2.2.1), checkpolicy (>= 2.2),
+         gawk, make, m4, selinux-utils (>= 2.2)
 Recommends: setools
 Description: Headers from the SELinux reference policy for building modules
  The SELinux Reference Policy (refpolicy) is a complete SELinux

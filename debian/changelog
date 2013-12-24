@@ -1,3 +1,10 @@
+refpolicy (2:2.20131214-2) UNRELEASED; urgency=low
+
+  * debian/selinux-policy-dev.post{inst,rm}: Call sepolgen-ifgen after
+    selinux-policy-dev installation if SELinux is enabled
+
+ -- Laurent Bigonville <bigon@debian.org>  Tue, 24 Dec 2013 14:20:14 +0100
+
 refpolicy (2:2.20131214-1) unstable; urgency=low
 
   * Team upload.
