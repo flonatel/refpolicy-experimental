@@ -1,4 +1,4 @@
-refpolicy (2:2.20110726-13) UNRELEASED; urgency=low
+refpolicy (2:2.20110726-12+deb7u1) UNRELEASED; urgency=low
 
   * Team upload.
   * Allow dhcpc_t to bind to all udp ports (Closes: #707658).
