@@ -6,6 +6,7 @@ refpolicy (2:2.20110726-12+deb7u1) UNRELEASED; urgency=low
     names (Closes: #712970).
   * Allow rsync_t to use, read and write pipes inherited from sshd_t, which
     is necessary for rsync in sender mode.
+  * Allow dovecot self:process setsched permission (Closes: #716753)
 
  -- Mika Pflüger <debian@mikapflueger.de>  Fri, 10 May 2013 01:39:11 +0200
 
