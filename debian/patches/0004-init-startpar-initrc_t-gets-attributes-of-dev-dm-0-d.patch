@@ -10,20 +10,9 @@ Signed-off-by: Dominick Grift <dominick.grift@gmail.com>
  policy/modules/system/init.te | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
-index 078fea6..9023d11 100644
 --- a/policy/modules/system/init.te
 +++ b/policy/modules/system/init.te
-@@ -180,7 +180,7 @@ seutil_read_config(init_t)
- miscfiles_read_localization(init_t)
- 
- ifdef(`distro_debian',`
--	fs_tmpfs_filetrans(init_t, initctl_t, fifo, "initctl")
-+	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file, "initctl")
- 
- 	allow init_t initrc_var_run_t:file manage_file_perms;
- 	fs_tmpfs_filetrans(init_t, initrc_var_run_t, file, "utmp")
-@@ -439,6 +439,9 @@ userdom_read_user_home_content_files(initrc_t)
+@@ -434,6 +434,9 @@ userdom_read_user_home_content_files(ini
  userdom_use_user_terminals(initrc_t)
  
  ifdef(`distro_debian',`
@@ -33,6 +22,3 @@ index 078fea6..9023d11 100644
  	dev_setattr_generic_dirs(initrc_t)
  
  	fs_tmpfs_filetrans(initrc_t, initrc_var_run_t, dir)
--- 
-1.8.5.1
-

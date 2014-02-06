@@ -4,6 +4,7 @@ refpolicy (2:2.20140206-1) UNRELEASED; urgency=medium
     - Allow unconfined_u user to enter system_r role again (Closes: #732857)
     - Allow unconfined user to transition to dpkg_t and transitively to
       dpkg_script_t (Closes: #707214)
+    - Refresh 0004-init-startpar-initrc_t-gets-attributes-of-dev-dm-0-d.patch
   * debian/selinux-policy-dev.post{inst,rm}: Call sepolgen-ifgen after
     selinux-policy-dev installation if SELinux is enabled
   * debian/selinux-policy-dev.install, debian/rules: Install headers in
@@ -13,7 +14,7 @@ refpolicy (2:2.20140206-1) UNRELEASED; urgency=medium
     development Makefile to work with new headers location
   * debian/control: Bump Standards-Version to 3.9.5 (no further changes)
 
- -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Feb 2014 20:10:50 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Feb 2014 21:01:32 +0100
 
 refpolicy (2:2.20131214-1) unstable; urgency=low
 
