@@ -1,4 +1,4 @@
-policy_module(selinuxutil, 1.17.3)
+policy_module(selinuxutil, 1.17.4)
 
 gen_require(`
 	bool secure_mode;
@@ -447,6 +447,8 @@ allow semanage_t self:netlink_audit_socket { create_netlink_socket_perms nlmsg_r
 allow semanage_t self:fifo_file rw_fifo_file_perms;
 
 allow semanage_t policy_config_t:file rw_file_perms;
+
+filetrans_pattern(semanage_t, selinux_config_t, semanage_store_t, dir, "modules")
 
 allow semanage_t semanage_tmp_t:dir manage_dir_perms;
 allow semanage_t semanage_tmp_t:file manage_file_perms;
