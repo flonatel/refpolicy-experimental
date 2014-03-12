@@ -1,3 +1,9 @@
+refpolicy (2:2.20140311-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 12 Mar 2014 10:33:23 +0100
+
 refpolicy (2:2.20140206-1) unstable; urgency=medium
 
   * Team upload.
