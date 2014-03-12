@@ -1,4 +1,4 @@
-policy_module(ssh, 2.4.4)
+policy_module(ssh, 2.5.0)
 
 ########################################
 #
@@ -18,6 +18,13 @@ gen_tunable(allow_ssh_keysign, false)
 ## </p>
 ## </desc>
 gen_tunable(ssh_sysadm_login, false)
+
+## <desc>
+## <p>
+## Allow ssh to use gpg-agent
+## </p>
+## </desc>
+gen_tunable(ssh_use_gpg_agent, false)
 
 attribute ssh_server;
 attribute ssh_agent_type;
@@ -195,6 +202,12 @@ tunable_policy(`use_samba_home_dirs',`
 tunable_policy(`user_tcp_server',`
 	corenet_tcp_bind_ssh_port(ssh_t)
 	corenet_tcp_bind_generic_node(ssh_t)
+')
+
+optional_policy(`
+	tunable_policy(`ssh_use_gpg_agent',`
+		gpg_stream_connect_agent(ssh_t)
+	')
 ')
 
 optional_policy(`
