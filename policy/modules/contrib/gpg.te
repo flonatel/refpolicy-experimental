@@ -1,4 +1,4 @@
-policy_module(gpg, 2.8.1)
+policy_module(gpg, 2.9.0)
 
 ########################################
 #
@@ -93,7 +93,7 @@ manage_files_pattern(gpg_t, gpg_secret_t, gpg_secret_t)
 manage_lnk_files_pattern(gpg_t, gpg_secret_t, gpg_secret_t)
 userdom_user_home_dir_filetrans(gpg_t, gpg_secret_t, dir)
 
-stream_connect_pattern(gpg_t, gpg_agent_tmp_t, gpg_agent_tmp_t, gpg_agent_t)
+gpg_stream_connect_agent(gpg_t)
 
 domtrans_pattern(gpg_t, gpg_agent_exec_t, gpg_agent_t)
 domtrans_pattern(gpg_t, gpg_helper_exec_t, gpg_helper_t)
@@ -271,6 +271,10 @@ tunable_policy(`use_samba_home_dirs',`
 
 optional_policy(`
 	mozilla_dontaudit_rw_user_home_files(gpg_agent_t)
+')
+
+optional_policy(`
+	pcscd_stream_connect(gpg_agent_t)
 ')
 
 ##############################
