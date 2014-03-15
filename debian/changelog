@@ -3,8 +3,10 @@ refpolicy (2:2.20140311-1) UNRELEASED; urgency=medium
   * New upstream release
   * d/p/u/0001-Properly-label-git-shell-and-other-git-commands-for-.patch:
     Properly label git commands as bin_t and git-shell as shell_exec_t
+  * d/p/u/0002-Label-usr-sbin-lightdm-as-xdm_exec_t.patch: Properly label
+    lightdm executable as xdm_exec_t (Closes: #739163)
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Mar 2014 09:20:25 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Mar 2014 09:22:25 +0100
 
 refpolicy (2:2.20140206-1) unstable; urgency=medium
 
