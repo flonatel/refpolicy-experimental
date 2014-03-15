@@ -1,5 +1,6 @@
-refpolicy (2:2.20140311-1) UNRELEASED; urgency=medium
+refpolicy (2:2.20140311-1) unstable; urgency=medium
 
+  * Team upload.
   * New upstream release
   * d/p/u/0001-Properly-label-git-shell-and-other-git-commands-for-.patch:
     Properly label git commands as bin_t and git-shell as shell_exec_t
@@ -8,7 +9,7 @@ refpolicy (2:2.20140311-1) UNRELEASED; urgency=medium
   * d/p/u/0003-Add-several-fcontext-for-debian-specific-paths-for-n.patch:
     Properly label ntp initscript and other ntp related files (Closes: #740656)
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Mar 2014 09:24:20 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Mar 2014 09:56:53 +0100
 
 refpolicy (2:2.20140206-1) unstable; urgency=medium
 
