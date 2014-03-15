@@ -2,3 +2,4 @@
 0004-init-startpar-initrc_t-gets-attributes-of-dev-dm-0-d.patch
 upstream/0001-Properly-label-git-shell-and-other-git-commands-for-.patch
 upstream/0002-Label-usr-sbin-lightdm-as-xdm_exec_t.patch
+upstream/0003-Add-several-fcontext-for-debian-specific-paths-for-n.patch
