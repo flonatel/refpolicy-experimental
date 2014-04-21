@@ -3873,6 +3873,42 @@ interface(`dev_getattr_sysfs_dirs',`
 
 ########################################
 ## <summary>
+##	Get the attributes of sysfs filesystem
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_getattr_sysfs',`
+	gen_require(`
+		type sysfs_t;
+	')
+
+	allow $1 sysfs_t:filesystem getattr;
+')
+
+########################################
+## <summary>
+##	Do not audit getting the attributes of sysfs filesystem
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain to dontaudit access from
+##	</summary>
+## </param>
+#
+interface(`dev_dontaudit_getattr_sysfs',`
+	gen_require(`
+		type sysfs_t;
+	')
+
+	dontaudit $1 sysfs_t:filesystem getattr;
+')
+
+########################################
+## <summary>
 ##	Search the sysfs directories.
 ## </summary>
 ## <param name="domain">
@@ -4850,6 +4886,31 @@ interface(`dev_create_zero_dev',`
 	')
 
 	create_chr_files_pattern($1, device_t, zero_device_t)
+')
+
+########################################
+## <summary>
+##	Read cpu online hardware state information
+## </summary>
+## <desc>
+##	<p>
+##	Allow the specified domain to read /sys/devices/system/cpu/online
+##	</p>
+## </desc>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`dev_read_cpu_online',`
+	gen_require(`
+		type cpu_online_t;
+	')
+
+	allow $1 cpu_online_t:file read_file_perms;
+
+	dev_search_sysfs($1)
 ')
 
 ########################################

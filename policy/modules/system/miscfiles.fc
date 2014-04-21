@@ -15,6 +15,10 @@ ifdef(`distro_gentoo',`
 /etc/ssl(/.*)?			gen_context(system_u:object_r:cert_t,s0)
 /etc/timezone		--	gen_context(system_u:object_r:locale_t,s0)
 
+ifdef(`distro_debian',`
+/etc/locale.alias	--	gen_context(system_u:object_r:locale_t,s0)
+')
+
 ifdef(`distro_redhat',`
 /etc/sysconfig/clock	--	gen_context(system_u:object_r:locale_t,s0)
 ')
@@ -37,6 +41,8 @@ ifdef(`distro_redhat',`
 
 /usr/lib/perl5/man(/.*)?	gen_context(system_u:object_r:man_t,s0)
 
+/usr/local/share/ca-certificates(/.*)?	gen_context(system_u:object_r:cert_t,s0)
+
 /usr/local/man(/.*)?		gen_context(system_u:object_r:man_t,s0)
 /usr/local/share/man(/.*)?	gen_context(system_u:object_r:man_t,s0)
 
@@ -50,6 +56,7 @@ ifdef(`distro_redhat',`
 /usr/share/ghostscript/fonts(/.*)? gen_context(system_u:object_r:fonts_t,s0)
 /usr/share/locale(/.*)?		gen_context(system_u:object_r:locale_t,s0)
 /usr/share/man(/.*)?		gen_context(system_u:object_r:man_t,s0)
+/usr/share/postgresql/[^/]*/man(/.*)?      gen_context(system_u:object_r:man_t,s0)
 /usr/share/X11/locale(/.*)?	gen_context(system_u:object_r:locale_t,s0)
 /usr/share/zoneinfo(/.*)?	gen_context(system_u:object_r:locale_t,s0)
 
