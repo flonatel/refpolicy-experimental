@@ -1,4 +1,4 @@
-policy_module(xserver, 3.10.0)
+policy_module(xserver, 3.10.1)
 
 gen_require(`
 	class x_drawable all_x_drawable_perms;
@@ -521,6 +521,10 @@ optional_policy(`
 	optional_policy(`
 		accountsd_dbus_chat(xdm_t)
 	')
+')
+
+optional_policy(`
+	gnome_spec_domtrans_all_gkeyringd(xdm_t)
 ')
 
 optional_policy(`

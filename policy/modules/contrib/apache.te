@@ -1,4 +1,4 @@
-policy_module(apache, 2.8.0)
+policy_module(apache, 2.8.2)
 
 ########################################
 #
@@ -256,6 +256,9 @@ attribute httpd_htaccess_type;
 
 # domains that can exec all scripts
 attribute httpd_exec_scripts;
+
+attribute httpd_ra_content;
+attribute httpd_rw_content;
 
 attribute httpd_script_exec_type;
 
@@ -864,6 +867,11 @@ optional_policy(`
 
 optional_policy(`
 	seutil_sigchld_newrole(httpd_t)
+')
+
+optional_policy(`
+	shibboleth_read_config(httpd_t)
+	shibboleth_stream_connect(httpd_t)
 ')
 
 optional_policy(`

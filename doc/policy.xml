@@ -432,7 +432,7 @@ The user domain associated with the role.
 </summary>
 </param>
 </template>
-<interface name="sudo_sigchld" lineno="174">
+<interface name="sudo_sigchld" lineno="175">
 <summary>
 Send a SIGCHLD signal to the sudo domain.
 </summary>
@@ -1726,7 +1726,7 @@ The prefix to be used for deriving type names.
 </summary>
 </param>
 </template>
-<interface name="apache_role" lineno="140">
+<interface name="apache_role" lineno="141">
 <summary>
 Role access for apache.
 </summary>
@@ -1741,7 +1741,7 @@ User domain for the role.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_user_scripts" lineno="195">
+<interface name="apache_read_user_scripts" lineno="196">
 <summary>
 Read user httpd script executable files.
 </summary>
@@ -1751,7 +1751,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_user_content" lineno="215">
+<interface name="apache_read_user_content" lineno="216">
 <summary>
 Read user httpd content.
 </summary>
@@ -1761,7 +1761,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_domtrans" lineno="235">
+<interface name="apache_domtrans" lineno="236">
 <summary>
 Execute httpd with a domain transition.
 </summary>
@@ -1771,7 +1771,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="apache_initrc_domtrans" lineno="254">
+<interface name="apache_initrc_domtrans" lineno="255">
 <summary>
 Execute httpd server in the httpd domain.
 </summary>
@@ -1781,7 +1781,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="apache_signal" lineno="272">
+<interface name="apache_signal" lineno="273">
 <summary>
 Send generic signals to httpd.
 </summary>
@@ -1791,7 +1791,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_signull" lineno="290">
+<interface name="apache_signull" lineno="291">
 <summary>
 Send null signals to httpd.
 </summary>
@@ -1801,7 +1801,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_sigchld" lineno="308">
+<interface name="apache_sigchld" lineno="309">
 <summary>
 Send child terminated signals to httpd.
 </summary>
@@ -1811,7 +1811,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_use_fds" lineno="327">
+<interface name="apache_use_fds" lineno="328">
 <summary>
 Inherit and use file descriptors
 from httpd.
@@ -1822,7 +1822,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_rw_fifo_file" lineno="346">
+<interface name="apache_dontaudit_rw_fifo_file" lineno="347">
 <summary>
 Do not audit attempts to read and
 write httpd unnamed pipes.
@@ -1833,7 +1833,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_rw_stream_sockets" lineno="365">
+<interface name="apache_dontaudit_rw_stream_sockets" lineno="366">
 <summary>
 Do not audit attempts to read and
 write httpd unix domain stream sockets.
@@ -1844,7 +1844,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_rw_tcp_sockets" lineno="384">
+<interface name="apache_dontaudit_rw_tcp_sockets" lineno="385">
 <summary>
 Do not audit attempts to read and
 write httpd TCP sockets.
@@ -1855,7 +1855,67 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_manage_all_content" lineno="404">
+<interface name="apache_read_all_ra_content" lineno="403">
+<summary>
+Read all appendable content
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_append_all_ra_content" lineno="422">
+<summary>
+Append to all appendable web content
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_read_all_rw_content" lineno="440">
+<summary>
+Read all read/write content
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_manage_all_rw_content" lineno="459">
+<summary>
+Manage all read/write content
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_read_all_content" lineno="478">
+<summary>
+Read all web content.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_search_all_content" lineno="500">
+<summary>
+Search all apache content.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="apache_manage_all_content" lineno="520">
 <summary>
 Create, read, write, and delete
 all httpd content.
@@ -1867,7 +1927,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_setattr_cache_dirs" lineno="428">
+<interface name="apache_setattr_cache_dirs" lineno="544">
 <summary>
 Set attributes httpd cache directories.
 </summary>
@@ -1877,7 +1937,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_list_cache" lineno="446">
+<interface name="apache_list_cache" lineno="562">
 <summary>
 List httpd cache directories.
 </summary>
@@ -1887,7 +1947,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_rw_cache_files" lineno="464">
+<interface name="apache_rw_cache_files" lineno="580">
 <summary>
 Read and write httpd cache files.
 </summary>
@@ -1897,7 +1957,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_delete_cache_dirs" lineno="482">
+<interface name="apache_delete_cache_dirs" lineno="598">
 <summary>
 Delete httpd cache directories.
 </summary>
@@ -1907,7 +1967,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_delete_cache_files" lineno="500">
+<interface name="apache_delete_cache_files" lineno="616">
 <summary>
 Delete httpd cache files.
 </summary>
@@ -1917,7 +1977,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_config" lineno="519">
+<interface name="apache_read_config" lineno="635">
 <summary>
 Read httpd configuration files.
 </summary>
@@ -1928,7 +1988,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_search_config" lineno="540">
+<interface name="apache_search_config" lineno="656">
 <summary>
 Search httpd configuration directories.
 </summary>
@@ -1938,7 +1998,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_manage_config" lineno="560">
+<interface name="apache_manage_config" lineno="676">
 <summary>
 Create, read, write, and delete
 httpd configuration files.
@@ -1949,7 +2009,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_domtrans_helper" lineno="582">
+<interface name="apache_domtrans_helper" lineno="698">
 <summary>
 Execute the Apache helper program
 with a domain transition.
@@ -1960,7 +2020,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_run_helper" lineno="609">
+<interface name="apache_run_helper" lineno="725">
 <summary>
 Execute the Apache helper program with
 a domain transition, and allow the
@@ -1978,7 +2038,7 @@ Role allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_read_log" lineno="629">
+<interface name="apache_read_log" lineno="745">
 <summary>
 Read httpd log files.
 </summary>
@@ -1989,7 +2049,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_append_log" lineno="650">
+<interface name="apache_append_log" lineno="766">
 <summary>
 Append httpd log files.
 </summary>
@@ -1999,7 +2059,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_append_log" lineno="671">
+<interface name="apache_dontaudit_append_log" lineno="787">
 <summary>
 Do not audit attempts to append
 httpd log files.
@@ -2010,7 +2070,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_manage_log" lineno="690">
+<interface name="apache_manage_log" lineno="806">
 <summary>
 Create, read, write, and delete
 httpd log files.
@@ -2021,7 +2081,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_write_log" lineno="711">
+<interface name="apache_write_log" lineno="827">
 <summary>
 Write apache log files.
 </summary>
@@ -2031,7 +2091,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_search_modules" lineno="731">
+<interface name="apache_dontaudit_search_modules" lineno="847">
 <summary>
 Do not audit attempts to search
 httpd module directories.
@@ -2042,7 +2102,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_list_modules" lineno="749">
+<interface name="apache_list_modules" lineno="865">
 <summary>
 List httpd module directories.
 </summary>
@@ -2052,7 +2112,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_exec_modules" lineno="767">
+<interface name="apache_exec_modules" lineno="883">
 <summary>
 Execute httpd module files.
 </summary>
@@ -2062,7 +2122,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_module_files" lineno="787">
+<interface name="apache_read_module_files" lineno="903">
 <summary>
 Read httpd module files.
 </summary>
@@ -2072,7 +2132,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_domtrans_rotatelogs" lineno="807">
+<interface name="apache_domtrans_rotatelogs" lineno="923">
 <summary>
 Execute a domain transition to
 run httpd_rotatelogs.
@@ -2083,7 +2143,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="apache_list_sys_content" lineno="826">
+<interface name="apache_list_sys_content" lineno="942">
 <summary>
 List httpd system content directories.
 </summary>
@@ -2093,7 +2153,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_manage_sys_content" lineno="847">
+<interface name="apache_manage_sys_content" lineno="963">
 <summary>
 Create, read, write, and delete
 httpd system content files.
@@ -2105,7 +2165,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_manage_sys_rw_content" lineno="869">
+<interface name="apache_manage_sys_rw_content" lineno="985">
 <summary>
 Create, read, write, and delete
 httpd system rw content.
@@ -2116,7 +2176,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_domtrans_sys_script" lineno="891">
+<interface name="apache_domtrans_sys_script" lineno="1007">
 <summary>
 Execute all httpd scripts in the
 system script domain.
@@ -2127,7 +2187,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_rw_sys_script_stream_sockets" lineno="914">
+<interface name="apache_dontaudit_rw_sys_script_stream_sockets" lineno="1030">
 <summary>
 Do not audit attempts to read and
 write httpd system script unix
@@ -2139,7 +2199,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_domtrans_all_scripts" lineno="933">
+<interface name="apache_domtrans_all_scripts" lineno="1049">
 <summary>
 Execute all user scripts in the user
 script domain.
@@ -2150,7 +2210,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="apache_run_all_scripts" lineno="958">
+<interface name="apache_run_all_scripts" lineno="1074">
 <summary>
 Execute all user scripts in the user
 script domain. Add user script domains
@@ -2167,7 +2227,7 @@ Role allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_squirrelmail_data" lineno="977">
+<interface name="apache_read_squirrelmail_data" lineno="1093">
 <summary>
 Read httpd squirrelmail data files.
 </summary>
@@ -2177,7 +2237,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_append_squirrelmail_data" lineno="995">
+<interface name="apache_append_squirrelmail_data" lineno="1111">
 <summary>
 Append httpd squirrelmail data files.
 </summary>
@@ -2187,7 +2247,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_search_sys_content" lineno="1013">
+<interface name="apache_search_sys_content" lineno="1129">
 <summary>
 Search httpd system content.
 </summary>
@@ -2197,7 +2257,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_sys_content" lineno="1032">
+<interface name="apache_read_sys_content" lineno="1148">
 <summary>
 Read httpd system content.
 </summary>
@@ -2207,7 +2267,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_search_sys_scripts" lineno="1052">
+<interface name="apache_search_sys_scripts" lineno="1168">
 <summary>
 Search httpd system CGI directories.
 </summary>
@@ -2217,7 +2277,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_manage_all_user_content" lineno="1072">
+<interface name="apache_manage_all_user_content" lineno="1188">
 <summary>
 Create, read, write, and delete all
 user httpd content.
@@ -2229,7 +2289,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="apache_search_sys_script_state" lineno="1093">
+<interface name="apache_search_sys_script_state" lineno="1209">
 <summary>
 Search system script state directories.
 </summary>
@@ -2239,7 +2299,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_read_tmp_files" lineno="1111">
+<interface name="apache_read_tmp_files" lineno="1227">
 <summary>
 Read httpd tmp files.
 </summary>
@@ -2249,7 +2309,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apache_dontaudit_write_tmp_files" lineno="1131">
+<interface name="apache_dontaudit_write_tmp_files" lineno="1247">
 <summary>
 Do not audit attempts to write
 httpd tmp files.
@@ -2260,7 +2320,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="apache_cgi_domain" lineno="1161">
+<interface name="apache_cgi_domain" lineno="1277">
 <summary>
 Execute CGI in the specified domain.
 </summary>
@@ -2282,7 +2342,7 @@ Type of the executable to enter the cgi domain.
 </summary>
 </param>
 </interface>
-<interface name="apache_admin" lineno="1189">
+<interface name="apache_admin" lineno="1305">
 <summary>
 All of the rules required to
 administrate an apache environment.
@@ -2828,7 +2888,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apt_read_db" lineno="188">
+<interface name="apt_read_db" lineno="187">
 <summary>
 Read apt package database content.
 </summary>
@@ -2838,7 +2898,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apt_manage_db" lineno="210">
+<interface name="apt_manage_db" lineno="209">
 <summary>
 Create, read, write, and delete
 apt package database content.
@@ -2849,7 +2909,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="apt_dontaudit_manage_db" lineno="232">
+<interface name="apt_dontaudit_manage_db" lineno="231">
 <summary>
 Do not audit attempts to create,
 read, write, and delete apt
@@ -9719,7 +9779,17 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="gnome_stream_connect_gkeyringd" lineno="689">
+<interface name="gnome_spec_domtrans_all_gkeyringd" lineno="682">
+<summary>
+Run all gkeyringd in gkeyringd domain.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed to transition.
+</summary>
+</param>
+</interface>
+<interface name="gnome_stream_connect_gkeyringd" lineno="709">
 <summary>
 Connect to gnome keyring daemon
 with a unix stream socket.
@@ -9736,7 +9806,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="gnome_stream_connect_all_gkeyringd" lineno="709">
+<interface name="gnome_stream_connect_all_gkeyringd" lineno="729">
 <summary>
 Connect to all gnome keyring daemon
 with a unix stream socket.
@@ -23427,6 +23497,30 @@ Domain allowed access.
 </summary>
 </param>
 <rolecap/>
+</interface>
+</module>
+<module name="shibboleth" filename="policy/modules/contrib/shibboleth.if">
+<summary>Shibboleth authentication deamon</summary>
+<interface name="shibboleth_read_config" lineno="14">
+<summary>
+Allow your application domain to access
+config files from shibboleth
+</summary>
+<param name="domain">
+<summary>
+The domain which should be enabled.
+</summary>
+</param>
+</interface>
+<interface name="shibboleth_stream_connect" lineno="32">
+<summary>
+Allow the specified domain to connect to shibboleth with a unix socket.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
 </interface>
 </module>
 <module name="shorewall" filename="policy/modules/contrib/shorewall.if">
@@ -90223,7 +90317,27 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_search_sysfs" lineno="3884">
+<interface name="dev_getattr_sysfs" lineno="3884">
+<summary>
+Get the attributes of sysfs filesystem
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_dontaudit_getattr_sysfs" lineno="3902">
+<summary>
+Do not audit getting the attributes of sysfs filesystem
+</summary>
+<param name="domain">
+<summary>
+Domain to dontaudit access from
+</summary>
+</param>
+</interface>
+<interface name="dev_search_sysfs" lineno="3920">
 <summary>
 Search the sysfs directories.
 </summary>
@@ -90233,7 +90347,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_dontaudit_search_sysfs" lineno="3902">
+<interface name="dev_dontaudit_search_sysfs" lineno="3938">
 <summary>
 Do not audit attempts to search sysfs.
 </summary>
@@ -90243,7 +90357,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_list_sysfs" lineno="3920">
+<interface name="dev_list_sysfs" lineno="3956">
 <summary>
 List the contents of the sysfs directories.
 </summary>
@@ -90253,7 +90367,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_write_sysfs_dirs" lineno="3939">
+<interface name="dev_write_sysfs_dirs" lineno="3975">
 <summary>
 Write in a sysfs directories.
 </summary>
@@ -90263,7 +90377,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_dontaudit_write_sysfs_dirs" lineno="3957">
+<interface name="dev_dontaudit_write_sysfs_dirs" lineno="3993">
 <summary>
 Do not audit attempts to write in a sysfs directory.
 </summary>
@@ -90273,7 +90387,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_manage_sysfs_dirs" lineno="3976">
+<interface name="dev_manage_sysfs_dirs" lineno="4012">
 <summary>
 Create, read, write, and delete sysfs
 directories.
@@ -90284,7 +90398,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_sysfs" lineno="4003">
+<interface name="dev_read_sysfs" lineno="4039">
 <summary>
 Read hardware state information.
 </summary>
@@ -90303,7 +90417,7 @@ Domain allowed access.
 </param>
 <infoflow type="read" weight="10"/>
 </interface>
-<interface name="dev_rw_sysfs" lineno="4024">
+<interface name="dev_rw_sysfs" lineno="4060">
 <summary>
 Allow caller to modify hardware state information.
 </summary>
@@ -90313,7 +90427,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_tpm" lineno="4045">
+<interface name="dev_rw_tpm" lineno="4081">
 <summary>
 Read and write the TPM device.
 </summary>
@@ -90323,7 +90437,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_urand" lineno="4086">
+<interface name="dev_read_urand" lineno="4122">
 <summary>
 Read from pseudo random number generator devices (e.g., /dev/urandom).
 </summary>
@@ -90356,7 +90470,7 @@ Domain allowed access.
 </param>
 <infoflow type="read" weight="10"/>
 </interface>
-<interface name="dev_dontaudit_read_urand" lineno="4105">
+<interface name="dev_dontaudit_read_urand" lineno="4141">
 <summary>
 Do not audit attempts to read from pseudo
 random devices (e.g., /dev/urandom)
@@ -90367,7 +90481,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_write_urand" lineno="4124">
+<interface name="dev_write_urand" lineno="4160">
 <summary>
 Write to the pseudo random device (e.g., /dev/urandom). This
 sets the random number generator seed.
@@ -90378,7 +90492,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_getattr_generic_usb_dev" lineno="4142">
+<interface name="dev_getattr_generic_usb_dev" lineno="4178">
 <summary>
 Getattr generic the USB devices.
 </summary>
@@ -90388,7 +90502,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_setattr_generic_usb_dev" lineno="4160">
+<interface name="dev_setattr_generic_usb_dev" lineno="4196">
 <summary>
 Setattr generic the USB devices.
 </summary>
@@ -90398,7 +90512,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_generic_usb_dev" lineno="4178">
+<interface name="dev_read_generic_usb_dev" lineno="4214">
 <summary>
 Read generic the USB devices.
 </summary>
@@ -90408,7 +90522,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_generic_usb_dev" lineno="4196">
+<interface name="dev_rw_generic_usb_dev" lineno="4232">
 <summary>
 Read and write generic the USB devices.
 </summary>
@@ -90418,7 +90532,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_relabel_generic_usb_dev" lineno="4214">
+<interface name="dev_relabel_generic_usb_dev" lineno="4250">
 <summary>
 Relabel generic the USB devices.
 </summary>
@@ -90428,7 +90542,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_usbmon_dev" lineno="4232">
+<interface name="dev_read_usbmon_dev" lineno="4268">
 <summary>
 Read USB monitor devices.
 </summary>
@@ -90438,7 +90552,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_write_usbmon_dev" lineno="4250">
+<interface name="dev_write_usbmon_dev" lineno="4286">
 <summary>
 Write USB monitor devices.
 </summary>
@@ -90448,7 +90562,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_mount_usbfs" lineno="4268">
+<interface name="dev_mount_usbfs" lineno="4304">
 <summary>
 Mount a usbfs filesystem.
 </summary>
@@ -90458,7 +90572,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_associate_usbfs" lineno="4286">
+<interface name="dev_associate_usbfs" lineno="4322">
 <summary>
 Associate a file to a usbfs filesystem.
 </summary>
@@ -90468,7 +90582,7 @@ The type of the file to be associated to usbfs.
 </summary>
 </param>
 </interface>
-<interface name="dev_getattr_usbfs_dirs" lineno="4304">
+<interface name="dev_getattr_usbfs_dirs" lineno="4340">
 <summary>
 Get the attributes of a directory in the usb filesystem.
 </summary>
@@ -90478,7 +90592,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_dontaudit_getattr_usbfs_dirs" lineno="4323">
+<interface name="dev_dontaudit_getattr_usbfs_dirs" lineno="4359">
 <summary>
 Do not audit attempts to get the attributes
 of a directory in the usb filesystem.
@@ -90489,7 +90603,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_search_usbfs" lineno="4341">
+<interface name="dev_search_usbfs" lineno="4377">
 <summary>
 Search the directory containing USB hardware information.
 </summary>
@@ -90499,7 +90613,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_list_usbfs" lineno="4359">
+<interface name="dev_list_usbfs" lineno="4395">
 <summary>
 Allow caller to get a list of usb hardware.
 </summary>
@@ -90509,7 +90623,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_setattr_usbfs_files" lineno="4380">
+<interface name="dev_setattr_usbfs_files" lineno="4416">
 <summary>
 Set the attributes of usbfs filesystem.
 </summary>
@@ -90519,7 +90633,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_usbfs" lineno="4400">
+<interface name="dev_read_usbfs" lineno="4436">
 <summary>
 Read USB hardware information using
 the usbfs filesystem interface.
@@ -90530,7 +90644,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_usbfs" lineno="4420">
+<interface name="dev_rw_usbfs" lineno="4456">
 <summary>
 Allow caller to modify usb hardware configuration files.
 </summary>
@@ -90540,7 +90654,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_getattr_video_dev" lineno="4440">
+<interface name="dev_getattr_video_dev" lineno="4476">
 <summary>
 Get the attributes of video4linux devices.
 </summary>
@@ -90550,7 +90664,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_userio_dev" lineno="4458">
+<interface name="dev_rw_userio_dev" lineno="4494">
 <summary>
 Read and write userio device.
 </summary>
@@ -90560,7 +90674,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_dontaudit_getattr_video_dev" lineno="4477">
+<interface name="dev_dontaudit_getattr_video_dev" lineno="4513">
 <summary>
 Do not audit attempts to get the attributes
 of video4linux device nodes.
@@ -90571,7 +90685,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_setattr_video_dev" lineno="4495">
+<interface name="dev_setattr_video_dev" lineno="4531">
 <summary>
 Set the attributes of video4linux device nodes.
 </summary>
@@ -90581,7 +90695,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_dontaudit_setattr_video_dev" lineno="4514">
+<interface name="dev_dontaudit_setattr_video_dev" lineno="4550">
 <summary>
 Do not audit attempts to set the attributes
 of video4linux device nodes.
@@ -90592,7 +90706,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_video_dev" lineno="4532">
+<interface name="dev_read_video_dev" lineno="4568">
 <summary>
 Read the video4linux devices.
 </summary>
@@ -90602,7 +90716,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_write_video_dev" lineno="4550">
+<interface name="dev_write_video_dev" lineno="4586">
 <summary>
 Write the video4linux devices.
 </summary>
@@ -90612,7 +90726,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_vhost" lineno="4568">
+<interface name="dev_rw_vhost" lineno="4604">
 <summary>
 Allow read/write the vhost net device
 </summary>
@@ -90622,7 +90736,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_vmware" lineno="4586">
+<interface name="dev_rw_vmware" lineno="4622">
 <summary>
 Read and write VMWare devices.
 </summary>
@@ -90632,7 +90746,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rwx_vmware" lineno="4604">
+<interface name="dev_rwx_vmware" lineno="4640">
 <summary>
 Read, write, and mmap VMWare devices.
 </summary>
@@ -90642,7 +90756,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_read_watchdog" lineno="4623">
+<interface name="dev_read_watchdog" lineno="4659">
 <summary>
 Read from watchdog devices.
 </summary>
@@ -90652,7 +90766,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_write_watchdog" lineno="4641">
+<interface name="dev_write_watchdog" lineno="4677">
 <summary>
 Write to watchdog devices.
 </summary>
@@ -90662,7 +90776,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_wireless" lineno="4659">
+<interface name="dev_rw_wireless" lineno="4695">
 <summary>
 Read and write the the wireless device.
 </summary>
@@ -90672,7 +90786,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_xen" lineno="4677">
+<interface name="dev_rw_xen" lineno="4713">
 <summary>
 Read and write Xen devices.
 </summary>
@@ -90682,7 +90796,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_manage_xen" lineno="4695">
+<interface name="dev_manage_xen" lineno="4731">
 <summary>
 Create, read, write, and delete Xen devices.
 </summary>
@@ -90692,7 +90806,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_filetrans_xen" lineno="4719">
+<interface name="dev_filetrans_xen" lineno="4755">
 <summary>
 Automatic type transition to the type
 for xen device nodes when created in /dev.
@@ -90708,7 +90822,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="dev_getattr_xserver_misc_dev" lineno="4737">
+<interface name="dev_getattr_xserver_misc_dev" lineno="4773">
 <summary>
 Get the attributes of X server miscellaneous devices.
 </summary>
@@ -90718,7 +90832,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_setattr_xserver_misc_dev" lineno="4755">
+<interface name="dev_setattr_xserver_misc_dev" lineno="4791">
 <summary>
 Set the attributes of X server miscellaneous devices.
 </summary>
@@ -90728,7 +90842,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_xserver_misc" lineno="4773">
+<interface name="dev_rw_xserver_misc" lineno="4809">
 <summary>
 Read and write X server miscellaneous devices.
 </summary>
@@ -90738,7 +90852,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rw_zero" lineno="4791">
+<interface name="dev_rw_zero" lineno="4827">
 <summary>
 Read and write to the zero device (/dev/zero).
 </summary>
@@ -90748,7 +90862,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_rwx_zero" lineno="4809">
+<interface name="dev_rwx_zero" lineno="4845">
 <summary>
 Read, write, and execute the zero device (/dev/zero).
 </summary>
@@ -90758,7 +90872,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_execmod_zero" lineno="4828">
+<interface name="dev_execmod_zero" lineno="4864">
 <summary>
 Execmod the zero device (/dev/zero).
 </summary>
@@ -90768,7 +90882,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_create_zero_dev" lineno="4847">
+<interface name="dev_create_zero_dev" lineno="4883">
 <summary>
 Create the zero device (/dev/zero).
 </summary>
@@ -90778,7 +90892,22 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="dev_unconfined" lineno="4865">
+<interface name="dev_read_cpu_online" lineno="4906">
+<summary>
+Read cpu online hardware state information
+</summary>
+<desc>
+<p>
+Allow the specified domain to read /sys/devices/system/cpu/online
+</p>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="dev_unconfined" lineno="4926">
 <summary>
 Unconfined access to devices.
 </summary>
@@ -95630,7 +95759,47 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_mount_xattr_fs" lineno="121">
+<interface name="fs_xattr_type" lineno="121">
+<summary>
+Transform specified type into a filesystem
+type which has extended attribute
+support.
+</summary>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+</interface>
+<interface name="fs_getattr_all_xattr_fs" lineno="159">
+<summary>
+Get the attributes of all the
+filesystems which have extended
+attributes.
+This includes pseudo filesystems.
+</summary>
+<desc>
+<p>
+Allow the specified domain to
+get the attributes of a filesystems
+which have extended attributes.
+Example attributes:
+</p>
+<ul>
+<li>Type of the file system (e.g., tmpfs)</li>
+<li>Size of the file system</li>
+<li>Available space on the file system</li>
+</ul>
+</desc>
+<param name="domain">
+<summary>
+Domain allowed access.
+</summary>
+</param>
+<infoflow type="read" weight="5"/>
+<rolecap/>
+</interface>
+<interface name="fs_mount_xattr_fs" lineno="179">
 <summary>
 Mount a persistent filesystem which
 has extended attributes, such as
@@ -95642,7 +95811,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_xattr_fs" lineno="142">
+<interface name="fs_remount_xattr_fs" lineno="200">
 <summary>
 Remount a persistent filesystem which
 has extended attributes, such as
@@ -95655,7 +95824,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_xattr_fs" lineno="162">
+<interface name="fs_unmount_xattr_fs" lineno="220">
 <summary>
 Unmount a persistent filesystem which
 has extended attributes, such as
@@ -95667,7 +95836,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_xattr_fs" lineno="198">
+<interface name="fs_getattr_xattr_fs" lineno="256">
 <summary>
 Get the attributes of persistent
 filesystems which have extended
@@ -95695,7 +95864,7 @@ Domain allowed access.
 <infoflow type="read" weight="5"/>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_getattr_xattr_fs" lineno="219">
+<interface name="fs_dontaudit_getattr_xattr_fs" lineno="277">
 <summary>
 Do not audit attempts to
 get the attributes of a persistent
@@ -95708,7 +95877,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_relabelfrom_xattr_fs" lineno="239">
+<interface name="fs_relabelfrom_xattr_fs" lineno="297">
 <summary>
 Allow changing of the label of a
 filesystem with extended attributes
@@ -95720,7 +95889,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_get_xattr_fs_quotas" lineno="259">
+<interface name="fs_get_xattr_fs_quotas" lineno="317">
 <summary>
 Get the filesystem quotas of a filesystem
 with extended attributes.
@@ -95732,7 +95901,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_set_xattr_fs_quotas" lineno="279">
+<interface name="fs_set_xattr_fs_quotas" lineno="337">
 <summary>
 Set the filesystem quotas of a filesystem
 with extended attributes.
@@ -95744,7 +95913,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_read_anon_inodefs_files" lineno="297">
+<interface name="fs_read_anon_inodefs_files" lineno="355">
 <summary>
 Read files on anon_inodefs file systems.
 </summary>
@@ -95754,7 +95923,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_anon_inodefs_files" lineno="317">
+<interface name="fs_rw_anon_inodefs_files" lineno="375">
 <summary>
 Read and write files on anon_inodefs
 file systems.
@@ -95765,7 +95934,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_rw_anon_inodefs_files" lineno="337">
+<interface name="fs_dontaudit_rw_anon_inodefs_files" lineno="395">
 <summary>
 Do not audit attempts to read or write files on
 anon_inodefs file systems.
@@ -95776,7 +95945,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_autofs" lineno="356">
+<interface name="fs_mount_autofs" lineno="414">
 <summary>
 Mount an automount pseudo filesystem.
 </summary>
@@ -95786,7 +95955,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_autofs" lineno="375">
+<interface name="fs_remount_autofs" lineno="433">
 <summary>
 Remount an automount pseudo filesystem
 This allows some mount options to be changed.
@@ -95797,7 +95966,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_autofs" lineno="393">
+<interface name="fs_unmount_autofs" lineno="451">
 <summary>
 Unmount an automount pseudo filesystem.
 </summary>
@@ -95807,7 +95976,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_autofs" lineno="412">
+<interface name="fs_getattr_autofs" lineno="470">
 <summary>
 Get the attributes of an automount
 pseudo filesystem.
@@ -95818,7 +95987,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_auto_mountpoints" lineno="439">
+<interface name="fs_search_auto_mountpoints" lineno="497">
 <summary>
 Search automount filesystem to use automatically
 mounted filesystems.
@@ -95837,7 +96006,7 @@ Domain allowed access.
 </param>
 <infoflow type="read" weight="5"/>
 </interface>
-<interface name="fs_list_auto_mountpoints" lineno="459">
+<interface name="fs_list_auto_mountpoints" lineno="517">
 <summary>
 Read directories of automatically
 mounted filesystems.
@@ -95849,7 +96018,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_list_auto_mountpoints" lineno="478">
+<interface name="fs_dontaudit_list_auto_mountpoints" lineno="536">
 <summary>
 Do not audit attempts to list directories of automatically
 mounted filesystems.
@@ -95860,7 +96029,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_autofs_symlinks" lineno="497">
+<interface name="fs_manage_autofs_symlinks" lineno="555">
 <summary>
 Create, read, write, and delete symbolic links
 on an autofs filesystem.
@@ -95871,7 +96040,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_binfmt_misc_dirs" lineno="516">
+<interface name="fs_getattr_binfmt_misc_dirs" lineno="574">
 <summary>
 Get the attributes of directories on
 binfmt_misc filesystems.
@@ -95882,7 +96051,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_register_binary_executable_type" lineno="552">
+<interface name="fs_register_binary_executable_type" lineno="610">
 <summary>
 Register an interpreter for new binary
 file types, using the kernel binfmt_misc
@@ -95909,7 +96078,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_mount_cgroup" lineno="570">
+<interface name="fs_mount_cgroup" lineno="628">
 <summary>
 Mount cgroup filesystems.
 </summary>
@@ -95919,7 +96088,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_cgroup" lineno="588">
+<interface name="fs_remount_cgroup" lineno="646">
 <summary>
 Remount cgroup filesystems.
 </summary>
@@ -95929,7 +96098,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_cgroup" lineno="606">
+<interface name="fs_unmount_cgroup" lineno="664">
 <summary>
 Unmount cgroup filesystems.
 </summary>
@@ -95939,7 +96108,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_cgroup" lineno="624">
+<interface name="fs_getattr_cgroup" lineno="682">
 <summary>
 Get attributes of cgroup filesystems.
 </summary>
@@ -95949,7 +96118,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_cgroup_dirs" lineno="642">
+<interface name="fs_search_cgroup_dirs" lineno="700">
 <summary>
 Search cgroup directories.
 </summary>
@@ -95959,7 +96128,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_cgroup_dirs" lineno="662">
+<interface name="fs_list_cgroup_dirs" lineno="720">
 <summary>
 list cgroup directories.
 </summary>
@@ -95969,7 +96138,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_delete_cgroup_dirs" lineno="681">
+<interface name="fs_delete_cgroup_dirs" lineno="739">
 <summary>
 Delete cgroup directories.
 </summary>
@@ -95979,7 +96148,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cgroup_dirs" lineno="700">
+<interface name="fs_manage_cgroup_dirs" lineno="758">
 <summary>
 Manage cgroup directories.
 </summary>
@@ -95989,7 +96158,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_cgroup_files" lineno="720">
+<interface name="fs_read_cgroup_files" lineno="778">
 <summary>
 Read cgroup files.
 </summary>
@@ -95999,7 +96168,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_write_cgroup_files" lineno="740">
+<interface name="fs_write_cgroup_files" lineno="798">
 <summary>
 Write cgroup files.
 </summary>
@@ -96009,7 +96178,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_cgroup_files" lineno="759">
+<interface name="fs_rw_cgroup_files" lineno="817">
 <summary>
 Read and write cgroup files.
 </summary>
@@ -96019,7 +96188,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_rw_cgroup_files" lineno="781">
+<interface name="fs_dontaudit_rw_cgroup_files" lineno="839">
 <summary>
 Do not audit attempts to open,
 get attributes, read and write
@@ -96031,7 +96200,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cgroup_files" lineno="799">
+<interface name="fs_manage_cgroup_files" lineno="857">
 <summary>
 Manage cgroup files.
 </summary>
@@ -96041,7 +96210,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mounton_cgroup" lineno="819">
+<interface name="fs_mounton_cgroup" lineno="877">
 <summary>
 Mount on cgroup directories.
 </summary>
@@ -96051,7 +96220,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_cifs_dirs" lineno="838">
+<interface name="fs_dontaudit_list_cifs_dirs" lineno="896">
 <summary>
 Do not audit attempts to read
 dirs on a CIFS or SMB filesystem.
@@ -96062,7 +96231,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_cifs" lineno="856">
+<interface name="fs_mount_cifs" lineno="914">
 <summary>
 Mount a CIFS or SMB network filesystem.
 </summary>
@@ -96072,7 +96241,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_cifs" lineno="875">
+<interface name="fs_remount_cifs" lineno="933">
 <summary>
 Remount a CIFS or SMB network filesystem.
 This allows some mount options to be changed.
@@ -96083,7 +96252,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_cifs" lineno="893">
+<interface name="fs_unmount_cifs" lineno="951">
 <summary>
 Unmount a CIFS or SMB network filesystem.
 </summary>
@@ -96093,7 +96262,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_cifs" lineno="913">
+<interface name="fs_getattr_cifs" lineno="971">
 <summary>
 Get the attributes of a CIFS or
 SMB network filesystem.
@@ -96105,7 +96274,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_search_cifs" lineno="931">
+<interface name="fs_search_cifs" lineno="989">
 <summary>
 Search directories on a CIFS or SMB filesystem.
 </summary>
@@ -96115,7 +96284,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_cifs" lineno="950">
+<interface name="fs_list_cifs" lineno="1008">
 <summary>
 List the contents of directories on a
 CIFS or SMB filesystem.
@@ -96126,7 +96295,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_cifs" lineno="969">
+<interface name="fs_dontaudit_list_cifs" lineno="1027">
 <summary>
 Do not audit attempts to list the contents
 of directories on a CIFS or SMB filesystem.
@@ -96137,7 +96306,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mounton_cifs" lineno="987">
+<interface name="fs_mounton_cifs" lineno="1045">
 <summary>
 Mounton a CIFS filesystem.
 </summary>
@@ -96147,7 +96316,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_cifs_files" lineno="1006">
+<interface name="fs_read_cifs_files" lineno="1064">
 <summary>
 Read files on a CIFS or SMB filesystem.
 </summary>
@@ -96158,7 +96327,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_getattr_noxattr_fs" lineno="1027">
+<interface name="fs_getattr_noxattr_fs" lineno="1085">
 <summary>
 Get the attributes of filesystems that
 do not have extended attribute support.
@@ -96170,7 +96339,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_list_noxattr_fs" lineno="1045">
+<interface name="fs_list_noxattr_fs" lineno="1103">
 <summary>
 Read all noxattrfs directories.
 </summary>
@@ -96180,7 +96349,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_noxattr_fs" lineno="1064">
+<interface name="fs_dontaudit_list_noxattr_fs" lineno="1122">
 <summary>
 Do not audit attempts to list all
 noxattrfs directories.
@@ -96191,7 +96360,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_noxattr_fs_dirs" lineno="1082">
+<interface name="fs_manage_noxattr_fs_dirs" lineno="1140">
 <summary>
 Create, read, write, and delete all noxattrfs directories.
 </summary>
@@ -96201,7 +96370,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_noxattr_fs_files" lineno="1100">
+<interface name="fs_read_noxattr_fs_files" lineno="1158">
 <summary>
 Read all noxattrfs files.
 </summary>
@@ -96211,7 +96380,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_noxattr_fs_files" lineno="1119">
+<interface name="fs_dontaudit_read_noxattr_fs_files" lineno="1177">
 <summary>
 Do not audit attempts to read all
 noxattrfs files.
@@ -96222,7 +96391,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_write_noxattr_fs_files" lineno="1137">
+<interface name="fs_dontaudit_write_noxattr_fs_files" lineno="1195">
 <summary>
 Dont audit attempts to write to noxattrfs files.
 </summary>
@@ -96232,7 +96401,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_noxattr_fs_files" lineno="1155">
+<interface name="fs_manage_noxattr_fs_files" lineno="1213">
 <summary>
 Create, read, write, and delete all noxattrfs files.
 </summary>
@@ -96242,7 +96411,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_noxattr_fs_symlinks" lineno="1173">
+<interface name="fs_read_noxattr_fs_symlinks" lineno="1231">
 <summary>
 Read all noxattrfs symbolic links.
 </summary>
@@ -96252,7 +96421,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_relabelfrom_noxattr_fs" lineno="1192">
+<interface name="fs_relabelfrom_noxattr_fs" lineno="1250">
 <summary>
 Relabel all objets from filesystems that
 do not support extended attributes.
@@ -96263,7 +96432,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_cifs_files" lineno="1218">
+<interface name="fs_dontaudit_read_cifs_files" lineno="1276">
 <summary>
 Do not audit attempts to read
 files on a CIFS or SMB filesystem.
@@ -96274,7 +96443,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_append_cifs_files" lineno="1238">
+<interface name="fs_append_cifs_files" lineno="1296">
 <summary>
 Append files
 on a CIFS filesystem.
@@ -96286,7 +96455,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_append_cifs_files" lineno="1258">
+<interface name="fs_dontaudit_append_cifs_files" lineno="1316">
 <summary>
 dontaudit Append files
 on a CIFS filesystem.
@@ -96298,7 +96467,7 @@ Domain to not audit.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_rw_cifs_files" lineno="1277">
+<interface name="fs_dontaudit_rw_cifs_files" lineno="1335">
 <summary>
 Do not audit attempts to read or
 write files on a CIFS or SMB filesystem.
@@ -96309,7 +96478,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_cifs_symlinks" lineno="1295">
+<interface name="fs_read_cifs_symlinks" lineno="1353">
 <summary>
 Read symbolic links on a CIFS or SMB filesystem.
 </summary>
@@ -96319,7 +96488,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_cifs_named_pipes" lineno="1315">
+<interface name="fs_read_cifs_named_pipes" lineno="1373">
 <summary>
 Read named pipes
 on a CIFS or SMB network filesystem.
@@ -96330,7 +96499,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_cifs_named_sockets" lineno="1334">
+<interface name="fs_read_cifs_named_sockets" lineno="1392">
 <summary>
 Read named pipes
 on a CIFS or SMB network filesystem.
@@ -96341,7 +96510,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_exec_cifs_files" lineno="1355">
+<interface name="fs_exec_cifs_files" lineno="1413">
 <summary>
 Execute files on a CIFS or SMB
 network filesystem, in the caller
@@ -96354,7 +96523,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_manage_cifs_dirs" lineno="1376">
+<interface name="fs_manage_cifs_dirs" lineno="1434">
 <summary>
 Create, read, write, and delete directories
 on a CIFS or SMB network filesystem.
@@ -96366,7 +96535,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_cifs_dirs" lineno="1396">
+<interface name="fs_dontaudit_manage_cifs_dirs" lineno="1454">
 <summary>
 Do not audit attempts to create, read,
 write, and delete directories
@@ -96378,7 +96547,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cifs_files" lineno="1416">
+<interface name="fs_manage_cifs_files" lineno="1474">
 <summary>
 Create, read, write, and delete files
 on a CIFS or SMB network filesystem.
@@ -96390,7 +96559,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_cifs_files" lineno="1436">
+<interface name="fs_dontaudit_manage_cifs_files" lineno="1494">
 <summary>
 Do not audit attempts to create, read,
 write, and delete files
@@ -96402,7 +96571,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cifs_symlinks" lineno="1455">
+<interface name="fs_manage_cifs_symlinks" lineno="1513">
 <summary>
 Create, read, write, and delete symbolic links
 on a CIFS or SMB network filesystem.
@@ -96413,7 +96582,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cifs_named_pipes" lineno="1474">
+<interface name="fs_manage_cifs_named_pipes" lineno="1532">
 <summary>
 Create, read, write, and delete named pipes
 on a CIFS or SMB network filesystem.
@@ -96424,7 +96593,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_cifs_named_sockets" lineno="1493">
+<interface name="fs_manage_cifs_named_sockets" lineno="1551">
 <summary>
 Create, read, write, and delete named sockets
 on a CIFS or SMB network filesystem.
@@ -96435,7 +96604,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_cifs_domtrans" lineno="1536">
+<interface name="fs_cifs_domtrans" lineno="1594">
 <summary>
 Execute a file on a CIFS or SMB filesystem
 in the specified domain.
@@ -96470,7 +96639,7 @@ The type of the new process.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_configfs_dirs" lineno="1556">
+<interface name="fs_manage_configfs_dirs" lineno="1614">
 <summary>
 Create, read, write, and delete dirs
 on a configfs filesystem.
@@ -96481,7 +96650,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_configfs_files" lineno="1575">
+<interface name="fs_manage_configfs_files" lineno="1633">
 <summary>
 Create, read, write, and delete files
 on a configfs filesystem.
@@ -96492,7 +96661,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_dos_fs" lineno="1594">
+<interface name="fs_mount_dos_fs" lineno="1652">
 <summary>
 Mount a DOS filesystem, such as
 FAT32 or NTFS.
@@ -96503,7 +96672,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_dos_fs" lineno="1614">
+<interface name="fs_remount_dos_fs" lineno="1672">
 <summary>
 Remount a DOS filesystem, such as
 FAT32 or NTFS.  This allows
@@ -96515,7 +96684,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_dos_fs" lineno="1633">
+<interface name="fs_unmount_dos_fs" lineno="1691">
 <summary>
 Unmount a DOS filesystem, such as
 FAT32 or NTFS.
@@ -96526,7 +96695,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_dos_fs" lineno="1653">
+<interface name="fs_getattr_dos_fs" lineno="1711">
 <summary>
 Get the attributes of a DOS
 filesystem, such as FAT32 or NTFS.
@@ -96538,7 +96707,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_relabelfrom_dos_fs" lineno="1672">
+<interface name="fs_relabelfrom_dos_fs" lineno="1730">
 <summary>
 Allow changing of the label of a
 DOS filesystem using the context= mount option.
@@ -96549,7 +96718,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_dos" lineno="1690">
+<interface name="fs_search_dos" lineno="1748">
 <summary>
 Search dosfs filesystem.
 </summary>
@@ -96559,7 +96728,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_dos" lineno="1708">
+<interface name="fs_list_dos" lineno="1766">
 <summary>
 List dirs DOS filesystem.
 </summary>
@@ -96569,7 +96738,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_dos_dirs" lineno="1727">
+<interface name="fs_manage_dos_dirs" lineno="1785">
 <summary>
 Create, read, write, and delete dirs
 on a DOS filesystem.
@@ -96580,7 +96749,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_dos_files" lineno="1745">
+<interface name="fs_read_dos_files" lineno="1803">
 <summary>
 Read files on a DOS filesystem.
 </summary>
@@ -96590,7 +96759,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_dos_files" lineno="1764">
+<interface name="fs_manage_dos_files" lineno="1822">
 <summary>
 Create, read, write, and delete files
 on a DOS filesystem.
@@ -96601,7 +96770,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_eventpollfs" lineno="1792">
+<interface name="fs_read_eventpollfs" lineno="1850">
 <summary>
 Read eventpollfs files.
 </summary>
@@ -96620,7 +96789,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_fusefs" lineno="1806">
+<interface name="fs_mount_fusefs" lineno="1864">
 <summary>
 Mount a FUSE filesystem.
 </summary>
@@ -96630,7 +96799,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_fusefs" lineno="1824">
+<interface name="fs_unmount_fusefs" lineno="1882">
 <summary>
 Unmount a FUSE filesystem.
 </summary>
@@ -96640,7 +96809,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mounton_fusefs" lineno="1842">
+<interface name="fs_mounton_fusefs" lineno="1900">
 <summary>
 Mounton a FUSEFS filesystem.
 </summary>
@@ -96650,7 +96819,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_fusefs" lineno="1862">
+<interface name="fs_search_fusefs" lineno="1920">
 <summary>
 Search directories
 on a FUSEFS filesystem.
@@ -96662,7 +96831,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_list_fusefs" lineno="1881">
+<interface name="fs_dontaudit_list_fusefs" lineno="1939">
 <summary>
 Do not audit attempts to list the contents
 of directories on a FUSEFS filesystem.
@@ -96673,7 +96842,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_fusefs_dirs" lineno="1901">
+<interface name="fs_manage_fusefs_dirs" lineno="1959">
 <summary>
 Create, read, write, and delete directories
 on a FUSEFS filesystem.
@@ -96685,7 +96854,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_fusefs_dirs" lineno="1921">
+<interface name="fs_dontaudit_manage_fusefs_dirs" lineno="1979">
 <summary>
 Do not audit attempts to create, read,
 write, and delete directories
@@ -96697,7 +96866,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_fusefs_files" lineno="1940">
+<interface name="fs_read_fusefs_files" lineno="1998">
 <summary>
 Read, a FUSEFS filesystem.
 </summary>
@@ -96708,7 +96877,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_exec_fusefs_files" lineno="1959">
+<interface name="fs_exec_fusefs_files" lineno="2017">
 <summary>
 Execute files on a FUSEFS filesystem.
 </summary>
@@ -96719,7 +96888,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_manage_fusefs_files" lineno="1979">
+<interface name="fs_manage_fusefs_files" lineno="2037">
 <summary>
 Create, read, write, and delete files
 on a FUSEFS filesystem.
@@ -96731,7 +96900,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_fusefs_files" lineno="1999">
+<interface name="fs_dontaudit_manage_fusefs_files" lineno="2057">
 <summary>
 Do not audit attempts to create,
 read, write, and delete files
@@ -96743,7 +96912,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_fusefs_symlinks" lineno="2017">
+<interface name="fs_read_fusefs_symlinks" lineno="2075">
 <summary>
 Read symbolic links on a FUSEFS filesystem.
 </summary>
@@ -96753,7 +96922,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_hugetlbfs" lineno="2037">
+<interface name="fs_getattr_hugetlbfs" lineno="2095">
 <summary>
 Get the attributes of an hugetlbfs
 filesystem.
@@ -96764,7 +96933,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_hugetlbfs" lineno="2055">
+<interface name="fs_list_hugetlbfs" lineno="2113">
 <summary>
 List hugetlbfs.
 </summary>
@@ -96774,7 +96943,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_hugetlbfs_dirs" lineno="2073">
+<interface name="fs_manage_hugetlbfs_dirs" lineno="2131">
 <summary>
 Manage hugetlbfs dirs.
 </summary>
@@ -96784,7 +96953,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_hugetlbfs_files" lineno="2091">
+<interface name="fs_rw_hugetlbfs_files" lineno="2149">
 <summary>
 Read and write hugetlbfs files.
 </summary>
@@ -96794,7 +96963,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_associate_hugetlbfs" lineno="2109">
+<interface name="fs_associate_hugetlbfs" lineno="2167">
 <summary>
 Allow the type to associate to hugetlbfs filesystems.
 </summary>
@@ -96804,7 +96973,7 @@ The type of the object to be associated.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_inotifyfs" lineno="2127">
+<interface name="fs_search_inotifyfs" lineno="2185">
 <summary>
 Search inotifyfs filesystem.
 </summary>
@@ -96814,7 +96983,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_inotifyfs" lineno="2145">
+<interface name="fs_list_inotifyfs" lineno="2203">
 <summary>
 List inotifyfs filesystem.
 </summary>
@@ -96824,7 +96993,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_inotifyfs" lineno="2163">
+<interface name="fs_dontaudit_list_inotifyfs" lineno="2221">
 <summary>
 Dontaudit List inotifyfs filesystem.
 </summary>
@@ -96834,7 +97003,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_hugetlbfs_filetrans" lineno="2197">
+<interface name="fs_hugetlbfs_filetrans" lineno="2255">
 <summary>
 Create an object in a hugetlbfs filesystem, with a private
 type using a type transition.
@@ -96860,7 +97029,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_iso9660_fs" lineno="2217">
+<interface name="fs_mount_iso9660_fs" lineno="2275">
 <summary>
 Mount an iso9660 filesystem, which
 is usually used on CDs.
@@ -96871,7 +97040,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_iso9660_fs" lineno="2237">
+<interface name="fs_remount_iso9660_fs" lineno="2295">
 <summary>
 Remount an iso9660 filesystem, which
 is usually used on CDs.  This allows
@@ -96883,7 +97052,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_iso9660_fs" lineno="2256">
+<interface name="fs_unmount_iso9660_fs" lineno="2314">
 <summary>
 Unmount an iso9660 filesystem, which
 is usually used on CDs.
@@ -96894,7 +97063,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_iso9660_fs" lineno="2276">
+<interface name="fs_getattr_iso9660_fs" lineno="2334">
 <summary>
 Get the attributes of an iso9660
 filesystem, which is usually used on CDs.
@@ -96906,7 +97075,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_getattr_iso9660_files" lineno="2295">
+<interface name="fs_getattr_iso9660_files" lineno="2353">
 <summary>
 Read files on an iso9660 filesystem, which
 is usually used on CDs.
@@ -96917,7 +97086,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_iso9660_files" lineno="2315">
+<interface name="fs_read_iso9660_files" lineno="2373">
 <summary>
 Read files on an iso9660 filesystem, which
 is usually used on CDs.
@@ -96928,7 +97097,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_nfs" lineno="2335">
+<interface name="fs_mount_nfs" lineno="2393">
 <summary>
 Mount a NFS filesystem.
 </summary>
@@ -96938,7 +97107,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_nfs" lineno="2354">
+<interface name="fs_remount_nfs" lineno="2412">
 <summary>
 Remount a NFS filesystem.  This allows
 some mount options to be changed.
@@ -96949,7 +97118,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_nfs" lineno="2372">
+<interface name="fs_unmount_nfs" lineno="2430">
 <summary>
 Unmount a NFS filesystem.
 </summary>
@@ -96959,7 +97128,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_nfs" lineno="2391">
+<interface name="fs_getattr_nfs" lineno="2449">
 <summary>
 Get the attributes of a NFS filesystem.
 </summary>
@@ -96970,7 +97139,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_search_nfs" lineno="2409">
+<interface name="fs_search_nfs" lineno="2467">
 <summary>
 Search directories on a NFS filesystem.
 </summary>
@@ -96980,7 +97149,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_nfs" lineno="2427">
+<interface name="fs_list_nfs" lineno="2485">
 <summary>
 List NFS filesystem.
 </summary>
@@ -96990,7 +97159,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_nfs" lineno="2446">
+<interface name="fs_dontaudit_list_nfs" lineno="2504">
 <summary>
 Do not audit attempts to list the contents
 of directories on a NFS filesystem.
@@ -97001,7 +97170,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mounton_nfs" lineno="2464">
+<interface name="fs_mounton_nfs" lineno="2522">
 <summary>
 Mounton a NFS filesystem.
 </summary>
@@ -97011,7 +97180,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_nfs_files" lineno="2483">
+<interface name="fs_read_nfs_files" lineno="2541">
 <summary>
 Read files on a NFS filesystem.
 </summary>
@@ -97022,7 +97191,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_read_nfs_files" lineno="2503">
+<interface name="fs_dontaudit_read_nfs_files" lineno="2561">
 <summary>
 Do not audit attempts to read
 files on a NFS filesystem.
@@ -97033,7 +97202,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_write_nfs_files" lineno="2521">
+<interface name="fs_write_nfs_files" lineno="2579">
 <summary>
 Read files on a NFS filesystem.
 </summary>
@@ -97043,7 +97212,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_exec_nfs_files" lineno="2541">
+<interface name="fs_exec_nfs_files" lineno="2599">
 <summary>
 Execute files on a NFS filesystem.
 </summary>
@@ -97054,7 +97223,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_append_nfs_files" lineno="2562">
+<interface name="fs_append_nfs_files" lineno="2620">
 <summary>
 Append files
 on a NFS filesystem.
@@ -97066,7 +97235,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_append_nfs_files" lineno="2582">
+<interface name="fs_dontaudit_append_nfs_files" lineno="2640">
 <summary>
 dontaudit Append files
 on a NFS filesystem.
@@ -97078,7 +97247,7 @@ Domain to not audit.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_rw_nfs_files" lineno="2601">
+<interface name="fs_dontaudit_rw_nfs_files" lineno="2659">
 <summary>
 Do not audit attempts to read or
 write files on a NFS filesystem.
@@ -97089,7 +97258,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_nfs_symlinks" lineno="2619">
+<interface name="fs_read_nfs_symlinks" lineno="2677">
 <summary>
 Read symbolic links on a NFS filesystem.
 </summary>
@@ -97099,7 +97268,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_nfs_symlinks" lineno="2638">
+<interface name="fs_dontaudit_read_nfs_symlinks" lineno="2696">
 <summary>
 Dontaudit read symbolic links on a NFS filesystem.
 </summary>
@@ -97109,7 +97278,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_nfs_named_sockets" lineno="2656">
+<interface name="fs_read_nfs_named_sockets" lineno="2714">
 <summary>
 Read named sockets on a NFS filesystem.
 </summary>
@@ -97119,7 +97288,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_nfs_named_pipes" lineno="2675">
+<interface name="fs_read_nfs_named_pipes" lineno="2733">
 <summary>
 Read named pipes on a NFS network filesystem.
 </summary>
@@ -97130,7 +97299,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_getattr_rpc_dirs" lineno="2693">
+<interface name="fs_getattr_rpc_dirs" lineno="2751">
 <summary>
 Read directories of RPC file system pipes.
 </summary>
@@ -97140,7 +97309,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_rpc" lineno="2712">
+<interface name="fs_search_rpc" lineno="2770">
 <summary>
 Search directories of RPC file system pipes.
 </summary>
@@ -97150,7 +97319,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_removable" lineno="2730">
+<interface name="fs_search_removable" lineno="2788">
 <summary>
 Search removable storage directories.
 </summary>
@@ -97160,7 +97329,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_removable" lineno="2748">
+<interface name="fs_dontaudit_list_removable" lineno="2806">
 <summary>
 Do not audit attempts to list removable storage directories.
 </summary>
@@ -97170,7 +97339,7 @@ Domain not to audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_removable_files" lineno="2766">
+<interface name="fs_read_removable_files" lineno="2824">
 <summary>
 Read removable storage files.
 </summary>
@@ -97180,7 +97349,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_removable_files" lineno="2784">
+<interface name="fs_dontaudit_read_removable_files" lineno="2842">
 <summary>
 Do not audit attempts to read removable storage files.
 </summary>
@@ -97190,7 +97359,7 @@ Domain not to audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_write_removable_files" lineno="2802">
+<interface name="fs_dontaudit_write_removable_files" lineno="2860">
 <summary>
 Do not audit attempts to write removable storage files.
 </summary>
@@ -97200,7 +97369,7 @@ Domain not to audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_removable_symlinks" lineno="2820">
+<interface name="fs_read_removable_symlinks" lineno="2878">
 <summary>
 Read removable storage symbolic links.
 </summary>
@@ -97210,7 +97379,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_removable_blk_files" lineno="2838">
+<interface name="fs_read_removable_blk_files" lineno="2896">
 <summary>
 Read block nodes on removable filesystems.
 </summary>
@@ -97220,7 +97389,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_removable_blk_files" lineno="2857">
+<interface name="fs_rw_removable_blk_files" lineno="2915">
 <summary>
 Read and write block nodes on removable filesystems.
 </summary>
@@ -97230,7 +97399,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_rpc" lineno="2876">
+<interface name="fs_list_rpc" lineno="2934">
 <summary>
 Read directories of RPC file system pipes.
 </summary>
@@ -97240,7 +97409,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_rpc_files" lineno="2894">
+<interface name="fs_read_rpc_files" lineno="2952">
 <summary>
 Read files of RPC file system pipes.
 </summary>
@@ -97250,7 +97419,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_rpc_symlinks" lineno="2912">
+<interface name="fs_read_rpc_symlinks" lineno="2970">
 <summary>
 Read symbolic links of RPC file system pipes.
 </summary>
@@ -97260,7 +97429,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_rpc_sockets" lineno="2930">
+<interface name="fs_read_rpc_sockets" lineno="2988">
 <summary>
 Read sockets of RPC file system pipes.
 </summary>
@@ -97270,7 +97439,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_rpc_sockets" lineno="2948">
+<interface name="fs_rw_rpc_sockets" lineno="3006">
 <summary>
 Read and write sockets of RPC file system pipes.
 </summary>
@@ -97280,7 +97449,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_nfs_dirs" lineno="2968">
+<interface name="fs_manage_nfs_dirs" lineno="3026">
 <summary>
 Create, read, write, and delete directories
 on a NFS filesystem.
@@ -97292,7 +97461,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_nfs_dirs" lineno="2988">
+<interface name="fs_dontaudit_manage_nfs_dirs" lineno="3046">
 <summary>
 Do not audit attempts to create, read,
 write, and delete directories
@@ -97304,7 +97473,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_nfs_files" lineno="3008">
+<interface name="fs_manage_nfs_files" lineno="3066">
 <summary>
 Create, read, write, and delete files
 on a NFS filesystem.
@@ -97316,7 +97485,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_nfs_files" lineno="3028">
+<interface name="fs_dontaudit_manage_nfs_files" lineno="3086">
 <summary>
 Do not audit attempts to create,
 read, write, and delete files
@@ -97328,7 +97497,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_nfs_symlinks" lineno="3048">
+<interface name="fs_manage_nfs_symlinks" lineno="3106">
 <summary>
 Create, read, write, and delete symbolic links
 on a NFS network filesystem.
@@ -97340,7 +97509,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_manage_nfs_named_pipes" lineno="3067">
+<interface name="fs_manage_nfs_named_pipes" lineno="3125">
 <summary>
 Create, read, write, and delete named pipes
 on a NFS filesystem.
@@ -97351,7 +97520,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_nfs_named_sockets" lineno="3086">
+<interface name="fs_manage_nfs_named_sockets" lineno="3144">
 <summary>
 Create, read, write, and delete named sockets
 on a NFS filesystem.
@@ -97362,7 +97531,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_nfs_domtrans" lineno="3129">
+<interface name="fs_nfs_domtrans" lineno="3187">
 <summary>
 Execute a file on a NFS filesystem
 in the specified domain.
@@ -97397,7 +97566,7 @@ The type of the new process.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_nfsd_fs" lineno="3148">
+<interface name="fs_mount_nfsd_fs" lineno="3206">
 <summary>
 Mount a NFS server pseudo filesystem.
 </summary>
@@ -97407,7 +97576,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_nfsd_fs" lineno="3167">
+<interface name="fs_remount_nfsd_fs" lineno="3225">
 <summary>
 Mount a NFS server pseudo filesystem.
 This allows some mount options to be changed.
@@ -97418,7 +97587,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_nfsd_fs" lineno="3185">
+<interface name="fs_unmount_nfsd_fs" lineno="3243">
 <summary>
 Unmount a NFS server pseudo filesystem.
 </summary>
@@ -97428,7 +97597,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_nfsd_fs" lineno="3204">
+<interface name="fs_getattr_nfsd_fs" lineno="3262">
 <summary>
 Get the attributes of a NFS server
 pseudo filesystem.
@@ -97439,7 +97608,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_nfsd_fs" lineno="3222">
+<interface name="fs_search_nfsd_fs" lineno="3280">
 <summary>
 Search NFS server directories.
 </summary>
@@ -97449,7 +97618,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_nfsd_fs" lineno="3240">
+<interface name="fs_list_nfsd_fs" lineno="3298">
 <summary>
 List NFS server directories.
 </summary>
@@ -97459,7 +97628,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_nfsd_files" lineno="3258">
+<interface name="fs_getattr_nfsd_files" lineno="3316">
 <summary>
 Getattr files on an nfsd filesystem
 </summary>
@@ -97469,7 +97638,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_nfsd_fs" lineno="3276">
+<interface name="fs_rw_nfsd_fs" lineno="3334">
 <summary>
 Read and write NFS server files.
 </summary>
@@ -97479,7 +97648,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_associate_ramfs" lineno="3294">
+<interface name="fs_associate_ramfs" lineno="3352">
 <summary>
 Allow the type to associate to ramfs filesystems.
 </summary>
@@ -97489,7 +97658,7 @@ The type of the object to be associated.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_ramfs" lineno="3312">
+<interface name="fs_mount_ramfs" lineno="3370">
 <summary>
 Mount a RAM filesystem.
 </summary>
@@ -97499,7 +97668,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_ramfs" lineno="3331">
+<interface name="fs_remount_ramfs" lineno="3389">
 <summary>
 Remount a RAM filesystem.  This allows
 some mount options to be changed.
@@ -97510,7 +97679,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_ramfs" lineno="3349">
+<interface name="fs_unmount_ramfs" lineno="3407">
 <summary>
 Unmount a RAM filesystem.
 </summary>
@@ -97520,7 +97689,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_ramfs" lineno="3367">
+<interface name="fs_getattr_ramfs" lineno="3425">
 <summary>
 Get the attributes of a RAM filesystem.
 </summary>
@@ -97530,7 +97699,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_ramfs" lineno="3385">
+<interface name="fs_search_ramfs" lineno="3443">
 <summary>
 Search directories on a ramfs
 </summary>
@@ -97540,7 +97709,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_search_ramfs" lineno="3403">
+<interface name="fs_dontaudit_search_ramfs" lineno="3461">
 <summary>
 Dontaudit Search directories on a ramfs
 </summary>
@@ -97550,7 +97719,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_ramfs_dirs" lineno="3422">
+<interface name="fs_manage_ramfs_dirs" lineno="3480">
 <summary>
 Create, read, write, and delete
 directories on a ramfs.
@@ -97561,7 +97730,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_ramfs_files" lineno="3440">
+<interface name="fs_dontaudit_read_ramfs_files" lineno="3498">
 <summary>
 Dontaudit read on a ramfs files.
 </summary>
@@ -97571,7 +97740,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_read_ramfs_pipes" lineno="3458">
+<interface name="fs_dontaudit_read_ramfs_pipes" lineno="3516">
 <summary>
 Dontaudit read on a ramfs fifo_files.
 </summary>
@@ -97581,7 +97750,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_ramfs_files" lineno="3477">
+<interface name="fs_manage_ramfs_files" lineno="3535">
 <summary>
 Create, read, write, and delete
 files on a ramfs filesystem.
@@ -97592,7 +97761,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_write_ramfs_pipes" lineno="3495">
+<interface name="fs_write_ramfs_pipes" lineno="3553">
 <summary>
 Write to named pipe on a ramfs filesystem.
 </summary>
@@ -97602,7 +97771,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_write_ramfs_pipes" lineno="3514">
+<interface name="fs_dontaudit_write_ramfs_pipes" lineno="3572">
 <summary>
 Do not audit attempts to write to named
 pipes on a ramfs filesystem.
@@ -97613,7 +97782,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_ramfs_pipes" lineno="3532">
+<interface name="fs_rw_ramfs_pipes" lineno="3590">
 <summary>
 Read and write a named pipe on a ramfs filesystem.
 </summary>
@@ -97623,7 +97792,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_ramfs_pipes" lineno="3551">
+<interface name="fs_manage_ramfs_pipes" lineno="3609">
 <summary>
 Create, read, write, and delete
 named pipes on a ramfs filesystem.
@@ -97634,7 +97803,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_write_ramfs_sockets" lineno="3569">
+<interface name="fs_write_ramfs_sockets" lineno="3627">
 <summary>
 Write to named socket on a ramfs filesystem.
 </summary>
@@ -97644,7 +97813,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_ramfs_sockets" lineno="3588">
+<interface name="fs_manage_ramfs_sockets" lineno="3646">
 <summary>
 Create, read, write, and delete
 named sockets on a ramfs filesystem.
@@ -97655,7 +97824,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_romfs" lineno="3606">
+<interface name="fs_mount_romfs" lineno="3664">
 <summary>
 Mount a ROM filesystem.
 </summary>
@@ -97665,7 +97834,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_romfs" lineno="3625">
+<interface name="fs_remount_romfs" lineno="3683">
 <summary>
 Remount a ROM filesystem.  This allows
 some mount options to be changed.
@@ -97676,7 +97845,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_romfs" lineno="3643">
+<interface name="fs_unmount_romfs" lineno="3701">
 <summary>
 Unmount a ROM filesystem.
 </summary>
@@ -97686,7 +97855,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_romfs" lineno="3662">
+<interface name="fs_getattr_romfs" lineno="3720">
 <summary>
 Get the attributes of a ROM
 filesystem.
@@ -97697,7 +97866,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_rpc_pipefs" lineno="3680">
+<interface name="fs_mount_rpc_pipefs" lineno="3738">
 <summary>
 Mount a RPC pipe filesystem.
 </summary>
@@ -97707,7 +97876,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_rpc_pipefs" lineno="3699">
+<interface name="fs_remount_rpc_pipefs" lineno="3757">
 <summary>
 Remount a RPC pipe filesystem.  This
 allows some mount option to be changed.
@@ -97718,7 +97887,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_rpc_pipefs" lineno="3717">
+<interface name="fs_unmount_rpc_pipefs" lineno="3775">
 <summary>
 Unmount a RPC pipe filesystem.
 </summary>
@@ -97728,7 +97897,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_rpc_pipefs" lineno="3736">
+<interface name="fs_getattr_rpc_pipefs" lineno="3794">
 <summary>
 Get the attributes of a RPC pipe
 filesystem.
@@ -97739,7 +97908,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_rpc_named_pipes" lineno="3754">
+<interface name="fs_rw_rpc_named_pipes" lineno="3812">
 <summary>
 Read and write RPC pipe filesystem named pipes.
 </summary>
@@ -97749,7 +97918,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_tmpfs" lineno="3772">
+<interface name="fs_mount_tmpfs" lineno="3830">
 <summary>
 Mount a tmpfs filesystem.
 </summary>
@@ -97759,7 +97928,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_tmpfs" lineno="3790">
+<interface name="fs_remount_tmpfs" lineno="3848">
 <summary>
 Remount a tmpfs filesystem.
 </summary>
@@ -97769,7 +97938,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_tmpfs" lineno="3808">
+<interface name="fs_unmount_tmpfs" lineno="3866">
 <summary>
 Unmount a tmpfs filesystem.
 </summary>
@@ -97779,7 +97948,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_tmpfs" lineno="3828">
+<interface name="fs_getattr_tmpfs" lineno="3886">
 <summary>
 Get the attributes of a tmpfs
 filesystem.
@@ -97791,7 +97960,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_associate_tmpfs" lineno="3846">
+<interface name="fs_associate_tmpfs" lineno="3904">
 <summary>
 Allow the type to associate to tmpfs filesystems.
 </summary>
@@ -97801,7 +97970,7 @@ The type of the object to be associated.
 </summary>
 </param>
 </interface>
-<interface name="fs_relabelfrom_tmpfs" lineno="3864">
+<interface name="fs_relabelfrom_tmpfs" lineno="3922">
 <summary>
 Relabel from tmpfs filesystem.
 </summary>
@@ -97811,7 +97980,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_tmpfs_dirs" lineno="3882">
+<interface name="fs_getattr_tmpfs_dirs" lineno="3940">
 <summary>
 Get the attributes of tmpfs directories.
 </summary>
@@ -97821,7 +97990,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_tmpfs_dirs" lineno="3901">
+<interface name="fs_dontaudit_getattr_tmpfs_dirs" lineno="3959">
 <summary>
 Do not audit attempts to get the attributes
 of tmpfs directories.
@@ -97832,7 +98001,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mounton_tmpfs" lineno="3919">
+<interface name="fs_mounton_tmpfs" lineno="3977">
 <summary>
 Mount on tmpfs directories.
 </summary>
@@ -97842,7 +98011,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_setattr_tmpfs_dirs" lineno="3937">
+<interface name="fs_setattr_tmpfs_dirs" lineno="3995">
 <summary>
 Set the attributes of tmpfs directories.
 </summary>
@@ -97852,7 +98021,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_tmpfs" lineno="3955">
+<interface name="fs_search_tmpfs" lineno="4013">
 <summary>
 Search tmpfs directories.
 </summary>
@@ -97862,7 +98031,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_tmpfs" lineno="3973">
+<interface name="fs_list_tmpfs" lineno="4031">
 <summary>
 List the contents of generic tmpfs directories.
 </summary>
@@ -97872,7 +98041,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_list_tmpfs" lineno="3992">
+<interface name="fs_dontaudit_list_tmpfs" lineno="4050">
 <summary>
 Do not audit attempts to list the
 contents of generic tmpfs directories.
@@ -97883,7 +98052,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_dirs" lineno="4011">
+<interface name="fs_manage_tmpfs_dirs" lineno="4069">
 <summary>
 Create, read, write, and delete
 tmpfs directories
@@ -97894,7 +98063,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_write_tmpfs_dirs" lineno="4030">
+<interface name="fs_dontaudit_write_tmpfs_dirs" lineno="4088">
 <summary>
 Do not audit attempts to write
 tmpfs directories
@@ -97905,7 +98074,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_tmpfs_filetrans" lineno="4064">
+<interface name="fs_tmpfs_filetrans" lineno="4122">
 <summary>
 Create an object in a tmpfs filesystem, with a private
 type using a type transition.
@@ -97931,7 +98100,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_tmpfs_files" lineno="4084">
+<interface name="fs_dontaudit_getattr_tmpfs_files" lineno="4142">
 <summary>
 Do not audit attempts to getattr
 generic tmpfs files.
@@ -97942,7 +98111,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_rw_tmpfs_files" lineno="4103">
+<interface name="fs_dontaudit_rw_tmpfs_files" lineno="4161">
 <summary>
 Do not audit attempts to read or write
 generic tmpfs files.
@@ -97953,7 +98122,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_auto_mountpoints" lineno="4122">
+<interface name="fs_manage_auto_mountpoints" lineno="4180">
 <summary>
 Create, read, write, and delete
 auto moutpoints.
@@ -97964,7 +98133,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_tmpfs_files" lineno="4140">
+<interface name="fs_read_tmpfs_files" lineno="4198">
 <summary>
 Read generic tmpfs files.
 </summary>
@@ -97974,7 +98143,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_tmpfs_files" lineno="4158">
+<interface name="fs_rw_tmpfs_files" lineno="4216">
 <summary>
 Read and write generic tmpfs files.
 </summary>
@@ -97984,7 +98153,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_read_tmpfs_symlinks" lineno="4176">
+<interface name="fs_read_tmpfs_symlinks" lineno="4234">
 <summary>
 Read tmpfs link files.
 </summary>
@@ -97994,7 +98163,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_tmpfs_chr_files" lineno="4194">
+<interface name="fs_rw_tmpfs_chr_files" lineno="4252">
 <summary>
 Read and write character nodes on tmpfs filesystems.
 </summary>
@@ -98004,7 +98173,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_use_tmpfs_chr_dev" lineno="4213">
+<interface name="fs_dontaudit_use_tmpfs_chr_dev" lineno="4271">
 <summary>
 dontaudit Read and write character nodes on tmpfs filesystems.
 </summary>
@@ -98014,7 +98183,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_relabel_tmpfs_chr_file" lineno="4232">
+<interface name="fs_relabel_tmpfs_chr_file" lineno="4290">
 <summary>
 Relabel character nodes on tmpfs filesystems.
 </summary>
@@ -98024,7 +98193,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_rw_tmpfs_blk_files" lineno="4251">
+<interface name="fs_rw_tmpfs_blk_files" lineno="4309">
 <summary>
 Read and write block nodes on tmpfs filesystems.
 </summary>
@@ -98034,7 +98203,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_relabel_tmpfs_blk_file" lineno="4270">
+<interface name="fs_relabel_tmpfs_blk_file" lineno="4328">
 <summary>
 Relabel block nodes on tmpfs filesystems.
 </summary>
@@ -98044,7 +98213,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_files" lineno="4290">
+<interface name="fs_manage_tmpfs_files" lineno="4348">
 <summary>
 Read and write, create and delete generic
 files on tmpfs filesystems.
@@ -98055,7 +98224,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_symlinks" lineno="4309">
+<interface name="fs_manage_tmpfs_symlinks" lineno="4367">
 <summary>
 Read and write, create and delete symbolic
 links on tmpfs filesystems.
@@ -98066,7 +98235,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_sockets" lineno="4328">
+<interface name="fs_manage_tmpfs_sockets" lineno="4386">
 <summary>
 Read and write, create and delete socket
 files on tmpfs filesystems.
@@ -98077,7 +98246,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_chr_files" lineno="4347">
+<interface name="fs_manage_tmpfs_chr_files" lineno="4405">
 <summary>
 Read and write, create and delete character
 nodes on tmpfs filesystems.
@@ -98088,7 +98257,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_tmpfs_blk_files" lineno="4366">
+<interface name="fs_manage_tmpfs_blk_files" lineno="4424">
 <summary>
 Read and write, create and delete block nodes
 on tmpfs filesystems.
@@ -98099,7 +98268,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_xenfs" lineno="4384">
+<interface name="fs_mount_xenfs" lineno="4442">
 <summary>
 Mount a XENFS filesystem.
 </summary>
@@ -98109,7 +98278,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_xenfs" lineno="4402">
+<interface name="fs_search_xenfs" lineno="4460">
 <summary>
 Search the XENFS filesystem.
 </summary>
@@ -98119,7 +98288,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_xenfs_dirs" lineno="4422">
+<interface name="fs_manage_xenfs_dirs" lineno="4480">
 <summary>
 Create, read, write, and delete directories
 on a XENFS filesystem.
@@ -98131,7 +98300,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_xenfs_dirs" lineno="4442">
+<interface name="fs_dontaudit_manage_xenfs_dirs" lineno="4500">
 <summary>
 Do not audit attempts to create, read,
 write, and delete directories
@@ -98143,7 +98312,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_manage_xenfs_files" lineno="4462">
+<interface name="fs_manage_xenfs_files" lineno="4520">
 <summary>
 Create, read, write, and delete files
 on a XENFS filesystem.
@@ -98155,7 +98324,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_manage_xenfs_files" lineno="4482">
+<interface name="fs_dontaudit_manage_xenfs_files" lineno="4540">
 <summary>
 Do not audit attempts to create,
 read, write, and delete files
@@ -98167,7 +98336,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_mount_all_fs" lineno="4500">
+<interface name="fs_mount_all_fs" lineno="4558">
 <summary>
 Mount all filesystems.
 </summary>
@@ -98177,7 +98346,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_remount_all_fs" lineno="4519">
+<interface name="fs_remount_all_fs" lineno="4577">
 <summary>
 Remount all filesystems.  This
 allows some mount options to be changed.
@@ -98188,7 +98357,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unmount_all_fs" lineno="4537">
+<interface name="fs_unmount_all_fs" lineno="4595">
 <summary>
 Unmount all filesystems.
 </summary>
@@ -98198,7 +98367,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_fs" lineno="4569">
+<interface name="fs_getattr_all_fs" lineno="4627">
 <summary>
 Get the attributes of all filesystems.
 </summary>
@@ -98222,7 +98391,7 @@ Domain allowed access.
 <infoflow type="read" weight="5"/>
 <rolecap/>
 </interface>
-<interface name="fs_dontaudit_getattr_all_fs" lineno="4589">
+<interface name="fs_dontaudit_getattr_all_fs" lineno="4647">
 <summary>
 Do not audit attempts to get the attributes
 all filesystems.
@@ -98233,7 +98402,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_get_all_fs_quotas" lineno="4608">
+<interface name="fs_get_all_fs_quotas" lineno="4666">
 <summary>
 Get the quotas of all filesystems.
 </summary>
@@ -98244,7 +98413,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_set_all_quotas" lineno="4627">
+<interface name="fs_set_all_quotas" lineno="4685">
 <summary>
 Set the quotas of all filesystems.
 </summary>
@@ -98255,7 +98424,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="fs_relabelfrom_all_fs" lineno="4645">
+<interface name="fs_relabelfrom_all_fs" lineno="4703">
 <summary>
 Relabelfrom all filesystems.
 </summary>
@@ -98265,7 +98434,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_dirs" lineno="4664">
+<interface name="fs_getattr_all_dirs" lineno="4722">
 <summary>
 Get the attributes of all directories
 with a filesystem type.
@@ -98276,7 +98445,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_search_all" lineno="4682">
+<interface name="fs_search_all" lineno="4740">
 <summary>
 Search all directories with a filesystem type.
 </summary>
@@ -98286,7 +98455,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_list_all" lineno="4700">
+<interface name="fs_list_all" lineno="4758">
 <summary>
 List all directories with a filesystem type.
 </summary>
@@ -98296,7 +98465,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_files" lineno="4719">
+<interface name="fs_getattr_all_files" lineno="4777">
 <summary>
 Get the attributes of all files with
 a filesystem type.
@@ -98307,7 +98476,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_all_files" lineno="4738">
+<interface name="fs_dontaudit_getattr_all_files" lineno="4796">
 <summary>
 Do not audit attempts to get the attributes
 of all files with a filesystem type.
@@ -98318,7 +98487,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_symlinks" lineno="4757">
+<interface name="fs_getattr_all_symlinks" lineno="4815">
 <summary>
 Get the attributes of all symbolic links with
 a filesystem type.
@@ -98329,7 +98498,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_all_symlinks" lineno="4776">
+<interface name="fs_dontaudit_getattr_all_symlinks" lineno="4834">
 <summary>
 Do not audit attempts to get the attributes
 of all symbolic links with a filesystem type.
@@ -98340,7 +98509,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_pipes" lineno="4795">
+<interface name="fs_getattr_all_pipes" lineno="4853">
 <summary>
 Get the attributes of all named pipes with
 a filesystem type.
@@ -98351,7 +98520,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_all_pipes" lineno="4814">
+<interface name="fs_dontaudit_getattr_all_pipes" lineno="4872">
 <summary>
 Do not audit attempts to get the attributes
 of all named pipes with a filesystem type.
@@ -98362,7 +98531,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_sockets" lineno="4833">
+<interface name="fs_getattr_all_sockets" lineno="4891">
 <summary>
 Get the attributes of all named sockets with
 a filesystem type.
@@ -98373,7 +98542,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_dontaudit_getattr_all_sockets" lineno="4852">
+<interface name="fs_dontaudit_getattr_all_sockets" lineno="4910">
 <summary>
 Do not audit attempts to get the attributes
 of all named sockets with a filesystem type.
@@ -98384,7 +98553,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_blk_files" lineno="4871">
+<interface name="fs_getattr_all_blk_files" lineno="4929">
 <summary>
 Get the attributes of all block device nodes with
 a filesystem type.
@@ -98395,7 +98564,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_getattr_all_chr_files" lineno="4890">
+<interface name="fs_getattr_all_chr_files" lineno="4948">
 <summary>
 Get the attributes of all character device nodes with
 a filesystem type.
@@ -98406,7 +98575,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="fs_unconfined" lineno="4908">
+<interface name="fs_unconfined" lineno="4966">
 <summary>
 Unconfined access to filesystems
 </summary>
@@ -101012,7 +101181,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_dontaudit_get_fs_mount" lineno="82">
+<interface name="selinux_dontaudit_get_fs_mount" lineno="86">
 <summary>
 Do not audit attempts to get the mountpoint
 of the selinuxfs filesystem.
@@ -101023,7 +101192,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="selinux_mount_fs" lineno="107">
+<interface name="selinux_mount_fs" lineno="115">
 <summary>
 Mount the selinuxfs filesystem.
 </summary>
@@ -101033,7 +101202,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_remount_fs" lineno="126">
+<interface name="selinux_remount_fs" lineno="134">
 <summary>
 Remount the selinuxfs filesystem.
 This allows some mount options to be changed.
@@ -101044,7 +101213,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_unmount_fs" lineno="144">
+<interface name="selinux_unmount_fs" lineno="152">
 <summary>
 Unmount the selinuxfs filesystem.
 </summary>
@@ -101054,7 +101223,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_getattr_fs" lineno="162">
+<interface name="selinux_getattr_fs" lineno="170">
 <summary>
 Get the attributes of the selinuxfs filesystem
 </summary>
@@ -101064,7 +101233,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_dontaudit_getattr_fs" lineno="181">
+<interface name="selinux_dontaudit_getattr_fs" lineno="192">
 <summary>
 Do not audit attempts to get the
 attributes of the selinuxfs filesystem
@@ -101075,7 +101244,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="selinux_dontaudit_getattr_dir" lineno="200">
+<interface name="selinux_dontaudit_getattr_dir" lineno="214">
 <summary>
 Do not audit attempts to get the
 attributes of the selinuxfs directory.
@@ -101086,7 +101255,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="selinux_search_fs" lineno="218">
+<interface name="selinux_search_fs" lineno="232">
 <summary>
 Search selinuxfs.
 </summary>
@@ -101096,7 +101265,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_dontaudit_search_fs" lineno="237">
+<interface name="selinux_dontaudit_search_fs" lineno="251">
 <summary>
 Do not audit attempts to search selinuxfs.
 </summary>
@@ -101106,7 +101275,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="selinux_dontaudit_read_fs" lineno="256">
+<interface name="selinux_dontaudit_read_fs" lineno="270">
 <summary>
 Do not audit attempts to read
 generic selinuxfs entries
@@ -101117,7 +101286,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="selinux_get_enforce_mode" lineno="277">
+<interface name="selinux_get_enforce_mode" lineno="291">
 <summary>
 Allows the caller to get the mode of policy enforcement
 (enforcing or permissive mode).
@@ -101129,7 +101298,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_set_enforce_mode" lineno="309">
+<interface name="selinux_set_enforce_mode" lineno="323">
 <summary>
 Allow caller to set the mode of policy enforcement
 (enforcing or permissive mode).
@@ -101151,7 +101320,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_load_policy" lineno="341">
+<interface name="selinux_load_policy" lineno="355">
 <summary>
 Allow caller to load the policy into the kernel.
 </summary>
@@ -101161,7 +101330,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_read_policy" lineno="373">
+<interface name="selinux_read_policy" lineno="387">
 <summary>
 Allow caller to read the policy from the kernel.
 </summary>
@@ -101171,7 +101340,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_set_boolean" lineno="411">
+<interface name="selinux_set_boolean" lineno="425">
 <summary>
 Allow caller to set the state of Booleans to
 enable or disable conditional portions of the policy.  (Deprecated)
@@ -101198,7 +101367,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_set_generic_booleans" lineno="438">
+<interface name="selinux_set_generic_booleans" lineno="452">
 <summary>
 Allow caller to set the state of generic Booleans to
 enable or disable conditional portions of the policy.
@@ -101220,7 +101389,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_set_all_booleans" lineno="478">
+<interface name="selinux_set_all_booleans" lineno="492">
 <summary>
 Allow caller to set the state of all Booleans to
 enable or disable conditional portions of the policy.
@@ -101242,7 +101411,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_set_parameters" lineno="525">
+<interface name="selinux_set_parameters" lineno="539">
 <summary>
 Allow caller to set SELinux access vector cache parameters.
 </summary>
@@ -101264,7 +101433,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_validate_context" lineno="550">
+<interface name="selinux_validate_context" lineno="564">
 <summary>
 Allows caller to validate security contexts.
 </summary>
@@ -101275,7 +101444,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_dontaudit_validate_context" lineno="572">
+<interface name="selinux_dontaudit_validate_context" lineno="586">
 <summary>
 Do not audit attempts to validate security contexts.
 </summary>
@@ -101286,7 +101455,7 @@ Domain to not audit.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_compute_access_vector" lineno="593">
+<interface name="selinux_compute_access_vector" lineno="607">
 <summary>
 Allows caller to compute an access vector.
 </summary>
@@ -101297,7 +101466,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_compute_create_context" lineno="615">
+<interface name="selinux_compute_create_context" lineno="629">
 <summary>
 Calculate the default type for object creation.
 </summary>
@@ -101308,7 +101477,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="selinux_compute_member" lineno="637">
+<interface name="selinux_compute_member" lineno="651">
 <summary>
 Allows caller to compute polyinstatntiated
 directory members.
@@ -101319,7 +101488,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_compute_relabel_context" lineno="667">
+<interface name="selinux_compute_relabel_context" lineno="681">
 <summary>
 Calculate the context for relabeling objects.
 </summary>
@@ -101338,7 +101507,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_compute_user_contexts" lineno="688">
+<interface name="selinux_compute_user_contexts" lineno="702">
 <summary>
 Allows caller to compute possible contexts for a user.
 </summary>
@@ -101348,7 +101517,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="selinux_unconfined" lineno="709">
+<interface name="selinux_unconfined" lineno="723">
 <summary>
 Unconfined access to the SELinux kernel security server.
 </summary>
@@ -110934,7 +111103,7 @@ is the prefix for user_t).
 </summary>
 </param>
 </template>
-<template name="userdom_admin_user_template" lineno="1083">
+<template name="userdom_admin_user_template" lineno="1081">
 <summary>
 The template for creating an administrative user.
 </summary>
@@ -110963,7 +111132,7 @@ is the prefix for sysadm_t).
 </summary>
 </param>
 </template>
-<template name="userdom_security_admin_template" lineno="1247">
+<template name="userdom_security_admin_template" lineno="1245">
 <summary>
 Allow user to run as a secadm
 </summary>
@@ -110989,7 +111158,7 @@ The role  of the object to create.
 </summary>
 </param>
 </template>
-<interface name="userdom_user_application_type" lineno="1322">
+<interface name="userdom_user_application_type" lineno="1320">
 <summary>
 Make the specified type usable as
 a user application domain type.
@@ -111000,7 +111169,7 @@ Type to be used as a user application domain.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_application_domain" lineno="1343">
+<interface name="userdom_user_application_domain" lineno="1341">
 <summary>
 Make the specified type usable as
 a user application domain.
@@ -111016,7 +111185,7 @@ Type to be used as the domain entry point.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_home_content" lineno="1360">
+<interface name="userdom_user_home_content" lineno="1358">
 <summary>
 Make the specified type usable in a
 user home directory.
@@ -111028,7 +111197,7 @@ user home directory.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_tmp_file" lineno="1386">
+<interface name="userdom_user_tmp_file" lineno="1384">
 <summary>
 Make the specified type usable as a
 user temporary file.
@@ -111040,7 +111209,7 @@ temporary directories.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_tmpfs_file" lineno="1403">
+<interface name="userdom_user_tmpfs_file" lineno="1401">
 <summary>
 Make the specified type usable as a
 user tmpfs file.
@@ -111052,7 +111221,7 @@ tmpfs directories.
 </summary>
 </param>
 </interface>
-<interface name="userdom_attach_admin_tun_iface" lineno="1418">
+<interface name="userdom_attach_admin_tun_iface" lineno="1416">
 <summary>
 Allow domain to attach to TUN devices created by administrative users.
 </summary>
@@ -111062,7 +111231,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_setattr_user_ptys" lineno="1437">
+<interface name="userdom_setattr_user_ptys" lineno="1435">
 <summary>
 Set the attributes of a user pty.
 </summary>
@@ -111072,7 +111241,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_create_user_pty" lineno="1455">
+<interface name="userdom_create_user_pty" lineno="1453">
 <summary>
 Create a user pty.
 </summary>
@@ -111082,7 +111251,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_getattr_user_home_dirs" lineno="1473">
+<interface name="userdom_getattr_user_home_dirs" lineno="1471">
 <summary>
 Get the attributes of user home directories.
 </summary>
@@ -111092,7 +111261,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_getattr_user_home_dirs" lineno="1492">
+<interface name="userdom_dontaudit_getattr_user_home_dirs" lineno="1490">
 <summary>
 Do not audit attempts to get the attributes of user home directories.
 </summary>
@@ -111102,7 +111271,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_search_user_home_dirs" lineno="1510">
+<interface name="userdom_search_user_home_dirs" lineno="1508">
 <summary>
 Search user home directories.
 </summary>
@@ -111112,7 +111281,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_search_user_home_dirs" lineno="1537">
+<interface name="userdom_dontaudit_search_user_home_dirs" lineno="1535">
 <summary>
 Do not audit attempts to search user home directories.
 </summary>
@@ -111130,7 +111299,7 @@ Domain to not audit.
 </param>
 <infoflow type="none"/>
 </interface>
-<interface name="userdom_list_user_home_dirs" lineno="1555">
+<interface name="userdom_list_user_home_dirs" lineno="1553">
 <summary>
 List user home directories.
 </summary>
@@ -111140,7 +111309,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_list_user_home_dirs" lineno="1574">
+<interface name="userdom_dontaudit_list_user_home_dirs" lineno="1572">
 <summary>
 Do not audit attempts to list user home subdirectories.
 </summary>
@@ -111150,7 +111319,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_create_user_home_dirs" lineno="1592">
+<interface name="userdom_create_user_home_dirs" lineno="1590">
 <summary>
 Create user home directories.
 </summary>
@@ -111160,7 +111329,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_dirs" lineno="1610">
+<interface name="userdom_manage_user_home_dirs" lineno="1608">
 <summary>
 Create user home directories.
 </summary>
@@ -111170,7 +111339,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_relabelto_user_home_dirs" lineno="1628">
+<interface name="userdom_relabelto_user_home_dirs" lineno="1626">
 <summary>
 Relabel to user home directories.
 </summary>
@@ -111180,7 +111349,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_home_filetrans_user_home_dir" lineno="1652">
+<interface name="userdom_home_filetrans_user_home_dir" lineno="1650">
 <summary>
 Create directories in the home dir root with
 the user home directory type.
@@ -111196,7 +111365,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_home_domtrans" lineno="1689">
+<interface name="userdom_user_home_domtrans" lineno="1687">
 <summary>
 Do a domain transition to the specified
 domain when executing a program in the
@@ -111225,7 +111394,7 @@ Domain to transition to.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_search_user_home_content" lineno="1709">
+<interface name="userdom_dontaudit_search_user_home_content" lineno="1707">
 <summary>
 Do not audit attempts to search user home content directories.
 </summary>
@@ -111235,7 +111404,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_list_all_user_home_content" lineno="1727">
+<interface name="userdom_list_all_user_home_content" lineno="1725">
 <summary>
 List all users home content directories.
 </summary>
@@ -111245,7 +111414,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_list_user_home_content" lineno="1746">
+<interface name="userdom_list_user_home_content" lineno="1744">
 <summary>
 List contents of users home directory.
 </summary>
@@ -111255,7 +111424,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_content_dirs" lineno="1765">
+<interface name="userdom_manage_user_home_content_dirs" lineno="1763">
 <summary>
 Create, read, write, and delete directories
 in a user home subdirectory.
@@ -111266,7 +111435,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_all_user_home_content_dirs" lineno="1784">
+<interface name="userdom_delete_all_user_home_content_dirs" lineno="1782">
 <summary>
 Delete all user home content directories.
 </summary>
@@ -111276,7 +111445,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_user_home_content_dirs" lineno="1804">
+<interface name="userdom_delete_user_home_content_dirs" lineno="1802">
 <summary>
 Delete directories in a user home subdirectory.
 </summary>
@@ -111286,7 +111455,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_setattr_all_user_home_content_dirs" lineno="1822">
+<interface name="userdom_setattr_all_user_home_content_dirs" lineno="1820">
 <summary>
 Set attributes of all user home content directories.
 </summary>
@@ -111296,7 +111465,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_setattr_user_home_content_files" lineno="1842">
+<interface name="userdom_dontaudit_setattr_user_home_content_files" lineno="1840">
 <summary>
 Do not audit attempts to set the
 attributes of user home files.
@@ -111307,7 +111476,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_mmap_user_home_content_files" lineno="1860">
+<interface name="userdom_mmap_user_home_content_files" lineno="1858">
 <summary>
 Mmap user home files.
 </summary>
@@ -111317,7 +111486,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_user_home_content_files" lineno="1879">
+<interface name="userdom_read_user_home_content_files" lineno="1877">
 <summary>
 Read user home files.
 </summary>
@@ -111327,7 +111496,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_read_user_home_content_files" lineno="1898">
+<interface name="userdom_dontaudit_read_user_home_content_files" lineno="1896">
 <summary>
 Do not audit attempts to read user home files.
 </summary>
@@ -111337,7 +111506,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_append_user_home_content_files" lineno="1917">
+<interface name="userdom_dontaudit_append_user_home_content_files" lineno="1915">
 <summary>
 Do not audit attempts to append user home files.
 </summary>
@@ -111347,7 +111516,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_write_user_home_content_files" lineno="1935">
+<interface name="userdom_dontaudit_write_user_home_content_files" lineno="1933">
 <summary>
 Do not audit attempts to write user home files.
 </summary>
@@ -111357,7 +111526,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_all_user_home_content_files" lineno="1953">
+<interface name="userdom_delete_all_user_home_content_files" lineno="1951">
 <summary>
 Delete all user home content files.
 </summary>
@@ -111367,7 +111536,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_user_home_content_files" lineno="1973">
+<interface name="userdom_delete_user_home_content_files" lineno="1971">
 <summary>
 Delete files in a user home subdirectory.
 </summary>
@@ -111377,7 +111546,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_relabel_user_home_content_files" lineno="1991">
+<interface name="userdom_dontaudit_relabel_user_home_content_files" lineno="1989">
 <summary>
 Do not audit attempts to write user home files.
 </summary>
@@ -111387,7 +111556,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_user_home_content_symlinks" lineno="2009">
+<interface name="userdom_read_user_home_content_symlinks" lineno="2007">
 <summary>
 Read user home subdirectory symbolic links.
 </summary>
@@ -111397,7 +111566,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_exec_user_home_content_files" lineno="2029">
+<interface name="userdom_exec_user_home_content_files" lineno="2027">
 <summary>
 Execute user home files.
 </summary>
@@ -111408,7 +111577,7 @@ Domain allowed access.
 </param>
 <rolecap/>
 </interface>
-<interface name="userdom_dontaudit_exec_user_home_content_files" lineno="2056">
+<interface name="userdom_dontaudit_exec_user_home_content_files" lineno="2054">
 <summary>
 Do not audit attempts to execute user home files.
 </summary>
@@ -111418,7 +111587,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_content_files" lineno="2075">
+<interface name="userdom_manage_user_home_content_files" lineno="2073">
 <summary>
 Create, read, write, and delete files
 in a user home subdirectory.
@@ -111429,7 +111598,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_manage_user_home_content_dirs" lineno="2096">
+<interface name="userdom_dontaudit_manage_user_home_content_dirs" lineno="2094">
 <summary>
 Do not audit attempts to create, read, write, and delete directories
 in a user home subdirectory.
@@ -111440,7 +111609,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_content_symlinks" lineno="2115">
+<interface name="userdom_manage_user_home_content_symlinks" lineno="2113">
 <summary>
 Create, read, write, and delete symbolic links
 in a user home subdirectory.
@@ -111451,7 +111620,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_all_user_home_content_symlinks" lineno="2135">
+<interface name="userdom_delete_all_user_home_content_symlinks" lineno="2133">
 <summary>
 Delete all user home content symbolic links.
 </summary>
@@ -111461,7 +111630,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_user_home_content_symlinks" lineno="2155">
+<interface name="userdom_delete_user_home_content_symlinks" lineno="2153">
 <summary>
 Delete symbolic links in a user home directory.
 </summary>
@@ -111471,7 +111640,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_content_pipes" lineno="2174">
+<interface name="userdom_manage_user_home_content_pipes" lineno="2172">
 <summary>
 Create, read, write, and delete named pipes
 in a user home subdirectory.
@@ -111482,7 +111651,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_home_content_sockets" lineno="2195">
+<interface name="userdom_manage_user_home_content_sockets" lineno="2193">
 <summary>
 Create, read, write, and delete named sockets
 in a user home subdirectory.
@@ -111493,7 +111662,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_home_dir_filetrans" lineno="2232">
+<interface name="userdom_user_home_dir_filetrans" lineno="2230">
 <summary>
 Create objects in a user home directory
 with an automatic type transition to
@@ -111520,7 +111689,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_home_content_filetrans" lineno="2268">
+<interface name="userdom_user_home_content_filetrans" lineno="2266">
 <summary>
 Create objects in a user home directory
 with an automatic type transition to
@@ -111547,7 +111716,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_home_dir_filetrans_user_home_content" lineno="2300">
+<interface name="userdom_user_home_dir_filetrans_user_home_content" lineno="2298">
 <summary>
 Create objects in a user home directory
 with an automatic type transition to
@@ -111569,7 +111738,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_write_user_tmp_sockets" lineno="2319">
+<interface name="userdom_write_user_tmp_sockets" lineno="2317">
 <summary>
 Write to user temporary named sockets.
 </summary>
@@ -111579,7 +111748,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_list_user_tmp" lineno="2338">
+<interface name="userdom_list_user_tmp" lineno="2336">
 <summary>
 List user temporary directories.
 </summary>
@@ -111589,7 +111758,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_list_user_tmp" lineno="2358">
+<interface name="userdom_dontaudit_list_user_tmp" lineno="2356">
 <summary>
 Do not audit attempts to list user
 temporary directories.
@@ -111600,7 +111769,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_manage_user_tmp_dirs" lineno="2377">
+<interface name="userdom_dontaudit_manage_user_tmp_dirs" lineno="2375">
 <summary>
 Do not audit attempts to manage users
 temporary directories.
@@ -111611,7 +111780,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_user_tmp_files" lineno="2395">
+<interface name="userdom_read_user_tmp_files" lineno="2393">
 <summary>
 Read user temporary files.
 </summary>
@@ -111621,7 +111790,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_read_user_tmp_files" lineno="2416">
+<interface name="userdom_dontaudit_read_user_tmp_files" lineno="2414">
 <summary>
 Do not audit attempts to read users
 temporary files.
@@ -111632,7 +111801,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_append_user_tmp_files" lineno="2435">
+<interface name="userdom_dontaudit_append_user_tmp_files" lineno="2433">
 <summary>
 Do not audit attempts to append users
 temporary files.
@@ -111643,7 +111812,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_rw_user_tmp_files" lineno="2453">
+<interface name="userdom_rw_user_tmp_files" lineno="2451">
 <summary>
 Read and write user temporary files.
 </summary>
@@ -111653,7 +111822,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_manage_user_tmp_files" lineno="2474">
+<interface name="userdom_dontaudit_manage_user_tmp_files" lineno="2472">
 <summary>
 Do not audit attempts to manage users
 temporary files.
@@ -111664,7 +111833,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_user_tmp_symlinks" lineno="2492">
+<interface name="userdom_read_user_tmp_symlinks" lineno="2490">
 <summary>
 Read user temporary symbolic links.
 </summary>
@@ -111674,7 +111843,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmp_dirs" lineno="2513">
+<interface name="userdom_manage_user_tmp_dirs" lineno="2511">
 <summary>
 Create, read, write, and delete user
 temporary directories.
@@ -111685,7 +111854,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmp_files" lineno="2533">
+<interface name="userdom_manage_user_tmp_files" lineno="2531">
 <summary>
 Create, read, write, and delete user
 temporary files.
@@ -111696,7 +111865,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmp_symlinks" lineno="2553">
+<interface name="userdom_manage_user_tmp_symlinks" lineno="2551">
 <summary>
 Create, read, write, and delete user
 temporary symbolic links.
@@ -111707,7 +111876,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmp_pipes" lineno="2573">
+<interface name="userdom_manage_user_tmp_pipes" lineno="2571">
 <summary>
 Create, read, write, and delete user
 temporary named pipes.
@@ -111718,7 +111887,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmp_sockets" lineno="2593">
+<interface name="userdom_manage_user_tmp_sockets" lineno="2591">
 <summary>
 Create, read, write, and delete user
 temporary named sockets.
@@ -111729,7 +111898,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_user_tmp_filetrans" lineno="2629">
+<interface name="userdom_user_tmp_filetrans" lineno="2627">
 <summary>
 Create objects in a user temporary directory
 with an automatic type transition to
@@ -111756,7 +111925,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_tmp_filetrans_user_tmp" lineno="2660">
+<interface name="userdom_tmp_filetrans_user_tmp" lineno="2658">
 <summary>
 Create objects in the temporary directory
 with an automatic type transition to
@@ -111778,7 +111947,7 @@ The name of the object being created.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_user_tmpfs_files" lineno="2678">
+<interface name="userdom_read_user_tmpfs_files" lineno="2676">
 <summary>
 Read user tmpfs files.
 </summary>
@@ -111788,7 +111957,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_rw_user_tmpfs_files" lineno="2698">
+<interface name="userdom_rw_user_tmpfs_files" lineno="2696">
 <summary>
 Read user tmpfs files.
 </summary>
@@ -111798,7 +111967,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_delete_user_tmpfs_files" lineno="2719">
+<interface name="userdom_delete_user_tmpfs_files" lineno="2717">
 <summary>
 Delete user tmpfs files.
 </summary>
@@ -111808,7 +111977,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_user_tmpfs_files" lineno="2738">
+<interface name="userdom_manage_user_tmpfs_files" lineno="2736">
 <summary>
 Create, read, write, and delete user tmpfs files.
 </summary>
@@ -111818,7 +111987,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_getattr_user_ttys" lineno="2758">
+<interface name="userdom_getattr_user_ttys" lineno="2756">
 <summary>
 Get the attributes of a user domain tty.
 </summary>
@@ -111828,7 +111997,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_getattr_user_ttys" lineno="2776">
+<interface name="userdom_dontaudit_getattr_user_ttys" lineno="2774">
 <summary>
 Do not audit attempts to get the attributes of a user domain tty.
 </summary>
@@ -111838,7 +112007,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_setattr_user_ttys" lineno="2794">
+<interface name="userdom_setattr_user_ttys" lineno="2792">
 <summary>
 Set the attributes of a user domain tty.
 </summary>
@@ -111848,7 +112017,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_setattr_user_ttys" lineno="2812">
+<interface name="userdom_dontaudit_setattr_user_ttys" lineno="2810">
 <summary>
 Do not audit attempts to set the attributes of a user domain tty.
 </summary>
@@ -111858,7 +112027,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_use_user_ttys" lineno="2830">
+<interface name="userdom_use_user_ttys" lineno="2828">
 <summary>
 Read and write a user domain tty.
 </summary>
@@ -111868,7 +112037,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_use_user_ptys" lineno="2848">
+<interface name="userdom_use_user_ptys" lineno="2846">
 <summary>
 Read and write a user domain pty.
 </summary>
@@ -111878,7 +112047,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_use_user_terminals" lineno="2882">
+<interface name="userdom_use_user_terminals" lineno="2880">
 <summary>
 Read and write a user TTYs and PTYs.
 </summary>
@@ -111904,7 +112073,7 @@ Domain allowed access.
 </param>
 <infoflow type="both" weight="10"/>
 </interface>
-<interface name="userdom_dontaudit_use_user_terminals" lineno="2903">
+<interface name="userdom_dontaudit_use_user_terminals" lineno="2901">
 <summary>
 Do not audit attempts to read and write
 a user domain tty and pty.
@@ -111915,7 +112084,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_spec_domtrans_all_users" lineno="2924">
+<interface name="userdom_spec_domtrans_all_users" lineno="2922">
 <summary>
 Execute a shell in all user domains.  This
 is an explicit transition, requiring the
@@ -111927,7 +112096,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="userdom_xsession_spec_domtrans_all_users" lineno="2947">
+<interface name="userdom_xsession_spec_domtrans_all_users" lineno="2945">
 <summary>
 Execute an Xserver session in all unprivileged user domains.  This
 is an explicit transition, requiring the
@@ -111939,7 +112108,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="userdom_spec_domtrans_unpriv_users" lineno="2970">
+<interface name="userdom_spec_domtrans_unpriv_users" lineno="2968">
 <summary>
 Execute a shell in all unprivileged user domains.  This
 is an explicit transition, requiring the
@@ -111951,7 +112120,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="userdom_xsession_spec_domtrans_unpriv_users" lineno="2993">
+<interface name="userdom_xsession_spec_domtrans_unpriv_users" lineno="2991">
 <summary>
 Execute an Xserver session in all unprivileged user domains.  This
 is an explicit transition, requiring the
@@ -111963,7 +112132,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="userdom_rw_unpriv_user_semaphores" lineno="3014">
+<interface name="userdom_rw_unpriv_user_semaphores" lineno="3012">
 <summary>
 Read and write unpriviledged user SysV sempaphores.
 </summary>
@@ -111973,7 +112142,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_unpriv_user_semaphores" lineno="3032">
+<interface name="userdom_manage_unpriv_user_semaphores" lineno="3030">
 <summary>
 Manage unpriviledged user SysV sempaphores.
 </summary>
@@ -111983,7 +112152,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_rw_unpriv_user_shared_mem" lineno="3051">
+<interface name="userdom_rw_unpriv_user_shared_mem" lineno="3049">
 <summary>
 Read and write unpriviledged user SysV shared
 memory segments.
@@ -111994,7 +112163,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_manage_unpriv_user_shared_mem" lineno="3070">
+<interface name="userdom_manage_unpriv_user_shared_mem" lineno="3068">
 <summary>
 Manage unpriviledged user SysV shared
 memory segments.
@@ -112005,7 +112174,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_bin_spec_domtrans_unpriv_users" lineno="3090">
+<interface name="userdom_bin_spec_domtrans_unpriv_users" lineno="3088">
 <summary>
 Execute bin_t in the unprivileged user domains. This
 is an explicit transition, requiring the
@@ -112017,7 +112186,7 @@ Domain allowed to transition.
 </summary>
 </param>
 </interface>
-<interface name="userdom_entry_spec_domtrans_unpriv_users" lineno="3113">
+<interface name="userdom_entry_spec_domtrans_unpriv_users" lineno="3111">
 <summary>
 Execute all entrypoint files in unprivileged user
 domains. This is an explicit transition, requiring the
@@ -112029,7 +112198,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_search_user_home_content" lineno="3134">
+<interface name="userdom_search_user_home_content" lineno="3132">
 <summary>
 Search users home directories.
 </summary>
@@ -112039,7 +112208,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_signull_unpriv_users" lineno="3153">
+<interface name="userdom_signull_unpriv_users" lineno="3151">
 <summary>
 Send signull to unprivileged user domains.
 </summary>
@@ -112049,7 +112218,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_signal_unpriv_users" lineno="3171">
+<interface name="userdom_signal_unpriv_users" lineno="3169">
 <summary>
 Send general signals to unprivileged user domains.
 </summary>
@@ -112059,7 +112228,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_use_unpriv_users_fds" lineno="3189">
+<interface name="userdom_use_unpriv_users_fds" lineno="3187">
 <summary>
 Inherit the file descriptors from unprivileged user domains.
 </summary>
@@ -112069,7 +112238,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_use_unpriv_user_fds" lineno="3217">
+<interface name="userdom_dontaudit_use_unpriv_user_fds" lineno="3215">
 <summary>
 Do not audit attempts to inherit the file descriptors
 from unprivileged user domains.
@@ -112089,7 +112258,7 @@ Domain to not audit.
 </param>
 <infoflow type="none"/>
 </interface>
-<interface name="userdom_dontaudit_use_user_ptys" lineno="3235">
+<interface name="userdom_dontaudit_use_user_ptys" lineno="3233">
 <summary>
 Do not audit attempts to use user ptys.
 </summary>
@@ -112099,7 +112268,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_relabelto_user_ptys" lineno="3253">
+<interface name="userdom_relabelto_user_ptys" lineno="3251">
 <summary>
 Relabel files to unprivileged user pty types.
 </summary>
@@ -112109,7 +112278,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_relabelfrom_user_ptys" lineno="3272">
+<interface name="userdom_dontaudit_relabelfrom_user_ptys" lineno="3270">
 <summary>
 Do not audit attempts to relabel files from
 user pty types.
@@ -112120,7 +112289,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_write_user_tmp_files" lineno="3290">
+<interface name="userdom_write_user_tmp_files" lineno="3288">
 <summary>
 Write all users files in /tmp
 </summary>
@@ -112130,7 +112299,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_use_user_ttys" lineno="3308">
+<interface name="userdom_dontaudit_use_user_ttys" lineno="3306">
 <summary>
 Do not audit attempts to use user ttys.
 </summary>
@@ -112140,7 +112309,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_read_all_users_state" lineno="3326">
+<interface name="userdom_read_all_users_state" lineno="3324">
 <summary>
 Read the process state of all user domains.
 </summary>
@@ -112150,7 +112319,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_getattr_all_users" lineno="3345">
+<interface name="userdom_getattr_all_users" lineno="3343">
 <summary>
 Get the attributes of all user domains.
 </summary>
@@ -112160,7 +112329,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_use_all_users_fds" lineno="3363">
+<interface name="userdom_use_all_users_fds" lineno="3361">
 <summary>
 Inherit the file descriptors from all user domains
 </summary>
@@ -112170,7 +112339,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dontaudit_use_all_users_fds" lineno="3382">
+<interface name="userdom_dontaudit_use_all_users_fds" lineno="3380">
 <summary>
 Do not audit attempts to inherit the file
 descriptors from any user domains.
@@ -112181,7 +112350,7 @@ Domain to not audit.
 </summary>
 </param>
 </interface>
-<interface name="userdom_signal_all_users" lineno="3400">
+<interface name="userdom_signal_all_users" lineno="3398">
 <summary>
 Send general signals to all user domains.
 </summary>
@@ -112191,7 +112360,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_sigchld_all_users" lineno="3418">
+<interface name="userdom_sigchld_all_users" lineno="3416">
 <summary>
 Send a SIGCHLD signal to all user domains.
 </summary>
@@ -112201,7 +112370,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_create_all_users_keys" lineno="3436">
+<interface name="userdom_create_all_users_keys" lineno="3434">
 <summary>
 Create keys for all user domains.
 </summary>
@@ -112211,7 +112380,7 @@ Domain allowed access.
 </summary>
 </param>
 </interface>
-<interface name="userdom_dbus_send_all_users" lineno="3454">
+<interface name="userdom_dbus_send_all_users" lineno="3452">
 <summary>
 Send a dbus message to all user domains.
 </summary>
