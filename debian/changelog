@@ -1,3 +1,14 @@
+refpolicy (2:2.20140421-1) UNRELEASED; urgency=medium
+
+  * New GIT snapshot of the policy
+    - Label /etc/locale.alias as locale_t (Closes: #707246)
+    - Allow xdm_t to execute gkeyringd_domains and to transition to them
+    - Label postgresql manpages properly (Closes: #740591)
+    - Allow setfiles_t and restorecond_t to getattr from all fs that support
+      xattr (Closes: #740682)
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 21 Apr 2014 20:20:19 +0200
+
 refpolicy (2:2.20140311-1) unstable; urgency=medium
 
   * Team upload.
