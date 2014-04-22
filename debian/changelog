@@ -1,3 +1,9 @@
+refpolicy (2:2.20140421-4) UNRELEASED; urgency=medium
+
+  * debian/rules: Properly expand flavour directory during build
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 23 Apr 2014 00:28:18 +0200
+
 refpolicy (2:2.20140421-3) unstable; urgency=medium
 
   * Allow sysadm_t to read policy

@@ -66,7 +66,7 @@ conf-%-policy:
 	cp debian/build.conf.$* $(CURDIR)/debian/build-$*/build.conf
 	$(MAKE) -C $(CURDIR)/debian/build-$*                               \
                    NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) bare
-	(cd $(SRCTOP)/debian/build-$(package) ;                            \
+	(cd $(CURDIR)/debian/build-$* ;                            \
            $(MAKE) NAME=$* TYPE=$(TYPE_$*) UBAC=$(UBAC_$*) UNK_PERMS=$(UNK_PERMS_$*) $(COMMON_OPTIONS) conf)
 	cp debian/modules.conf.$*                                          \
                      $(CURDIR)/debian/build-$*/policy/modules.conf
