@@ -57,6 +57,9 @@ case "$1" in
 	if dpkg --compare-versions "$2" le-nl "2:2.20131214-1~"; then
 		rm -f "${moduledir}/"{epmd,lda,pythonsupport}.pp
 	fi
+	if dpkg --compare-versions "$2" le-nl "2:2.20140421-2~"; then
+		rm -f "${moduledir}/"{init,logging,authlogin,application,userdomain,systemd,dmesg,dpkg,usermanage,libraries,fstools,miscfiles,mount,selinuxutil,storage,sysnetwork,anaconda,authbind,kudzu,portage,rhgb,speedtouch}.pp
+	fi
 	
 	# Build policy but do not load it into the kernel yet
 	semodule -s "${flavour}" -BN

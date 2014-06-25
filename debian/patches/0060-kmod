@@ -1,0 +1,211 @@
+Description: Change modutils policy to match the use of a single binary
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+Index: refpolicy-2.20140421/policy/modules/system/modutils.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/modutils.te
++++ refpolicy-2.20140421/policy/modules/system/modutils.te
+@@ -5,15 +5,12 @@ policy_module(modutils, 1.15.0)
+ # Declarations
+ #
+ 
+-attribute_role update_modules_roles;
+-
+-type depmod_t;
+-type depmod_exec_t;
+-init_system_domain(depmod_t, depmod_exec_t)
+-role system_r types depmod_t;
+-
+ type insmod_t;
++typealias insmod_t alias { depmod_t update_modules_t };
++
+ type insmod_exec_t;
++typealias insmod_exec_t alias { depmod_exec_t update_modules_exec_t };
++
+ application_domain(insmod_t, insmod_exec_t)
+ mls_file_write_all_levels(insmod_t)
+ role system_r types insmod_t;
+@@ -26,78 +23,6 @@ files_type(modules_conf_t)
+ type modules_dep_t;
+ files_type(modules_dep_t)
+ 
+-type update_modules_t;
+-type update_modules_exec_t;
+-init_system_domain(update_modules_t, update_modules_exec_t)
+-roleattribute system_r update_modules_roles;
+-role update_modules_roles types update_modules_t;
+-
+-type update_modules_tmp_t;
+-files_tmp_file(update_modules_tmp_t)
+-
+-########################################
+-#
+-# depmod local policy
+-#
+-
+-can_exec(depmod_t, depmod_exec_t)
+-
+-# Read conf.modules.
+-read_files_pattern(depmod_t, modules_conf_t, modules_conf_t)
+-
+-allow depmod_t modules_dep_t:file manage_file_perms;
+-files_kernel_modules_filetrans(depmod_t, modules_dep_t, file)
+-
+-kernel_read_system_state(depmod_t)
+-
+-corecmd_search_bin(depmod_t)
+-
+-domain_use_interactive_fds(depmod_t)
+-
+-files_read_kernel_symbol_table(depmod_t)
+-files_read_kernel_modules(depmod_t)
+-files_read_etc_runtime_files(depmod_t)
+-files_read_etc_files(depmod_t)
+-files_read_usr_src_files(depmod_t)
+-files_list_usr(depmod_t)
+-
+-fs_getattr_xattr_fs(depmod_t)
+-
+-term_use_console(depmod_t)
+-
+-init_use_fds(depmod_t)
+-init_use_script_fds(depmod_t)
+-init_use_script_ptys(depmod_t)
+-
+-userdom_use_user_terminals(depmod_t)
+-# Read System.map from home directories.
+-files_list_home(depmod_t)
+-userdom_read_user_home_content_files(depmod_t)
+-
+-ifdef(`distro_ubuntu',`
+-	optional_policy(`
+-		unconfined_domain(depmod_t)
+-	')
+-')
+-
+-tunable_policy(`use_nfs_home_dirs',`
+-	fs_read_nfs_files(depmod_t)
+-')
+-
+-tunable_policy(`use_samba_home_dirs',`
+-	fs_read_cifs_files(depmod_t)
+-')
+-
+-optional_policy(`
+-	rpm_rw_pipes(depmod_t)
+-	rpm_manage_script_tmp_files(depmod_t)
+-')
+-
+-optional_policy(`
+-	# Read System.map from home directories.
+-	unconfined_domain(depmod_t)
+-')
+-
+ ########################################
+ #
+ # insmod local policy
+@@ -114,6 +39,9 @@ list_dirs_pattern(insmod_t, modules_conf
+ read_files_pattern(insmod_t, modules_conf_t, modules_conf_t)
+ list_dirs_pattern(insmod_t, modules_dep_t, modules_dep_t)
+ read_files_pattern(insmod_t, modules_dep_t, modules_dep_t)
++filetrans_add_pattern(insmod_t, modules_object_t, modules_dep_t, file)
++create_files_pattern(insmod_t, modules_object_t, modules_dep_t)
++delete_files_pattern(insmod_t, modules_object_t, modules_dep_t)
+ 
+ can_exec(insmod_t, insmod_exec_t)
+ 
+@@ -230,6 +158,7 @@ optional_policy(`
+ optional_policy(`
+ 	unconfined_domain(insmod_t)
+ 	unconfined_dontaudit_rw_pipes(insmod_t)
++	unconfined_domtrans_to(insmod_t, insmod_exec_t)
+ ')
+ 
+ optional_policy(`
+@@ -239,85 +168,3 @@ optional_policy(`
+ 	xserver_getattr_log(insmod_t)
+ ')
+ 
+-#################################
+-#
+-# update-modules local policy
+-#
+-
+-allow update_modules_t self:fifo_file rw_fifo_file_perms;
+-
+-allow update_modules_t modules_dep_t:file rw_file_perms;
+-
+-can_exec(update_modules_t, insmod_exec_t)
+-can_exec(update_modules_t, update_modules_exec_t)
+-
+-# manage module loading configuration
+-manage_files_pattern(update_modules_t, modules_conf_t, modules_conf_t)
+-files_kernel_modules_filetrans(update_modules_t, modules_conf_t, file)
+-files_etc_filetrans(update_modules_t, modules_conf_t, file)
+-
+-# transition to depmod
+-domain_auto_trans(update_modules_t, depmod_exec_t, depmod_t)
+-allow update_modules_t depmod_t:fd use;
+-allow depmod_t update_modules_t:fd use;
+-allow depmod_t update_modules_t:fifo_file rw_file_perms;
+-allow depmod_t update_modules_t:process sigchld;
+-
+-manage_dirs_pattern(update_modules_t, update_modules_tmp_t, update_modules_tmp_t)
+-manage_files_pattern(update_modules_t, update_modules_tmp_t, update_modules_tmp_t)
+-files_tmp_filetrans(update_modules_t, update_modules_tmp_t, { file dir })
+-
+-kernel_read_kernel_sysctls(update_modules_t)
+-kernel_read_system_state(update_modules_t)
+-
+-corecmd_exec_bin(update_modules_t)
+-corecmd_exec_shell(update_modules_t)
+-
+-dev_read_urand(update_modules_t)
+-
+-domain_use_interactive_fds(update_modules_t)
+-
+-files_read_etc_runtime_files(update_modules_t)
+-files_read_etc_files(update_modules_t)
+-files_exec_etc_files(update_modules_t)
+-
+-fs_getattr_xattr_fs(update_modules_t)
+-
+-term_use_console(update_modules_t)
+-
+-init_use_fds(update_modules_t)
+-init_use_script_fds(update_modules_t)
+-init_use_script_ptys(update_modules_t)
+-
+-logging_send_syslog_msg(update_modules_t)
+-
+-miscfiles_read_localization(update_modules_t)
+-
+-modutils_run_insmod(update_modules_t, update_modules_roles)
+-
+-userdom_use_user_terminals(update_modules_t)
+-userdom_dontaudit_search_user_home_dirs(update_modules_t)
+-
+-ifdef(`distro_gentoo',`
+-	kernel_list_unlabeled(update_modules_t) # /var
+-
+-	files_search_pids(update_modules_t)
+-	files_getattr_usr_src_files(update_modules_t)
+-
+-	# update-modules on Gentoo throws errors when run because it
+-	# sources /etc/init.d/functions.sh, which always scans
+-	# /var/lib/init.d to set SOFTLEVEL environment var.
+-	# This is never used by update-modules.
+-	files_dontaudit_search_var_lib(update_modules_t)
+-	init_dontaudit_read_script_status_files(update_modules_t)
+-
+-	optional_policy(`
+-		consoletype_exec(update_modules_t)
+-	')
+-')
+-
+-ifdef(`distro_ubuntu',`
+-	optional_policy(`
+-		unconfined_domain(update_modules_t)
+-	')
+-')

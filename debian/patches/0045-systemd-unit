@@ -1,0 +1,894 @@
+Description: Add systemd unit types
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-01-12
+
+Index: refpolicy-2.20140421/policy/modules/contrib/alsa.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/alsa.fc
++++ refpolicy-2.20140421/policy/modules/contrib/alsa.fc
+@@ -24,3 +24,4 @@ ifdef(`distro_debian',`
+ /usr/share/alsa/pcm(/.*)?	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
+ 
+ /var/lib/alsa(/.*)?	gen_context(system_u:object_r:alsa_var_lib_t,s0)
++/lib/systemd/system/alsa.*\.service -- gen_context(system_u:object_r:alsa_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/alsa.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/alsa.te
++++ refpolicy-2.20140421/policy/modules/contrib/alsa.te
+@@ -27,6 +27,9 @@ files_type(alsa_var_lib_t)
+ type alsa_home_t;
+ userdom_user_home_content(alsa_home_t)
+ 
++type alsa_unit_file_t;
++systemd_unit_file(alsa_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/apache.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apache.fc
++++ refpolicy-2.20140421/policy/modules/contrib/apache.fc
+@@ -26,6 +26,9 @@ HOME_DIR/((www)|(web)|(public_html))(/.*
+ /etc/WebCalendar(/.*)?	gen_context(system_u:object_r:httpd_sys_rw_content_t,s0)
+ /etc/zabbix/web(/.*)?	gen_context(system_u:object_r:httpd_sys_rw_content_t,s0)
+ 
++/lib/systemd/system/httpd.*\.service -- gen_context(system_u:object_r:httpd_unit_file_t,s0)
++/lib/systemd/system/jetty.*\.service -- gen_context(system_u:object_r:httpd_unit_file_t,s0)
++
+ /opt/.*\.cgi	--	gen_context(system_u:object_r:httpd_sys_script_exec_t,s0)
+ /opt/dirsrv/var/run/dirsrv/dsgw/cookies(/.*)?	gen_context(system_u:object_r:httpd_var_run_t,s0)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/apache.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apache.te
++++ refpolicy-2.20140421/policy/modules/contrib/apache.te
+@@ -289,6 +289,8 @@ init_script_file(httpd_initrc_exec_t)
+ type httpd_keytab_t;
+ files_type(httpd_keytab_t)
+ 
++type httpd_unit_file_t;
++systemd_unit_file(httpd_unit_file_t)
+ type httpd_lock_t;
+ files_lock_file(httpd_lock_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/apcupsd.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apcupsd.fc
++++ refpolicy-2.20140421/policy/modules/contrib/apcupsd.fc
+@@ -1,5 +1,7 @@
+ /etc/rc\.d/init\.d/apcupsd	--	gen_context(system_u:object_r:apcupsd_initrc_exec_t,s0)
+ 
++/lib/systemd/system/apcupsd.*\.service -- gen_context(system_u:object_r:apcupsd_unit_file_t,s0)
++
+ /sbin/apcupsd	--	gen_context(system_u:object_r:apcupsd_exec_t,s0)
+ 
+ /usr/sbin/apcupsd	--	gen_context(system_u:object_r:apcupsd_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/apcupsd.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apcupsd.te
++++ refpolicy-2.20140421/policy/modules/contrib/apcupsd.te
+@@ -24,6 +24,9 @@ files_tmp_file(apcupsd_tmp_t)
+ type apcupsd_var_run_t;
+ files_pid_file(apcupsd_var_run_t)
+ 
++type apcupsd_unit_file_t;
++systemd_unit_file(apcupsd_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/apm.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apm.fc
++++ refpolicy-2.20140421/policy/modules/contrib/apm.fc
+@@ -17,3 +17,5 @@
+ /var/run/powersave_socket	-s	gen_context(system_u:object_r:apmd_var_run_t,s0)
+ 
+ /var/lib/acpi(/.*)?	gen_context(system_u:object_r:apmd_var_lib_t,s0)
++
++/lib/systemd/system/apmd.*\.service -- gen_context(system_u:object_r:apmd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/apm.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apm.te
++++ refpolicy-2.20140421/policy/modules/contrib/apm.te
+@@ -35,6 +35,9 @@ files_type(apmd_var_lib_t)
+ type apmd_var_run_t;
+ files_pid_file(apmd_var_run_t)
+ 
++type apmd_unit_file_t;
++systemd_unit_file(apmd_unit_file_t)
++
+ ########################################
+ #
+ # Client local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/arpwatch.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/arpwatch.fc
++++ refpolicy-2.20140421/policy/modules/contrib/arpwatch.fc
+@@ -7,3 +7,5 @@
+ /var/lib/arpwatch(/.*)?	gen_context(system_u:object_r:arpwatch_data_t,s0)
+ 
+ /var/run/arpwatch.*\.pid	--	gen_context(system_u:object_r:arpwatch_var_run_t,s0)
++
++/lib/systemd/system/arpwatch.*\.service -- gen_context(system_u:object_r:arpwatch_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/arpwatch.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/arpwatch.te
++++ refpolicy-2.20140421/policy/modules/contrib/arpwatch.te
+@@ -21,6 +21,9 @@ files_tmp_file(arpwatch_tmp_t)
+ type arpwatch_var_run_t;
+ files_pid_file(arpwatch_var_run_t)
+ 
++type arpwatch_unit_file_t;
++systemd_unit_file(arpwatch_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/automount.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/automount.fc
++++ refpolicy-2.20140421/policy/modules/contrib/automount.fc
+@@ -6,3 +6,5 @@
+ /var/lock/subsys/autofs	--	gen_context(system_u:object_r:automount_lock_t,s0)
+ 
+ /var/run/autofs.*	gen_context(system_u:object_r:automount_var_run_t,s0)
++
++/lib/systemd/system/autofs.*\.service -- gen_context(system_u:object_r:automount_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/automount.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/automount.te
++++ refpolicy-2.20140421/policy/modules/contrib/automount.te
+@@ -25,6 +25,9 @@ files_mountpoint(automount_tmp_t)
+ type automount_var_run_t;
+ files_pid_file(automount_var_run_t)
+ 
++type automount_unit_file_t;
++systemd_unit_file(automount_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/avahi.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/avahi.fc
++++ refpolicy-2.20140421/policy/modules/contrib/avahi.fc
+@@ -7,3 +7,5 @@
+ /var/run/avahi-daemon(/.*)?	gen_context(system_u:object_r:avahi_var_run_t,s0)
+ 
+ /var/lib/avahi-autoipd(/.*)?	gen_context(system_u:object_r:avahi_var_lib_t,s0)
++
++/lib/systemd/system/avahi.*\.service -- gen_context(system_u:object_r:avahi_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/avahi.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/avahi.te
++++ refpolicy-2.20140421/policy/modules/contrib/avahi.te
+@@ -18,6 +18,9 @@ files_pid_file(avahi_var_lib_t)
+ type avahi_var_run_t;
+ files_pid_file(avahi_var_run_t)
+ 
++type avahi_unit_file_t;
++systemd_unit_file(avahi_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/bind.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/bind.fc
++++ refpolicy-2.20140421/policy/modules/contrib/bind.fc
+@@ -14,6 +14,9 @@
+ /etc/unbound(/.*)?	gen_context(system_u:object_r:named_conf_t,s0)
+ /etc/unbound/.*\.key	--	gen_context(system_u:object_r:dnssec_t,s0)
+ 
++/lib/systemd/system/unbound.*\.service -- gen_context(system_u:object_r:named_unit_file_t,s0)
++/lib/systemd/system/named.*\.service -- gen_context(system_u:object_r:named_unit_file_t,s0)
++
+ /usr/sbin/lwresd	--	gen_context(system_u:object_r:named_exec_t,s0)
+ /usr/sbin/named	--	gen_context(system_u:object_r:named_exec_t,s0)
+ /usr/sbin/named-checkconf	--	gen_context(system_u:object_r:named_checkconf_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/bind.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/bind.te
++++ refpolicy-2.20140421/policy/modules/contrib/bind.te
+@@ -47,6 +47,9 @@ init_script_file(named_initrc_exec_t)
+ type named_keytab_t;
+ files_type(named_keytab_t)
+ 
++type named_unit_file_t;
++systemd_unit_file(named_unit_file_t)
++
+ type named_log_t;
+ logging_log_file(named_log_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/bluetooth.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/bluetooth.fc
++++ refpolicy-2.20140421/policy/modules/contrib/bluetooth.fc
+@@ -22,3 +22,5 @@
+ 
+ /var/run/bluetoothd_address	--	gen_context(system_u:object_r:bluetooth_var_run_t,s0)
+ /var/run/sdp	-s	gen_context(system_u:object_r:bluetooth_var_run_t,s0)
++
++/lib/systemd/system/bluetooth.*\.service -- gen_context(system_u:object_r:bluetooth_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/bluetooth.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/bluetooth.te
++++ refpolicy-2.20140421/policy/modules/contrib/bluetooth.te
+@@ -49,6 +49,9 @@ files_type(bluetooth_var_lib_t)
+ type bluetooth_var_run_t;
+ files_pid_file(bluetooth_var_run_t)
+ 
++type bluetooth_unit_file_t;
++systemd_unit_file(bluetooth_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/clamav.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/clamav.fc
++++ refpolicy-2.20140421/policy/modules/contrib/clamav.fc
+@@ -24,3 +24,5 @@
+ /var/run/clamd.*	gen_context(system_u:object_r:clamd_var_run_t,s0)
+ 
+ /var/spool/amavisd/clamd\.sock	-s	gen_context(system_u:object_r:clamd_var_run_t,s0)
++
++/lib/systemd/system/clamd.*\.service -- gen_context(system_u:object_r:clamd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/clamav.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/clamav.te
++++ refpolicy-2.20140421/policy/modules/contrib/clamav.te
+@@ -38,6 +38,9 @@ files_config_file(clamd_etc_t)
+ type clamd_initrc_exec_t;
+ init_script_file(clamd_initrc_exec_t)
+ 
++type clamd_unit_file_t;
++systemd_unit_file(clamd_unit_file_t)
++
+ type clamd_tmp_t;
+ files_tmp_file(clamd_tmp_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/consolekit.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/consolekit.fc
++++ refpolicy-2.20140421/policy/modules/contrib/consolekit.fc
+@@ -1,3 +1,5 @@
++/lib/systemd/system/console-kit.*\.service -- gen_context(system_u:object_r:consolekit_unit_file_t,s0)
++
+ /usr/sbin/console-kit-daemon	--	gen_context(system_u:object_r:consolekit_exec_t,s0)
+ 
+ /var/log/ConsoleKit(/.*)?	gen_context(system_u:object_r:consolekit_log_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/consolekit.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/consolekit.te
++++ refpolicy-2.20140421/policy/modules/contrib/consolekit.te
+@@ -19,6 +19,9 @@ type consolekit_var_run_t;
+ files_pid_file(consolekit_var_run_t)
+ init_daemon_run_dir(consolekit_var_run_t, "ConsoleKit")
+ 
++type consolekit_unit_file_t;
++systemd_unit_file(consolekit_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.fc
++++ refpolicy-2.20140421/policy/modules/contrib/cron.fc
+@@ -64,3 +64,6 @@ ifdef(`distro_suse',`
+ /var/spool/cron/lastrun/[^/]*	--	<<none>>
+ /var/spool/cron/tabs	-d	gen_context(system_u:object_r:cron_spool_t,s0)
+ ')
++
++/lib/systemd/system/atd.*\.service -- gen_context(system_u:object_r:crond_unit_file_t,s0)
++/lib/systemd/system/crond.*\.service -- gen_context(system_u:object_r:crond_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.te
++++ refpolicy-2.20140421/policy/modules/contrib/cron.te
+@@ -71,6 +71,9 @@ domain_cron_exemption_source(crond_t)
+ type crond_initrc_exec_t;
+ init_script_file(crond_initrc_exec_t)
+ 
++type crond_unit_file_t;
++systemd_unit_file(crond_unit_file_t)
++
+ type crond_tmp_t;
+ files_tmp_file(crond_tmp_t)
+ files_poly_parent(crond_tmp_t)
+Index: refpolicy-2.20140421/policy/modules/contrib/cups.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cups.fc
++++ refpolicy-2.20140421/policy/modules/contrib/cups.fc
+@@ -75,3 +75,5 @@
+ /var/run/ptal-mlcd(/.*)?	gen_context(system_u:object_r:ptal_var_run_t,s0)
+ /var/run/udev-configure-printer(/.*)?	gen_context(system_u:object_r:cupsd_config_var_run_t,s0)
+ /var/turboprint(/.*)?	gen_context(system_u:object_r:cupsd_var_run_t,s0)
++
++/lib/systemd/system/cups.*\.service -- gen_context(system_u:object_r:cupsd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/cups.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cups.te
++++ refpolicy-2.20140421/policy/modules/contrib/cups.te
+@@ -62,6 +62,9 @@ files_pid_file(cupsd_var_run_t)
+ init_daemon_run_dir(cupsd_var_run_t, "cups")
+ mls_trusted_object(cupsd_var_run_t)
+ 
++type cupsd_unit_file_t;
++systemd_unit_file(cupsd_unit_file_t)
++
+ type hplip_t;
+ type hplip_exec_t;
+ init_daemon_domain(hplip_t, hplip_exec_t)
+Index: refpolicy-2.20140421/policy/modules/contrib/dhcp.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dhcp.fc
++++ refpolicy-2.20140421/policy/modules/contrib/dhcp.fc
+@@ -6,3 +6,4 @@
+ /var/lib/dhcp(3)?/dhcpd\.leases.*	--	gen_context(system_u:object_r:dhcpd_state_t,s0)
+ 
+ /var/run/dhcpd(6)?\.pid	--	gen_context(system_u:object_r:dhcpd_var_run_t,s0)
++/lib/systemd/system/dhcpcd.*\.service   --      gen_context(system_u:object_r:dhcpd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/dhcp.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dhcp.te
++++ refpolicy-2.20140421/policy/modules/contrib/dhcp.te
+@@ -20,6 +20,9 @@ init_daemon_domain(dhcpd_t, dhcpd_exec_t
+ type dhcpd_initrc_exec_t;
+ init_script_file(dhcpd_initrc_exec_t)
+ 
++type dhcpd_unit_file_t;
++systemd_unit_file(dhcpd_unit_file_t)
++
+ type dhcpd_state_t;
+ files_type(dhcpd_state_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/dnsmasq.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dnsmasq.fc
++++ refpolicy-2.20140421/policy/modules/contrib/dnsmasq.fc
+@@ -12,3 +12,4 @@
+ 
+ /var/run/dnsmasq.*	--	gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
+ /var/run/libvirt/network(/.*)?	gen_context(system_u:object_r:dnsmasq_var_run_t,s0)
++/lib/systemd/system/dnsmasq.*\.service  --      gen_context(system_u:object_r:dnsmasq_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/dnsmasq.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dnsmasq.te
++++ refpolicy-2.20140421/policy/modules/contrib/dnsmasq.te
+@@ -24,6 +24,9 @@ logging_log_file(dnsmasq_var_log_t)
+ type dnsmasq_var_run_t;
+ files_pid_file(dnsmasq_var_run_t)
+ 
++type dnsmasq_unit_file_t;
++systemd_unit_file(dnsmasq_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/ftp.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ftp.fc
++++ refpolicy-2.20140421/policy/modules/contrib/ftp.fc
+@@ -26,3 +26,6 @@
+ /var/log/vsftpd.*	--	gen_context(system_u:object_r:xferlog_t,s0)
+ /var/log/xferlog.*	--	gen_context(system_u:object_r:xferlog_t,s0)
+ /var/log/xferreport.*	--	gen_context(system_u:object_r:xferlog_t,s0)
++
++/lib/systemd/system/vsftpd.*\.service -- gen_context(system_u:object_r:iptables_unit_file_t,s0)
++/lib/systemd/system/proftpd.*\.service -- gen_context(system_u:object_r:iptables_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/ftp.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ftp.te
++++ refpolicy-2.20140421/policy/modules/contrib/ftp.te
+@@ -127,6 +127,9 @@ init_script_file(ftpd_initrc_exec_t)
+ type ftpd_keytab_t;
+ files_type(ftpd_keytab_t)
+ 
++type ftpd_unit_file_t;
++systemd_unit_file(ftpd_unit_file_t)
++
+ type ftpd_lock_t;
+ files_lock_file(ftpd_lock_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/kdump.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/kdump.fc
++++ refpolicy-2.20140421/policy/modules/contrib/kdump.fc
+@@ -11,3 +11,5 @@
+ 
+ /usr/sbin/kdump	--	gen_context(system_u:object_r:kdump_exec_t,s0)
+ /usr/sbin/kexec	--	gen_context(system_u:object_r:kdump_exec_t,s0)
++
++/lib/systemd/system/kdump.*\.service -- gen_context(system_u:object_r:iptables_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/kdump.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/kdump.te
++++ refpolicy-2.20140421/policy/modules/contrib/kdump.te
+@@ -23,6 +23,9 @@ application_executable_file(kdumpctl_exe
+ type kdumpctl_tmp_t;
+ files_tmp_file(kdumpctl_tmp_t)
+ 
++type kdump_unit_file_t;
++systemd_unit_file(kdump_unit_file_t)
++
+ #####################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/ldap.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ldap.fc
++++ refpolicy-2.20140421/policy/modules/contrib/ldap.fc
+@@ -27,3 +27,5 @@
+ /var/run/slapd.*	-s	gen_context(system_u:object_r:slapd_var_run_t,s0)
+ /var/run/slapd\.args	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
+ /var/run/slapd\.pid	--	gen_context(system_u:object_r:slapd_var_run_t,s0)
++
++/lib/systemd/system/slapd.*\.service -- gen_context(system_u:object_r:slapd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/ldap.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ldap.te
++++ refpolicy-2.20140421/policy/modules/contrib/ldap.te
+@@ -24,6 +24,9 @@ init_script_file(slapd_initrc_exec_t)
+ type slapd_keytab_t;
+ files_type(slapd_keytab_t)
+ 
++type slapd_unit_file_t;
++systemd_unit_file(slapd_unit_file_t)
++
+ type slapd_lock_t;
+ files_lock_file(slapd_lock_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/mysql.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mysql.fc
++++ refpolicy-2.20140421/policy/modules/contrib/mysql.fc
+@@ -25,3 +25,5 @@ HOME_DIR/\.my\.cnf	--	gen_context(system
+ /var/run/mysqld.*	gen_context(system_u:object_r:mysqld_var_run_t,s0)
+ /var/run/mysqlmanager.*	--	gen_context(system_u:object_r:mysqlmanagerd_var_run_t,s0)
+ /var/run/mysqld/mysqlmanager.*	--	gen_context(system_u:object_r:mysqlmanagerd_var_run_t,s0)
++
++/lib/systemd/system/mysqld.*\.service -- gen_context(system_u:object_r:mysqld_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/mysql.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mysql.te
++++ refpolicy-2.20140421/policy/modules/contrib/mysql.te
+@@ -38,6 +38,9 @@ files_config_file(mysqld_etc_t)
+ type mysqld_home_t;
+ userdom_user_home_content(mysqld_home_t)
+ 
++type mysqld_unit_file_t;
++systemd_unit_file(mysqld_unit_file_t)
++
+ type mysqld_initrc_exec_t;
+ init_script_file(mysqld_initrc_exec_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/networkmanager.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/networkmanager.fc
++++ refpolicy-2.20140421/policy/modules/contrib/networkmanager.fc
+@@ -1,3 +1,4 @@
++/lib/systemd/system/NetworkManager.*\.service -- gen_context(system_u:object_r:NetworkManager_unit_file_t,s0)
+ /etc/rc\.d/init\.d/wicd	--	gen_context(system_u:object_r:NetworkManager_initrc_exec_t,s0)
+ 
+ /etc/NetworkManager(/.*)?	gen_context(system_u:object_r:NetworkManager_etc_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/networkmanager.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/networkmanager.te
++++ refpolicy-2.20140421/policy/modules/contrib/networkmanager.te
+@@ -18,6 +18,9 @@ files_config_file(NetworkManager_etc_rw_
+ type NetworkManager_initrc_exec_t;
+ init_script_file(NetworkManager_initrc_exec_t)
+ 
++type NetworkManager_unit_file_t;
++systemd_unit_file(NetworkManager_unit_file_t)
++
+ type NetworkManager_log_t;
+ logging_log_file(NetworkManager_log_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/nis.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/nis.fc
++++ refpolicy-2.20140421/policy/modules/contrib/nis.fc
+@@ -20,3 +20,8 @@
+ /var/run/ypbind.*	--	gen_context(system_u:object_r:ypbind_var_run_t,s0)
+ /var/run/ypserv.*	--	gen_context(system_u:object_r:ypserv_var_run_t,s0)
+ /var/run/yppass.*	--	gen_context(system_u:object_r:yppasswdd_var_run_t,s0)
++
++/lib/systemd/system/ypbind.*\.service    --      gen_context(system_u:object_r:ypbind_unit_file_t,s0)
++/lib/systemd/system/ypserv.*\.service    --      gen_context(system_u:object_r:nis_unit_file_t,s0)
++/lib/systemd/system/yppasswdd.*\.service --      gen_context(system_u:object_r:nis_unit_file_t,s0)
++/lib/systemd/system/ypxfrd.*\.service    --      gen_context(system_u:object_r:nis_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/nis.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/nis.te
++++ refpolicy-2.20140421/policy/modules/contrib/nis.te
+@@ -27,6 +27,9 @@ files_tmp_file(ypbind_tmp_t)
+ type ypbind_var_run_t;
+ files_pid_file(ypbind_var_run_t)
+ 
++type ypbind_unit_file_t;
++systemd_unit_file(ypbind_unit_file_t)
++
+ type yppasswdd_t;
+ type yppasswdd_exec_t;
+ init_daemon_domain(yppasswdd_t, yppasswdd_exec_t)
+@@ -55,6 +58,9 @@ init_daemon_domain(ypxfr_t, ypxfr_exec_t
+ type ypxfr_var_run_t;
+ files_pid_file(ypxfr_var_run_t)
+ 
++type nis_unit_file_t;
++systemd_unit_file(nis_unit_file_t)
++
+ ########################################
+ #
+ # ypbind local policy
+Index: refpolicy-2.20140421/policy/modules/contrib/nscd.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/nscd.te
++++ refpolicy-2.20140421/policy/modules/contrib/nscd.te
+@@ -31,6 +31,9 @@ role nscd_roles types nscd_t;
+ type nscd_initrc_exec_t;
+ init_script_file(nscd_initrc_exec_t)
+ 
++type nscd_unit_file_t;
++systemd_unit_file(nscd_unit_file_t)
++
+ type nscd_log_t;
+ logging_log_file(nscd_log_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/ntp.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ntp.fc
++++ refpolicy-2.20140421/policy/modules/contrib/ntp.fc
+@@ -23,3 +23,7 @@
+ /var/log/xntpd.*	--	gen_context(system_u:object_r:ntpd_log_t,s0)
+ 
+ /var/run/ntpd\.pid	--	gen_context(system_u:object_r:ntpd_var_run_t,s0)
++
++/lib/systemd/system/ntpd.*\.service               --      gen_context(system_u:object_r:ntpd_unit_file_t,s0)
++
++/usr/lib/systemd/system/ntpd.*\.service               --      gen_context(system_u:object_r:ntpd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/ntp.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ntp.te
++++ refpolicy-2.20140421/policy/modules/contrib/ntp.te
+@@ -21,6 +21,9 @@ init_script_file(ntpd_initrc_exec_t)
+ type ntp_conf_t;
+ files_config_file(ntp_conf_t)
+ 
++type ntpd_unit_file_t;
++systemd_unit_file(ntpd_unit_file_t)
++
+ type ntpd_key_t;
+ files_type(ntpd_key_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/ppp.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ppp.fc
++++ refpolicy-2.20140421/policy/modules/contrib/ppp.fc
+@@ -28,3 +28,5 @@ HOME_DIR/\.ppprc	--	gen_context(system_u
+ /var/run/pppd[0-9]*\.tdb	--	gen_context(system_u:object_r:pppd_var_run_t,s0)
+ /var/run/ppp(/.*)?	gen_context(system_u:object_r:pppd_var_run_t,s0)
+ /var/run/pptp(/.*)?	gen_context(system_u:object_r:pptp_var_run_t,s0)
++
++/lib/systemd/system/ppp.*\.service      --      gen_context(system_u:object_r:pppd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/ppp.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/ppp.te
++++ refpolicy-2.20140421/policy/modules/contrib/ppp.te
+@@ -41,6 +41,9 @@ files_type(pppd_etc_rw_t)
+ type pppd_initrc_exec_t alias pppd_script_exec_t;
+ init_script_file(pppd_initrc_exec_t)
+ 
++type pppd_unit_file_t;
++systemd_unit_file(pppd_unit_file_t)
++
+ type pppd_secret_t;
+ files_type(pppd_secret_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/rpc.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/rpc.fc
++++ refpolicy-2.20140421/policy/modules/contrib/rpc.fc
+@@ -20,3 +20,6 @@
+ 
+ /var/run/rpc\.statd(/.*)?	gen_context(system_u:object_r:rpcd_var_run_t,s0)
+ /var/run/rpc\.statd\.pid	--	gen_context(system_u:object_r:rpcd_var_run_t,s0)
++
++/lib/systemd/system/nfs.*\.service --   gen_context(system_u:object_r:nfsd_unit_file_t,s0)
++/lib/systemd/system/rpc.*\.service --   gen_context(system_u:object_r:rpcd_unit_file_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/rpc.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/rpc.te
++++ refpolicy-2.20140421/policy/modules/contrib/rpc.te
+@@ -44,11 +44,17 @@ rpc_domain_template(rpcd)
+ type rpcd_initrc_exec_t;
+ init_script_file(rpcd_initrc_exec_t)
+ 
++type rpcd_unit_file_t;
++systemd_unit_file(rpcd_unit_file_t)
++
+ rpc_domain_template(nfsd)
+ 
+ type nfsd_initrc_exec_t;
+ init_script_file(nfsd_initrc_exec_t)
+ 
++type nfsd_unit_file_t;
++systemd_unit_file(nfsd_unit_file_t)
++
+ type nfsd_rw_t;
+ files_type(nfsd_rw_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/samba.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/samba.fc
++++ refpolicy-2.20140421/policy/modules/contrib/samba.fc
+@@ -8,6 +8,8 @@
+ /etc/samba/smbpasswd	--	gen_context(system_u:object_r:samba_secrets_t,s0)
+ /etc/samba(/.*)?	gen_context(system_u:object_r:samba_etc_t,s0)
+ 
++/lib/systemd/system/smb.*\.service -- gen_context(system_u:object_r:samba_unit_file_t,s0)
++
+ /usr/bin/net	--	gen_context(system_u:object_r:samba_net_exec_t,s0)
+ /usr/bin/ntlm_auth	--	gen_context(system_u:object_r:winbind_helper_exec_t,s0)
+ /usr/bin/smbcontrol	--	gen_context(system_u:object_r:smbcontrol_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/samba.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/samba.te
++++ refpolicy-2.20140421/policy/modules/contrib/samba.te
+@@ -113,6 +113,9 @@ files_config_file(samba_etc_t)
+ type samba_initrc_exec_t;
+ init_script_file(samba_initrc_exec_t)
+ 
++type samba_unit_file_t;
++systemd_unit_file(samba_unit_file_t)
++
+ type samba_log_t;
+ logging_log_file(samba_log_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/tor.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/tor.fc
++++ refpolicy-2.20140421/policy/modules/contrib/tor.fc
+@@ -5,6 +5,8 @@
+ /usr/bin/tor	--	gen_context(system_u:object_r:tor_exec_t,s0)
+ /usr/sbin/tor	--	gen_context(system_u:object_r:tor_exec_t,s0)
+ 
++/lib/systemd/system/tor.*\.service -- gen_context(system_u:object_r:tor_unit_file_t,s0)
++
+ /var/lib/tor(/.*)?	gen_context(system_u:object_r:tor_var_lib_t,s0)
+ /var/lib/tor-data(/.*)?	gen_context(system_u:object_r:tor_var_lib_t,s0)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/tor.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/tor.te
++++ refpolicy-2.20140421/policy/modules/contrib/tor.te
+@@ -33,6 +33,9 @@ type tor_var_run_t;
+ files_pid_file(tor_var_run_t)
+ init_daemon_run_dir(tor_var_run_t, "tor")
+ 
++type tor_unit_file_t;
++systemd_unit_file(tor_unit_file_t)
++
+ ########################################
+ #
+ # Local policy
+Index: refpolicy-2.20140421/policy/modules/system/iptables.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/iptables.fc
++++ refpolicy-2.20140421/policy/modules/system/iptables.fc
+@@ -3,6 +3,9 @@
+ /etc/sysconfig/ip6?tables.*	--	gen_context(system_u:object_r:iptables_conf_t,s0)
+ /etc/sysconfig/system-config-firewall.* -- gen_context(system_u:object_r:iptables_conf_t,s0)
+ 
++/lib/systemd/system/iptables.*\.service -- gen_context(system_u:object_r:iptables_unit_file_t,s0)
++/lib/systemd/system/ip6tables.*\.service -- gen_context(system_u:object_r:iptables_unit_file_t,s0)
++
+ /sbin/ebtables			--	gen_context(system_u:object_r:iptables_exec_t,s0)
+ /sbin/ebtables-restore		--	gen_context(system_u:object_r:iptables_exec_t,s0)
+ /sbin/ipchains.*		--	gen_context(system_u:object_r:iptables_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/system/iptables.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/iptables.te
++++ refpolicy-2.20140421/policy/modules/system/iptables.te
+@@ -25,6 +25,9 @@ files_tmp_file(iptables_tmp_t)
+ type iptables_var_run_t;
+ files_pid_file(iptables_var_run_t)
+ 
++type iptables_unit_file_t;
++systemd_unit_file(iptables_unit_file_t)
++
+ ########################################
+ #
+ # Iptables local policy
+Index: refpolicy-2.20140421/policy/modules/system/logging.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.fc
++++ refpolicy-2.20140421/policy/modules/system/logging.fc
+@@ -6,6 +6,8 @@
+ /etc/rc\.d/init\.d/auditd --	gen_context(system_u:object_r:auditd_initrc_exec_t,s0)
+ /etc/rc\.d/init\.d/rsyslog --	gen_context(system_u:object_r:syslogd_initrc_exec_t,s0)
+ 
++/lib/systemd/system/auditd.*\.service	--	gen_context(system_u:object_r:auditd_unit_file_t,s0)
++
+ /sbin/audispd		--	gen_context(system_u:object_r:audisp_exec_t,s0)
+ /sbin/audisp-remote	--	gen_context(system_u:object_r:audisp_remote_exec_t,s0)
+ /sbin/auditctl		--	gen_context(system_u:object_r:auditctl_exec_t,s0)
+@@ -23,6 +25,7 @@
+ /usr/sbin/rsyslogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
+ /usr/sbin/syslog-ng	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
+ /usr/sbin/syslogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
++/lib/systemd/system/rsyslog.*\.service -- gen_context(system_u:object_r:syslogd_unit_file_t,s0)
+ 
+ /var/lib/misc/syslog-ng.persist-? -- gen_context(system_u:object_r:syslogd_var_lib_t,s0)
+ /var/lib/syslog-ng(/.*)? 	gen_context(system_u:object_r:syslogd_var_lib_t,s0)
+Index: refpolicy-2.20140421/policy/modules/system/logging.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.te
++++ refpolicy-2.20140421/policy/modules/system/logging.te
+@@ -12,6 +12,9 @@ type auditctl_exec_t;
+ init_system_domain(auditctl_t, auditctl_exec_t)
+ role system_r types auditctl_t;
+ 
++type auditd_unit_file_t;
++systemd_unit_file(auditd_unit_file_t)
++
+ type auditd_etc_t;
+ files_security_file(auditd_etc_t)
+ 
+@@ -65,6 +68,9 @@ type syslogd_t;
+ type syslogd_exec_t;
+ init_daemon_domain(syslogd_t, syslogd_exec_t)
+ 
++type syslogd_unit_file_t;
++systemd_unit_file(syslogd_unit_file_t)
++
+ type syslogd_initrc_exec_t;
+ init_script_file(syslogd_initrc_exec_t)
+ 
+Index: refpolicy-2.20140421/policy/flask/access_vectors
+===================================================================
+--- refpolicy-2.20140421.orig/policy/flask/access_vectors
++++ refpolicy-2.20140421/policy/flask/access_vectors
+@@ -389,10 +389,14 @@ class security
+ class system
+ {
+ 	ipc_info
+-	syslog_read  
++	syslog_read
+ 	syslog_mod
+ 	syslog_console
+ 	module_request
++	halt
++	reboot
++	status
++	undefined
+ }
+ 
+ #
+@@ -865,3 +869,20 @@ inherits database
+ 	implement
+ 	execute
+ }
++
++class service
++{
++	start
++	stop
++	status
++	reload
++	kill
++	load
++	enable
++	disable
++}
++
++class proxy
++{
++	read
++}
+Index: refpolicy-2.20140421/policy/flask/security_classes
+===================================================================
+--- refpolicy-2.20140421.orig/policy/flask/security_classes
++++ refpolicy-2.20140421/policy/flask/security_classes
+@@ -131,4 +131,10 @@ class db_view			# userspace
+ class db_sequence		# userspace
+ class db_language		# userspace
+ 
++# systemd services
++class service
++
++# gssd services
++class proxy
++
+ # FLASK
+Index: refpolicy-2.20140421/policy/modules/system/init.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.if
++++ refpolicy-2.20140421/policy/modules/system/init.if
+@@ -1837,3 +1837,17 @@ interface(`init_udp_recvfrom_all_daemons
+ 	')
+ 	corenet_udp_recvfrom_labeled($1, daemon)
+ ')
++
++#######################################
++## <summary>
++##      Create a file type used for systemd unit files.
++## </summary>
++## <param name="script_file">
++##      <summary>
++##      Type to be used for an unit file.
++##      </summary>
++## </param>
++#
++interface(`systemd_unit_file',`
++	files_type($1)
++')
+Index: refpolicy-2.20140421/policy/modules/system/selinuxutil.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/selinuxutil.fc
++++ refpolicy-2.20140421/policy/modules/system/selinuxutil.fc
+@@ -36,6 +36,7 @@
+ 
+ /usr/sbin/load_policy		--	gen_context(system_u:object_r:load_policy_exec_t,s0)
+ /usr/sbin/restorecond		--	gen_context(system_u:object_r:restorecond_exec_t,s0)
++/lib/systemd/system/restorecond.*\.service -- gen_context(system_u:object_r:restorecond_unit_file_t,s0)
+ /usr/sbin/run_init		--	gen_context(system_u:object_r:run_init_exec_t,s0)
+ /usr/sbin/setfiles.*		--	gen_context(system_u:object_r:setfiles_exec_t,s0)
+ /usr/sbin/setsebool		--	gen_context(system_u:object_r:semanage_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/system/selinuxutil.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/selinuxutil.te
++++ refpolicy-2.20140421/policy/modules/system/selinuxutil.te
+@@ -85,6 +85,9 @@ init_daemon_domain(restorecond_t, restor
+ domain_obj_id_change_exemption(restorecond_t)
+ role system_r types restorecond_t;
+ 
++type restorecond_unit_file_t;
++systemd_unit_file(restorecond_unit_file_t)
++
+ type restorecond_var_run_t;
+ files_pid_file(restorecond_var_run_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/system/setrans.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/setrans.fc
++++ refpolicy-2.20140421/policy/modules/system/setrans.fc
+@@ -1,5 +1,6 @@
+ /etc/rc\.d/init\.d/mcstrans --	gen_context(system_u:object_r:setrans_initrc_exec_t,s0)
+ 
+ /sbin/mcstransd		--	gen_context(system_u:object_r:setrans_exec_t,s0)
++/lib/systemd/system/mcstrans.*\.service -- gen_context(system_u:object_r:setrans_unit_file_t,s0)
+ 
+ /var/run/setrans(/.*)?		gen_context(system_u:object_r:setrans_var_run_t,mls_systemhigh)
+Index: refpolicy-2.20140421/policy/modules/system/setrans.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/setrans.te
++++ refpolicy-2.20140421/policy/modules/system/setrans.te
+@@ -13,6 +13,9 @@ type setrans_t;
+ type setrans_exec_t;
+ init_daemon_domain(setrans_t, setrans_exec_t)
+ 
++type setrans_unit_file_t;
++systemd_unit_file(setrans_unit_file_t)
++
+ type setrans_initrc_exec_t;
+ init_script_file(setrans_initrc_exec_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/kernel/corecommands.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/corecommands.fc
++++ refpolicy-2.20140421/policy/modules/kernel/corecommands.fc
+@@ -135,7 +135,7 @@ ifdef(`distro_debian',`
+ /lib/nut/.*			--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/readahead(/.*)?			gen_context(system_u:object_r:bin_t,s0)
+ /lib/security/pam_krb5/pam_krb5_storetmp -- gen_context(system_u:object_r:bin_t,s0)
+-/lib/systemd/systemd.*		--	gen_context(system_u:object_r:bin_t,s0)
++/lib/systemd/systemd-.*		--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/udev/[^/]*			--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/udev/scsi_id		--	gen_context(system_u:object_r:bin_t,s0)
+ /lib/upstart(/.*)?			gen_context(system_u:object_r:bin_t,s0)

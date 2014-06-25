@@ -1,0 +1,114 @@
+Description: misc patches for daemon policy
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+Index: refpolicy-2.20140421/policy/modules/contrib/fetchmail.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/fetchmail.te
++++ refpolicy-2.20140421/policy/modules/contrib/fetchmail.te
+@@ -47,6 +47,7 @@ create_files_pattern(fetchmail_t, fetchm
+ setattr_files_pattern(fetchmail_t, fetchmail_log_t, fetchmail_log_t)
+ logging_log_filetrans(fetchmail_t, fetchmail_log_t, { dir file })
+ 
++allow fetchmail_t fetchmail_uidl_cache_t:dir manage_dir_perms;
+ allow fetchmail_t fetchmail_uidl_cache_t:file manage_file_perms;
+ mta_spool_filetrans(fetchmail_t, fetchmail_uidl_cache_t, file)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/mysql.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mysql.te
++++ refpolicy-2.20140421/policy/modules/contrib/mysql.te
+@@ -70,7 +70,7 @@ dontaudit mysqld_t self:capability sys_t
+ allow mysqld_t self:process { setsched getsched setrlimit signal_perms rlimitinh };
+ allow mysqld_t self:fifo_file rw_fifo_file_perms;
+ allow mysqld_t self:shm create_shm_perms;
+-allow mysqld_t self:unix_stream_socket { accept listen };
++allow mysqld_t self:unix_stream_socket { connectto accept listen };
+ allow mysqld_t self:tcp_socket { accept listen };
+ 
+ manage_dirs_pattern(mysqld_t, mysqld_db_t, mysqld_db_t)
+@@ -99,6 +99,7 @@ manage_sock_files_pattern(mysqld_t, mysq
+ files_pid_filetrans(mysqld_t, mysqld_var_run_t, { dir file sock_file })
+ 
+ kernel_read_kernel_sysctls(mysqld_t)
++kernel_read_vm_sysctls(mysqld_t)
+ kernel_read_network_state(mysqld_t)
+ kernel_read_system_state(mysqld_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/tor.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/tor.te
++++ refpolicy-2.20140421/policy/modules/contrib/tor.te
+@@ -41,7 +41,7 @@ systemd_unit_file(tor_unit_file_t)
+ # Local policy
+ #
+ 
+-allow tor_t self:capability { setgid setuid sys_tty_config };
++allow tor_t self:capability { chown dac_override dac_read_search fowner fsetid setgid setuid sys_tty_config };
+ allow tor_t self:process signal;
+ allow tor_t self:fifo_file rw_fifo_file_perms;
+ allow tor_t self:unix_stream_socket { accept listen };
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.if
++++ refpolicy-2.20140421/policy/modules/contrib/cron.if
+@@ -910,3 +910,21 @@ interface(`cron_manage_system_spool',`
+ 	files_search_spool($1)
+ 	manage_files_pattern($1, cron_system_spool_t, cron_system_spool_t)
+ ')
++
++########################################
++## <summary>
++##      Access temporary files crond creates for script output
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`read_write_crond_tmp',`
++	gen_require(`
++		type crond_tmp_t;
++	')
++
++	allow $1 crond_tmp_t:file rw_file_perms;
++')
+Index: refpolicy-2.20140421/policy/modules/contrib/sysstat.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/sysstat.te
++++ refpolicy-2.20140421/policy/modules/contrib/sysstat.te
+@@ -25,6 +25,7 @@ allow sysstat_t self:fifo_file rw_fifo_f
+ 
+ manage_dirs_pattern(sysstat_t,sysstat_log_t,sysstat_log_t)
+ append_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
++read_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
+ create_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
+ setattr_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
+ manage_lnk_files_pattern(sysstat_t,sysstat_log_t,sysstat_log_t)
+@@ -39,6 +40,7 @@ kernel_read_fs_sysctls(sysstat_t)
+ kernel_read_rpc_sysctls(sysstat_t)
+ 
+ corecmd_exec_bin(sysstat_t)
++corecmd_exec_shell(sysstat_t)
+ 
+ dev_read_sysfs(sysstat_t)
+ dev_read_urand(sysstat_t)
+@@ -66,4 +68,5 @@ userdom_dontaudit_list_user_home_dirs(sy
+ 
+ optional_policy(`
+ 	cron_system_entry(sysstat_t, sysstat_exec_t)
++	read_write_crond_tmp(sysstat_t)
+ ')
+Index: refpolicy-2.20140421/policy/modules/contrib/dirmngr.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dirmngr.fc
++++ refpolicy-2.20140421/policy/modules/contrib/dirmngr.fc
+@@ -7,6 +7,7 @@
+ /var/log/dirmngr(/.*)?	gen_context(system_u:object_r:dirmngr_log_t,s0)
+ 
+ /var/lib/dirmngr(/.*)?	gen_context(system_u:object_r:dirmngr_var_lib_t,s0)
++/var/cache/dirmngr(/.*)?	gen_context(system_u:object_r:dirmngr_var_lib_t,s0)
+ 
+ /var/run/dirmngr\.pid	--	gen_context(system_u:object_r:dirmngr_var_run_t,s0)
+ 

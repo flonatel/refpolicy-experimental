@@ -1,0 +1,16 @@
+Description: Allow rpcbind to access /sys
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+--- refpolicy-2.20140421.orig/policy/modules/contrib/rpcbind.te
++++ refpolicy-2.20140421/policy/modules/contrib/rpcbind.te
+@@ -38,6 +38,9 @@ manage_files_pattern(rpcbind_t, rpcbind_
+ manage_sock_files_pattern(rpcbind_t, rpcbind_var_lib_t, rpcbind_var_lib_t)
+ files_var_lib_filetrans(rpcbind_t, rpcbind_var_lib_t, { file dir sock_file })
+ 
++# for /sys/devices/system/cpu/online
++dev_read_sysfs(rpcbind_t)
++
+ kernel_read_system_state(rpcbind_t)
+ kernel_read_network_state(rpcbind_t)
+ kernel_request_load_module(rpcbind_t)

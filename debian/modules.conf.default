@@ -94,6 +94,14 @@ mls = base
 selinux = base
 
 # Layer: kernel
+# Module: systemd
+# Required in base
+#
+# Policy for systemd as init
+# 
+systemd = base
+
+# Layer: kernel
 # Module: terminal
 # Required in base
 #
@@ -128,7 +136,7 @@ consoletype = module
 #
 # Policy for dmesg.
 # 
-dmesg = module
+dmesg = base
 
 # Layer: admin
 # Module: netutils
@@ -156,7 +164,7 @@ sudo = module
 #
 # Policy for managing user accounts.
 # 
-usermanage = module
+usermanage = base
 
 # Layer: apps
 # Module: seunshare
@@ -254,7 +262,7 @@ amtu = module
 #
 # Anaconda installer.
 # 
-anaconda = module
+anaconda = off
 
 # Layer: contrib
 # Module: apache
@@ -303,7 +311,7 @@ asterisk = module
 #
 # Tool for non-root processes to bind to reserved ports.
 # 
-authbind = module
+authbind = off
 
 # Layer: contrib
 # Module: automount
@@ -786,7 +794,7 @@ dovecot = module
 #
 # Debian package manager.
 # 
-dpkg = module
+dpkg = base
 
 # Layer: contrib
 # Module: drbd
@@ -1192,7 +1200,7 @@ ktalk = module
 #
 # Hardware detection and configuration tools.
 # 
-kudzu = module
+kudzu = off
 
 # Layer: contrib
 # Module: l2tp
@@ -1689,7 +1697,7 @@ polipo = module
 #
 # Package Management System.
 # 
-portage = module
+portage = off
 
 # Layer: contrib
 # Module: portmap
@@ -1962,7 +1970,7 @@ rhcs = module
 #
 # Red Hat Graphical Boot.
 # 
-rhgb = module
+rhgb = off
 
 # Layer: contrib
 # Module: rhsmcertd
@@ -2242,7 +2250,7 @@ spamassassin = module
 #
 # Alcatel speedtouch USB ADSL modem
 # 
-speedtouch = module
+speedtouch = off
 
 # Layer: contrib
 # Module: squid
@@ -2676,7 +2684,7 @@ zosremote = module
 #
 # Policy controlling access to storage devices
 # 
-storage = module
+storage = base
 
 # Layer: roles
 # Module: auditadm
@@ -2746,14 +2754,14 @@ xserver = module
 #
 # Policy for user executable applications.
 # 
-application = module
+application = base
 
 # Layer: system
 # Module: authlogin
 #
 # Common policy for authentication and user login.
 # 
-authlogin = module
+authlogin = base
 
 # Layer: system
 # Module: clock
@@ -2767,7 +2775,7 @@ clock = module
 #
 # Tools for filesystem management, such as mkfs and fsck.
 # 
-fstools = module
+fstools = base
 
 # Layer: system
 # Module: getty
@@ -2796,7 +2804,7 @@ hotplug = module
 #
 # System initialization programs (init and init scripts).
 # 
-init = module
+init = base
 
 # Layer: system
 # Module: ipsec
@@ -2817,7 +2825,7 @@ iptables = module
 #
 # Policy for system libraries.
 # 
-libraries = module
+libraries = base
 
 # Layer: system
 # Module: locallogin
@@ -2831,7 +2839,7 @@ locallogin = module
 #
 # Policy for the kernel message logger and system logging daemon.
 # 
-logging = module
+logging = base
 
 # Layer: system
 # Module: lvm
@@ -2845,7 +2853,7 @@ lvm = module
 #
 # Miscelaneous files.
 # 
-miscfiles = module
+miscfiles = base
 
 # Layer: system
 # Module: modutils
@@ -2859,7 +2867,7 @@ modutils = module
 #
 # Policy for mount.
 # 
-mount = module
+mount = base
 
 # Layer: system
 # Module: netlabel
@@ -2873,7 +2881,7 @@ netlabel = module
 #
 # Policy for SELinux policy and userland applications.
 # 
-selinuxutil = module
+selinuxutil = base
 
 # Layer: system
 # Module: setrans
@@ -2887,7 +2895,7 @@ setrans = module
 #
 # Policy for network configuration: ifconfig and dhcp client.
 # 
-sysnetwork = module
+sysnetwork = base
 
 # Layer: system
 # Module: udev
@@ -2908,5 +2916,5 @@ unconfined = module
 #
 # Policy for user domains
 # 
-userdomain = module
+userdomain = base
 

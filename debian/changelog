@@ -1,3 +1,54 @@
+refpolicy (2:2.20140421-2) unstable; urgency=medium
+
+  * Fix systemd support
+  * Made init, logging, authlogin, application, userdomain, systemd, dmesg,
+    dpkg, usermanage, libraries, fstools, miscfiles, mount, selinuxutil,
+    storage and sysnetwork be base modules - some of this is needed for
+    systemd, some just makes sense.
+  * Disabled modules anaconda, authbind, kudzu, portage, rhgb, speedtouch
+  * Allow syslogd_t to read /dev/urandom (for systemd)
+  * Change unit files to use .*\.service
+  * Default trans syslogd_tmp_t for name /run/log (for systemd)
+  * Make /var/auth a mountpoint
+  * Allow systemd_tmpfiles_t to relabelto xconsole_device_t
+  * Allow init_t to start and stop service systemd_unit_file_t
+  * Allow udev_t to write to init_t stream sockets for systemctl
+  * Allow syslogd_t to read udev_var_run_t so systemd_journal can get seat data
+  * Allow systemd_logind_t to read udev_var_run_t for seat data
+  * Allow syslogd_t setgid and setgid for systemd_journal
+  * Allow udev_t to read cgroup files for systemd-udevd to read it's own cgroup
+  * Give logrotate_t the systemd_systemctl_domain access to restart daemons
+  * Make transition from unconfined_t to insmod_t for running modutils and
+    remove all unused modutils domains. Make unconfined_t transition to
+    insmod_t, this makes depmod run as insmod_t. Make insmod_t write modules
+    dep files with the correct context.
+  * Allow udev_t to load kernel modules for systemd-udevd
+  * Allow initrc_t to systemd_config_all_services
+  * Allow lvm_t to talk to init_t via unix socket for systemd
+  * Allow allow lvm_t to read sysctl_crypto_t
+  * Allow udev_t to read modules_object_t for systemd-udevd
+  * Allow udev_t to search /run/systemd for systemd-udevd
+  * Allow systemd_tmpfiles_t to relabel man_cache_t
+  * Allow initrc_t to get status of init_t for systemd
+  * Allow udev_t to get initrc_exec_t service status for when udev runs hdparm
+    script
+
+  * Allow ifconfig_t to load kernel modules
+  * Allow named_t to read vm sysctls
+  * Allow tor_t capabilities chown dac_read_search dac_override fowner
+  * Allow fetchmail_t to manage dirs of type fetchmail_uidl_cache_t
+  * Allow mysqld_t to connect to itself on unix_stream_socket
+  * Allow mysqld_t kernel_read_vm_sysctls for overcommit_memory
+  * Allow sysstat_t read and write access to crond_tmp_t (for cron to capture
+    stdout/stderr).
+  * Allow sysstat_t to read it's own log files and read shell_exec_t
+  * Included file context for /run/kdm.pid
+  * Allow kerneloops_t to read /proc/filesystems
+  * Label /var/cache/dirmngr as dirmngr_var_lib_t
+  * systemd_login_list_pid_dirs(system_dbusd_t)
+
+ -- Russell Coker <russell@coker.com.au>  Wed, 25 Jun 2014 15:38:58 +1000
+
 refpolicy (2:2.20140421-1) unstable; urgency=medium
 
   * Team upload.

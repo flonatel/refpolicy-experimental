@@ -1,0 +1,16 @@
+Description: allow ifconfig_t to load modules
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-03
+
+Index: refpolicy-2.20140421/policy/modules/system/sysnetwork.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/sysnetwork.te
++++ refpolicy-2.20140421/policy/modules/system/sysnetwork.te
+@@ -256,6 +256,7 @@ optional_policy(`
+ # Ifconfig local policy
+ #
+ 
++kernel_load_module(ifconfig_t)
+ allow ifconfig_t self:capability { net_raw net_admin sys_admin sys_tty_config };
+ allow ifconfig_t self:process ~{ ptrace setcurrent setexec setfscreate setrlimit execmem execheap execstack };
+ allow ifconfig_t self:fd use;

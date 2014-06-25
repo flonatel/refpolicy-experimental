@@ -1,0 +1,1560 @@
+Description: Misc stuff from the systemd patch that isn't all systemd specific
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+Index: refpolicy-2.20140421/policy/global_tunables
+===================================================================
+--- refpolicy-2.20140421.orig/policy/global_tunables
++++ refpolicy-2.20140421/policy/global_tunables
+@@ -6,6 +6,13 @@
+ 
+ ## <desc>
+ ## <p>
++## Allow sysadm to debug or ptrace all processes.
++## </p>
++## </desc>
++gen_tunable(deny_ptrace, false)
++
++## <desc>
++## <p>
+ ## Allow unconfined executables to make their heap memory executable.  Doing this is a really bad idea. Probably indicates a badly coded executable, but could indicate an attack. This executable should be reported in bugzilla
+ ## </p>
+ ## </desc>
+Index: refpolicy-2.20140421/policy/modules/contrib/portslave.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/portslave.te
++++ refpolicy-2.20140421/policy/modules/contrib/portslave.te
+@@ -7,7 +7,6 @@ policy_module(portslave, 1.8.0)
+ 
+ type portslave_t;
+ type portslave_exec_t;
+-init_domain(portslave_t, portslave_exec_t)
+ init_daemon_domain(portslave_t, portslave_exec_t)
+ 
+ type portslave_etc_t;
+Index: refpolicy-2.20140421/policy/modules/kernel/filesystem.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/filesystem.te
++++ refpolicy-2.20140421/policy/modules/kernel/filesystem.te
+@@ -99,6 +99,8 @@ fs_xattr_type(hugetlbfs_t)
+ files_mountpoint(hugetlbfs_t)
+ dev_associate(hugetlbfs_t)
+ fs_use_trans hugetlbfs gen_context(system_u:object_r:hugetlbfs_t,s0);
++# for systemd
++dev_associate(hugetlbfs_t)
+ 
+ type ibmasmfs_t;
+ fs_type(ibmasmfs_t)
+Index: refpolicy-2.20140421/policy/modules/system/init.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.fc
++++ refpolicy-2.20140421/policy/modules/system/init.fc
+@@ -42,11 +42,24 @@ ifdef(`distro_gentoo', `
+ #
+ /usr/bin/sepg_ctl	--	gen_context(system_u:object_r:initrc_exec_t,s0)
+ 
++/usr/sbin/init(ng)?		--	gen_context(system_u:object_r:init_exec_t,s0)
++# because nowadays, /sbin/init is often a symlink to /sbin/upstart
++/usr/sbin/upstart		--	gen_context(system_u:object_r:init_exec_t,s0)
++
++/usr/lib/systemd/[^/]*		--	gen_context(system_u:object_r:init_exec_t,s0)
++/usr/lib/systemd/fedora[^/]* 	--	gen_context(system_u:object_r:initrc_exec_t,s0)
++/usr/lib/systemd/system-generators/[^/]*	--	gen_context(system_u:object_r:init_exec_t,s0)
++
+ /usr/libexec/dcc/start-.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
+ /usr/libexec/dcc/stop-.* --	gen_context(system_u:object_r:initrc_exec_t,s0)
+ 
+ /usr/sbin/apachectl	-- 	gen_context(system_u:object_r:initrc_exec_t,s0)
+ /usr/sbin/open_init_pty	--	gen_context(system_u:object_r:initrc_exec_t,s0)
++/usr/sbin/startx	-- 	gen_context(system_u:object_r:initrc_exec_t,s0)
++/usr/bin/systemd	--	gen_context(system_u:object_r:init_exec_t,s0)
++/lib/systemd/systemd	--	gen_context(system_u:object_r:init_exec_t,s0)
++
++/usr/share/system-config-services/system-config-services-mechanism\.py  --	gen_context(system_u:object_r:initrc_exec_t,s0)
+ 
+ #
+ # /var
+Index: refpolicy-2.20140421/policy/modules/system/logging.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.te
++++ refpolicy-2.20140421/policy/modules/system/logging.te
+@@ -121,7 +121,9 @@ term_use_all_terms(auditctl_t)
+ 
+ init_dontaudit_use_fds(auditctl_t)
+ 
+-locallogin_dontaudit_use_fds(auditctl_t)
++optional_policy(`
++	locallogin_dontaudit_use_fds(auditctl_t)
++')
+ 
+ logging_set_audit_parameters(auditctl_t)
+ logging_send_syslog_msg(auditctl_t)
+@@ -361,7 +363,7 @@ optional_policy(`
+ # sys_admin for the integrated klog of syslog-ng and metalog
+ # sys_nice for rsyslog
+ # cjp: why net_admin!
+-allow syslogd_t self:capability { dac_override sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
++allow syslogd_t self:capability { dac_override setgid setuid sys_resource sys_tty_config net_admin sys_admin sys_nice chown fsetid };
+ dontaudit syslogd_t self:capability sys_tty_config;
+ # setpgid for metalog
+ # setrlimit for syslog-ng
+@@ -528,6 +530,8 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	udev_read_db(syslogd_t)
++	# for systemd-journal to read seat data from /run/udev/data
++	udev_read_pid_files(syslogd_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20140421/policy/modules/system/lvm.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/lvm.fc
++++ refpolicy-2.20140421/policy/modules/system/lvm.fc
+@@ -28,6 +28,7 @@ ifdef(`distro_gentoo',`
+ #
+ /lib/lvm-10/.*		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /lib/lvm-200/.*		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/lib/systemd/systemd-cryptsetup -- gen_context(system_u:object_r:lvm_exec_t,s0)
+ /lib/udev/udisks-lvm-pv-export	--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ 
+ #
+Index: refpolicy-2.20140421/policy/modules/system/lvm.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/lvm.te
++++ refpolicy-2.20140421/policy/modules/system/lvm.te
+@@ -293,6 +293,9 @@ init_dontaudit_getattr_initctl(lvm_t)
+ init_use_script_ptys(lvm_t)
+ init_read_script_state(lvm_t)
+ 
++# for systemd-cryptsetup
++dev_write_kmsg(lvm_t)
++
+ logging_send_syslog_msg(lvm_t)
+ 
+ miscfiles_read_localization(lvm_t)
+Index: refpolicy-2.20140421/policy/modules/system/udev.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.if
++++ refpolicy-2.20140421/policy/modules/system/udev.if
+@@ -172,6 +172,24 @@ interface(`udev_dontaudit_search_db',`
+ 
+ ########################################
+ ## <summary>
++##     Allow process to read the table dir
++## </summary>
++## <param name="domain">
++##     <summary>
++##     The type of the process performing this action.
++##     </summary>
++## </param>
++#
++interface(`udev_list_table_dir',`
++        gen_require(`
++                type udev_tbl_t;
++        ')
++
++        allow $1 udev_tbl_t:dir list_dir_perms;
++')
++
++########################################
++## <summary>
+ ##	Read the udev device table.
+ ## </summary>
+ ## <desc>
+@@ -263,6 +281,25 @@ interface(`udev_manage_pid_dirs',`
+ 
+ ########################################
+ ## <summary>
++##      Allow process to modify relabelto udev database
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`udev_relabelto_db',`
++	gen_require(`
++		type udev_var_run_t;
++	')
++
++	files_search_pids($1)
++	allow $1 udev_var_run_t:file relabelto_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Read udev pid files.
+ ## </summary>
+ ## <param name="domain">
+@@ -322,3 +359,22 @@ interface(`udev_generic_pid_filetrans_ru
+ 
+ 	files_pid_filetrans($1, udev_var_run_t, dir, $2)
+ ')
++
++#######################################
++## <summary>
++##      Allow caller to create kobject uevent socket for udev
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`udev_create_kobject_uevent_socket',`
++        gen_require(`
++                type udev_t;
++                role system_r;
++        ')
++
++        allow $1 udev_t:netlink_kobject_uevent_socket create_socket_perms;
++')
+Index: refpolicy-2.20140421/policy/modules/system/userdomain.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/userdomain.if
++++ refpolicy-2.20140421/policy/modules/system/userdomain.if
+@@ -2853,6 +2853,35 @@ interface(`userdom_use_user_ptys',`
+ 
+ ########################################
+ ## <summary>
++##     Read and write a inherited user TTYs and PTYs.
++## </summary>
++## <desc>
++##     <p>
++##     Allow the specified domain to read and write inherited user
++##     TTYs and PTYs. This will allow the domain to
++##     interact with the user via the terminal. Typically
++##     all interactive applications will require this
++##     access.
++##     </p>
++## </desc>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++## <infoflow type="both" weight="10"/>
++#
++interface(`userdom_use_inherited_user_terminals',`
++	gen_require(`
++		type user_tty_device_t, user_devpts_t;
++	')
++
++	allow $1 user_tty_device_t:chr_file rw_inherited_term_perms;
++	allow $1 user_devpts_t:chr_file rw_inherited_term_perms;
++')
++
++########################################
++## <summary>
+ ##	Read and write a user TTYs and PTYs.
+ ## </summary>
+ ## <desc>
+@@ -3403,6 +3432,42 @@ interface(`userdom_signal_all_users',`
+ 	allow $1 userdomain:process signal;
+ ')
+ 
++#######################################
++## <summary>
++##  Send signull to all user domains.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`userdom_signull_all_users',`
++        gen_require(`
++                attribute userdomain;
++        ')
++
++        allow $1 userdomain:process signull;
++')
++
++########################################
++## <summary>
++##     Send kill signals to all user domains.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`userdom_kill_all_users',`
++        gen_require(`
++                attribute userdomain;
++        ')
++
++        allow $1 userdomain:process sigkill;
++')
++
+ ########################################
+ ## <summary>
+ ##	Send a SIGCHLD signal to all user domains.
+@@ -3457,3 +3522,41 @@ interface(`userdom_dbus_send_all_users',
+ 
+ 	allow $1 userdomain:dbus send_msg;
+ ')
++
++########################################
++## <summary>
++##      Do not audit attempts to write users
++##      temporary files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain to not audit.
++##      </summary>
++## </param>
++#
++interface(`userdom_dontaudit_write_user_tmp_files',`
++	gen_require(`
++		type user_tmp_t;
++	')
++
++	dontaudit $1 user_tmp_t:file write;
++')
++
++########################################
++## <summary>
++##     Do not audit attempts to read and write
++##     unserdomain stream.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain to not audit.
++##     </summary>
++## </param>
++#
++interface(`userdom_dontaudit_rw_stream',`
++	gen_require(`
++		attribute userdomain;
++	')
++
++	dontaudit $1 userdomain:unix_stream_socket rw_socket_perms;
++')
+Index: refpolicy-2.20140421/policy/modules/kernel/files.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/files.if
++++ refpolicy-2.20140421/policy/modules/kernel/files.if
+@@ -4396,6 +4396,42 @@ interface(`files_rw_generic_tmp_sockets'
+ 
+ ########################################
+ ## <summary>
++##     Relabel a dir from the type used in /tmp.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_relabelfrom_tmp_dirs',`
++        gen_require(`
++                type tmp_t;
++        ')
++
++        relabelfrom_dirs_pattern($1, tmp_t, tmp_t)
++')
++
++########################################
++## <summary>
++##     Relabel a file from the type used in /tmp.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_relabelfrom_tmp_files',`
++        gen_require(`
++                type tmp_t;
++        ')
++
++        relabelfrom_files_pattern($1, tmp_t, tmp_t)
++')
++
++########################################
++## <summary>
+ ##	Set the attributes of all tmp directories.
+ ## </summary>
+ ## <param name="domain">
+@@ -6208,6 +6244,43 @@ interface(`files_dontaudit_ioctl_all_pid
+ 
+ ########################################
+ ## <summary>
++##     Relable all pid directories
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_relabel_all_pid_dirs',`
++	gen_require(`
++		attribute pidfile;
++	')
++
++	relabel_dirs_pattern($1, pidfile, pidfile)
++')
++
++########################################
++## <summary>
++##     manage all pidfile directories
++##     in the /var/run directory.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_manage_all_pid_dirs',`
++	gen_require(`
++		attribute pidfile;
++	')
++
++	manage_dirs_pattern($1,pidfile,pidfile)
++')
++
++########################################
++## <summary>
+ ##	Read all process ID files.
+ ## </summary>
+ ## <param name="domain">
+@@ -6230,6 +6303,42 @@ interface(`files_read_all_pids',`
+ 
+ ########################################
+ ## <summary>
++##     Relable all pid files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_relabel_all_pid_files',`
++	gen_require(`
++		attribute pidfile;
++	')
++
++	relabel_files_pattern($1, pidfile, pidfile)
++')
++
++########################################
++## <summary>
++##     Execute generic programs in /var/run in the caller domain.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_exec_generic_pid_files',`
++	gen_require(`
++		type var_run_t;
++	')
++
++	exec_files_pattern($1, var_run_t, var_run_t)
++')
++
++########################################
++## <summary>
+ ##	Delete all process IDs.
+ ## </summary>
+ ## <param name="domain">
+@@ -6539,3 +6648,153 @@ interface(`files_unconfined',`
+ 
+ 	typeattribute $1 files_unconfined_type;
+ ')
++
++########################################
++## <summary>
++##     Create a core files in /
++## </summary>
++## <desc>
++##     <p>
++##     Create a core file in /,
++##     </p>
++## </desc>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++## <rolecap/>
++#
++interface(`files_manage_root_files',`
++	gen_require(`
++		type root_t;
++	')
++
++	manage_files_pattern($1, root_t, root_t)
++')
++
++########################################
++## <summary>
++##     Create all pid sockets
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_create_all_pid_sockets',`
++	gen_require(`
++		attribute pidfile;
++	')
++
++	allow $1 pidfile:sock_file create_sock_file_perms;
++')
++
++########################################
++## <summary>
++##     Create all pid named pipes
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_create_all_pid_pipes',`
++	gen_require(`
++		attribute pidfile;
++	')
++
++	allow $1 pidfile:fifo_file create_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##     Create all spool sockets
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_create_all_spool_sockets',`
++        gen_require(`
++                attribute spoolfile;
++        ')
++
++        allow $1 spoolfile:sock_file create_sock_file_perms;
++')
++
++########################################
++## <summary>
++##     Delete all spool sockets
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_delete_all_spool_sockets',`
++        gen_require(`
++                attribute spoolfile;
++        ')
++
++        allow $1 spoolfile:sock_file delete_sock_file_perms;
++')
++
++########################################
++## <summary>
++##     Delete all pid sockets
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_delete_all_pid_sockets',`
++        gen_require(`
++                attribute pidfile;
++        ')
++
++        allow $1 pidfile:sock_file delete_sock_file_perms;
++')
++
++########################################
++## <summary>
++##     Delete all pid named pipes
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`files_delete_all_pid_pipes',`
++        gen_require(`
++                attribute pidfile;
++        ')
++
++        allow $1 pidfile:fifo_file delete_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##     Allow domain to delete to all files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain to not audit.
++##     </summary>
++## </param>
++#
++interface(`files_delete_all_non_security_files',`
++        gen_require(`
++                attribute non_security_file_type;
++        ')
++
++        allow $1 non_security_file_type:file_class_set unlink;
++')
+Index: refpolicy-2.20140421/policy/modules/system/unconfined.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/unconfined.if
++++ refpolicy-2.20140421/policy/modules/system/unconfined.if
+@@ -586,3 +586,22 @@ interface(`unconfined_dbus_connect',`
+ 
+ 	allow $1 unconfined_t:dbus acquire_svc;
+ ')
++
++########################################
++## <summary>
++##      Do not audit attempts to read and write
++##      unconfined domain stream.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain to not audit.
++##      </summary>
++## </param>
++#
++interface(`unconfined_dontaudit_rw_stream',`
++	gen_require(`
++		type unconfined_t;
++	')
++
++	dontaudit $1 unconfined_t:unix_stream_socket rw_socket_perms;
++')
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.if
++++ refpolicy-2.20140421/policy/modules/contrib/cron.if
+@@ -412,6 +412,24 @@ interface(`cron_sigchld',`
+ 
+ ########################################
+ ## <summary>
++##      Send a generic signal to cron daemon.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`cron_signal',`
++        gen_require(`
++                type crond_t;
++        ')
++
++        allow $1 crond_t:process signal;
++')
++
++########################################
++## <summary>
+ ##	Set the attributes of cron log files.
+ ## </summary>
+ ## <param name="domain">
+@@ -534,6 +552,46 @@ interface(`cron_read_pipes',`
+ 
+ ########################################
+ ## <summary>
++##      Read crond state files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`cron_read_state_crond',`
++        gen_require(`
++                type crond_t;
++        ')
++
++        kernel_search_proc($1)
++        ps_process_pattern($1, crond_t)
++')
++
++########################################
++## <summary>
++##      Send and receive messages from
++##      crond over dbus.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`cron_dbus_chat_crond',`
++        gen_require(`
++                type crond_t;
++                class dbus send_msg;
++        ')
++
++        allow $1 crond_t:dbus send_msg;
++        allow crond_t $1:dbus send_msg;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to write
+ ##	cron daemon unnamed pipes.
+ ## </summary>
+@@ -833,3 +891,22 @@ interface(`cron_dontaudit_write_system_j
+ 
+ 	dontaudit $1 system_cronjob_tmp_t:file write_file_perms;
+ ')
++
++########################################
++## <summary>
++##      Search the directory containing user cron tables.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`cron_manage_system_spool',`
++	gen_require(`
++		type cron_system_spool_t;
++	')
++
++	files_search_spool($1)
++	manage_files_pattern($1, cron_system_spool_t, cron_system_spool_t)
++')
+Index: refpolicy-2.20140421/policy/modules/system/logging.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.if
++++ refpolicy-2.20140421/policy/modules/system/logging.if
+@@ -550,6 +550,26 @@ interface(`logging_send_syslog_msg',`
+ 
+ ########################################
+ ## <summary>
++##      Connect to the syslog control unix stream socket.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`logging_create_devlog_dev',`
++        gen_require(`
++                type devlog_t;
++        ')
++
++        allow $1 devlog_t:sock_file manage_sock_file_perms;
++        dev_filetrans($1, devlog_t, sock_file)
++        init_pid_filetrans($1, devlog_t, sock_file, "syslog")
++')
++
++########################################
++## <summary>
+ ##	Read the auditd configuration files.
+ ## </summary>
+ ## <param name="domain">
+@@ -780,6 +800,24 @@ interface(`logging_append_all_logs',`
+ ')
+ 
+ ########################################
++## <summary>
++##      Append to all log files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`logging_inherit_append_all_logs',`
++	gen_require(`
++		attribute logfile;
++	')
++
++	allow $1 logfile:file { getattr append ioctl lock };
++')
++
++########################################
+ ## <summary>
+ ##	Read all log files.
+ ## </summary>
+Index: refpolicy-2.20140421/policy/modules/kernel/devices.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/devices.if
++++ refpolicy-2.20140421/policy/modules/kernel/devices.if
+@@ -154,6 +154,25 @@ interface(`dev_relabel_all_dev_nodes',`
+ 
+ ########################################
+ ## <summary>
++##     Allow full relabeling (to and from) of all device files.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++## <rolecap/>
++#
++interface(`dev_relabel_all_dev_files',`
++	gen_require(`
++		type device_t;
++	')
++
++	relabel_files_pattern($1, device_t, device_t)
++')
++
++########################################
++## <summary>
+ ##	List all of the device nodes in a device directory.
+ ## </summary>
+ ## <param name="domain">
+@@ -462,6 +481,24 @@ interface(`dev_getattr_generic_blk_files
+ 
+ ########################################
+ ## <summary>
++##     write generic sock files in /dev.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain to not audit.
++##     </summary>
++## </param>
++#
++interface(`dev_write_generic_sock_files',`
++        gen_require(`
++                type device_t;
++        ')
++
++        write_sock_files_pattern($1, device_t, device_t)
++')
++
++########################################
++## <summary>
+ ##	Dontaudit getattr on generic block devices.
+ ## </summary>
+ ## <param name="domain">
+@@ -4070,6 +4107,44 @@ interface(`dev_rw_sysfs',`
+ 
+ ########################################
+ ## <summary>
++##     Relabel hardware state directories.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`dev_relabel_sysfs_dirs',`
++	gen_require(`
++		type sysfs_t;
++	')
++
++	relabel_dirs_pattern($1, sysfs_t, sysfs_t)
++')
++
++########################################
++## <summary>
++##     Relabel hardware state files
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`dev_relabel_all_sysfs',`
++        gen_require(`
++                type sysfs_t;
++        ')
++
++        relabel_dirs_pattern($1, sysfs_t, sysfs_t)
++        relabel_files_pattern($1, sysfs_t, sysfs_t)
++        relabel_lnk_files_pattern($1, sysfs_t, sysfs_t)
++')
++
++########################################
++## <summary>
+ ##	Read and write the TPM device.
+ ## </summary>
+ ## <param name="domain">
+@@ -4930,3 +5005,79 @@ interface(`dev_unconfined',`
+ 
+ 	typeattribute $1 devices_unconfined_type;
+ ')
++
++########################################
++## <summary>
++##     Relabel cpu online hardware state information.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`dev_relabel_cpu_online',`
++        gen_require(`
++                type cpu_online_t;
++                type sysfs_t;
++        ')
++
++        dev_search_sysfs($1)
++        allow $1 cpu_online_t:file relabel_file_perms;
++')
++
++########################################
++## <summary>
++##     Relabel the printer device.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`dev_relabel_printer',`
++        gen_require(`
++                type printer_device_t;
++        ')
++
++        allow $1 printer_device_t:chr_file relabel_chr_file_perms;
++')
++
++########################################
++## <summary>
++##     Read and write the printer device.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`dev_manage_printer',`
++        gen_require(`
++                type device_t, printer_device_t;
++        ')
++
++        manage_chr_files_pattern($1, device_t, printer_device_t)
++')
++
++########################################
++## <summary>
++##      Create FIFO pipes in device directories.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`dev_create_generic_pipes',`
++        gen_require(`
++                type device_t;
++        ')
++       allow $1 device_t:dir add_entry_dir_perms;
++       allow $1 device_t:fifo_file { getattr create };
++       allow $1 device_t:dir search_dir_perms;
++       allow $1 device_t:file setattr_file_perms;
++')
+Index: refpolicy-2.20140421/policy/modules/kernel/filesystem.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/filesystem.if
++++ refpolicy-2.20140421/policy/modules/kernel/filesystem.if
+@@ -689,6 +689,27 @@ interface(`fs_getattr_cgroup',`
+ 
+ ########################################
+ ## <summary>
++##     Get attributes of cgroup files.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`fs_getattr_cgroup_files',`
++        gen_require(`
++                type cgroup_t;
++
++        ')
++
++        getattr_files_pattern($1, cgroup_t, cgroup_t)
++        fs_search_tmpfs($1)
++        dev_search_sysfs($1)
++')
++
++########################################
++## <summary>
+ ##	Search cgroup directories.
+ ## </summary>
+ ## <param name="domain">
+@@ -709,6 +730,25 @@ interface(`fs_search_cgroup_dirs',`
+ 
+ ########################################
+ ## <summary>
++##     Relabel cgroup directories.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`fs_relabel_cgroup_dirs',`
++        gen_require(`
++                type cgroup_t;
++
++        ')
++
++        relabel_dirs_pattern($1, cgroup_t, cgroup_t)
++')
++
++########################################
++## <summary>
+ ##	list cgroup directories.
+ ## </summary>
+ ## <param name="domain">
+@@ -4056,6 +4096,42 @@ interface(`fs_dontaudit_list_tmpfs',`
+ ')
+ 
+ ########################################
++## <summary>
++##     Relabel directory  on tmpfs filesystems.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`fs_relabel_tmpfs_dirs',`
++        gen_require(`
++                type tmpfs_t;
++        ')
++
++        relabel_dirs_pattern($1, tmpfs_t, tmpfs_t)
++')
++
++########################################
++## <summary>
++##     Relabel files  on tmpfs filesystems.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`fs_relabel_tmpfs_files',`
++        gen_require(`
++                type tmpfs_t;
++        ')
++
++        relabel_files_pattern($1, tmpfs_t, tmpfs_t)
++')
++
++########################################
+ ## <summary>
+ ##	Create, read, write, and delete
+ ##	tmpfs directories
+Index: refpolicy-2.20140421/policy/modules/kernel/terminal.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/terminal.if
++++ refpolicy-2.20140421/policy/modules/kernel/terminal.if
+@@ -481,6 +481,24 @@ interface(`term_list_ptys',`
+ 
+ ########################################
+ ## <summary>
++##     Relabel the /dev/pts directory
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`term_relabel_ptys_dirs',`
++        gen_require(`
++                type devpts_t;
++        ')
++
++        allow $1 devpts_t:dir relabel_dir_perms;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to read the
+ ##	/dev/pts directory.
+ ## </summary>
+Index: refpolicy-2.20140421/policy/modules/system/lvm.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/lvm.if
++++ refpolicy-2.20140421/policy/modules/system/lvm.if
+@@ -123,3 +123,39 @@ interface(`lvm_domtrans_clvmd',`
+ 	corecmd_search_bin($1)
+ 	domtrans_pattern($1, clvmd_exec_t, clvmd_t)
+ ')
++
++########################################
++## <summary>
++##      Read and write a lvm unnamed pipe.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`lvm_rw_pipes',`
++        gen_require(`
++                type lvm_var_run_t;
++        ')
++
++        allow $1 lvm_var_run_t:fifo_file rw_inherited_fifo_file_perms;
++')
++
++########################################
++## <summary>
++##      Send lvm a null signal.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`lvm_signull',`
++        gen_require(`
++                type lvm_t;
++        ')
++
++        allow $1 lvm_t:process signull;
++')
+Index: refpolicy-2.20140421/policy/support/obj_perm_sets.spt
+===================================================================
+--- refpolicy-2.20140421.orig/policy/support/obj_perm_sets.spt
++++ refpolicy-2.20140421/policy/support/obj_perm_sets.spt
+@@ -192,7 +192,8 @@ define(`setattr_fifo_file_perms',`{ seta
+ define(`read_fifo_file_perms',`{ getattr open read lock ioctl }')
+ define(`append_fifo_file_perms',`{ getattr open append lock ioctl }')
+ define(`write_fifo_file_perms',`{ getattr open write append lock ioctl }')
+-define(`rw_fifo_file_perms',`{ getattr open read write append ioctl lock }')
++define(`rw_inherited_fifo_file_perms',`{ getattr read write append ioctl lock }')
++define(`rw_fifo_file_perms',`{ open rw_inherited_fifo_file_perms }')
+ define(`create_fifo_file_perms',`{ getattr create open }')
+ define(`rename_fifo_file_perms',`{ getattr rename }')
+ define(`delete_fifo_file_perms',`{ getattr unlink }')
+@@ -259,7 +260,8 @@ define(`relabel_chr_file_perms',`{ getat
+ #
+ # Use (read and write) terminals
+ #
+-define(`rw_term_perms', `{ getattr open read write append ioctl }')
++define(`rw_inherited_term_perms', `{ getattr read write append ioctl }')
++define(`rw_term_perms', `{ rw_inherited_term_perms open }')
+ 
+ #
+ # Sockets
+Index: refpolicy-2.20140421/policy/modules/system/application.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/application.if
++++ refpolicy-2.20140421/policy/modules/system/application.if
+@@ -189,6 +189,24 @@ interface(`application_dontaudit_signal'
+ 
+ ########################################
+ ## <summary>
++##     Send kill signals to all application domains.
++## </summary>
++## <param name="domain">
++##     <summary>
++##     Domain allowed access.
++##     </summary>
++## </param>
++#
++interface(`application_sigkill',`
++        gen_require(`
++                attribute application_domain_type;
++        ')
++
++        allow $1 application_domain_type:process sigkill;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to send kill signals
+ ##	to all application domains.
+ ## </summary>
+Index: refpolicy-2.20140421/policy/modules/contrib/dpkg.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dpkg.te
++++ refpolicy-2.20140421/policy/modules/contrib/dpkg.te
+@@ -183,13 +183,16 @@ domain_signull_all_domains(dpkg_t)
+ files_read_etc_runtime_files(dpkg_t)
+ files_exec_usr_files(dpkg_t)
+ miscfiles_read_localization(dpkg_t)
+-modutils_run_depmod(dpkg_t, dpkg_roles)
+-modutils_run_insmod(dpkg_t, dpkg_roles)
+ seutil_run_loadpolicy(dpkg_t, dpkg_roles)
+ seutil_run_setfiles(dpkg_t, dpkg_roles)
+ userdom_use_all_users_fds(dpkg_t)
+ 
+ optional_policy(`
++modutils_run_depmod(dpkg_t, dpkg_roles)
++modutils_run_insmod(dpkg_t, dpkg_roles)
++')
++
++optional_policy(`
+ 	mta_send_mail(dpkg_t)
+ ')
+ optional_policy(`
+@@ -287,8 +290,10 @@ logging_send_syslog_msg(dpkg_script_t)
+ 
+ miscfiles_read_localization(dpkg_script_t)
+ 
++optional_policy(`
+ modutils_run_depmod(dpkg_script_t, dpkg_roles)
+ modutils_run_insmod(dpkg_script_t, dpkg_roles)
++')
+ 
+ seutil_run_loadpolicy(dpkg_script_t, dpkg_roles)
+ seutil_run_setfiles(dpkg_script_t, dpkg_roles)
+Index: refpolicy-2.20140421/policy/modules/system/selinuxutil.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/selinuxutil.te
++++ refpolicy-2.20140421/policy/modules/system/selinuxutil.te
+@@ -346,7 +346,9 @@ files_relabel_non_auth_files(restorecond
+ files_read_non_auth_files(restorecond_t)
+ auth_use_nsswitch(restorecond_t)
+ 
+-locallogin_dontaudit_use_fds(restorecond_t)
++optional_policy(`
++	locallogin_dontaudit_use_fds(restorecond_t)
++')
+ 
+ logging_send_syslog_msg(restorecond_t)
+ 
+@@ -488,7 +490,9 @@ term_use_all_terms(semanage_t)
+ # Running genhomedircon requires this for finding all users
+ auth_use_nsswitch(semanage_t)
+ 
+-locallogin_use_fds(semanage_t)
++optional_policy(`
++	locallogin_use_fds(semanage_t)
++')
+ 
+ logging_send_syslog_msg(semanage_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/system/sysnetwork.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/sysnetwork.te
++++ refpolicy-2.20140421/policy/modules/system/sysnetwork.te
+@@ -143,7 +143,9 @@ logging_send_syslog_msg(dhcpc_t)
+ 
+ miscfiles_read_localization(dhcpc_t)
+ 
+-modutils_run_insmod(dhcpc_t, dhcpc_roles)
++optional_policy(`
++	modutils_run_insmod(dhcpc_t, dhcpc_roles)
++')
+ 
+ sysnet_run_ifconfig(dhcpc_t, dhcpc_roles)
+ 
+@@ -319,7 +321,9 @@ logging_send_syslog_msg(ifconfig_t)
+ 
+ miscfiles_read_localization(ifconfig_t)
+ 
+-modutils_domtrans_insmod(ifconfig_t)
++optional_policy(`
++	modutils_domtrans_insmod(ifconfig_t)
++')
+ 
+ seutil_use_runinit_fds(ifconfig_t)
+ 
+Index: refpolicy-2.20140421/policy/flask/access_vectors
+===================================================================
+--- refpolicy-2.20140421.orig/policy/flask/access_vectors
++++ refpolicy-2.20140421/policy/flask/access_vectors
+@@ -60,7 +60,7 @@ common socket
+ 	recv_msg
+ 	send_msg
+ 	name_bind
+-}	
++}
+ 
+ #
+ # Define a common prefix for ipc access vectors.
+@@ -244,7 +244,7 @@ inherits socket
+ 	node_bind
+ }
+ 
+-class node 
++class node
+ {
+ 	tcp_recv
+ 	tcp_send
+@@ -362,7 +362,7 @@ inherits ipc
+ 
+ 
+ #
+-# Define the access vector interpretation for the security server. 
++# Define the access vector interpretation for the security server.
+ #
+ 
+ class security
+@@ -410,33 +410,33 @@ class capability
+ 	# Care should be taken to ensure that these are consistent with
+ 	# those definitions. (Order matters)
+ 
+-	chown           
+-	dac_override    
+-	dac_read_search 
+-	fowner          
+-	fsetid          
+-	kill            
+-	setgid           
+-	setuid           
+-	setpcap          
+-	linux_immutable  
+-	net_bind_service 
+-	net_broadcast    
+-	net_admin        
+-	net_raw          
+-	ipc_lock         
+-	ipc_owner        
+-	sys_module       
+-	sys_rawio        
+-	sys_chroot       
+-	sys_ptrace       
+-	sys_pacct        
+-	sys_admin        
+-	sys_boot         
+-	sys_nice         
+-	sys_resource     
+-	sys_time         
+-	sys_tty_config  
++	chown
++	dac_override
++	dac_read_search
++	fowner
++	fsetid
++	kill
++	setgid
++	setuid
++	setpcap
++	linux_immutable
++	net_bind_service
++	net_broadcast
++	net_admin
++	net_raw
++	ipc_lock
++	ipc_owner
++	sys_module
++	sys_rawio
++	sys_chroot
++	sys_ptrace
++	sys_pacct
++	sys_admin
++	sys_boot
++	sys_nice
++	sys_resource
++	sys_time
++	sys_tty_config
+ 	mknod
+ 	lease
+ 	audit_write
+@@ -444,7 +444,7 @@ class capability
+ 	setfcap
+ }
+ 
+-class capability2 
++class capability2
+ {
+ 	mac_override	# unused by SELinux
+ 	mac_admin	# unused by SELinux
+@@ -826,7 +826,7 @@ class x_application_data
+ class kernel_service
+ {
+ 	use_as_override
+-	create_files_as	
++	create_files_as
+ }
+ 
+ class tun_socket
+Index: refpolicy-2.20140421/policy/flask/security_classes
+===================================================================
+--- refpolicy-2.20140421.orig/policy/flask/security_classes
++++ refpolicy-2.20140421/policy/flask/security_classes
+@@ -1,7 +1,7 @@
+ # FLASK
+ 
+ #
+-# Define the security object classes 
++# Define the security object classes
+ #
+ 
+ # Classes marked as userspace are classes
+@@ -117,7 +117,7 @@ class x_synthetic_event		# userspace
+ class x_application_data	# userspace
+ 
+ # kernel services that need to override task security, e.g. cachefiles
+-class kernel_service 
++class kernel_service
+ 
+ class tun_socket
+ 
+Index: refpolicy-2.20140421/policy/modules/system/init.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.te
++++ refpolicy-2.20140421/policy/modules/system/init.te
+@@ -194,10 +194,6 @@ ifdef(`distro_redhat',`
+ 
+ tunable_policy(`init_upstart',`
+ 	corecmd_shell_domtrans(init_t, initrc_t)
+-',`
+-	# Run the shell in the sysadm role for single-user mode.
+-	# causes problems with upstart
+-	sysadm_shell_domtrans(init_t)
+ ')
+ 
+ optional_policy(`
+@@ -422,8 +418,10 @@ miscfiles_read_localization(initrc_t)
+ # slapd needs to read cert files from its initscript
+ miscfiles_read_generic_certs(initrc_t)
+ 
+-modutils_read_module_config(initrc_t)
+-modutils_domtrans_insmod(initrc_t)
++optional_policy(`
++	modutils_read_module_config(initrc_t)
++	modutils_domtrans_insmod(initrc_t)
++')
+ 
+ seutil_read_config(initrc_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/system/init.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.if
++++ refpolicy-2.20140421/policy/modules/system/init.if
+@@ -1851,3 +1851,24 @@ interface(`init_udp_recvfrom_all_daemons
+ interface(`systemd_unit_file',`
+ 	files_type($1)
+ ')
++
++########################################
++## <summary>
++##      Init will execute a shell in the specified domain.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Target domain
++##      </summary>
++## </param>
++#
++interface(`init_shell_domtrans',`
++	gen_require(`
++		type init_t;
++	')
++
++	corecmd_shell_domtrans(init_t, $1)
++	allow $1 init_t:fd use;
++	allow $1 init_t:fifo_file rw_file_perms;
++	allow $1 init_t:process sigchld;
++')
+Index: refpolicy-2.20140421/policy/modules/system/authlogin.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/authlogin.te
++++ refpolicy-2.20140421/policy/modules/system/authlogin.te
+@@ -81,6 +81,7 @@ application_domain(utempter_t, utempter_
+ #
+ type var_auth_t;
+ files_type(var_auth_t)
++files_mountpoint(var_auth_t)
+ 
+ type wtmp_t;
+ logging_log_file(wtmp_t)
+Index: refpolicy-2.20140421/policy/modules/system/udev.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.te
++++ refpolicy-2.20140421/policy/modules/system/udev.te
+@@ -54,6 +54,7 @@ allow udev_t self:unix_dgram_socket send
+ allow udev_t self:unix_stream_socket connectto;
+ allow udev_t self:netlink_kobject_uevent_socket create_socket_perms;
+ allow udev_t self:rawip_socket create_socket_perms;
++fs_read_cgroup_files(udev_t)
+ 
+ allow udev_t udev_exec_t:file write;
+ can_exec(udev_t, udev_exec_t)
+@@ -79,6 +80,8 @@ files_pid_filetrans(udev_t, udev_var_run
+ 
+ kernel_read_system_state(udev_t)
+ kernel_request_load_module(udev_t)
++# systemd-udevd needs kernel_load_module
++kernel_load_module(udev_t)
+ kernel_getattr_core_if(udev_t)
+ kernel_use_fds(udev_t)
+ kernel_read_device_sysctls(udev_t)
+Index: refpolicy-2.20140421/policy/modules/services/xserver.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/services/xserver.fc
++++ refpolicy-2.20140421/policy/modules/services/xserver.fc
+@@ -107,6 +107,7 @@ ifndef(`distro_debian',`
+ /var/run/gdm(3)?(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/gdm(3)?\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/xdm\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
++/var/run/kdm\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/lxdm\.auth	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/lxdm\.pid	--	gen_context(system_u:object_r:xdm_var_run_t,s0)
+ /var/run/lxdm(/.*)?		gen_context(system_u:object_r:xdm_var_run_t,s0)
+Index: refpolicy-2.20140421/policy/modules/contrib/kerneloops.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/kerneloops.te
++++ refpolicy-2.20140421/policy/modules/contrib/kerneloops.te
+@@ -28,6 +28,7 @@ manage_files_pattern(kerneloops_t, kerne
+ files_tmp_filetrans(kerneloops_t, kerneloops_tmp_t, file)
+ 
+ kernel_read_ring_buffer(kerneloops_t)
++kernel_read_system_state(kerneloops_t)
+ 
+ domain_use_interactive_fds(kerneloops_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/system/locallogin.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/locallogin.te
++++ refpolicy-2.20140421/policy/modules/system/locallogin.te
+@@ -62,6 +62,8 @@ kernel_link_key(local_login_t)
+ 
+ corecmd_list_bin(local_login_t)
+ corecmd_read_bin_symlinks(local_login_t)
++# for /bin/uname
++corecmd_exec_bin(local_login_t)
+ # cjp: these are probably not needed:
+ corecmd_read_bin_files(local_login_t)
+ corecmd_read_bin_pipes(local_login_t)

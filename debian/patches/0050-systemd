@@ -1,0 +1,3373 @@
+Description: Make systemd work
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+Index: refpolicy-2.20140421/policy/modules/contrib/apache.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apache.te
++++ refpolicy-2.20140421/policy/modules/contrib/apache.te
+@@ -291,6 +291,7 @@ files_type(httpd_keytab_t)
+ 
+ type httpd_unit_file_t;
+ systemd_unit_file(httpd_unit_file_t)
++systemd_manage_passwd_run(httpd_t)
+ type httpd_lock_t;
+ files_lock_file(httpd_lock_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.te
++++ refpolicy-2.20140421/policy/modules/contrib/cron.te
+@@ -415,6 +415,15 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	systemd_use_fds_logind(crond_t)
++	systemd_write_inherited_logind_sessions_pipes(crond_t)
++')
++optional_policy(`
++	systemd_dbus_chat_logind(system_cronjob_t)
++	systemd_write_inherited_logind_sessions_pipes(system_cronjob_t)
++')
++
++optional_policy(`
+ 	udev_read_db(crond_t)
+ ')
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/networkmanager.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/networkmanager.te
++++ refpolicy-2.20140421/policy/modules/contrib/networkmanager.te
+@@ -323,6 +323,10 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	systemd_read_logind_sessions_files(NetworkManager_t)
++')
++
++optional_policy(`
+ 	udev_exec(NetworkManager_t)
+ 	udev_read_db(NetworkManager_t)
+ 	udev_read_pid_files(NetworkManager_t)
+Index: refpolicy-2.20140421/policy/modules/kernel/devices.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/devices.te
++++ refpolicy-2.20140421/policy/modules/kernel/devices.te
+@@ -20,6 +20,9 @@ files_mountpoint(device_t)
+ files_associate_tmp(device_t)
+ fs_xattr_type(device_t)
+ fs_use_trans devtmpfs gen_context(system_u:object_r:device_t,s0);
++optional_policy(`
++	systemd_tmpfiles_manage_object(device_t, fifo_file)
++')
+ 
+ #
+ # Type for /dev/agpgart
+Index: refpolicy-2.20140421/policy/modules/kernel/files.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/files.te
++++ refpolicy-2.20140421/policy/modules/kernel/files.te
+@@ -10,6 +10,7 @@ attribute files_unconfined_type;
+ attribute lockfile;
+ attribute mountpoint;
+ attribute pidfile;
++attribute spoolfile;
+ attribute configfile;
+ 
+ # For labeling types that are to be polyinstantiated
+@@ -173,6 +174,10 @@ type var_run_t;
+ files_pid_file(var_run_t)
+ files_mountpoint(var_run_t)
+ 
++optional_policy(`
++	systemd_tmpfiles_manage_object(var_run_t, lnk_file)
++')
++
+ #
+ # var_spool_t is the type of /var/spool
+ #
+Index: refpolicy-2.20140421/policy/modules/kernel/kernel.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/kernel.te
++++ refpolicy-2.20140421/policy/modules/kernel/kernel.te
+@@ -305,6 +305,8 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	init_sigchld(kernel_t)
++	init_dyntrans(kernel_t)
++	domain_dyntrans_type(kernel_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20140421/policy/modules/services/ssh.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/services/ssh.te
++++ refpolicy-2.20140421/policy/modules/services/ssh.te
+@@ -279,6 +279,10 @@ tunable_policy(`ssh_sysadm_login',`
+ ')
+ 
+ optional_policy(`
++	systemd_write_inherited_logind_sessions_pipes(sshd_t)
++')
++
++optional_policy(`
+ 	daemontools_service_domain(sshd_t, sshd_exec_t)
+ ')
+ 
+Index: refpolicy-2.20140421/policy/modules/system/authlogin.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/authlogin.te
++++ refpolicy-2.20140421/policy/modules/system/authlogin.te
+@@ -30,6 +30,9 @@ role system_r types chkpwd_t;
+ 
+ type faillog_t;
+ logging_log_file(faillog_t)
++optional_policy(`
++	systemd_tmpfiles_manage_object(faillog_t, file)
++')
+ 
+ type lastlog_t;
+ logging_log_file(lastlog_t)
+@@ -82,6 +85,9 @@ application_domain(utempter_t, utempter_
+ type var_auth_t;
+ files_type(var_auth_t)
+ files_mountpoint(var_auth_t)
++optional_policy(`
++	systemd_tmpfiles_manage_object(var_auth_t, dir)
++')
+ 
+ type wtmp_t;
+ logging_log_file(wtmp_t)
+Index: refpolicy-2.20140421/policy/modules/system/init.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.fc
++++ refpolicy-2.20140421/policy/modules/system/init.fc
+@@ -29,6 +29,18 @@ ifdef(`distro_gentoo', `
+ #
+ # /sbin
+ #
++/bin/systemd		--	gen_context(system_u:object_r:init_exec_t,s0)
++
++#
++# systemd init scripts
++#
++/lib/systemd/[^/]*	--	gen_context(system_u:object_r:init_exec_t,s0)
++/lib/systemd/fedora[^/]* --	gen_context(system_u:object_r:initrc_exec_t,s0)
++/lib/systemd/system-generators/[^/]*	--	gen_context(system_u:object_r:init_exec_t,s0)
++
++#
++# /sbin
++#
+ /sbin/init(ng)?		--	gen_context(system_u:object_r:init_exec_t,s0)
+ # because nowadays, /sbin/init is often a symlink to /sbin/upstart
+ /sbin/upstart		--	gen_context(system_u:object_r:init_exec_t,s0)
+@@ -87,3 +99,4 @@ ifdef(`distro_suse', `
+ /var/run/setleds-on	--	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ /var/run/sysconfig(/.*)?	gen_context(system_u:object_r:initrc_var_run_t,s0)
+ ')
++/var/run/systemd(/.*)?		gen_context(system_u:object_r:init_var_run_t,s0)
+Index: refpolicy-2.20140421/policy/modules/system/init.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.if
++++ refpolicy-2.20140421/policy/modules/system/init.if
+@@ -81,6 +81,44 @@ interface(`init_script_domain',`
+ 	domtrans_pattern(init_run_all_scripts_domain, $2, $1)
+ ')
+ 
++
++#######################################
++## <summary>
++##  Create a domain which can be started by init.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Type to be used as a domain.
++##  </summary>
++## </param>
++## <param name="entry_point">
++##  <summary>
++##  Type of the program to be used as an entry point to this domain.
++##  </summary>
++## </param>
++#
++interface(`init_systemd_domain',`
++    gen_require(`
++        type init_t;
++        role system_r;
++    ')
++
++    domain_type($1)
++    domain_entry_file($1,$2)
++
++    role system_r types $1;
++
++    tunable_policy(`init_systemd',`
++        domtrans_pattern(init_t,$2,$1)
++        allow init_t $1:unix_stream_socket create_stream_socket_perms;
++        allow init_t $1:unix_dgram_socket create_socket_perms;
++	allow $1 init_t:unix_stream_socket ioctl;
++        allow $1 init_t:unix_dgram_socket sendto;
++	# need write to /var/run/systemd/notify
++	init_write_pid_socket($1)
++    ')
++')
++
+ ########################################
+ ## <summary>
+ ##	Create a domain which can be started by init.
+@@ -107,7 +145,11 @@ interface(`init_domain',`
+ 
+ 	role system_r types $1;
+ 
+-	domtrans_pattern(init_t, $2, $1)
++	tunable_policy(`init_systemd', `
++		domtrans_pattern(init_t, $2, $1)
++		allow init_t $1:unix_stream_socket create_stream_socket_perms;
++		allow $1 init_t:unix_dgram_socket sendto;
++	')
+ 
+ 	ifdef(`hide_broken_symptoms',`
+ 		# RHEL4 systems seem to have a stray
+@@ -194,8 +236,10 @@ interface(`init_ranged_domain',`
+ interface(`init_daemon_domain',`
+ 	gen_require(`
+ 		type initrc_t;
++		type init_t;
+ 		role system_r;
+ 		attribute daemon;
++		attribute initrc_transition_domain;
+ 	')
+ 
+ 	typeattribute $1 daemon;
+@@ -207,6 +251,12 @@ interface(`init_daemon_domain',`
+ 
+ 	domtrans_pattern(initrc_t, $2, $1)
+ 
++	tunable_policy(`init_systemd', `
++		domtrans_pattern(init_t, $2, $1)
++		allow init_t $1:unix_stream_socket create_stream_socket_perms;
++		allow $1 init_t:unix_dgram_socket sendto;
++	')
++
+ 	# daemons started from init will
+ 	# inherit fds from init for the console
+ 	init_dontaudit_use_fds($1)
+@@ -278,17 +328,20 @@ interface(`init_daemon_domain',`
+ interface(`init_ranged_daemon_domain',`
+ 	gen_require(`
+ 		type initrc_t;
++		type init_t;
+ 	')
+ 
+-	init_daemon_domain($1, $2)
++#	init_daemon_domain($1, $2)
+ 
+ 	ifdef(`enable_mcs',`
+ 		range_transition initrc_t $2:process $3;
++		range_transition init_t $2:process $3;
+ 	')
+ 
+ 	ifdef(`enable_mls',`
+ 		range_transition initrc_t $2:process $3;
+ 		mls_rangetrans_target($1)
++		range_transition init_t $2:process $3;
+ 	')
+ ')
+ 
+@@ -331,22 +384,23 @@ interface(`init_ranged_daemon_domain',`
+ #
+ interface(`init_system_domain',`
+ 	gen_require(`
++		type init_t;
+ 		type initrc_t;
+ 		role system_r;
++		attribute initrc_transition_domain;
++		attribute systemprocess;
+ 	')
+ 
++	typeattribute $1 systemprocess;
+ 	application_domain($1, $2)
+ 
+ 	role system_r types $1;
+ 
+ 	domtrans_pattern(initrc_t, $2, $1)
+ 
+-	ifdef(`hide_broken_symptoms',`
+-		# RHEL4 systems seem to have a stray
+-		# fds open from the initrd
+-		ifdef(`distro_rhel4',`
+-			kernel_dontaudit_use_fds($1)
+-		')
++	tunable_policy(`init_systemd',`
++		# Handle upstart/systemd direct transition to a executable
++		domtrans_pattern(init_t,$2,$1)
+ 	')
+ ')
+ 
+@@ -396,20 +450,41 @@ interface(`init_system_domain',`
+ interface(`init_ranged_system_domain',`
+ 	gen_require(`
+ 		type initrc_t;
++		type init_t;
+ 	')
+ 
+ 	init_system_domain($1, $2)
+ 
+ 	ifdef(`enable_mcs',`
+ 		range_transition initrc_t $2:process $3;
++		range_transition init_t $2:process $3;
+ 	')
+ 
+ 	ifdef(`enable_mls',`
+ 		range_transition initrc_t $2:process $3;
++		range_transition init_t $2:process $3;
+ 		mls_rangetrans_target($1)
+ 	')
+ ')
+ 
++######################################
++## <summary>
++##  Allow domain dyntransition to init_t domain.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed to transition.
++##  </summary>
++## </param>
++#
++interface(`init_dyntrans',`
++    gen_require(`
++        type init_t;
++    ')
++
++    dyntrans_pattern($1, init_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Mark the file type as a daemon run dir, allowing initrc_t
+@@ -464,7 +539,6 @@ interface(`init_domtrans',`
+ ##	Domain allowed access.
+ ##	</summary>
+ ## </param>
+-## <rolecap/>
+ #
+ interface(`init_exec',`
+ 	gen_require(`
+@@ -473,6 +547,29 @@ interface(`init_exec',`
+ 
+ 	corecmd_search_bin($1)
+ 	can_exec($1, init_exec_t)
++
++	tunable_policy(`init_systemd',`
++		systemd_exec_systemctl($1)
++	')
++')
++
++#######################################
++## <summary>
++##  Dontaudit getattr on the init program.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++## <rolecap/>
++#
++interface(`init_dontaudit_getattr_exec',`
++    gen_require(`
++        type init_exec_t;
++    ')
++
++	dontaudit $1 init_exec_t:file getattr;
+ ')
+ 
+ ########################################
+@@ -561,6 +658,24 @@ interface(`init_sigchld',`
+ 
+ ########################################
+ ## <summary>
++##	Send generic signals to init.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_signal',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:process signal;
++')
++
++########################################
++## <summary>
+ ##	Connect to init with a unix socket.
+ ## </summary>
+ ## <param name="domain">
+@@ -571,10 +686,66 @@ interface(`init_sigchld',`
+ #
+ interface(`init_stream_connect',`
+ 	gen_require(`
+-		type init_t;
++		type init_t, init_var_run_t;
+ 	')
+ 
+-	allow $1 init_t:unix_stream_socket connectto;
++	files_search_pids($1)
++	stream_connect_pattern($1, init_var_run_t, init_var_run_t, init_t)
++	allow $1 init_t:unix_stream_socket getattr;
++')
++
++#######################################
++## <summary>
++##  Dontaudit Connect to init with a unix socket.
++## </summary>
++## <param name="domain">
++##  <summary>
++##	Domain to not audit.
++##  </summary>
++## </param>
++#
++interface(`init_dontaudit_stream_connect',`
++    gen_require(`
++        type init_t;
++    ')
++
++    dontaudit $1 init_t:unix_stream_socket connectto;
++')
++
++######################################
++## <summary>
++##  Dontaudit getattr to init with a unix socket.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain to not audit.
++##  </summary>
++## </param>
++#
++interface(`init_dontaudit_getattr_stream_socket',`
++    gen_require(`
++        type init_t;
++    ')
++
++    dontaudit $1 init_t:unix_stream_socket getattr;
++')
++
++######################################
++## <summary>
++##  Dontaudit read and write to init with a unix socket.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain to not audit.
++##  </summary>
++## </param>
++#
++interface(`init_dontaudit_rw_stream_socket',`
++    gen_require(`
++        type init_t;
++    ')
++
++    dontaudit $1 init_t:unix_stream_socket { getattr read write };
+ ')
+ 
+ ########################################
+@@ -740,19 +911,25 @@ interface(`init_telinit',`
+ 		type initctl_t;
+ 	')
+ 
++	corecmd_exec_bin($1)
++
+ 	dev_list_all_dev_nodes($1)
+ 	allow $1 initctl_t:fifo_file rw_fifo_file_perms;
+ 
+ 	init_exec($1)
+ 
+-	tunable_policy(`init_upstart',`
++	tunable_policy(`init_upstart || init_systemd',`
+ 		gen_require(`
+ 			type init_t;
+ 		')
+ 
++		ps_process_pattern($1, init_t)
++		allow $1 init_t:process signal;
+ 		# upstart uses a datagram socket instead of initctl pipe
+ 		allow $1 self:unix_dgram_socket create_socket_perms;
+ 		allow $1 init_t:unix_dgram_socket sendto;
++		#576913
++		allow $1 init_t:unix_stream_socket connectto;
+ 	')
+ ')
+ 
+@@ -782,7 +959,7 @@ interface(`init_rw_initctl',`
+ ## </summary>
+ ## <param name="domain">
+ ##	<summary>
+-##	Domain allowed access.
++##	Domain to not audit.
+ ##	</summary>
+ ## </param>
+ #
+@@ -860,19 +1037,41 @@ interface(`init_spec_domtrans_script',`
+ #
+ interface(`init_domtrans_script',`
+ 	gen_require(`
+-		type initrc_t, initrc_exec_t;
++		type initrc_t;
++		attribute init_script_file_type;
++		attribute initrc_transition_domain;
+ 	')
++	typeattribute $1 initrc_transition_domain;
+ 
+ 	files_list_etc($1)
+-	domtrans_pattern($1, initrc_exec_t, initrc_t)
++	domtrans_pattern($1, init_script_file_type, initrc_t)
+ 
+ 	ifdef(`enable_mcs',`
+-		range_transition $1 initrc_exec_t:process s0;
++		range_transition $1 init_script_file_type:process s0;
+ 	')
+ 
+ 	ifdef(`enable_mls',`
+-		range_transition $1 initrc_exec_t:process s0 - mls_systemhigh;
++		range_transition $1 init_script_file_type:process s0 - mls_systemhigh;
++	')
++')
++
++########################################
++## <summary>
++##	Execute a file in a bin directory
++##	in the initrc_t domain
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_bin_domtrans_spec',`
++	gen_require(`
++		type initrc_t;
+ 	')
++
++	corecmd_bin_domtrans($1, initrc_t)
+ ')
+ 
+ ########################################
+@@ -928,9 +1127,14 @@ interface(`init_script_file_domtrans',`
+ interface(`init_labeled_script_domtrans',`
+ 	gen_require(`
+ 		type initrc_t;
++		attribute initrc_transition_domain;
+ 	')
+ 
++	typeattribute $1 initrc_transition_domain;
++	# service script searches all filesystems via mountpoint
++	fs_search_all($1)
+ 	domtrans_pattern($1, $2, initrc_t)
++	allow $1 $2:file ioctl;
+ 	files_search_etc($1)
+ ')
+ 
+@@ -1023,7 +1227,9 @@ interface(`init_ptrace',`
+ 		type init_t;
+ 	')
+ 
+-	allow $1 init_t:process ptrace;
++	tunable_policy(`deny_ptrace',`',`
++		allow $1 init_t:process ptrace;
++	')
+ ')
+ 
+ ########################################
+@@ -1141,6 +1347,24 @@ interface(`init_read_all_script_files',`
+ 
+ #######################################
+ ## <summary>
++##	Dontaudit getattr all init script files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`init_dontaudit_getattr_all_script_files',`
++	gen_require(`
++		attribute init_script_file_type;
++	')
++
++	dontaudit $1 init_script_file_type:file getattr;
++')
++
++#######################################
++## <summary>
+ ##	Dontaudit read all init script files.
+ ## </summary>
+ ## <param name="domain">
+@@ -1192,12 +1416,7 @@ interface(`init_read_script_state',`
+ 	')
+ 
+ 	kernel_search_proc($1)
+-	read_files_pattern($1, initrc_t, initrc_t)
+-	read_lnk_files_pattern($1, initrc_t, initrc_t)
+-	list_dirs_pattern($1, initrc_t, initrc_t)
+-
+-	# should move this to separate interface
+-	allow $1 initrc_t:process getattr;
++	ps_process_pattern($1, initrc_t)
+ ')
+ 
+ ########################################
+@@ -1437,6 +1656,27 @@ interface(`init_dbus_send_script',`
+ ########################################
+ ## <summary>
+ ##	Send and receive messages from
++##	init over dbus.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_dbus_chat',`
++	gen_require(`
++		type init_t;
++		class dbus send_msg;
++	')
++
++	allow $1 init_t:dbus send_msg;
++	allow init_t $1:dbus send_msg;
++')
++
++########################################
++## <summary>
++##	Send and receive messages from
+ ##	init scripts over dbus.
+ ## </summary>
+ ## <param name="domain">
+@@ -1544,6 +1784,25 @@ interface(`init_getattr_script_status_fi
+ 
+ ########################################
+ ## <summary>
++##	Manage init script
++##	status files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_manage_script_status_files',`
++	gen_require(`
++		type initrc_state_t;
++	')
++
++	manage_files_pattern($1, initrc_state_t, initrc_state_t)
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to read init script
+ ##	status files.
+ ## </summary>
+@@ -1602,6 +1861,24 @@ interface(`init_rw_script_tmp_files',`
+ 
+ ########################################
+ ## <summary>
++##	Read and write init script inherited temporary data.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_rw_inherited_script_tmp_files',`
++	gen_require(`
++		type initrc_tmp_t;
++	')
++
++	allow $1 initrc_tmp_t:file rw_inherited_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Create files in a init script
+ ##	temporary data directory.
+ ## </summary>
+@@ -1674,6 +1951,24 @@ interface(`init_read_utmp',`
+ 
+ ########################################
+ ## <summary>
++##	Do not audit attempts to read utmp.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`init_dontaudit_read_utmp',`
++	gen_require(`
++		type initrc_var_run_t;
++	')
++
++	dontaudit $1 initrc_var_run_t:file read_file_perms;
++')
++
++########################################
++## <summary>
+ ##	Do not audit attempts to write utmp.
+ ## </summary>
+ ## <param name="domain">
+@@ -1762,7 +2057,7 @@ interface(`init_dontaudit_rw_utmp',`
+ 		type initrc_var_run_t;
+ 	')
+ 
+-	dontaudit $1 initrc_var_run_t:file { getattr read write append lock };
++	dontaudit $1 initrc_var_run_t:file rw_file_perms;
+ ')
+ 
+ ########################################
+@@ -1803,6 +2098,128 @@ interface(`init_pid_filetrans_utmp',`
+ 	files_pid_filetrans($1, initrc_var_run_t, file, "utmp")
+ ')
+ 
++######################################
++## <summary>
++##  Allow search  directory in the /run/systemd directory.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_search_pid_dirs',`
++    gen_require(`
++        type init_var_run_t;
++    ')
++
++    allow $1 init_var_run_t:dir search_dir_perms;
++')
++
++######################################
++## <summary>
++##  Allow listing of the /run/systemd directory.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_list_pid_dirs',`
++    gen_require(`
++        type init_var_run_t;
++    ')
++
++    allow $1 init_var_run_t:dir list_dir_perms;
++')
++
++#######################################
++## <summary>
++##  Create a directory in the /run/systemd directory.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_create_pid_dirs',`
++    gen_require(`
++        type init_var_run_t;
++    ')
++
++    allow $1 init_var_run_t:dir list_dir_perms;
++    create_dirs_pattern($1, init_var_run_t, init_var_run_t)
++')
++
++#######################################
++## <summary>
++##  Create objects in /run/systemd directory
++##  with an automatic type transition to
++##  a specified private type.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++## <param name="private_type">
++##  <summary>
++##  The type of the object to create.
++##  </summary>
++## </param>
++## <param name="object_class">
++##  <summary>
++##  The class of the object to be created.
++##  </summary>
++## </param>
++#
++interface(`init_pid_filetrans',`
++    gen_require(`
++        type init_var_run_t;
++    ')
++
++	files_search_pids($1)
++	filetrans_pattern($1, init_var_run_t, $2, $3, $4)
++')
++
++#######################################
++## <summary>
++##	Create objects in /run/systemd directory
++##	with an automatic type transition to
++##	a specified private type.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="private_type">
++##	<summary>
++##	The type of the object to create.
++##	</summary>
++## </param>
++## <param name="object_class">
++##	<summary>
++##	The class of the object to be created.
++##	</summary>
++## </param>
++## <param name="object_name">
++##	<summary>
++##	The name of the object to be created.
++##	</summary>
++## </param>
++#
++interface(`init_named_pid_filetrans',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	files_search_pids($1)
++	filetrans_pattern($1, init_var_run_t, $2, $3, $4)
++')
++
+ ########################################
+ ## <summary>
+ ##	Allow the specified domain to connect to daemon with a tcp socket
+@@ -1838,18 +2255,267 @@ interface(`init_udp_recvfrom_all_daemons
+ 	corenet_udp_recvfrom_labeled($1, daemon)
+ ')
+ 
++########################################
++## <summary>
++##	Transition to system_r when execute an init script
++## </summary>
++## <desc>
++##      <p>
++##	Execute a init script in a specified role
++##      </p>
++##      <p>
++##      No interprocess communication (signals, pipes,
++##      etc.) is provided by this interface since
++##      the domains are not owned by this module.
++##      </p>
++## </desc>
++## <param name="source_role">
++##	<summary>
++##	Role to transition from.
++##	</summary>
++## </param>
++#
++interface(`init_script_role_transition',`
++	gen_require(`
++		attribute init_script_file_type;
++	')
++
++	role_transition $1 init_script_file_type system_r;
++')
++
++########################################
++## <summary>
++##	dontaudit read and write an leaked init scrip file descriptors
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`init_dontaudit_script_leaks',`
++	gen_require(`
++		type initrc_t;
++	')
++
++	dontaudit $1 initrc_t:tcp_socket { read write };
++	dontaudit $1 initrc_t:udp_socket { read write };
++	dontaudit $1 initrc_t:unix_dgram_socket { read write };
++	dontaudit $1 initrc_t:unix_stream_socket { read write };
++	dontaudit $1 initrc_t:shm rw_shm_perms;
++	init_dontaudit_use_script_ptys($1)
++	init_dontaudit_use_script_fds($1)
++')
++
++#######################################
++## <summary>
++##  Allow the specified domain to ioctl an
++##  init with a unix domain stream sockets.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_ioctl_stream_sockets',`
++    gen_require(`
++        type init_t;
++    ')
++
++    allow $1 init_t:unix_stream_socket ioctl;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to read/write to
++##	init with a unix domain stream sockets.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_rw_stream_sockets',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:unix_stream_socket rw_stream_socket_perms;
++')
++
+ #######################################
+ ## <summary>
+-##      Create a file type used for systemd unit files.
++##  Allow the specified domain to write to
++##  init sock file.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`init_write_pid_socket',`
++    gen_require(`
++        type init_var_run_t;
++    ')
++
++    allow $1 init_var_run_t:sock_file write;
++')
++
++########################################
++## <summary>
++##	Send a message to init over a unix domain
++##	datagram socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_dgram_send',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:unix_dgram_socket sendto;
++')
++
++########################################
++## <summary>
++##	Send a message to init over a unix domain
++##	stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_stream_send',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:unix_stream_socket sendto;
++')
++
++########################################
++## <summary>
++##	Create a file type used for init socket files.
+ ## </summary>
++## <desc>
++##	<p>
++##	This defines a type that init can create sock_file within for
++##	impersonation purposes
++##	</p>
++## </desc>
+ ## <param name="script_file">
+-##      <summary>
+-##      Type to be used for an unit file.
+-##      </summary>
++##	<summary>
++##	Type to be used for a sock file.
++##	</summary>
+ ## </param>
++## <infoflow type="none"/>
+ #
+-interface(`systemd_unit_file',`
+-	files_type($1)
++interface(`init_sock_file',`
++	gen_require(`
++		attribute init_sock_file_type;
++	')
++
++	typeattribute $1 init_sock_file_type;
++
++')
++
++########################################
++## <summary>
++##	Read init unnamed pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_read_pipes',`
++	gen_require(`
++		type init_var_run_t;
++	')
++
++	read_fifo_files_pattern($1, init_var_run_t, init_var_run_t)
++')
++
++########################################
++## <summary>
++##	Get the system status information from init
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_status',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:system status;
++')
++
++########################################
++## <summary>
++##	Tell init to reboot the system.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_reboot',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:system reboot;
++')
++
++########################################
++## <summary>
++##	Tell init to halt the system.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_halt',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:system halt;
++')
++
++########################################
++## <summary>
++##	Tell init to do an unknown access.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`init_undefined',`
++	gen_require(`
++		type init_t;
++	')
++
++	allow $1 init_t:system undefined;
+ ')
+ 
+ ########################################
+@@ -1872,3 +2538,21 @@ interface(`init_shell_domtrans',`
+ 	allow $1 init_t:fifo_file rw_file_perms;
+ 	allow $1 init_t:process sigchld;
+ ')
++
++########################################
++## <summary>
++##      Allow getting service status of initrc_exec_t scripts
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Target domain
++##      </summary>
++## </param>
++#
++interface(`initrc_service_status',`
++	gen_require(`
++		type initrc_exec_t;
++	')
++
++	allow $1 initrc_exec_t:service status;
++')
+Index: refpolicy-2.20140421/policy/modules/system/init.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/init.te
++++ refpolicy-2.20140421/policy/modules/system/init.te
+@@ -16,12 +16,37 @@ gen_require(`
+ ## </desc>
+ gen_tunable(init_upstart, false)
+ 
++## <desc>
++## <p>
++## Enable support for systemd as the init program.
++## </p>
++## </desc>
++gen_tunable(init_systemd, true)
++
++## <desc>
++## <p>
++## Allow all daemons the ability to read/write terminals
++## </p>
++## </desc>
++gen_tunable(allow_daemons_use_tty, false)
++
++## <desc>
++## <p>
++## Allow all daemons to write corefiles to /
++## </p>
++## </desc>
++gen_tunable(allow_daemons_dump_core, false)
++
+ attribute init_script_domain_type;
+ attribute init_script_file_type;
+ attribute init_run_all_scripts_domain;
++attribute initrc_transition_domain;
++# Attribute used for systemd so domains can allow systemd to create sock_files
++attribute init_sock_file_type;
+ 
+ # Mark process types as daemons
+ attribute daemon;
++attribute systemprocess;
+ 
+ # Mark file type as a daemon run directory
+ attribute daemonrundir;
+@@ -29,7 +54,7 @@ attribute daemonrundir;
+ #
+ # init_t is the domain of the init process.
+ #
+-type init_t;
++type init_t, initrc_transition_domain;
+ type init_exec_t;
+ domain_type(init_t)
+ domain_entry_file(init_t, init_exec_t)
+@@ -93,6 +118,7 @@ ifdef(`enable_mls',`
+ 
+ # Use capabilities. old rule:
+ allow init_t self:capability ~sys_module;
++allow init_t self:capability2 block_suspend;
+ # is ~sys_module really needed? observed:
+ # sys_boot
+ # sys_tty_config
+@@ -154,7 +180,7 @@ mcs_killall(init_t)
+ 
+ mls_file_read_all_levels(init_t)
+ mls_file_write_all_levels(init_t)
+-mls_process_write_down(init_t)
++mls_process_write_all_levels(init_t)
+ mls_fd_use_all_levels(init_t)
+ 
+ selinux_set_all_booleans(init_t)
+@@ -192,7 +218,7 @@ ifdef(`distro_redhat',`
+ 	fs_tmpfs_filetrans(init_t, initctl_t, fifo_file)
+ ')
+ 
+-tunable_policy(`init_upstart',`
++tunable_policy(`init_upstart || init_systemd',`
+ 	corecmd_shell_domtrans(init_t, initrc_t)
+ ')
+ 
+@@ -213,6 +239,17 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	udev_read_db(init_t)
++	udev_relabelto_db(init_t)
++	udev_create_kobject_uevent_socket(init_t)
++')
++
++#optional_policy(`
++#	xserver_relabel_xdm_tmp_dirs(init_t)
++#	xserver_manage_xdm_tmp_dirs(init_t)
++#')
++
++optional_policy(`
+ 	unconfined_domain(init_t)
+ ')
+ 
+@@ -261,6 +298,7 @@ manage_files_pattern(initrc_t, initrc_tm
+ manage_dirs_pattern(initrc_t, initrc_tmp_t, initrc_tmp_t)
+ manage_lnk_files_pattern(initrc_t, initrc_tmp_t, initrc_tmp_t)
+ files_tmp_filetrans(initrc_t, initrc_tmp_t, { file dir })
++allow initrc_t initrc_tmp_t:dir relabelfrom;
+ 
+ manage_dirs_pattern(initrc_t, initrc_var_log_t, initrc_var_log_t)
+ manage_files_pattern(initrc_t, initrc_var_log_t, initrc_var_log_t)
+@@ -303,6 +341,7 @@ corenet_sendrecv_all_client_packets(init
+ 
+ dev_read_rand(initrc_t)
+ dev_read_urand(initrc_t)
++dev_dontaudit_read_kmsg(initrc_t)
+ dev_write_kmsg(initrc_t)
+ dev_write_rand(initrc_t)
+ dev_write_urand(initrc_t)
+@@ -313,8 +352,10 @@ dev_write_framebuffer(initrc_t)
+ dev_read_realtime_clock(initrc_t)
+ dev_read_sound_mixer(initrc_t)
+ dev_write_sound_mixer(initrc_t)
++dev_setattr_generic_dirs(initrc_t)
+ dev_setattr_all_chr_files(initrc_t)
+ dev_rw_lvm_control(initrc_t)
++dev_rw_generic_chr_files(initrc_t)
+ dev_delete_lvm_control_dev(initrc_t)
+ dev_manage_generic_symlinks(initrc_t)
+ dev_manage_generic_files(initrc_t)
+@@ -322,17 +363,16 @@ dev_manage_generic_files(initrc_t)
+ dev_delete_generic_symlinks(initrc_t)
+ dev_getattr_all_blk_files(initrc_t)
+ dev_getattr_all_chr_files(initrc_t)
+-# Early devtmpfs
+-dev_rw_generic_chr_files(initrc_t)
++dev_rw_xserver_misc(initrc_t)
+ 
+ domain_kill_all_domains(initrc_t)
+ domain_signal_all_domains(initrc_t)
+ domain_signull_all_domains(initrc_t)
+ domain_sigstop_all_domains(initrc_t)
++domain_sigstop_all_domains(initrc_t)
+ domain_sigchld_all_domains(initrc_t)
+ domain_read_all_domains_state(initrc_t)
+ domain_getattr_all_domains(initrc_t)
+-domain_dontaudit_ptrace_all_domains(initrc_t)
+ domain_getsession_all_domains(initrc_t)
+ domain_use_interactive_fds(initrc_t)
+ # for lsof which is used by alsa shutdown:
+@@ -340,6 +380,7 @@ domain_dontaudit_getattr_all_udp_sockets
+ domain_dontaudit_getattr_all_tcp_sockets(initrc_t)
+ domain_dontaudit_getattr_all_dgram_sockets(initrc_t)
+ domain_dontaudit_getattr_all_pipes(initrc_t)
++domain_obj_id_change_exemption(initrc_t)
+ 
+ files_getattr_all_dirs(initrc_t)
+ files_getattr_all_files(initrc_t)
+@@ -347,8 +388,10 @@ files_getattr_all_symlinks(initrc_t)
+ files_getattr_all_pipes(initrc_t)
+ files_getattr_all_sockets(initrc_t)
+ files_purge_tmp(initrc_t)
+-files_delete_all_locks(initrc_t)
++files_manage_all_locks(initrc_t)
++files_manage_boot_files(initrc_t)
+ files_read_all_pids(initrc_t)
++files_delete_root_files(initrc_t)
+ files_delete_all_pids(initrc_t)
+ files_delete_all_pid_dirs(initrc_t)
+ files_read_etc_files(initrc_t)
+@@ -362,8 +405,12 @@ files_manage_generic_spool(initrc_t)
+ # cjp: not sure why these are here; should use mount policy
+ files_list_default(initrc_t)
+ files_mounton_default(initrc_t)
++files_manage_mnt_dirs(initrc_t)
++files_manage_mnt_files(initrc_t)
+ 
+-fs_write_cgroup_files(initrc_t)
++fs_delete_cgroup_dirs(initrc_t)
++fs_list_cgroup_dirs(initrc_t)
++fs_rw_cgroup_files(initrc_t)
+ fs_list_inotifyfs(initrc_t)
+ fs_register_binary_executable_type(initrc_t)
+ # rhgb-console writes to ramfs
+@@ -373,18 +420,22 @@ fs_mount_all_fs(initrc_t)
+ fs_unmount_all_fs(initrc_t)
+ fs_remount_all_fs(initrc_t)
+ fs_getattr_all_fs(initrc_t)
++fs_search_all(initrc_t)
++fs_getattr_nfsd_files(initrc_t)
+ 
+ # initrc_t needs to do a pidof which requires ptrace
+-mcs_ptrace_all(initrc_t)
++mcs_file_read_all(initrc_t)
++mcs_file_write_all(initrc_t)
+ mcs_killall(initrc_t)
+ mcs_process_set_categories(initrc_t)
+ 
+ mls_file_read_all_levels(initrc_t)
+ mls_file_write_all_levels(initrc_t)
+-mls_process_read_up(initrc_t)
+-mls_process_write_down(initrc_t)
++mls_process_read_all_levels(initrc_t)
++mls_process_write_all_levels(initrc_t)
+ mls_rangetrans_source(initrc_t)
+ mls_fd_share_all_levels(initrc_t)
++mls_socket_write_to_clearance(initrc_t)
+ 
+ selinux_get_enforce_mode(initrc_t)
+ 
+@@ -416,7 +467,12 @@ logging_read_audit_config(initrc_t)
+ 
+ miscfiles_read_localization(initrc_t)
+ # slapd needs to read cert files from its initscript
+-miscfiles_read_generic_certs(initrc_t)
++miscfiles_manage_generic_cert_files(initrc_t)
++
++optional_policy(`
++	systemd_config_all_services(initrc_t)
++	init_status(initrc_t)
++')
+ 
+ optional_policy(`
+ 	modutils_read_module_config(initrc_t)
+@@ -429,7 +485,7 @@ userdom_read_user_home_content_files(ini
+ # Allow access to the sysadm TTYs. Note that this will give access to the
+ # TTYs to any process in the initrc_t domain. Therefore, daemons and such
+ # started from init should be placed in their own domain.
+-userdom_use_user_terminals(initrc_t)
++userdom_use_inherited_user_terminals(initrc_t)
+ 
+ ifdef(`distro_debian',`
+ 	kernel_getattr_core_if(initrc_t)
+@@ -487,7 +543,9 @@ ifdef(`distro_gentoo',`
+ 	files_mountpoint(initrc_state_t)
+ 
+ 	# init scripts touch this
+-	clock_dontaudit_write_adjtime(initrc_t)
++	optional_policy(`
++		clock_dontaudit_write_adjtime(initrc_t)
++	')
+ 
+ 	logging_send_audit_msgs(initrc_t)
+ 
+@@ -501,6 +559,10 @@ ifdef(`distro_gentoo',`
+ 	sysnet_setattr_config(initrc_t)
+ 
+ 	optional_policy(`
++		abrt_manage_pid_files(initrc_t)
++	')
++
++	optional_policy(`
+ 		alsa_read_lib(initrc_t)
+ 	')
+ 
+@@ -521,7 +583,7 @@ ifdef(`distro_redhat',`
+ 
+ 	# Red Hat systems seem to have a stray
+ 	# fd open from the initrd
+-	kernel_dontaudit_use_fds(initrc_t)
++	kernel_use_fds(initrc_t)
+ 	files_dontaudit_read_root_files(initrc_t)
+ 
+ 	# These seem to be from the initrd
+@@ -556,6 +618,7 @@ ifdef(`distro_redhat',`
+ 	miscfiles_rw_localization(initrc_t)
+ 	miscfiles_setattr_localization(initrc_t)
+ 	miscfiles_relabel_localization(initrc_t)
++	miscfiles_filetrans_named_content(initrc_t)
+ 
+ 	miscfiles_read_fonts(initrc_t)
+ 	miscfiles_read_hwdata(initrc_t)
+@@ -565,8 +628,35 @@ ifdef(`distro_redhat',`
+ 	')
+ 
+ 	optional_policy(`
++		abrt_manage_pid_files(initrc_t)
++	')
++
++	optional_policy(`
+ 		bind_manage_config_dirs(initrc_t)
++		bind_manage_config(initrc_t)
+ 		bind_write_config(initrc_t)
++		bind_setattr_zone_dirs(initrc_t)
++	')
++
++	optional_policy(`
++		devicekit_append_inherited_log_files(initrc_t)
++	')
++
++	optional_policy(`
++		dirsrvadmin_read_config(initrc_t)
++		dirsrv_manage_var_run(initrc_t)
++	')
++
++	optional_policy(`
++		gnome_manage_gconf_config(initrc_t)
++	')
++
++	optional_policy(`
++		ldap_read_db_files(initrc_t)
++	')
++
++	optional_policy(`
++		pulseaudio_stream_connect(initrc_t)
+ 	')
+ 
+ 	optional_policy(`
+@@ -574,14 +664,27 @@ ifdef(`distro_redhat',`
+ 		rpc_write_exports(initrc_t)
+ 		rpc_manage_nfs_state_data(initrc_t)
+ 	')
++	optional_policy(`
++		rpcbind_stream_connect(initrc_t)
++	')
+ 
+ 	optional_policy(`
+ 		sysnet_rw_dhcp_config(initrc_t)
+ 		sysnet_manage_config(initrc_t)
++		sysnet_manage_dhcpc_state(initrc_t)
++		sysnet_relabelfrom_dhcpc_state(initrc_t)
++		sysnet_relabelfrom_net_conf(initrc_t)
++		sysnet_relabelto_net_conf(initrc_t)
++		sysnet_filetrans_named_content(initrc_t)
++	')
++
++	optional_policy(`
++		wdmd_manage_pid_files(initrc_t)
+ 	')
+ 
+ 	optional_policy(`
+ 		xserver_delete_log(initrc_t)
++		xserver_manage_user_fonts_dir(initrc_t)
+ 	')
+ ')
+ 
+@@ -592,6 +695,32 @@ ifdef(`distro_suse',`
+ 	')
+ ')
+ 
++domain_dontaudit_use_interactive_fds(daemon)
++
++tunable_policy(`allow_daemons_use_tty',`
++	term_use_unallocated_ttys(daemon)
++	term_use_generic_ptys(daemon)
++	term_use_all_ttys(daemon)
++	term_use_all_ptys(daemon)
++',`
++	term_dontaudit_use_unallocated_ttys(daemon)
++	term_dontaudit_use_generic_ptys(daemon)
++	term_dontaudit_use_all_ttys(daemon)
++	term_dontaudit_use_all_ptys(daemon)
++ ')
++
++# system-config-services causes avc messages that should be dontaudited
++tunable_policy(`allow_daemons_dump_core',`
++	files_manage_root_files(daemon)
++')
++
++optional_policy(`
++	unconfined_dontaudit_rw_pipes(daemon)
++	unconfined_dontaudit_rw_stream(daemon)
++	userdom_dontaudit_read_user_tmp_files(daemon)
++	userdom_dontaudit_write_user_tmp_files(daemon)
++')
++
+ optional_policy(`
+ 	amavis_search_lib(initrc_t)
+ 	amavis_setattr_pid_files(initrc_t)
+@@ -604,6 +733,8 @@ optional_policy(`
+ optional_policy(`
+ 	apache_read_config(initrc_t)
+ 	apache_list_modules(initrc_t)
++	# webmin seems to cause this.
++	apache_search_sys_content(daemon)
+ ')
+ 
+ optional_policy(`
+@@ -625,6 +756,7 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	cgroup_stream_connect_cgred(initrc_t)
++	domain_setpriority_all_domains(initrc_t)
+ ')
+ 
+ optional_policy(`
+@@ -641,6 +773,12 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	cron_read_pipes(initrc_t)
++	# managing /etc/cron.d/mailman content
++	cron_manage_system_spool(initrc_t)
++')
++
++optional_policy(`
+ 	dev_getattr_printer_dev(initrc_t)
+ 
+ 	cups_read_log(initrc_t)
+@@ -657,9 +795,13 @@ optional_policy(`
+ 	dbus_connect_system_bus(initrc_t)
+ 	dbus_system_bus_client(initrc_t)
+ 	dbus_read_config(initrc_t)
++	dbus_manage_lib_files(initrc_t)
++
++	init_dbus_chat(initrc_t)
+ 
+ 	optional_policy(`
+ 		consolekit_dbus_chat(initrc_t)
++		consolekit_manage_log(initrc_t)
+ 	')
+ 
+ 	optional_policy(`
+@@ -701,6 +843,11 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	modutils_read_module_config(initrc_t)
++	modutils_domtrans_insmod(initrc_t)
++')
++
++optional_policy(`
+ 	inn_exec_config(initrc_t)
+ ')
+ 
+@@ -741,6 +888,7 @@ optional_policy(`
+ 	lpd_list_spool(initrc_t)
+ 
+ 	lpd_read_config(initrc_t)
++	lpd_manage_spool(init_t)
+ ')
+ 
+ optional_policy(`
+@@ -759,6 +907,7 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	mta_read_config(initrc_t)
++	mta_write_config(initrc_t)
+ 	mta_dontaudit_read_spool_symlinks(initrc_t)
+ ')
+ 
+@@ -781,6 +930,10 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
++	plymouthd_stream_connect(initrc_t)
++')
++
++optional_policy(`
+ 	postgresql_manage_db(initrc_t)
+ 	postgresql_read_config(initrc_t)
+ ')
+@@ -793,6 +946,7 @@ optional_policy(`
+ 	puppet_rw_tmp(initrc_t)
+ ')
+ 
++
+ optional_policy(`
+ 	quota_manage_flags(initrc_t)
+ ')
+@@ -823,8 +977,6 @@ optional_policy(`
+ 	# bash tries ioctl for some reason
+ 	files_dontaudit_ioctl_all_pids(initrc_t)
+ 
+-	# why is this needed:
+-	rpm_manage_db(initrc_t)
+ ')
+ 
+ optional_policy(`
+@@ -842,10 +994,12 @@ optional_policy(`
+ 	squid_manage_logs(initrc_t)
+ ')
+ 
++ifdef(`enabled_mls',`
+ optional_policy(`
+ 	# allow init scripts to su
+ 	su_restricted_domain_template(initrc, initrc_t, system_r)
+ ')
++')
+ 
+ optional_policy(`
+ 	ssh_dontaudit_read_server_keys(initrc_t)
+@@ -861,7 +1015,6 @@ optional_policy(`
+ ')
+ 
+ optional_policy(`
+-	udev_rw_db(initrc_t)
+ 	udev_manage_pid_files(initrc_t)
+ 	udev_manage_pid_dirs(initrc_t)
+ 	udev_manage_rules_files(initrc_t)
+@@ -878,6 +1031,10 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	unconfined_domain(initrc_t)
++	domain_role_change_exemption(initrc_t)
++	mcs_file_read_all(initrc_t)
++	mcs_file_write_all(initrc_t)
++	mcs_killall(initrc_t)
+ 
+ 	ifdef(`distro_redhat',`
+ 		# system-config-services causes avc messages that should be dontaudited
+@@ -887,6 +1044,15 @@ optional_policy(`
+ 	optional_policy(`
+ 		mono_domtrans(initrc_t)
+ 	')
++
++	optional_policy(`
++		rtkit_scheduled(initrc_t)
++	')
++')
++
++optional_policy(`
++	rpm_read_db(initrc_t)
++	rpm_delete_db(initrc_t)
+ ')
+ 
+ optional_policy(`
+@@ -912,3 +1078,268 @@ optional_policy(`
+ optional_policy(`
+ 	zebra_read_config(initrc_t)
+ ')
++
++userdom_dontaudit_rw_stream(daemon)
++
++logging_inherit_append_all_logs(daemon)
++
++optional_policy(`
++	# sudo service restart causes this
++	unconfined_signull(daemon)
++')
++
++
++optional_policy(`
++	tunable_policy(`use_nfs_home_dirs',`
++		fs_dontaudit_rw_nfs_files(daemon)
++	')
++	tunable_policy(`use_samba_home_dirs',`
++		fs_dontaudit_rw_cifs_files(daemon)
++	')
++')
++
++init_rw_script_stream_sockets(daemon)
++
++optional_policy(`
++	abrt_stream_connect(daemon)
++')
++
++optional_policy(`
++	fail2ban_read_lib_files(daemon)
++')
++
++init_rw_stream_sockets(daemon)
++
++allow init_t var_run_t:dir relabelto;
++
++init_stream_connect(initrc_t)
++
++allow initrc_t daemon:process siginh;
++allow daemon initrc_transition_domain:fifo_file rw_inherited_fifo_file_perms;
++allow daemon initrc_transition_domain:fd use;
++
++storage_raw_rw_fixed_disk(init_t)
++
++optional_policy(`
++	modutils_domtrans_insmod(init_t)
++')
++
++optional_policy(`
++	postfix_list_spool(init_t)
++	mta_read_aliases(init_t)
++')
++
++optional_policy(`
++	clock_read_adjtime(init_t)
++')
++
++tunable_policy(`init_systemd',`
++	allow init_t self:system { status reboot halt };
++
++	allow init_t self:unix_dgram_socket { create_socket_perms sendto };
++	allow init_t self:process { setsockcreate setfscreate setrlimit };
++	allow init_t self:process { getcap setcap };
++	allow init_t self:unix_stream_socket { create_stream_socket_perms connectto };
++	allow init_t self:netlink_kobject_uevent_socket create_socket_perms;
++	# Until systemd is fixed
++	allow daemon init_t:socket_class_set { getopt read getattr ioctl setopt write };
++	allow init_t self:udp_socket create_socket_perms;
++	allow init_t self:netlink_route_socket create_netlink_socket_perms;
++	allow init_t initrc_t:unix_dgram_socket create_socket_perms;
++
++	kernel_list_unlabeled(init_t)
++	kernel_read_network_state(init_t)
++	kernel_rw_kernel_sysctl(init_t)
++	kernel_rw_net_sysctls(init_t)
++	kernel_read_all_sysctls(init_t)
++	kernel_read_software_raid_state(init_t)
++	kernel_unmount_debugfs(init_t)
++	kernel_setsched(init_t)
++
++	dev_write_kmsg(init_t)
++	dev_write_urand(init_t)
++	dev_rw_lvm_control(init_t)
++	dev_rw_autofs(init_t)
++	dev_manage_generic_symlinks(init_t)
++	dev_manage_generic_dirs(init_t)
++	dev_manage_generic_files(init_t)
++	dev_read_generic_chr_files(init_t)
++	dev_relabel_generic_dev_dirs(init_t)
++	dev_relabel_all_dev_nodes(init_t)
++	dev_relabel_all_dev_files(init_t)
++	dev_manage_sysfs_dirs(init_t)
++	dev_relabel_sysfs_dirs(init_t)
++
++	files_search_all(init_t)
++	files_mounton_all_mountpoints(init_t)
++	files_unmount_all_file_type_fs(init_t)
++	files_manage_all_pid_dirs(init_t)
++	files_manage_generic_tmp_dirs(init_t)
++	files_relabel_all_pid_dirs(init_t)
++	files_relabel_all_pid_files(init_t)
++	files_create_all_pid_sockets(init_t)
++	files_delete_all_pids(init_t)
++	files_exec_generic_pid_files(init_t)
++	files_create_all_pid_pipes(init_t)
++	files_create_all_spool_sockets(init_t)
++	files_delete_all_spool_sockets(init_t)
++	files_manage_urandom_seed(init_t)
++	files_list_locks(init_t)
++	files_list_spool(init_t)
++	files_list_var(init_t)
++	files_create_lock_dirs(init_t)
++	files_relabel_all_lock_dirs(init_t)
++
++	fs_getattr_all_fs(init_t)
++	fs_manage_cgroup_dirs(init_t)
++	fs_manage_cgroup_files(init_t)
++	fs_manage_hugetlbfs_dirs(init_t)
++	fs_manage_tmpfs_dirs(init_t)
++	fs_relabel_tmpfs_dirs(init_t)
++	fs_relabel_tmpfs_files(init_t)
++	fs_mount_all_fs(init_t)
++	fs_unmount_all_fs(init_t)
++	fs_remount_all_fs(init_t)
++	fs_list_auto_mountpoints(init_t)
++	fs_relabel_cgroup_dirs(init_t)
++	fs_search_cgroup_dirs(daemon)
++
++	selinux_compute_create_context(init_t)
++	selinux_validate_context(init_t)
++	selinux_unmount_fs(init_t)
++
++	storage_getattr_removable_dev(init_t)
++
++	term_relabel_ptys_dirs(init_t)
++
++	auth_relabel_login_records(init_t)
++	auth_relabel_pam_console_data_dirs(init_t)
++
++	init_read_script_state(init_t)
++
++	seutil_read_file_contexts(init_t)
++
++	systemd_exec_systemctl(init_t)
++	systemd_manage_unit_dirs(init_t)
++	systemd_manage_all_unit_files(init_t)
++	systemd_logger_stream_connect(init_t)
++
++	create_sock_files_pattern(init_t, init_sock_file_type, init_sock_file_type)
++
++')
++auth_use_nsswitch(init_t)
++auth_rw_login_records(init_t)
++
++optional_policy(`
++	systemd_filetrans_named_content(init_t)
++')
++
++optional_policy(`
++	lvm_rw_pipes(init_t)
++')
++
++tunable_policy(`init_systemd',`
++	allow init_t daemon:unix_stream_socket create_stream_socket_perms;
++	allow init_t daemon:unix_dgram_socket create_socket_perms;
++	allow init_t daemon:tcp_socket create_stream_socket_perms;
++	allow init_t daemon:udp_socket create_socket_perms;
++	allow daemon init_t:unix_dgram_socket sendto;
++	# need write to /var/run/systemd/notify
++	init_write_pid_socket(daemon)
++	allow daemon init_t:unix_stream_socket { append write read getattr ioctl };
++')
++
++# daemons started from init will
++# inherit fds from init for the console
++init_dontaudit_use_fds(daemon)
++term_dontaudit_use_console(daemon)
++# init script ptys are the stdin/out/err
++# when using run_init
++init_use_script_ptys(daemon)
++
++allow init_t daemon:process siginh;
++
++ifdef(`hide_broken_symptoms',`
++	# RHEL4 systems seem to have a stray
++	# fds open from the initrd
++	ifdef(`distro_rhel4',`
++		kernel_dontaudit_use_fds(daemon)
++	')
++
++	dontaudit daemon init_t:dir search_dir_perms;
++')
++
++optional_policy(`
++	nscd_socket_use(daemon)
++')
++
++optional_policy(`
++	puppet_rw_tmp(daemon)
++')
++
++allow initrc_t systemprocess:process siginh;
++allow systemprocess initrc_transition_domain:fifo_file rw_inherited_fifo_file_perms;
++allow systemprocess initrc_transition_domain:fd use;
++
++dontaudit systemprocess init_t:unix_stream_socket getattr;
++
++
++tunable_policy(`init_systemd',`
++	# Handle upstart/systemd direct transition to a executable
++	allow init_t systemprocess:process { dyntransition siginh };
++	allow init_t systemprocess:unix_stream_socket create_stream_socket_perms;
++	allow init_t systemprocess:unix_dgram_socket create_socket_perms;
++	allow systemprocess init_t:unix_dgram_socket sendto;
++	allow systemprocess init_t:unix_stream_socket { append write read getattr ioctl };
++')
++
++ifdef(`hide_broken_symptoms',`
++	# RHEL4 systems seem to have a stray
++	# fds open from the initrd
++	ifdef(`distro_rhel4',`
++		kernel_dontaudit_use_fds(systemprocess)
++	')
++')
++
++userdom_dontaudit_search_user_home_dirs(systemprocess)
++userdom_dontaudit_rw_stream(systemprocess)
++userdom_dontaudit_write_user_tmp_files(systemprocess)
++
++tunable_policy(`allow_daemons_use_tty',`
++   term_use_all_ttys(systemprocess)
++   term_use_all_ptys(systemprocess)
++',`
++   term_dontaudit_use_all_ttys(systemprocess)
++   term_dontaudit_use_all_ptys(systemprocess)
++')
++
++# these apps are often redirect output to random log files
++logging_inherit_append_all_logs(systemprocess)
++
++optional_policy(`
++	abrt_stream_connect(systemprocess)
++')
++
++optional_policy(`
++	cron_rw_pipes(systemprocess)
++')
++
++optional_policy(`
++	puppet_rw_tmp(systemprocess)
++')
++
++optional_policy(`
++	unconfined_dontaudit_rw_pipes(systemprocess)
++	unconfined_dontaudit_rw_stream(systemprocess)
++	userdom_dontaudit_read_user_tmp_files(systemprocess)
++')
++
++init_rw_script_stream_sockets(systemprocess)
++
++role system_r types systemprocess;
++role system_r types daemon;
++
++#ifdef(`enable_mls',`
++#	mls_rangetrans_target(systemprocess)
++#')
++
+Index: refpolicy-2.20140421/policy/modules/system/logging.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.fc
++++ refpolicy-2.20140421/policy/modules/system/logging.fc
+@@ -70,6 +70,7 @@ ifdef(`distro_redhat',`
+ /var/run/syslog-ng.ctl	--	gen_context(system_u:object_r:syslogd_var_run_t,s0)
+ /var/run/syslog-ng\.pid	--	gen_context(system_u:object_r:syslogd_var_run_t,mls_systemhigh)
+ /var/run/syslog-ng(/.*)?	gen_context(system_u:object_r:syslogd_var_run_t,s0)
++/var/run/systemd/journal/syslog	-s	gen_context(system_u:object_r:devlog_t,mls_systemhigh)
+ 
+ /var/spool/audit(/.*)?		gen_context(system_u:object_r:audit_spool_t,mls_systemhigh)
+ /var/spool/bacula/log(/.*)? 	gen_context(system_u:object_r:var_log_t,s0)
+@@ -78,3 +79,20 @@ ifdef(`distro_redhat',`
+ /var/spool/rsyslog(/.*)? 	gen_context(system_u:object_r:var_log_t,s0)
+ 
+ /var/tinydns/log/main(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
++
++/lib/systemd/systemd-journald		--	gen_context(system_u:object_r:syslogd_exec_t,s0)
++/lib/systemd/systemd-kmsg-syslogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
++
++/opt/zimbra/log(/.*)?		gen_context(system_u:object_r:var_log_t,s0)
++/opt/Symantec/scspagent/IDS/system(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
++
++/usr/lib/systemd/systemd-journald		--	gen_context(system_u:object_r:syslogd_exec_t,s0)
++/usr/lib/systemd/systemd-kmsg-syslogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
++
++/usr/local/centreon/log(/.*)?	gen_context(system_u:object_r:var_log_t,s0)
++
++/usr/sbin/audispd	--	gen_context(system_u:object_r:audisp_exec_t,s0)
++/usr/sbin/audisp-remote	--	gen_context(system_u:object_r:audisp_remote_exec_t,s0)
++/usr/sbin/auditctl	--	gen_context(system_u:object_r:auditctl_exec_t,s0)
++/usr/sbin/auditd	--	gen_context(system_u:object_r:auditd_exec_t,s0)
++/usr/sbin/minilogd	--	gen_context(system_u:object_r:syslogd_exec_t,s0)
+Index: refpolicy-2.20140421/policy/modules/system/miscfiles.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/miscfiles.te
++++ refpolicy-2.20140421/policy/modules/system/miscfiles.te
+@@ -40,6 +40,9 @@ files_type(locale_t)
+ #
+ type man_t alias catman_t;
+ files_type(man_t)
++optional_policy(`
++	systemd_tmpfiles_manage_object(man_t, dir)
++')
+ 
+ type man_cache_t;
+ files_type(man_cache_t)
+Index: refpolicy-2.20140421/policy/modules/system/systemd.if
+===================================================================
+--- /dev/null
++++ refpolicy-2.20140421/policy/modules/system/systemd.if
+@@ -0,0 +1,719 @@
++## <summary>SELinux policy for systemd components</summary>
++
++#######################################
++## <summary>
++##      Create a domain for processes which are started
++##      exuting systemctl.
++## </summary>
++## <param name="domain_prefix">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_systemctl_domain',`
++        gen_require(`
++                type systemd_systemctl_exec_t;
++                role system_r;
++		attribute systemctl_domain;
++        ')
++
++	type $1_systemctl_t, systemctl_domain;
++	domain_type($1_systemctl_t)
++	domain_entry_file($1_systemctl_t, systemd_systemctl_exec_t)
++
++	role system_r types $1_systemctl_t;
++
++	domtrans_pattern($1_t, systemd_systemctl_exec_t , $1_systemctl_t)
++')
++
++########################################
++## <summary>
++##      Execute systemctl in the caller domain.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_exec_systemctl',`
++        gen_require(`
++                type systemd_systemctl_exec_t;
++        ')
++
++	corecmd_search_bin($1)
++	can_exec($1, systemd_systemctl_exec_t)
++
++	fs_list_cgroup_dirs($1)
++	fs_read_cgroup_files($1)
++	systemd_list_unit_dirs($1)
++	init_list_pid_dirs($1)
++	init_read_state($1)
++	init_stream_send($1)
++	init_stream_connect($1)
++
++	systemd_login_list_pid_dirs($1)
++	systemd_login_read_pid_files($1)
++')
++
++#######################################
++## <summary>
++##      Create a file type used for systemd unit files.
++## </summary>
++## <param name="script_file">
++##      <summary>
++##      Type to be used for an unit file.
++##      </summary>
++## </param>
++#
++interface(`systemd_unit_file',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++        typeattribute $1 systemd_unit_file_type;
++	files_type($1)
++')
++
++######################################
++## <summary>
++##      Allow domain to search systemd unit dirs.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_search_unit_dirs',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++	files_search_var_lib($1)
++	allow $1 systemd_unit_file_type:dir search_dir_perms;
++')
++
++######################################
++## <summary>
++##      Allow domain to list systemd unit dirs.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_list_unit_dirs',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++	files_search_var_lib($1)
++	allow $1 systemd_unit_file_type:dir list_dir_perms;
++')
++
++#####################################
++## <summary>
++##      Allow domain to getattr all systemd unit files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_getattr_unit_files',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++    files_search_var_lib($1)
++    allow $1 systemd_unit_file_type:file getattr_file_perms;
++')
++
++######################################
++## <summary>
++##      Allow domain to read all systemd unit files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`systemd_read_unit_files',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++	files_search_var_lib($1)
++	allow $1 systemd_unit_file_type:file read_file_perms;
++	allow $1 systemd_unit_file_type:lnk_file read_lnk_file_perms;
++	allow $1 systemd_unit_file_type:dir list_dir_perms;
++')
++
++#####################################
++## <summary>
++##      Dontaudit domain to read all systemd unit files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##	Domain to not audit.
++##      </summary>
++## </param>
++#
++interface(`systemd_dontaudit_read_unit_files',`
++        gen_require(`
++                attribute systemd_unit_file_type;
++        ')
++
++        dontaudit $1 systemd_unit_file_type:file read_file_perms;
++')
++
++######################################
++## <summary>
++##	Read systemd_login PID files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_read_pid_files',`
++	gen_require(`
++		type systemd_logind_var_run_t;
++	')
++
++	files_search_pids($1)
++	read_files_pattern($1, systemd_logind_var_run_t, systemd_logind_var_run_t)
++')
++
++######################################
++## <summary>
++##	Read systemd_login PID files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_list_pid_dirs',`
++	gen_require(`
++		type systemd_logind_var_run_t;
++	')
++
++	files_search_pids($1)
++	list_dirs_pattern($1, systemd_logind_var_run_t, systemd_logind_var_run_t)
++')
++
++######################################
++## <summary>
++##	Use and and inherited systemd
++##	logind file descriptors.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_use_fds_logind',`
++	gen_require(`
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:fd use;
++')
++
++######################################
++## <summary>
++##	Read logind sessions files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_read_logind_sessions_files',`
++	gen_require(`
++		type systemd_logind_sessions_t;
++	')
++
++	init_search_pid_dirs($1)
++	allow $1 systemd_logind_sessions_t:dir list_dir_perms;
++	read_files_pattern($1, systemd_logind_sessions_t, systemd_logind_sessions_t)
++')
++
++######################################
++## <summary>
++##	Write inherited logind sessions pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_write_inherited_logind_sessions_pipes',`
++	gen_require(`
++		type systemd_logind_t, systemd_logind_sessions_t;
++	')
++
++	allow $1 systemd_logind_t:fd use;
++	allow $1 systemd_logind_sessions_t:fifo_file write;
++	allow systemd_logind_t $1:process signal;
++')
++
++########################################
++## <summary>
++##	Send and receive messages from
++##	systemd logind over dbus.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_dbus_chat_logind',`
++	gen_require(`
++		type systemd_logind_t;
++		class dbus send_msg;
++	')
++
++	allow $1 systemd_logind_t:dbus send_msg;
++	allow systemd_logind_t $1:dbus send_msg;
++	ps_process_pattern(systemd_logind_t, $1)
++	allow systemd_logind_t $1:process signal;
++')
++
++#######################################
++## <summary>
++##  Execute a domain transition to run systemd-tmpfiles.
++## </summary>
++## <param name="domain">
++## <summary>
++##  Domain allowed access.
++## </summary>
++## </param>
++#
++interface(`systemd_tmpfiles_domtrans',`
++    gen_require(`
++        type systemd_tmpfiles_t, systemd_tmpfiles_exec_t;
++    ')
++
++    domtrans_pattern($1, systemd_tmpfiles_exec_t, systemd_tmpfiles_t)
++')
++
++#######################################
++## <summary>
++##  Allow systemd_tmpfiles_t to manage filesystem objects
++## </summary>
++## <param name="type">
++## <summary>
++##  type of object to manage
++## </summary>
++## </param>
++## <param name="class">
++## <summary>
++##  object class to manage
++## </summary>
++## </param>
++#
++interface(`systemd_tmpfiles_manage_object',`
++    gen_require(`
++        type systemd_tmpfiles_t;
++    ')
++
++    allow systemd_tmpfiles_t $1:$2 { setattr relabelfrom relabelto create };
++')
++
++########################################
++## <summary>
++##	Execute a domain transition to run systemd-tty-ask-password-agent.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed access.
++## </summary>
++## </param>
++#
++interface(`systemd_passwd_agent_domtrans',`
++	gen_require(`
++		type systemd_passwd_agent_t, systemd_passwd_agent_exec_t;
++	')
++
++	domtrans_pattern($1, systemd_passwd_agent_exec_t, systemd_passwd_agent_t)
++')
++
++#######################################
++## <summary>
++##  Execute systemd-tty-ask-password-agent in the caller domain
++## </summary>
++## <param name="domain">
++## <summary>
++##  Domain allowed access.
++## </summary>
++## </param>
++#
++interface(`systemd_passwd_agent_exec',`
++    gen_require(`
++        type systemd_passwd_agent_t, systemd_passwd_agent_exec_t;
++    ')
++
++	can_exec($1, systemd_passwd_agent_exec_t)
++')
++
++########################################
++## <summary>
++##	Execute a domain transition to run systemd_notify.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed access.
++## </summary>
++## </param>
++#
++interface(`systemd_notify_domtrans',`
++	gen_require(`
++		type systemd_notify_t, systemd_notify_exec_t;
++	')
++
++	domtrans_pattern($1, systemd_notify_exec_t, systemd_notify_t)
++')
++
++########################################
++## <summary>
++##	Execute systemd-tty-ask-password-agent in the systemd_passwd_agent domain, and
++##	allow the specified role the systemd_passwd_agent domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	The role to be allowed the systemd_passwd_agent domain.
++##	</summary>
++## </param>
++#
++interface(`systemd_passwd_agent_run',`
++	gen_require(`
++		type systemd_passwd_agent_t;
++	')
++
++	systemd_passwd_agent_domtrans($1)
++	role $2 types systemd_passwd_agent_t;
++')
++
++########################################
++## <summary>
++##	Role access for systemd_passwd_agent
++## </summary>
++## <param name="role">
++##	<summary>
++##	Role allowed access
++##	</summary>
++## </param>
++## <param name="domain">
++##	<summary>
++##	User domain for the role
++##	</summary>
++## </param>
++#
++interface(`systemd_passwd_agent_role',`
++	gen_require(`
++              type systemd_passwd_agent_t;
++	')
++
++	role $1 types systemd_passwd_agent_t;
++
++	systemd_passwd_agent_domtrans($2)
++
++	ps_process_pattern($2, systemd_passwd_agent_t)
++	allow $2 systemd_passwd_agent_t:process signal;
++')
++
++########################################
++## <summary>
++##	Send generic signals to systemd_passwd_agent processes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_signal_passwd_agent',`
++	gen_require(`
++              type systemd_passwd_agent_t;
++	')
++
++	allow $1 systemd_passwd_agent_t:process signal;
++')
++
++######################################
++## <summary>
++##  Allow to domain to read systemd-passwd pipe
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`systemd_read_fifo_file_passwd_run',`
++    gen_require(`
++        type systemd_passwd_var_run_t;
++    ')
++
++    read_sock_files_pattern($1, systemd_passwd_var_run_t, systemd_passwd_var_run_t)
++')
++
++#######################################
++## <summary>
++##  Send generic signals to systemd_passwd_agent processes.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`systemd_manage_passwd_run',`
++	gen_require(`
++		type systemd_passwd_agent_t;
++		type systemd_passwd_var_run_t;
++	')
++
++	manage_files_pattern($1, systemd_passwd_var_run_t, systemd_passwd_var_run_t)
++	manage_sock_files_pattern($1, systemd_passwd_var_run_t, systemd_passwd_var_run_t)
++
++	allow systemd_passwd_agent_t $1:process signull;
++	allow systemd_passwd_agent_t $1:unix_dgram_socket sendto;
++')
++
++######################################
++## <summary>
++##  Template for temporary sockets and files in /dev/.systemd/ask-password
++##  which are used by systemd-passwd-agent
++## </summary>
++## <param name="userdomain_prefix">
++##  <summary>
++##  The prefix of the domain (e.g., user
++##  is the prefix for user_t).
++##  </summary>
++## </param>
++#
++interface(`systemd_passwd_agent_dev_template',`
++        gen_require(`
++                type systemd_passwd_agent_t;
++        ')
++
++	type systemd_$1_device_t;
++        files_type(systemd_$1_device_t)
++        dev_associate(systemd_$1_device_t)
++
++	dev_filetrans($1_t, systemd_$1_device_t, { file sock_file })
++	init_pid_filetrans($1_t, systemd_$1_device_t, { file sock_file })
++        allow $1_t systemd_$1_device_t:file manage_file_perms;
++        allow $1_t systemd_$1_device_t:sock_file manage_sock_file_perms;
++
++	allow systemd_passwd_agent_t $1_t:process signull;
++        allow systemd_passwd_agent_t $1_t:unix_dgram_socket sendto;
++	allow systemd_passwd_agent_t systemd_$1_device_t:sock_file write;
++        allow systemd_passwd_agent_t systemd_$1_device_t:file read_file_perms;
++')
++
++########################################
++## <summary>
++##	Allow the specified domain to connect to
++##	systemd_logger with a unix socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_logger_stream_connect',`
++	gen_require(`
++		type systemd_logger_t;
++	')
++
++	allow $1 systemd_logger_t:unix_stream_socket connectto;
++')
++
++########################################
++## <summary>
++##	manage systemd unit dirs
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_manage_unit_dirs',`
++	gen_require(`
++		attribute systemd_unit_file_type;
++	')
++
++	manage_dirs_pattern($1, systemd_unit_file_type, systemd_unit_file_type)
++')
++
++########################################
++## <summary>
++##	manage all systemd unit files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_manage_all_unit_files',`
++	gen_require(`
++		attribute systemd_unit_file_type;
++	')
++
++	manage_files_pattern($1, systemd_unit_file_type, systemd_unit_file_type)
++	manage_lnk_files_pattern($1, systemd_unit_file_type, systemd_unit_file_type)
++')
++
++########################################
++## <summary>
++##	manage all systemd unit lnk_files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_manage_all_unit_lnk_files',`
++	gen_require(`
++		attribute systemd_unit_file_type;
++	')
++
++	manage_lnk_files_pattern($1, systemd_unit_file_type, systemd_unit_file_type)
++')
++
++
++########################################
++## <summary>
++##	Allow the specified domain to access all service perms
++##	for all unit files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_config_all_services',`
++	gen_require(`
++		attribute systemd_unit_file_type;
++	')
++
++	allow $1 systemd_unit_file_type:service all_service_perms;
++')
++
++
++########################################
++## <summary>
++##	Transition to systemd named content
++## </summary>
++## <param name="domain">
++##	<summary>
++##      Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_filetrans_named_content',`
++	gen_require(`
++		type systemd_passwd_var_run_t;
++	')
++
++	init_named_pid_filetrans($1, systemd_passwd_var_run_t, dir, "ask-password-block")
++	init_named_pid_filetrans($1, systemd_passwd_var_run_t, dir, "ask-password")
++')
++
++########################################
++## <summary>
++##	Get the system status information from systemd_login
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_status',`
++	gen_require(`
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:system status;
++')
++
++########################################
++## <summary>
++##	Tell systemd_login to reboot the system.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_reboot',`
++	gen_require(`
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:system reboot;
++')
++
++########################################
++## <summary>
++##	Tell systemd_login to halt the system.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_halt',`
++	gen_require(`
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:system halt;
++')
++
++########################################
++## <summary>
++##	Tell systemd_login to do an unknown access.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_login_undefined',`
++	gen_require(`
++		type systemd_logind_t;
++	')
++
++	allow $1 systemd_logind_t:system undefined;
++')
++
+Index: refpolicy-2.20140421/policy/modules/system/systemd.fc
+===================================================================
+--- /dev/null
++++ refpolicy-2.20140421/policy/modules/system/systemd.fc
+@@ -0,0 +1,29 @@
++/bin/systemd-notify				--		gen_context(system_u:object_r:systemd_notify_exec_t,s0)
++/bin/systemctl					--	gen_context(system_u:object_r:systemd_systemctl_exec_t,s0)
++/bin/systemd-tty-ask-password-agent		--		gen_context(system_u:object_r:systemd_passwd_agent_exec_t,s0)
++/bin/systemd-tmpfiles				--		gen_context(system_u:object_r:systemd_tmpfiles_exec_t,s0)
++
++/usr/bin/systemctl				--	gen_context(system_u:object_r:systemd_systemctl_exec_t,s0)
++/usr/bin/systemd-gnome-ask-password-agent	--		gen_context(system_u:object_r:systemd_passwd_agent_exec_t,s0)
++/usr/bin/systemd-notify				--		gen_context(system_u:object_r:systemd_notify_exec_t,s0)
++/usr/bin/systemd-tmpfiles			--		gen_context(system_u:object_r:systemd_tmpfiles_exec_t,s0)
++/usr/bin/systemd-tty-ask-password-agent		--		gen_context(system_u:object_r:systemd_passwd_agent_exec_t,s0)
++
++
++/lib/systemd/system(/.*)?		gen_context(system_u:object_r:systemd_unit_file_t,s0)
++/lib/systemd/systemd-logind	--	gen_context(system_u:object_r:systemd_logind_exec_t,s0)
++/lib/systemd/systemd-logger	--	gen_context(system_u:object_r:systemd_logger_exec_t,s0)
++/lib/systemd/systemd-tmpfiles				--		gen_context(system_u:object_r:systemd_tmpfiles_exec_t,s0)
++
++/usr/lib/systemd/system(/.*)?		gen_context(system_u:object_r:systemd_unit_file_t,s0)
++/usr/lib/systemd/systemd-logind	--	gen_context(system_u:object_r:systemd_logind_exec_t,s0)
++/usr/lib/systemd/systemd-logger	--	gen_context(system_u:object_r:systemd_logger_exec_t,s0)
++/usr/lib/systemd/systemd-tmpfiles				--		gen_context(system_u:object_r:systemd_tmpfiles_exec_t,s0)
++
++/var/run/systemd/seats(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
++/var/run/systemd/sessions(/.*)?	gen_context(system_u:object_r:systemd_logind_sessions_t,s0)
++/var/run/systemd/users(/.*)?	gen_context(system_u:object_r:systemd_logind_var_run_t,s0)
++/var/run/systemd/ask-password-block(/.*)?	gen_context(system_u:object_r:systemd_passwd_var_run_t,s0)
++/var/run/systemd/generator(/.*)?	gen_context(system_u:object_r:systemd_passwd_var_run_t,s0)
++/var/run/systemd/ask-password(/.*)?	gen_context(system_u:object_r:systemd_passwd_var_run_t,s0)
++/var/run/initramfs(/.*)?	<<none>>
+Index: refpolicy-2.20140421/policy/modules/system/systemd.te
+===================================================================
+--- /dev/null
++++ refpolicy-2.20140421/policy/modules/system/systemd.te
+@@ -0,0 +1,416 @@
++policy_module(systemd, 1.0.0)
++
++#######################################
++#
++# Declarations
++#
++
++attribute systemd_unit_file_type;
++attribute systemd_domain;
++attribute systemctl_domain;
++
++type systemd_logger_t;
++type systemd_logger_exec_t;
++init_systemd_domain(systemd_logger_t, systemd_logger_exec_t)
++
++type systemd_logind_t;
++type systemd_logind_exec_t;
++init_systemd_domain(systemd_logind_t, systemd_logind_exec_t)
++
++# /run/systemd/sessions
++type systemd_logind_sessions_t;
++files_pid_file(systemd_logind_sessions_t)
++
++# /run/systemd/{seats, users}
++type systemd_logind_var_run_t;
++files_pid_file(systemd_logind_var_run_t)
++
++# domain for systemd-tty-ask-password-agent and systemd-gnome-ask-password-agent
++# systemd components
++
++type systemd_passwd_agent_t;
++type systemd_passwd_agent_exec_t;
++init_daemon_domain(systemd_passwd_agent_t, systemd_passwd_agent_exec_t)
++
++type systemd_passwd_var_run_t alias systemd_device_t;
++files_pid_file(systemd_passwd_var_run_t)
++
++# domain for systemd-tmpfiles component
++type systemd_tmpfiles_t;
++type systemd_tmpfiles_exec_t;
++init_systemd_domain(systemd_tmpfiles_t, systemd_tmpfiles_exec_t)
++
++type systemd_notify_t;
++type systemd_notify_exec_t;
++init_systemd_domain(systemd_notify_t, systemd_notify_exec_t)
++
++# type for systemd unit files
++type systemd_unit_file_t;
++systemd_unit_file(systemd_unit_file_t)
++allow init_t systemd_unit_file_t:service { stop start status };
++
++# executable for systemctl
++type systemd_systemctl_exec_t;
++corecmd_executable_file(systemd_systemctl_exec_t)
++
++#######################################
++#
++# Systemd_logind local policy
++#
++
++# dac_override is for /run/user/$USER ($USER ownership is $USER:$USER)
++allow systemd_logind_t self:capability { chown kill dac_override fowner sys_tty_config };
++allow systemd_logind_t self:process getcap;
++allow systemd_logind_t self:netlink_kobject_uevent_socket create_socket_perms;
++allow systemd_logind_t self:unix_dgram_socket create_socket_perms;
++
++manage_dirs_pattern(systemd_logind_t, { systemd_logind_sessions_t systemd_logind_var_run_t }, { systemd_logind_sessions_t systemd_logind_var_run_t })
++manage_files_pattern(systemd_logind_t, { systemd_logind_sessions_t systemd_logind_var_run_t }, { systemd_logind_var_run_t systemd_logind_sessions_t })
++manage_fifo_files_pattern(systemd_logind_t, systemd_logind_sessions_t, { systemd_logind_sessions_t systemd_logind_var_run_t })
++init_pid_filetrans(systemd_logind_t, systemd_logind_var_run_t, dir)
++init_status(systemd_logind_t)
++init_reboot(systemd_logind_t)
++init_halt(systemd_logind_t)
++init_undefined(systemd_logind_t)
++
++kernel_read_system_state(systemd_logind_t)
++selinux_search_fs(systemd_logind_t)
++selinux_getattr_fs(systemd_logind_t)
++
++dev_getattr_all_chr_files(systemd_logind_t)
++dev_getattr_all_blk_files(systemd_logind_t)
++dev_rw_sysfs(systemd_logind_t)
++dev_setattr_all_chr_files(systemd_logind_t)
++dev_setattr_dri_dev(systemd_logind_t)
++dev_setattr_generic_usb_dev(systemd_logind_t)
++dev_setattr_input_dev(systemd_logind_t)
++dev_setattr_kvm_dev(systemd_logind_t)
++dev_setattr_mouse_dev(systemd_logind_t)
++dev_setattr_sound_dev(systemd_logind_t)
++dev_setattr_video_dev(systemd_logind_t)
++dev_write_kmsg(systemd_logind_t)
++dev_rw_input_dev(systemd_logind_t)
++
++domain_read_all_domains_state(systemd_logind_t)
++
++# /etc/udev/udev.conf should probably have a private type if only for confined administration
++# /etc/nsswitch.conf
++files_read_etc_files(systemd_logind_t)
++
++fs_getattr_xattr_fs(systemd_logind_t)
++# /sys/fs/cgroup/systemd/user
++fs_manage_cgroup_dirs(systemd_logind_t)
++# write getattr open setattr
++fs_manage_cgroup_files(systemd_logind_t)
++# for cpu link
++fs_read_cgroup_links(systemd_logind_t)
++
++mcs_killall(systemd_logind_t)
++
++storage_setattr_removable_dev(systemd_logind_t)
++storage_setattr_scsi_generic_dev(systemd_logind_t)
++
++term_use_unallocated_ttys(systemd_logind_t)
++
++# /run/user/.*
++# Actually only have proof of it creating dirs and symlinks (/run/user/$USER/X11/display)
++auth_manage_var_auth(systemd_logind_t)
++auth_use_nsswitch(systemd_logind_t)
++
++init_dbus_chat(systemd_logind_t)
++init_dbus_chat_script(systemd_logind_t)
++init_read_script_state(systemd_logind_t)
++init_read_state(systemd_logind_t)
++init_rw_stream_sockets(systemd_logind_t)
++
++logging_send_syslog_msg(systemd_logind_t)
++
++miscfiles_read_localization(systemd_logind_t)
++
++optional_policy(`
++	udev_read_db(systemd_logind_t)
++	udev_manage_rules_files(systemd_logind_t)
++	udev_list_table_dir(systemd_logind_t)
++	udev_manage_pid_dirs(systemd_logind_t)
++	udev_read_pid_files(systemd_logind_t)
++	# for systemd-udevd to run systemctl
++	udev_write_socket(init_t)
++')
++
++userdom_read_all_users_state(systemd_logind_t)
++userdom_use_user_ttys(systemd_logind_t)
++userdom_manage_user_tmp_dirs(systemd_logind_t)
++userdom_manage_user_tmp_files(systemd_logind_t)
++userdom_manage_user_tmp_symlinks(systemd_logind_t)
++userdom_manage_user_tmp_sockets(systemd_logind_t)
++userdom_signal_all_users(systemd_logind_t)
++userdom_signull_all_users(systemd_logind_t)
++userdom_kill_all_users(systemd_logind_t)
++
++application_signal(systemd_logind_t)
++application_signull(systemd_logind_t)
++application_sigkill(systemd_logind_t)
++
++optional_policy(`
++	cron_dbus_chat_crond(systemd_logind_t)
++	cron_read_state_crond(systemd_logind_t)
++	cron_signal(systemd_logind_t)
++')
++
++optional_policy(`
++	dbus_connect_system_bus(systemd_logind_t)
++	dbus_system_bus_client(systemd_logind_t)
++')
++
++optional_policy(`
++	devicekit_dbus_chat_power(systemd_logind_t)
++')
++
++#optional_policy(`
++#	# we label /run/user/$USER/dconf as config_home_t
++#	gnome_manage_home_config_dirs(systemd_logind_t)
++#	gnome_manage_home_config(systemd_logind_t)
++#')
++
++optional_policy(`
++	policykit_dbus_chat(systemd_logind_t)
++')
++
++
++#######################################
++#
++# Local policy
++#
++
++allow systemd_passwd_agent_t self:capability { chown sys_tty_config dac_override };
++allow systemd_passwd_agent_t self:process { setfscreate setsockcreate signal };
++allow systemd_passwd_agent_t self:unix_dgram_socket create_socket_perms;
++
++manage_dirs_pattern(systemd_passwd_agent_t, systemd_passwd_var_run_t, systemd_passwd_var_run_t);
++manage_files_pattern(systemd_passwd_agent_t, systemd_passwd_var_run_t, systemd_passwd_var_run_t);
++manage_sock_files_pattern(systemd_passwd_agent_t, systemd_passwd_var_run_t, systemd_passwd_var_run_t);
++manage_fifo_files_pattern(systemd_passwd_agent_t, systemd_passwd_var_run_t, systemd_passwd_var_run_t);
++init_pid_filetrans(systemd_passwd_agent_t, systemd_passwd_var_run_t, { dir fifo_file file })
++
++fs_getattr_xattr_fs(systemd_passwd_agent_t)
++kernel_read_system_state(systemd_passwd_agent_t)
++kernel_stream_connect(systemd_passwd_agent_t)
++
++files_read_etc_files(systemd_passwd_agent_t)
++
++dev_create_generic_dirs(systemd_passwd_agent_t)
++dev_read_generic_files(systemd_passwd_agent_t)
++dev_write_generic_sock_files(systemd_passwd_agent_t)
++
++term_read_console(systemd_passwd_agent_t)
++
++auth_use_nsswitch(systemd_passwd_agent_t)
++
++init_create_pid_dirs(systemd_passwd_agent_t)
++init_read_pipes(systemd_passwd_agent_t)
++init_read_utmp(systemd_passwd_agent_t)
++init_stream_connect(systemd_passwd_agent_t)
++
++miscfiles_read_localization(systemd_passwd_agent_t)
++
++userdom_use_user_ptys(systemd_passwd_agent_t)
++
++optional_policy(`
++	lvm_signull(systemd_passwd_agent_t)
++')
++
++optional_policy(`
++	plymouthd_stream_connect(systemd_passwd_agent_t)
++')
++
++#######################################
++#
++# Local policy
++#
++
++allow systemd_tmpfiles_t self:capability { chown dac_override fsetid fowner mknod };
++allow systemd_tmpfiles_t self:process { setfscreate };
++
++allow systemd_tmpfiles_t self:unix_dgram_socket create_socket_perms;
++
++kernel_read_network_state(systemd_tmpfiles_t)
++kernel_read_system_state(systemd_tmpfiles_t)
++
++dev_write_kmsg(systemd_tmpfiles_t)
++dev_relabel_all_sysfs(systemd_tmpfiles_t)
++dev_relabel_cpu_online(systemd_tmpfiles_t)
++dev_read_cpu_online(systemd_tmpfiles_t)
++dev_manage_printer(systemd_tmpfiles_t)
++dev_relabel_printer(systemd_tmpfiles_t)
++dev_create_generic_pipes(systemd_tmpfiles_t)
++
++domain_obj_id_change_exemption(systemd_tmpfiles_t)
++
++# systemd-tmpfiles relabel /run/lock and creates /run/lock/lockdev
++fs_manage_tmpfs_dirs(systemd_tmpfiles_t)
++fs_relabel_tmpfs_dirs(systemd_tmpfiles_t)
++fs_list_all(systemd_tmpfiles_t)
++fs_getattr_xattr_fs(systemd_tmpfiles_t)
++
++files_read_etc_files(systemd_tmpfiles_t)
++files_getattr_all_dirs(systemd_tmpfiles_t)
++files_getattr_all_files(systemd_tmpfiles_t)
++files_getattr_all_sockets(systemd_tmpfiles_t)
++files_getattr_all_symlinks(systemd_tmpfiles_t)
++files_relabel_all_lock_dirs(systemd_tmpfiles_t)
++files_relabel_all_pid_dirs(systemd_tmpfiles_t)
++files_relabel_all_pid_files(systemd_tmpfiles_t)
++files_manage_all_pids(systemd_tmpfiles_t)
++files_manage_all_pid_dirs(systemd_tmpfiles_t)
++files_manage_all_locks(systemd_tmpfiles_t)
++files_setattr_all_tmp_dirs(systemd_tmpfiles_t)
++files_delete_boot_flag(systemd_tmpfiles_t)
++files_delete_all_non_security_files(systemd_tmpfiles_t)
++files_delete_all_pid_sockets(systemd_tmpfiles_t)
++files_delete_all_pid_pipes(systemd_tmpfiles_t)
++files_purge_tmp(systemd_tmpfiles_t)
++files_manage_generic_tmp_files(systemd_tmpfiles_t)
++files_manage_generic_tmp_dirs(systemd_tmpfiles_t)
++files_relabelfrom_tmp_dirs(systemd_tmpfiles_t)
++files_relabelfrom_tmp_files(systemd_tmpfiles_t)
++files_relabel_all_tmp_dirs(systemd_tmpfiles_t)
++files_relabel_all_tmp_files(systemd_tmpfiles_t)
++files_list_lost_found(systemd_tmpfiles_t)
++optional_policy(`
++	relabelto_setattr_xconsole_pipes(systemd_tmpfiles_t)
++')
++
++mcs_file_read_all(systemd_tmpfiles_t)
++mcs_file_write_all(systemd_tmpfiles_t)
++mls_file_read_all_levels(systemd_tmpfiles_t)
++mls_file_write_all_levels(systemd_tmpfiles_t)
++
++selinux_get_enforce_mode(systemd_tmpfiles_t)
++selinux_getattr_fs(systemd_tmpfiles_t)
++
++auth_manage_var_auth(systemd_tmpfiles_t)
++auth_append_faillog(systemd_tmpfiles_t)
++auth_relabel_login_records(systemd_tmpfiles_t)
++auth_setattr_login_records(systemd_tmpfiles_t)
++auth_use_nsswitch(systemd_tmpfiles_t)
++
++init_dgram_send(systemd_tmpfiles_t)
++init_rw_stream_sockets(systemd_tmpfiles_t)
++
++logging_create_devlog_dev(systemd_tmpfiles_t)
++logging_send_syslog_msg(systemd_tmpfiles_t)
++
++miscfiles_manage_man_pages(systemd_tmpfiles_t)
++miscfiles_relabel_man_cache(systemd_tmpfiles_t)
++miscfiles_read_localization(systemd_tmpfiles_t)
++
++seutil_read_config(systemd_tmpfiles_t)
++seutil_read_file_contexts(systemd_tmpfiles_t)
++
++ifdef(`distro_redhat',`
++	userdom_list_user_home_content(systemd_tmpfiles_t)
++	userdom_delete_all_user_home_content_dirs(systemd_tmpfiles_t)
++	userdom_delete_all_user_home_content_files(systemd_tmpfiles_t)
++	userdom_delete_all_user_home_content_sock_files(systemd_tmpfiles_t)
++	userdom_delete_all_user_home_content_symlinks(systemd_tmpfiles_t)
++	userdom_delete_admin_home_files(systemd_tmpfiles_t)
++')
++
++optional_policy(`
++	apache_list_cache(systemd_tmpfiles_t)
++	apache_delete_cache_files(systemd_tmpfiles_t)
++	apache_setattr_cache_dirs(systemd_tmpfiles_t)
++')
++
++
++optional_policy(`
++    auth_rw_login_records(systemd_tmpfiles_t)
++')
++
++#optional_policy(`
++#	# we have /run/user/$USER/dconf
++#	gnome_delete_home_config(systemd_tmpfiles_t)
++#	gnome_delete_home_config_dirs(systemd_tmpfiles_t)
++#	gnome_setattr_home_config_dirs(systemd_tmpfiles_t)
++#')
++
++optional_policy(`
++	rpm_read_db(systemd_tmpfiles_t)
++	rpm_delete_db(systemd_tmpfiles_t)
++')
++
++
++########################################
++#
++# systemd_notify local policy
++#
++allow systemd_notify_t self:capability chown;
++allow systemd_notify_t self:process { fork setfscreate setsockcreate };
++
++allow systemd_notify_t self:fifo_file rw_fifo_file_perms;
++allow systemd_notify_t self:unix_stream_socket create_stream_socket_perms;
++
++domain_use_interactive_fds(systemd_notify_t)
++
++files_read_etc_files(systemd_notify_t)
++files_read_usr_files(systemd_notify_t)
++
++fs_getattr_cgroup_files(systemd_notify_t)
++
++auth_use_nsswitch(systemd_notify_t)
++
++init_rw_stream_sockets(systemd_notify_t)
++
++miscfiles_read_localization(systemd_notify_t)
++
++########################################
++#
++# systemd_logger local policy
++#
++
++allow systemd_logger_t self:capability { sys_admin chown kill };
++allow systemd_logger_t self:process { fork setfscreate setsockcreate };
++
++allow systemd_logger_t self:fifo_file rw_fifo_file_perms;
++allow systemd_logger_t self:unix_stream_socket create_stream_socket_perms;
++
++kernel_use_fds(systemd_logger_t)
++
++dev_write_kmsg(systemd_logger_t)
++
++domain_use_interactive_fds(systemd_logger_t)
++
++files_read_etc_files(systemd_logger_t)
++files_read_usr_files(systemd_logger_t)
++
++# only needs write
++term_use_generic_ptys(systemd_logger_t)
++
++auth_use_nsswitch(systemd_logger_t)
++
++# /run/systemd/notify
++init_write_pid_socket(systemd_logger_t)
++
++logging_send_syslog_msg(systemd_logger_t)
++
++miscfiles_read_localization(systemd_logger_t)
++
++
++########################################
++#
++# systemd_sysctl domains local policy
++#
++
++allow systemctl_domain systemd_unit_file_type:dir search_dir_perms;
++
++fs_list_cgroup_dirs(systemctl_domain)
++fs_read_cgroup_files(systemctl_domain)
++
++# needed by systemctl
++init_dgram_send(systemctl_domain)
++init_stream_connect(systemctl_domain)
++init_read_state(systemctl_domain)
++init_list_pid_dirs(systemctl_domain)
++init_use_fds(systemctl_domain)
++
++miscfiles_read_localization(systemctl_domain)
+Index: refpolicy-2.20140421/policy/modules/system/udev.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.te
++++ refpolicy-2.20140421/policy/modules/system/udev.te
+@@ -80,8 +80,14 @@ files_pid_filetrans(udev_t, udev_var_run
+ 
+ kernel_read_system_state(udev_t)
+ kernel_request_load_module(udev_t)
+-# systemd-udevd needs kernel_load_module
++# systemd-udevd needs kernel_load_module and files_read_kernel_modules
+ kernel_load_module(udev_t)
++files_read_kernel_modules(udev_t)
++# systemd-udevd searches /run/systemd
++init_search_pid_dirs(udev_t)
++# for hdparm init script run by udev
++initrc_service_status(udev_t)
++
+ kernel_getattr_core_if(udev_t)
+ kernel_use_fds(udev_t)
+ kernel_read_device_sysctls(udev_t)
+@@ -176,6 +182,8 @@ sysnet_signal_dhcpc(udev_t)
+ sysnet_manage_config(udev_t)
+ sysnet_etc_filetrans_config(udev_t)
+ 
++systemd_login_read_pid_files(udev_t)
++
+ userdom_dontaudit_search_user_home_content(udev_t)
+ 
+ ifdef(`distro_debian',`
+Index: refpolicy-2.20140421/policy/modules/system/logging.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/logging.te
++++ refpolicy-2.20140421/policy/modules/system/logging.te
+@@ -92,6 +92,23 @@ ifdef(`enable_mls',`
+ 	init_ranged_daemon_domain(syslogd_t, syslogd_exec_t, mls_systemhigh)
+ ')
+ 
++tunable_policy(`init_systemd', `
++	dev_read_kmsg(syslogd_t)
++	dev_write_kmsg(syslogd_t)
++	allow syslogd_t self:capability sys_ptrace;
++	init_read_pipes(syslogd_t)
++	init_read_state(syslogd_t)
++	allow syslogd_t init_var_run_t:file { read write create open };
++	allow syslogd_t var_run_t:dir create;
++	init_create_pid_dirs(syslogd_t)
++	kernel_read_ring_buffer(syslogd_t)
++	dev_read_urand(syslogd_t)
++	domain_read_all_domains_state(syslogd_t)
++')
++
++# for systemd but can not be conditional
++filetrans_pattern(syslogd_t, var_run_t, syslogd_tmp_t, dir, "log")
++
+ ########################################
+ #
+ # Auditctl local policy
+Index: refpolicy-2.20140421/policy/modules/services/xserver.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/services/xserver.if
++++ refpolicy-2.20140421/policy/modules/services/xserver.if
+@@ -620,6 +620,24 @@ interface(`xserver_setattr_console_pipes
+ 
+ ########################################
+ ## <summary>
++##	Label the X windows console named pipes.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`relabelto_setattr_xconsole_pipes',`
++	gen_require(`
++		type xconsole_device_t;
++	')
++
++	allow $1 xconsole_device_t:fifo_file { getattr relabelfrom relabelto setattr };
++')
++
++########################################
++## <summary>
+ ##	Read and write the X windows console named pipe.
+ ## </summary>
+ ## <param name="domain">
+Index: refpolicy-2.20140421/policy/modules/system/udev.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.if
++++ refpolicy-2.20140421/policy/modules/system/udev.if
+@@ -378,3 +378,21 @@ interface(`udev_create_kobject_uevent_so
+ 
+         allow $1 udev_t:netlink_kobject_uevent_socket create_socket_perms;
+ ')
++
++#######################################
++## <summary>
++##      Allow udev_t to write to a unix_stream_socket
++## </summary>
++## <param name="domain">
++##      <summary>
++##      domain to connect to
++##      </summary>
++## </param>
++#
++interface(`udev_write_socket',`
++        gen_require(`
++                type udev_t;
++	')
++
++	allow udev_t $1:unix_stream_socket connectto;
++')
+Index: refpolicy-2.20140421/policy/modules/contrib/logrotate.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/logrotate.te
++++ refpolicy-2.20140421/policy/modules/contrib/logrotate.te
+@@ -124,6 +124,10 @@ ifdef(`distro_debian',`
+ ')
+ 
+ optional_policy(`
++	systemd_systemctl_domain(logrotate)
++')
++
++optional_policy(`
+ 	abrt_manage_cache(logrotate_t)
+ ')
+ 
+Index: refpolicy-2.20140421/policy/modules/system/lvm.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/lvm.te
++++ refpolicy-2.20140421/policy/modules/system/lvm.te
+@@ -293,6 +293,11 @@ init_dontaudit_getattr_initctl(lvm_t)
+ init_use_script_ptys(lvm_t)
+ init_read_script_state(lvm_t)
+ 
++# for systemd-cryptsetup to talk to /run/systemd/journal/socket
++init_stream_connect(lvm_t)
++# for systemd-cryptsetup
++kernel_read_crypto_sysctls(lvm_t)
++
+ # for systemd-cryptsetup
+ dev_write_kmsg(lvm_t)
+ 
+Index: refpolicy-2.20140421/policy/modules/system/miscfiles.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/miscfiles.if
++++ refpolicy-2.20140421/policy/modules/system/miscfiles.if
+@@ -579,6 +579,25 @@ interface(`miscfiles_manage_man_pages',`
+ 
+ ########################################
+ ## <summary>
++##	relabel man cache
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`miscfiles_relabel_man_cache',`
++	gen_require(`
++		type man_cache_t;
++	')
++
++	relabel_dirs_pattern($1, man_cache_t, man_cache_t)
++	relabel_files_pattern($1, man_cache_t, man_cache_t)
++')
++
++########################################
++## <summary>
+ ##	Read man cache content.
+ ## </summary>
+ ## <param name="domain">
+Index: refpolicy-2.20140421/policy/modules/kernel/filesystem.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/kernel/filesystem.if
++++ refpolicy-2.20140421/policy/modules/kernel/filesystem.if
+@@ -827,6 +827,26 @@ interface(`fs_read_cgroup_files',`
+ 
+ ########################################
+ ## <summary>
++##	Read cgroup lnk_files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`fs_read_cgroup_links',`
++	gen_require(`
++		type cgroup_t;
++
++	')
++
++	read_lnk_files_pattern($1, cgroup_t, cgroup_t)
++	dev_search_sysfs($1)
++')
++
++########################################
++## <summary>
+ ##	Write cgroup files.
+ ## </summary>
+ ## <param name="domain">
