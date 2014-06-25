@@ -70,7 +70,6 @@ refpolicy (2:2.20140421-2) unstable; urgency=medium
   * Allow initrc_t to get status of init_t for systemd
   * Allow udev_t to get initrc_exec_t service status for when udev runs hdparm
     script
-
   * Allow ifconfig_t to load kernel modules
   * Allow named_t to read vm sysctls
   * Allow tor_t capabilities chown dac_read_search dac_override fowner
