@@ -4,8 +4,10 @@ refpolicy (2:2.20140421-4) UNRELEASED; urgency=medium
   * debian/rules: Properly remove postrm scripts in clean target
   * debian/postinst.policy: Remove the modules that are not built anymore from
     the notdefault list
+  * debian/postinst.policy: Remove the .disabled file for the modules that are
+    now built in the base.pp or not built anymore at all.
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 29 Jun 2014 17:04:28 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 29 Jun 2014 17:12:37 +0200
 
 refpolicy (2:2.20140421-3) unstable; urgency=medium
 
