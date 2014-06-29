@@ -1,3 +1,41 @@
+refpolicy (2:2.20140421-3) unstable; urgency=medium
+
+  * Allow sysadm_t to read policy
+  * Make systemd_login_list_pid_dirs() call init_search_pid_dirs() as it
+    doesn't work without it
+  * Added chromium/google-chrome policy
+  * dev_getattr_sysfs(sysstat_t) for Debian cron job
+  * Allow sysstat_t to manage it's log files
+  * Allow dpkg_script_t to config all systemd services and get init status
+  * Allow dpkg_script_t to dirmngr_admin
+  * really added systemd_login_list_pid_dirs(system_dbusd_t) (somehow missed
+    this last time)
+  * Allow sshd to chat with systemd via dbus
+  * Allow unconfined_t to restart services
+  * systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
+  * systemd_dbus_chat_logind(sshd_t)
+  * Allow xend to read vm sysctls
+  * Allow udev_t to manage xenfs_t files for xenstore-read
+  * Allow system_dbusd_t systemd_login_read_pid_files access for
+    /run/systemd/users/* files
+  * Allow systemd_logind_t to stat tmpfs_t filesystems for /run/user
+  * Remove the "genfscon selinuxfs" line from selinux.if in selinux-policy-dev
+    to stop sepolgen-ifgen errors.
+  * Make udev_relabelto_db() include lnk_file relabeling
+  * Allow kernel_t to fs_search_tmpfs, selinux_compute_create_context, and
+    kernel_read_unlabeled_state for booting without unconfined.pp
+  * Allow system_cronjob_t to manage the apt cache
+  * Allow modutils_read_module_config(init_t) and create cgroup_t links for
+    strict config. Allow it to relabel from tmpfs_t symlinks
+  * Allow init_run_all_scripts_domain (initrc_t) the service { status start
+    stop } for all the daemon _initrc_exec_t scripts.
+  * Allow sysadm_r to have domain system_mail_t for strict policy
+  * Allow init_t to relabel device_t symlinks and pstore_t dirs, load kernel
+    modules, manage init_var_run_t sock_files, read /usr, read /dev/urandom,
+    systemd_manage_passwd_run, and domain_read_all_domains_state
+
+ -- Russell Coker <russell@coker.com.au>  Sun, 29 Jun 2014 19:11:45 +1000
+
 refpolicy (2:2.20140421-2) unstable; urgency=medium
 
   * Fix systemd support

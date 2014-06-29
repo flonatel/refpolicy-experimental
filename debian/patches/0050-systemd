@@ -1,6 +1,6 @@
 Description: Make systemd work
 Author: Russell Coker <russell@coker.com.au>
-Last-Update: 2014-06-25
+Last-Update: 2014-06-29
 
 Index: refpolicy-2.20140421/policy/modules/contrib/apache.te
 ===================================================================
@@ -103,11 +103,12 @@ Index: refpolicy-2.20140421/policy/modules/services/ssh.te
 ===================================================================
 --- refpolicy-2.20140421.orig/policy/modules/services/ssh.te
 +++ refpolicy-2.20140421/policy/modules/services/ssh.te
-@@ -279,6 +279,10 @@ tunable_policy(`ssh_sysadm_login',`
+@@ -279,6 +279,11 @@ tunable_policy(`ssh_sysadm_login',`
  ')
  
  optional_policy(`
 +	systemd_write_inherited_logind_sessions_pipes(sshd_t)
++	systemd_dbus_chat_logind(sshd_t)
 +')
 +
 +optional_policy(`
@@ -170,7 +171,16 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
 ===================================================================
 --- refpolicy-2.20140421.orig/policy/modules/system/init.if
 +++ refpolicy-2.20140421/policy/modules/system/init.if
-@@ -81,6 +81,44 @@ interface(`init_script_domain',`
+@@ -40,6 +40,8 @@ interface(`init_script_file',`
+ 	domain_entry_file(initrc_t, $1)
+ 
+ 	domtrans_pattern(init_run_all_scripts_domain, $1, initrc_t)
++	# for initrc runing daemon start scripts
++	allow init_run_all_scripts_domain $1:service { status start stop };
+ ')
+ 
+ ########################################
+@@ -81,6 +83,44 @@ interface(`init_script_domain',`
  	domtrans_pattern(init_run_all_scripts_domain, $2, $1)
  ')
  
@@ -215,7 +225,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ########################################
  ## <summary>
  ##	Create a domain which can be started by init.
-@@ -107,7 +145,11 @@ interface(`init_domain',`
+@@ -107,7 +147,11 @@ interface(`init_domain',`
  
  	role system_r types $1;
  
@@ -228,7 +238,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  
  	ifdef(`hide_broken_symptoms',`
  		# RHEL4 systems seem to have a stray
-@@ -194,8 +236,10 @@ interface(`init_ranged_domain',`
+@@ -194,8 +238,10 @@ interface(`init_ranged_domain',`
  interface(`init_daemon_domain',`
  	gen_require(`
  		type initrc_t;
@@ -239,7 +249,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	')
  
  	typeattribute $1 daemon;
-@@ -207,6 +251,12 @@ interface(`init_daemon_domain',`
+@@ -207,6 +253,12 @@ interface(`init_daemon_domain',`
  
  	domtrans_pattern(initrc_t, $2, $1)
  
@@ -252,7 +262,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	# daemons started from init will
  	# inherit fds from init for the console
  	init_dontaudit_use_fds($1)
-@@ -278,17 +328,20 @@ interface(`init_daemon_domain',`
+@@ -278,17 +330,20 @@ interface(`init_daemon_domain',`
  interface(`init_ranged_daemon_domain',`
  	gen_require(`
  		type initrc_t;
@@ -274,7 +284,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	')
  ')
  
-@@ -331,22 +384,23 @@ interface(`init_ranged_daemon_domain',`
+@@ -331,22 +386,23 @@ interface(`init_ranged_daemon_domain',`
  #
  interface(`init_system_domain',`
  	gen_require(`
@@ -304,7 +314,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	')
  ')
  
-@@ -396,20 +450,41 @@ interface(`init_system_domain',`
+@@ -396,20 +452,41 @@ interface(`init_system_domain',`
  interface(`init_ranged_system_domain',`
  	gen_require(`
  		type initrc_t;
@@ -346,7 +356,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ########################################
  ## <summary>
  ##	Mark the file type as a daemon run dir, allowing initrc_t
-@@ -464,7 +539,6 @@ interface(`init_domtrans',`
+@@ -464,7 +541,6 @@ interface(`init_domtrans',`
  ##	Domain allowed access.
  ##	</summary>
  ## </param>
@@ -354,7 +364,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  #
  interface(`init_exec',`
  	gen_require(`
-@@ -473,6 +547,29 @@ interface(`init_exec',`
+@@ -473,6 +549,29 @@ interface(`init_exec',`
  
  	corecmd_search_bin($1)
  	can_exec($1, init_exec_t)
@@ -384,7 +394,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -561,6 +658,24 @@ interface(`init_sigchld',`
+@@ -561,6 +660,24 @@ interface(`init_sigchld',`
  
  ########################################
  ## <summary>
@@ -409,7 +419,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	Connect to init with a unix socket.
  ## </summary>
  ## <param name="domain">
-@@ -571,10 +686,66 @@ interface(`init_sigchld',`
+@@ -571,10 +688,66 @@ interface(`init_sigchld',`
  #
  interface(`init_stream_connect',`
  	gen_require(`
@@ -478,7 +488,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -740,19 +911,25 @@ interface(`init_telinit',`
+@@ -740,19 +913,25 @@ interface(`init_telinit',`
  		type initctl_t;
  	')
  
@@ -505,7 +515,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	')
  ')
  
-@@ -782,7 +959,7 @@ interface(`init_rw_initctl',`
+@@ -782,7 +961,7 @@ interface(`init_rw_initctl',`
  ## </summary>
  ## <param name="domain">
  ##	<summary>
@@ -514,7 +524,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	</summary>
  ## </param>
  #
-@@ -860,19 +1037,41 @@ interface(`init_spec_domtrans_script',`
+@@ -860,19 +1039,41 @@ interface(`init_spec_domtrans_script',`
  #
  interface(`init_domtrans_script',`
  	gen_require(`
@@ -560,7 +570,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -928,9 +1127,14 @@ interface(`init_script_file_domtrans',`
+@@ -928,9 +1129,14 @@ interface(`init_script_file_domtrans',`
  interface(`init_labeled_script_domtrans',`
  	gen_require(`
  		type initrc_t;
@@ -575,7 +585,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  	files_search_etc($1)
  ')
  
-@@ -1023,7 +1227,9 @@ interface(`init_ptrace',`
+@@ -1023,7 +1229,9 @@ interface(`init_ptrace',`
  		type init_t;
  	')
  
@@ -586,7 +596,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -1141,6 +1347,24 @@ interface(`init_read_all_script_files',`
+@@ -1141,6 +1349,24 @@ interface(`init_read_all_script_files',`
  
  #######################################
  ## <summary>
@@ -611,7 +621,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	Dontaudit read all init script files.
  ## </summary>
  ## <param name="domain">
-@@ -1192,12 +1416,7 @@ interface(`init_read_script_state',`
+@@ -1192,12 +1418,7 @@ interface(`init_read_script_state',`
  	')
  
  	kernel_search_proc($1)
@@ -625,7 +635,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -1437,6 +1656,27 @@ interface(`init_dbus_send_script',`
+@@ -1437,6 +1658,27 @@ interface(`init_dbus_send_script',`
  ########################################
  ## <summary>
  ##	Send and receive messages from
@@ -653,7 +663,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	init scripts over dbus.
  ## </summary>
  ## <param name="domain">
-@@ -1544,6 +1784,25 @@ interface(`init_getattr_script_status_fi
+@@ -1544,6 +1786,25 @@ interface(`init_getattr_script_status_fi
  
  ########################################
  ## <summary>
@@ -679,7 +689,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	Do not audit attempts to read init script
  ##	status files.
  ## </summary>
-@@ -1602,6 +1861,24 @@ interface(`init_rw_script_tmp_files',`
+@@ -1602,6 +1863,24 @@ interface(`init_rw_script_tmp_files',`
  
  ########################################
  ## <summary>
@@ -704,7 +714,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	Create files in a init script
  ##	temporary data directory.
  ## </summary>
-@@ -1674,6 +1951,24 @@ interface(`init_read_utmp',`
+@@ -1674,6 +1953,24 @@ interface(`init_read_utmp',`
  
  ########################################
  ## <summary>
@@ -729,7 +739,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ##	Do not audit attempts to write utmp.
  ## </summary>
  ## <param name="domain">
-@@ -1762,7 +2057,7 @@ interface(`init_dontaudit_rw_utmp',`
+@@ -1762,7 +2059,7 @@ interface(`init_dontaudit_rw_utmp',`
  		type initrc_var_run_t;
  	')
  
@@ -738,7 +748,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -1803,6 +2098,128 @@ interface(`init_pid_filetrans_utmp',`
+@@ -1803,6 +2100,128 @@ interface(`init_pid_filetrans_utmp',`
  	files_pid_filetrans($1, initrc_var_run_t, file, "utmp")
  ')
  
@@ -867,7 +877,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ########################################
  ## <summary>
  ##	Allow the specified domain to connect to daemon with a tcp socket
-@@ -1838,18 +2255,267 @@ interface(`init_udp_recvfrom_all_daemons
+@@ -1838,18 +2257,267 @@ interface(`init_udp_recvfrom_all_daemons
  	corenet_udp_recvfrom_labeled($1, daemon)
  ')
  
@@ -1141,7 +1151,7 @@ Index: refpolicy-2.20140421/policy/modules/system/init.if
  ')
  
  ########################################
-@@ -1872,3 +2538,21 @@ interface(`init_shell_domtrans',`
+@@ -1872,3 +2540,21 @@ interface(`init_shell_domtrans',`
  	allow $1 init_t:fifo_file rw_file_perms;
  	allow $1 init_t:process sigchld;
  ')
@@ -1992,7 +2002,7 @@ Index: refpolicy-2.20140421/policy/modules/system/systemd.if
 ===================================================================
 --- /dev/null
 +++ refpolicy-2.20140421/policy/modules/system/systemd.if
-@@ -0,0 +1,719 @@
+@@ -0,0 +1,720 @@
 +## <summary>SELinux policy for systemd components</summary>
 +
 +#######################################
@@ -2201,6 +2211,7 @@ Index: refpolicy-2.20140421/policy/modules/system/systemd.if
 +		type systemd_logind_var_run_t;
 +	')
 +
++	init_search_pid_dirs($1)
 +	files_search_pids($1)
 +	list_dirs_pattern($1, systemd_logind_var_run_t, systemd_logind_var_run_t)
 +')
@@ -2750,7 +2761,7 @@ Index: refpolicy-2.20140421/policy/modules/system/systemd.te
 ===================================================================
 --- /dev/null
 +++ refpolicy-2.20140421/policy/modules/system/systemd.te
-@@ -0,0 +1,416 @@
+@@ -0,0 +1,417 @@
 +policy_module(systemd, 1.0.0)
 +
 +#######################################
@@ -2851,6 +2862,7 @@ Index: refpolicy-2.20140421/policy/modules/system/systemd.te
 +files_read_etc_files(systemd_logind_t)
 +
 +fs_getattr_xattr_fs(systemd_logind_t)
++fs_getattr_tmpfs(systemd_logind_t)
 +# /sys/fs/cgroup/systemd/user
 +fs_manage_cgroup_dirs(systemd_logind_t)
 +# write getattr open setattr
@@ -3371,3 +3383,92 @@ Index: refpolicy-2.20140421/policy/modules/kernel/filesystem.if
  ##	Write cgroup files.
  ## </summary>
  ## <param name="domain">
+Index: refpolicy-2.20140421/policy/modules/contrib/dpkg.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dpkg.te
++++ refpolicy-2.20140421/policy/modules/contrib/dpkg.te
+@@ -281,6 +281,7 @@ files_manage_non_auth_files(dpkg_script_
+ 
+ init_all_labeled_script_domtrans(dpkg_script_t)
+ init_use_script_fds(dpkg_script_t)
++init_status(dpkg_script_t)
+ 
+ libs_exec_ld_so(dpkg_script_t)
+ libs_exec_lib_files(dpkg_script_t)
+@@ -295,6 +296,14 @@ modutils_run_depmod(dpkg_script_t, dpkg_
+ modutils_run_insmod(dpkg_script_t, dpkg_roles)
+ ')
+ 
++optional_policy(`
++	dirmngr_service_manage(dpkg_script_t)
++')
++
++optional_policy(`
++	systemd_config_all_services(dpkg_script_t)
++')
++
+ seutil_run_loadpolicy(dpkg_script_t, dpkg_roles)
+ seutil_run_setfiles(dpkg_script_t, dpkg_roles)
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/dbus.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dbus.te
++++ refpolicy-2.20140421/policy/modules/contrib/dbus.te
+@@ -140,6 +140,12 @@ userdom_dontaudit_use_unpriv_user_fds(sy
+ userdom_dontaudit_search_user_home_dirs(system_dbusd_t)
+ 
+ optional_policy(`
++	systemd_login_list_pid_dirs(system_dbusd_t)
++	systemd_write_inherited_logind_sessions_pipes(system_dbusd_t)
++	systemd_login_read_pid_files(system_dbusd_t)
++')
++
++optional_policy(`
+ 	bluetooth_stream_connect(system_dbusd_t)
+ ')
+ 
+Index: refpolicy-2.20140421/policy/modules/contrib/dirmngr.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/dirmngr.if
++++ refpolicy-2.20140421/policy/modules/contrib/dirmngr.if
+@@ -2,6 +2,25 @@
+ 
+ ########################################
+ ## <summary>
++##	Allow a domain to restart dirmngr
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`dirmngr_service_manage',`
++	gen_require(`
++		type dirmngr_initrc_exec_t;
++	')
++
++	allow $1 dirmngr_initrc_exec_t:service { status start stop };
++')
++
++########################################
++## <summary>
+ ##	All of the rules required to
+ ##	administrate an dirmngr environment.
+ ## </summary>
+Index: refpolicy-2.20140421/policy/modules/system/unconfined.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/unconfined.te
++++ refpolicy-2.20140421/policy/modules/system/unconfined.te
+@@ -59,6 +59,10 @@ ifdef(`direct_sysadm_daemon',`
+ ')
+ 
+ optional_policy(`
++	systemd_config_all_services(unconfined_t)
++')
++
++optional_policy(`
+ 	ada_domtrans(unconfined_t)
+ ')
+ 

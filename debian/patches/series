@@ -2,9 +2,12 @@
 0004-init-startpar-initrc_t-gets-attributes-of-dev-dm-0-d.patch
 0010-ifconfig.patch
 0011-named.patch
+0030-watchdog-pids
 0045-systemd-unit
 0046-misc-not-systemd
 0050-systemd
 0060-kmod
 0070-rpcbind
 0080-misc-daemon
+0090-selinux
+0100-chrome

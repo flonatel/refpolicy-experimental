@@ -1,6 +1,6 @@
 Description: misc patches for daemon policy
 Author: Russell Coker <russell@coker.com.au>
-Last-Update: 2014-06-25
+Last-Update: 2014-06-29
 
 Index: refpolicy-2.20140421/policy/modules/contrib/fetchmail.te
 ===================================================================
@@ -78,23 +78,28 @@ Index: refpolicy-2.20140421/policy/modules/contrib/sysstat.te
 ===================================================================
 --- refpolicy-2.20140421.orig/policy/modules/contrib/sysstat.te
 +++ refpolicy-2.20140421/policy/modules/contrib/sysstat.te
-@@ -25,6 +25,7 @@ allow sysstat_t self:fifo_file rw_fifo_f
+@@ -24,8 +24,7 @@ allow sysstat_t self:capability { dac_ov
+ allow sysstat_t self:fifo_file rw_fifo_file_perms;
  
  manage_dirs_pattern(sysstat_t,sysstat_log_t,sysstat_log_t)
- append_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
-+read_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
- create_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
+-append_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
+-create_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
++manage_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
  setattr_files_pattern(sysstat_t, sysstat_log_t, sysstat_log_t)
  manage_lnk_files_pattern(sysstat_t,sysstat_log_t,sysstat_log_t)
-@@ -39,6 +40,7 @@ kernel_read_fs_sysctls(sysstat_t)
+ logging_log_filetrans(sysstat_t, sysstat_log_t, { file dir })
+@@ -39,8 +38,10 @@ kernel_read_fs_sysctls(sysstat_t)
  kernel_read_rpc_sysctls(sysstat_t)
  
  corecmd_exec_bin(sysstat_t)
 +corecmd_exec_shell(sysstat_t)
  
  dev_read_sysfs(sysstat_t)
++dev_getattr_sysfs(sysstat_t)
  dev_read_urand(sysstat_t)
-@@ -66,4 +68,5 @@ userdom_dontaudit_list_user_home_dirs(sy
+ 
+ files_search_var(sysstat_t)
+@@ -66,4 +67,5 @@ userdom_dontaudit_list_user_home_dirs(sy
  
  optional_policy(`
  	cron_system_entry(sysstat_t, sysstat_exec_t)
@@ -112,3 +117,116 @@ Index: refpolicy-2.20140421/policy/modules/contrib/dirmngr.fc
  
  /var/run/dirmngr\.pid	--	gen_context(system_u:object_r:dirmngr_var_run_t,s0)
  
+Index: refpolicy-2.20140421/policy/modules/contrib/xen.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/xen.te
++++ refpolicy-2.20140421/policy/modules/contrib/xen.te
+@@ -219,6 +219,7 @@ domtrans_pattern(xend_t, xenstored_exec_
+ xen_stream_connect_xenstore(xend_t)
+ 
+ kernel_read_kernel_sysctls(xend_t)
++kernel_read_vm_sysctls(xend_t)
+ kernel_read_system_state(xend_t)
+ kernel_write_xen_state(xend_t)
+ kernel_read_xen_state(xend_t)
+Index: refpolicy-2.20140421/policy/modules/system/udev.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.te
++++ refpolicy-2.20140421/policy/modules/system/udev.te
+@@ -329,6 +329,7 @@ optional_policy(`
+ 	kernel_read_xen_state(udev_t)
+ 	xen_manage_log(udev_t)
+ 	xen_read_image_files(udev_t)
++	fs_manage_xenfs_files(udev_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20140421/policy/modules/system/fstools.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/fstools.te
++++ refpolicy-2.20140421/policy/modules/system/fstools.te
+@@ -195,6 +195,10 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	udev_read_db(fsadm_t)
++
++	# Xen causes losetup to run with a presumably accidentally inherited
++	# file handle for /run/xen-hotplug/block
++	dontaudit_udev_pidfile_rw(fsadm_t)
+ ')
+ 
+ optional_policy(`
+Index: refpolicy-2.20140421/policy/modules/system/udev.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/system/udev.if
++++ refpolicy-2.20140421/policy/modules/system/udev.if
+@@ -261,6 +261,24 @@ interface(`udev_search_pids',`
+ 
+ ########################################
+ ## <summary>
++##	dontaudit attempts to read/write udev pidfiles
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`dontaudit_udev_pidfile_rw',`
++	gen_require(`
++		type udev_var_run_t;
++	')
++
++	dontaudit $1 udev_var_run_t:file { read write };
++')
++
++########################################
++## <summary>
+ ##	Create, read, write, and delete
+ ##	udev pid directories
+ ## </summary>
+Index: refpolicy-2.20140421/policy/modules/contrib/apt.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/apt.if
++++ refpolicy-2.20140421/policy/modules/contrib/apt.if
+@@ -164,6 +164,26 @@ interface(`apt_use_ptys',`
+ ##	</summary>
+ ## </param>
+ #
++interface(`apt_manage_cache',`
++	gen_require(`
++		type apt_var_cache_t;
++	')
++
++	files_search_var($1)
++	allow $1 apt_var_cache_t:dir manage_dir_perms;
++	allow $1 apt_var_cache_t:file manage_file_perms;
++')
++
++########################################
++## <summary>
++##	Read apt package cache content.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
+ interface(`apt_read_cache',`
+ 	gen_require(`
+ 		type apt_var_cache_t;
+Index: refpolicy-2.20140421/policy/modules/contrib/cron.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/cron.te
++++ refpolicy-2.20140421/policy/modules/contrib/cron.te
+@@ -336,6 +336,9 @@ ifdef(`distro_debian',`
+ 	optional_policy(`
+ 		logwatch_search_cache_dir(crond_t)
+ 	')
++	optional_policy(`
++		apt_manage_cache(system_cronjob_t)
++	')
+ ')
+ 
+ ifdef(`distro_redhat',`

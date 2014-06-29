@@ -1,0 +1,134 @@
+Description: Policy for Chromium/Chrome
+Author: Russell Coker <russell@coker.com.au>
+Last-Update: 2014-06-25
+
+Index: refpolicy-2.20140421/policy/modules/contrib/mozilla.fc
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mozilla.fc
++++ refpolicy-2.20140421/policy/modules/contrib/mozilla.fc
+@@ -1,5 +1,7 @@
+ HOME_DIR/\.galeon(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.mozilla(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/\.config/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
++HOME_DIR/\.cache/chromium(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.mozilla/plugins(/.*)?	gen_context(system_u:object_r:mozilla_plugin_home_t,s0)
+ HOME_DIR/\.netscape(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+ HOME_DIR/\.phoenix(/.*)?	gen_context(system_u:object_r:mozilla_home_t,s0)
+@@ -36,3 +38,8 @@ HOME_DIR/zimbrauserdata(/.*)?	gen_contex
+ /usr/lib/nspluginwrapper/npviewer.bin	--	gen_context(system_u:object_r:mozilla_plugin_exec_t,s0)
+ /usr/lib/nspluginwrapper/plugin-config	--	gen_context(system_u:object_r:mozilla_plugin_config_exec_t,s0)
+ /usr/lib/xulrunner[^/]*/plugin-container	--	gen_context(system_u:object_r:mozilla_plugin_exec_t,s0)
++/usr/lib/chromium/chrome-sandbox --	gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
++/usr/lib/chromium/chromium	--	gen_context(system_u:object_r:chrome_browser_exec_t,s0)
++/opt/google/chrome/chrome-sandbox --	gen_context(system_u:object_r:chrome_sandbox_exec_t,s0)
++/opt/google/chrome/chrome	--	gen_context(system_u:object_r:chrome_browser_exec_t,s0)
++
+Index: refpolicy-2.20140421/policy/modules/contrib/mozilla.if
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mozilla.if
++++ refpolicy-2.20140421/policy/modules/contrib/mozilla.if
+@@ -20,6 +20,7 @@ interface(`mozilla_role',`
+ 		type mozilla_t, mozilla_exec_t, mozilla_home_t;
+ 		type mozilla_tmp_t, mozilla_tmpfs_t, mozilla_plugin_tmp_t;
+ 		type mozilla_plugin_tmpfs_t, mozilla_plugin_home_t;
++		type chrome_sandbox_t, chrome_browser_exec_t;
+ 		attribute_role mozilla_roles;
+ 	')
+ 
+@@ -301,10 +302,12 @@ interface(`mozilla_execmod_user_plugin_h
+ interface(`mozilla_domtrans',`
+ 	gen_require(`
+ 		type mozilla_t, mozilla_exec_t;
++		type chrome_browser_exec_t;
+ 	')
+ 
+ 	corecmd_search_bin($1)
+ 	domtrans_pattern($1, mozilla_exec_t, mozilla_t)
++	domtrans_pattern($1, chrome_browser_exec_t, mozilla_t)
+ ')
+ 
+ ########################################
+Index: refpolicy-2.20140421/policy/modules/contrib/mozilla.te
+===================================================================
+--- refpolicy-2.20140421.orig/policy/modules/contrib/mozilla.te
++++ refpolicy-2.20140421/policy/modules/contrib/mozilla.te
+@@ -21,7 +21,7 @@ type mozilla_t;
+ type mozilla_exec_t;
+ typealias mozilla_t alias { user_mozilla_t staff_mozilla_t sysadm_mozilla_t };
+ typealias mozilla_t alias { auditadm_mozilla_t secadm_mozilla_t };
+-userdom_user_application_domain(mozilla_t, mozilla_exec_t)
++userdom_user_application_domain(mozilla_t, mozilla_exec_t )
+ role mozilla_roles types mozilla_t;
+ 
+ type mozilla_home_t;
+@@ -43,6 +43,41 @@ userdom_user_tmp_file(mozilla_plugin_tmp
+ type mozilla_plugin_tmpfs_t;
+ userdom_user_tmpfs_file(mozilla_plugin_tmpfs_t)
+ 
++type chrome_sandbox_t;
++type chrome_sandbox_exec_t;
++type chrome_browser_exec_t;
++application_domain(mozilla_t, chrome_browser_exec_t)
++userdom_user_application_domain(mozilla_t, chrome_browser_exec_t )
++role mozilla_plugin_roles types chrome_sandbox_t;
++domain_auto_trans(chrome_sandbox_t, chrome_browser_exec_t, mozilla_t)
++allow mozilla_t chrome_sandbox_t:process sigchld;
++application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
++ubac_constrained(chrome_sandbox_t)
++fs_getattr_xattr_fs(chrome_sandbox_t)
++
++allow chrome_sandbox_t mozilla_t:dir list_dir_perms;
++allow chrome_sandbox_t mozilla_t:fifo_file rw_file_perms;
++allow chrome_sandbox_t mozilla_t:file read_file_perms;
++allow chrome_sandbox_t mozilla_t:lnk_file read_lnk_file_perms;
++allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
++allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
++allow chrome_sandbox_t mozilla_t:fd use;
++allow chrome_sandbox_t mozilla_t:file write;
++allow chrome_sandbox_t proc_t:dir read;
++allow chrome_sandbox_t self:process setrlimit;
++type chrome_sandbox_tmp_t;
++files_tmp_file(chrome_sandbox_tmp_t)
++ubac_constrained(chrome_sandbox_tmp_t)
++files_tmp_filetrans(chrome_sandbox_t, chrome_sandbox_tmp_t, { file dir })
++allow chrome_sandbox_t chrome_sandbox_tmp_t:dir manage_dir_perms;
++allow mozilla_t self:unix_dgram_socket sendto;
++allow mozilla_t chrome_browser_exec_t:file execute_no_trans;
++# for V8
++allow mozilla_t self:process execmem;
++
++allow mozilla_t chrome_sandbox_t:shm { write unix_read getattr unix_write associate read };
++allow mozilla_t chrome_sandbox_t:unix_dgram_socket { read write };
++
+ optional_policy(`
+ 	pulseaudio_tmpfs_content(mozilla_plugin_tmpfs_t)
+ ')
+@@ -72,6 +107,20 @@ optional_policy(`
+ # Local policy
+ #
+ 
++dontaudit chrome_sandbox_t domain:dir getattr;
++application_domain(chrome_sandbox_t, chrome_sandbox_exec_t)
++domain_auto_trans(mozilla_t, chrome_sandbox_exec_t, chrome_sandbox_t)
++allow mozilla_t mozilla_home_t:sock_file manage_sock_file_perms;
++allow chrome_sandbox_t self:fifo_file rw_file_perms;
++allow chrome_sandbox_t mozilla_t:unix_dgram_socket { read write };
++allow chrome_sandbox_t mozilla_t:unix_stream_socket { read write };
++allow chrome_sandbox_t self:capability { chown dac_override fsetid setgid setuid net_raw net_raw sys_chroot sys_ptrace sys_admin };
++allow chrome_sandbox_t mozilla_t:process { share sigchld };
++allow mozilla_t chrome_sandbox_t:fd use;
++allow mozilla_t chrome_sandbox_t:unix_stream_socket { read write };
++dev_read_sysfs(mozilla_t)
++domain_dontaudit_search_all_domains_state(chrome_sandbox_t)
++
+ allow mozilla_t self:capability { sys_nice setgid setuid };
+ allow mozilla_t self:process { sigkill signal setsched getsched setrlimit };
+ allow mozilla_t self:fifo_file rw_fifo_file_perms;
+@@ -199,6 +248,7 @@ mozilla_run_plugin(mozilla_t, mozilla_ro
+ mozilla_run_plugin_config(mozilla_t, mozilla_roles)
+ 
+ xserver_user_x_domain_template(mozilla, mozilla_t, mozilla_tmpfs_t)
++corenet_tcp_connect_xserver_port(mozilla_t)
+ xserver_dontaudit_read_xdm_tmp_files(mozilla_t)
+ xserver_dontaudit_getattr_xdm_tmp_sockets(mozilla_t)
+ 
