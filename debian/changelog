@@ -1,3 +1,10 @@
+refpolicy (2:2.20140421-exp-001) unstable; urgency=medium
+
+  * udev must be able to use systemd unit files (and unit files
+    which are linked to /dev/null). (Closes: #756729)
+
+ -- Andreas Florath <andre@flonatel.org>  Wed, 13 Aug 2014 08:51:15 +0200
+
 refpolicy (2:2.20140421-exp-000) unstable; urgency=medium
 
   * Create experimental branch.
