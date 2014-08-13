@@ -1,3 +1,7 @@
+Systemd files can be a link to /dev/null.
+
+Signed-off-by: Andreas Florath <andre@flonatel.org>
+
 Index: refpolicy-experimental/policy/modules/system/systemd.if
 ===================================================================
 --- refpolicy-experimental.orig/policy/modules/system/systemd.if
