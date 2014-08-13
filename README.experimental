@@ -1,0 +1,12 @@
+Experimental branch of Debian's refpolicy.
+
+Because when trying to fix issus in the refpolicy, I run into the
+problem that old problems come up again and again.  Also some fixes
+depend on other fixes.
+Therefore I created this experimental repository: to track all the
+changes and give the maintainers a (hopefully) easy way to pull
+changes.
+
+Andreas Florath
+2014-04-13
+
