@@ -1,0 +1,81 @@
+There is the need for udev (hotplug) to run systemd_unit_file_type
+programs like 
+ /lib/systemd/system/ifup@.service
+which has the context
+ system_u:object_r:systemd_unit_file_t:SystemLow
+in the same manner as the init scripts.
+(init_t is e.g. used for 'auto eth0', udev_t for 'allow-hotplug eth0')
+
+Signed-off-by: Andreas Florath <andre@flonatel.org>
+
+Index: refpolicy-experimental/policy/modules/system/systemd.if
+===================================================================
+--- refpolicy-experimental.orig/policy/modules/system/systemd.if
++++ refpolicy-experimental/policy/modules/system/systemd.if
+@@ -626,6 +626,28 @@ interface(`systemd_config_all_services',
+ 	allow $1 systemd_unit_file_type:service all_service_perms;
+ ')
+ 
++########################################
++## <summary>
++##    Allow the specified domain to access start, stop and status
++##      service perms for all unit files
++## </summary>
++## <param name="domain">
++##    <summary>
++##    Domain allowed access.
++##    </summary>
++## </param>
++#
++interface(`systemd_config_sss_services',`
++      gen_require(`
++              attribute systemd_unit_file_type;
++	      type null_device_t;
++      ')
++
++      allow $1 systemd_unit_file_type:service { stop start status };
++      # There is a special feature in systemd, that unit files can be
++      # linked to /dev/null.
++      allow $1 null_device_t:service { stop start status };
++')
+ 
+ ########################################
+ ## <summary>
+Index: refpolicy-experimental/policy/modules/system/systemd.te
+===================================================================
+--- refpolicy-experimental.orig/policy/modules/system/systemd.te
++++ refpolicy-experimental/policy/modules/system/systemd.te
+@@ -1,4 +1,4 @@
+-policy_module(systemd, 1.0.0)
++policy_module(systemd, 1.0.1)
+ 
+ #######################################
+ #
+@@ -47,7 +47,7 @@ init_systemd_domain(systemd_notify_t, sy
+ # type for systemd unit files
+ type systemd_unit_file_t;
+ systemd_unit_file(systemd_unit_file_t)
+-allow init_t systemd_unit_file_t:service { stop start status };
++systemd_config_sss_services(init_t)
+ 
+ # executable for systemctl
+ type systemd_systemctl_exec_t;
+Index: refpolicy-experimental/policy/modules/system/udev.te
+===================================================================
+--- refpolicy-experimental.orig/policy/modules/system/udev.te
++++ refpolicy-experimental/policy/modules/system/udev.te
+@@ -1,4 +1,4 @@
+-policy_module(udev, 1.17.1)
++policy_module(udev, 1.17.2)
+ 
+ ########################################
+ #
+@@ -87,6 +87,8 @@ files_read_kernel_modules(udev_t)
+ init_search_pid_dirs(udev_t)
+ # for hdparm init script run by udev
+ initrc_service_status(udev_t)
++# for (hotplug) script run by udev
++systemd_config_sss_services(udev_t)
+ 
+ kernel_getattr_core_if(udev_t)
+ kernel_use_fds(udev_t)

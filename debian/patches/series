@@ -11,3 +11,4 @@
 0080-misc-daemon
 0090-selinux
 0100-chrome
+1000-allow-udev-systemd_unit_file
