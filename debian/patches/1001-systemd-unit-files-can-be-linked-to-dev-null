@@ -1,0 +1,18 @@
+Index: refpolicy-experimental/policy/modules/system/systemd.if
+===================================================================
+--- refpolicy-experimental.orig/policy/modules/system/systemd.if
++++ refpolicy-experimental/policy/modules/system/systemd.if
+@@ -621,9 +621,13 @@ interface(`systemd_manage_all_unit_lnk_f
+ interface(`systemd_config_all_services',`
+ 	gen_require(`
+ 		attribute systemd_unit_file_type;
++		type null_device_t;
+ 	')
+ 
+ 	allow $1 systemd_unit_file_type:service all_service_perms;
++	# There is a special feature in systemd, that unit files can be
++	# linked to /dev/null.
++	allow $1 null_device_t:service { stop start status };
+ ')
+ 
+ 
