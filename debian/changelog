@@ -1,3 +1,10 @@
+refpolicy (2:2.20140421-exp-002) unstable; urgency=medium
+
+  * Generic handling of systemd unit files which are linked
+    to /dev/null. (Closes: #757994)
+
+ -- Andreas Florath <andre@flonatel.org>  Wed, 13 Aug 2014 10:10:58 +0200
+
 refpolicy (2:2.20140421-exp-001) unstable; urgency=medium
 
   * udev must be able to use systemd unit files (and unit files
