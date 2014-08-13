@@ -12,3 +12,4 @@
 0090-selinux
 0100-chrome
 1000-allow-udev-systemd_unit_file
+1001-systemd-unit-files-can-be-linked-to-dev-null
